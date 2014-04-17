@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app
+    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+
+  <!-- Servlets -->
+  <servlet>
+    <servlet-name>mechaverseServlet</servlet-name>
+    <servlet-class>org.mechaverse.gwt.server.MechaverseGwtRpcServiceImpl</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>mechaverseServlet</servlet-name>
+    <url-pattern>MechaverseClient/service</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>mechaverseServlet</servlet-name>
+    <url-pattern>/org.mechaverse.gwt.MechaverseClientJUnit/mechaverse</url-pattern>
+  </servlet-mapping>
+
+  <!-- Default page to serve -->
+  <welcome-file-list>
+    <welcome-file>mechaverse.html</welcome-file>
+  </welcome-file-list>
+
+</web-app>
