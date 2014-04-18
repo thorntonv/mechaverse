@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.mechaverse.org/api/model/simulation/ant"
+  xmlns:mechaverse="http://www.mechaverse.org/api/model/simulation/ant" elementFormDefault="qualified">
+
+  <element name="SimulationState" type="mechaverse:SimulationState"></element>
+  <element name="Environment" type="mechaverse:Environment"></element>
+  <element name="Ant" type="mechaverse:Ant"></element>
+
+  <complexType name="EnvironmentStats">
+    <sequence>
+      <element name="age" type="unsignedLong" minOccurs="0" maxOccurs="1" />
+    </sequence>
+  </complexType>
+
+  <complexType name="EntityStats">
+    <sequence>
+      <element name="age" type="unsignedLong" minOccurs="0" maxOccurs="1" />
+      <element name="energyExpended" type="unsignedLong" minOccurs="0" maxOccurs="1" />
+      <element name="distanceTraveled" type="unsignedLong" minOccurs="0" maxOccurs="1" />
+    </sequence>
+  </complexType>
+
+  <simpleType name="Direction">
+    <restriction base="string">
+      <enumeration value="EAST" />
+      <enumeration value="NORTH_EAST" />
+      <enumeration value="NORTH" />
+      <enumeration value="NORTH_WEST" />
+      <enumeration value="WEST" />
+      <enumeration value="SOUTH_WEST" />
+      <enumeration value="SOUTH" />
+      <enumeration value="SOUTH_EAST" />
+    </restriction>
+  </simpleType>
+
+  <simpleType name="EntityType">
+    <restriction base="string">
+      <enumeration value="Ant" />
+      <enumeration value="Barrier" />
+      <enumeration value="Conduit" />
+      <enumeration value="Dirt" />
+      <enumeration value="Food" />
+      <enumeration value="Pheromone" />
+      <enumeration value="Rock" />
+    </restriction>
+  </simpleType>
+
+  <complexType name="Entity">
+    <sequence>
+      <element name="id" type="string" minOccurs="1" maxOccurs="1" />
+      <element name="x" type="int" minOccurs="1" maxOccurs="1" />
+      <element name="y" type="int" minOccurs="1" maxOccurs="1" />
+
+      <element name="energy" type="int" minOccurs="0" maxOccurs="1" />
+      <element name="maxEnergy" type="int" minOccurs="0" maxOccurs="1" />
+      <element name="direction" type="mechaverse:Direction" minOccurs="0" maxOccurs="1" />
+
+      <element name="stats" type="mechaverse:EntityStats" minOccurs="0" maxOccurs="1" />
+    </sequence>
+  </complexType>
+
+  <complexType name="Ant">
+    <complexContent>
+      <extension base="mechaverse:Entity">
+        <sequence>
+          <element name="carriedEntityId" type="string" minOccurs="0" maxOccurs="1" />
+          <element name="data" type="base64Binary" minOccurs="1" maxOccurs="1" />
+          <element name="inputPositions" type="mechaverse:InputPositions" minOccurs="1" maxOccurs="1" />
+          <element name="outputPositions" type="mechaverse:OutputPositions" minOccurs="1" maxOccurs="1" />
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="InputPositions">
+    <sequence>
+      <element name="random" type="int" minOccurs="0" maxOccurs="1" />
+      <element name="general" type="int" minOccurs="0" maxOccurs="1" />
+      <element name="energy_level" type="int" minOccurs="0" maxOccurs="1" />
+      <element name="current_cell_entity_sensor" type="int" minOccurs="0" maxOccurs="1" />
+      <element name="current_cell_entity_id_sensor" type="int" minOccurs="0" maxOccurs="1" />
+      <element name="front_entity_sensor" type="int" minOccurs="0" maxOccurs="1" />
+      <element name="front_entity_id_sensor" type="int" minOccurs="0" maxOccurs="1" />
+      <element name="front_left_sensor" type="int" minOccurs="0" maxOccurs="1" />
+      <element name="front_right_sensor" type="int" minOccurs="0" maxOccurs="1" />
+      <element name="left_sensor" type="int" minOccurs="0" maxOccurs="1" />
+      <element name="right_sensor" type="int" minOccurs="0" maxOccurs="1" />
+      <element name="pheromone_sensor" type="int" minOccurs="0" maxOccurs="1" />
+      <element name="direction_sensor" type="int" minOccurs="0" maxOccurs="1" />
+    </sequence>
+  </complexType>
+
+  <complexType name="OutputPositions">
+    <sequence>
+      <element name="general" type="int" minOccurs="0" maxOccurs="1" />
+      <element name="move" type="int" minOccurs="0" maxOccurs="1" />
+      <element name="turn" type="int" minOccurs="0" maxOccurs="1" />
+      <element name="pick_up" type="int" minOccurs="0" maxOccurs="1" />
+      <element name="drop" type="int" minOccurs="0" maxOccurs="1" />
+      <element name="interact" type="int" minOccurs="0" maxOccurs="1" />
+      <element name="trophallaxis" type="int" minOccurs="0" maxOccurs="1" />
+    </sequence>
+  </complexType>
+  
+  <complexType name="Barrier">
+    <complexContent>
+      <extension base="mechaverse:Entity" />
+    </complexContent>
+  </complexType>
+
+  <complexType name="Conduit">
+    <complexContent>
+      <extension base="mechaverse:Entity">
+        <sequence>
+          <element name="targetEnvironmentId" type="string" minOccurs="1" maxOccurs="1" />
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="Dirt">
+    <complexContent>
+      <extension base="mechaverse:Entity" />
+    </complexContent>
+  </complexType>
+
+  <complexType name="Food">
+    <complexContent>
+      <extension base="mechaverse:Entity" />
+    </complexContent>
+  </complexType>
+
+  <complexType name="Pheromone">
+    <complexContent>
+      <extension base="mechaverse:Entity">
+        <sequence>
+          <element name="value" type="int" minOccurs="0" maxOccurs="1" />
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="Rock">
+    <complexContent>
+      <extension base="mechaverse:Entity" />
+    </complexContent>
+  </complexType>
+
+  <complexType name="Environment">
+    <sequence>
+      <element name="id" type="string" minOccurs="1" maxOccurs="1" />
+      <element name="width" type="int" minOccurs="1" maxOccurs="1" />
+      <element name="height" type="int" minOccurs="1" maxOccurs="1" />
+
+      <element name="entity" type="mechaverse:Entity" minOccurs="0" maxOccurs="unbounded" />
+    </sequence>
+  </complexType>
+
+  <complexType name="SimulationState">
+    <sequence>
+      <element name="id" type="string" minOccurs="1" maxOccurs="1" />
+      <element name="environment" type="mechaverse:Environment" minOccurs="1" maxOccurs="1" />
+      <element name="sub_environment" type="mechaverse:Environment" minOccurs="0" maxOccurs="unbounded" />
+    </sequence>
+  </complexType>
+
+</schema>
