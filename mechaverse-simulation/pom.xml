@@ -1,0 +1,77 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.mechaverse.simulation</groupId>
+  <artifactId>mechaverse-simulation</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <name>Mechaverse Simulation</name>
+  <packaging>nar</packaging>
+
+  <parent>
+    <artifactId>mechaverse</artifactId>
+    <groupId>org.mechaverse</groupId>
+    <version>1.0</version>
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.mechaverse.api</groupId>
+      <artifactId>mechaverse-api</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <classifier>sources</classifier>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.8</version>
+        <executions>
+          <execution>
+            <id>src-dependencies</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+              <groupId>org.mechaverse.api</groupId>
+              <artifactId>mechaverse-api</artifactId>
+              <classifier>sources</classifier>
+              <outputDirectory>${project.build.directory}/sources</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.github.maven-nar</groupId>
+        <artifactId>nar-maven-plugin</artifactId>
+        <version>3.0.0</version>
+        <extensions>true</extensions>
+        <configuration>
+          <output>${project.artifactId}</output>
+          <libraries>
+            <library>
+              <type>jni</type>
+              <narSystemPackage>org.mechaverse.simulation</narSystemPackage>
+            </library>
+          </libraries>
+          <linker>
+            <sysLibs>
+              <sysLib><name>protobuf</name></sysLib>
+              <sysLib><name>OpenCL</name></sysLib>
+            </sysLibs>
+          </linker>
+          <cpp>
+            <includePaths>
+              <includePath>${basedir}/src/main</includePath>
+              <includePath>${project.build.directory}/sources/</includePath>
+            </includePaths>
+            <sourceDirectory>${basedir}</sourceDirectory>
+          </cpp>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
