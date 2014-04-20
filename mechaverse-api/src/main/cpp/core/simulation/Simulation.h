@@ -1,10 +1,3 @@
-/*
- * Simulation.h
- *
- *  Created on: Dec 25, 2013
- *      Author: thorntonv
- */
-
 #ifndef SIMULATION_H_
 #define SIMULATION_H_
 
@@ -14,6 +7,8 @@ namespace mechaverse {
 
 /**
  * An interface for the mechaverse simulation.
+ *
+ * @author thorntonv@mechaverse.org
  */
 class Simulation {
 
