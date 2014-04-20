@@ -15,7 +15,7 @@ public class SimulationPresenter {
   protected class UpdateTimer extends Timer {
     @Override
     public void run() {
-      service.setStatus(SimulationStatus.STEP, new AsyncCallback<Void>() {
+      service.setStatus(SimulationStatus.STEPPING, new AsyncCallback<Void>() {
         @Override
         public void onFailure(Throwable ex) {
           Window.alert(ex.getMessage());
