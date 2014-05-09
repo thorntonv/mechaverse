@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<circuit xmlns="http://www.mechaverse.org/circuit/model" width="1" height="1">
+
+  <element-type id="register">
+    <output id="[1,2,3]">
+      <expression>{input1} ? {input2} : {output1}</expression>
+    </output>
+  </element-type>
+
+  <element-type id="routing3in3out">
+    <output id="1">
+      <param id="input2Mask" />
+      <param id="input3Mask" />
+      <expression><![CDATA[({input2} & {input2Mask}) | ({input3} & {input3Mask})]]></expression>
+    </output>
+    <output id="2">
+      <param id="input1Mask" />
+      <param id="input3Mask" />
+      <expression><![CDATA[({input1} & {input1Mask}) | ({input3} & {input3Mask})]]></expression>
+    </output>
+    <output id="3">
+      <param id="input1Mask" />
+      <param id="input2Mask" />
+      <expression><![CDATA[({input1} & {input1Mask}) | ({input2} & {input2Mask})]]></expression>
+    </output>
+  </element-type>
+
+  <logical-unit>
+    <row>
+      <element type="routing3in3out" />
+      <element type="routing3in3out" />
+      <element type="routing3in3out" />
+      <element type="routing3in3out" />
+    </row>
+    <row>
+      <element type="routing3in3out" />
+      <element type="routing3in3out" />
+      <element type="routing3in3out" />
+      <element type="routing3in3out" />
+    </row>
+    <row>
+      <element type="routing3in3out" />
+      <element type="routing3in3out" />
+      <element type="routing3in3out" />
+      <element type="routing3in3out" />
+    </row>
+    <row>
+      <element type="routing3in3out" />
+      <element type="routing3in3out" />
+      <element type="routing3in3out" />
+      <element type="routing3in3out" />
+    </row>
+  </logical-unit>
+</circuit>
