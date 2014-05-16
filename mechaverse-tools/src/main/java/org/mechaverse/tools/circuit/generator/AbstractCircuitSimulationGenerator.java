@@ -75,4 +75,12 @@ public abstract class AbstractCircuitSimulationGenerator implements CircuitSimul
     out.append(expression.substring(position));
     return out.toString();
   }
+
+  /**
+   * Returns the index of the logical unit that is referenced by the given external element.
+   */
+  protected int getRelativeLogicalUnitIndex(ExternalElement element) {
+    return (element.getRelativeUnitRow() * model.getWidth() + element.getRelativeUnitColumn())
+        * model.getLogicalUnitInfo().getStateSize();
+  }
 }

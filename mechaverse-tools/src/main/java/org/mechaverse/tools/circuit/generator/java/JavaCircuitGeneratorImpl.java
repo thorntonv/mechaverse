@@ -2,12 +2,15 @@ package org.mechaverse.tools.circuit.generator.java;
 
 import java.io.PrintWriter;
 
+import org.mechaverse.circuit.model.Circuit;
 import org.mechaverse.circuit.model.Output;
 import org.mechaverse.circuit.model.Param;
 import org.mechaverse.tools.circuit.generator.AbstractCircuitSimulationGenerator;
 import org.mechaverse.tools.circuit.generator.CircuitSimulationModel;
 import org.mechaverse.tools.circuit.generator.CircuitSimulationModel.ElementInfo;
+import org.mechaverse.tools.circuit.generator.CircuitSimulationModel.ExternalElementInfo;
 import org.mechaverse.tools.circuit.generator.CircuitSimulationModel.LogicalUnitInfo;
+import org.mechaverse.tools.circuit.generator.CircuitSimulationModelBuilder;
 
 /**
  * A generator that creates Java source code for executing a circuit simulation.
@@ -15,6 +18,10 @@ import org.mechaverse.tools.circuit.generator.CircuitSimulationModel.LogicalUnit
  * @author thorntonv@mechaverse.org
  */
 public class JavaCircuitGeneratorImpl extends AbstractCircuitSimulationGenerator {
+
+  public JavaCircuitGeneratorImpl(Circuit circuit) {
+    this(new CircuitSimulationModelBuilder().buildModel(circuit));
+  }
 
   public JavaCircuitGeneratorImpl(CircuitSimulationModel model) {
     super(model);
@@ -32,10 +39,20 @@ public class JavaCircuitGeneratorImpl extends AbstractCircuitSimulationGenerator
     out.println("public void update(int logicalUnitIndex, int state[]) {");
 
     // Copy state values into the appropriate external inputs.
-    int idx = 0;
-    for(ElementInfo element : logicalUnitInfo.getExternalElements()) {
-      for(String outputVarName : element.getOutputVarNames()) {
-        out.printf("int %s = 0;", outputVarName);
+    for(ExternalElementInfo externalElement : logicalUnitInfo.getExternalElements()) {
+      ElementInfo targetElement =
+          logicalUnitInfo.getElementInfo(externalElement.getElement().getElementId());
+      String targetVarName = targetElement.getOutputVarName(externalElement.getElement().getOutputId());
+      int targetStateIndex = logicalUnitInfo.getStateIndex(targetVarName);
+      for(String outputVarName : externalElement.getOutputVarNames()) {
+        String stateIndexExpr = String.format("logicalUnitIndex * %d + (%d) + (%d)",
+          model.getLogicalUnitInfo().getStateSize(),
+          getRelativeLogicalUnitIndex(externalElement.getElement()), targetStateIndex);
+        out.printf("int %s = %s;", outputVarName, stateIndexExpr);
+        out.println();
+        int totalSize = model.getLogicalUnitInfo().getStateSize() * model.getWidth() * model.getHeight();
+        out.printf("%s = state[(%s > 0 ? %s : %s + %d) %% %d];",
+          outputVarName, outputVarName, outputVarName, outputVarName, totalSize, totalSize);
       }
       out.println();
     }
@@ -44,19 +61,25 @@ public class JavaCircuitGeneratorImpl extends AbstractCircuitSimulationGenerator
     // Copy state values into the appropriate variables.
     for (ElementInfo element : logicalUnitInfo.getElements()) {
       for (Output output : element.getOutputs()) {
-        out.printf("int %s = state[%d];", element.getOutputVarName(output), idx++);
+        String varName = element.getOutputVarName(output);
+        int stateIndex = logicalUnitInfo.getStateIndex(varName);
+        out.printf("int %s = state[%d];", varName, stateIndex);
         out.println();
       }
     }
     out.println();
     for (ElementInfo element : logicalUnitInfo.getElements()) {
       for (Param param : element.getType().getParams()) {
-        out.printf("int %s = state[%d];", element.getParamVarName(param), idx++);
+        String varName = element.getParamVarName(param);
+        int stateIndex = logicalUnitInfo.getStateIndex(varName);
+        out.printf("int %s = state[%d];", varName, stateIndex);
         out.println();
       }
       for (Output output : element.getOutputs()) {
         for (Param param : output.getParams()) {
-          out.printf("int %s = state[%d];", element.getOutputParamVarName(output, param), idx++);
+          String varName = element.getOutputParamVarName(output, param);
+          int stateIndex = logicalUnitInfo.getStateIndex(varName);
+          out.printf("int %s = state[%d];", varName, stateIndex);
           out.println();
         }
       }
@@ -75,10 +98,11 @@ public class JavaCircuitGeneratorImpl extends AbstractCircuitSimulationGenerator
     out.println();
 
     // Copy output values from variables back to state array.
-    idx = 0;
     for (ElementInfo element : logicalUnitInfo.getElements()) {
       for (Output output : element.getOutputs()) {
-        out.printf("state[%d] = %s;", idx++, element.getOutputVarName(output));
+        String varName = element.getOutputVarName(output);
+        int stateIndex = logicalUnitInfo.getStateIndex(varName);
+        out.printf("state[%d] = %s;", stateIndex, varName);
         out.println();
       }
     }

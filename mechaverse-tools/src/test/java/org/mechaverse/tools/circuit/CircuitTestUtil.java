@@ -17,6 +17,8 @@ public class CircuitTestUtil {
    */
   public static Circuit createTestCircuit1() {
     Circuit circuit = new Circuit();
+    circuit.setWidth(1);
+    circuit.setHeight(1);
     circuit.getElementTypes().add(createRouting3in3OutElementType());
     circuit.setLogicalUnit(new LogicalUnit());
     Row row = new Row();

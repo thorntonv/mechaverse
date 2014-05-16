@@ -3,6 +3,7 @@ package org.mechaverse.tools.circuit.generator.java;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import org.apache.log4j.Logger;
 import org.mechaverse.circuit.model.Circuit;
 import org.mechaverse.tools.circuit.generator.CircuitSimulationModel;
 import org.mechaverse.tools.circuit.generator.CircuitSimulationModelBuilder;
@@ -21,11 +22,14 @@ public class JavaCircuitCompiler {
 
   private final CircuitSimulationModelBuilder modelBuilder = new CircuitSimulationModelBuilder();
 
+  private final Logger logger = Logger.getLogger(JavaCircuitCompiler.class);
+
   public CircuitSimulation compile(Circuit circuit) throws CompileException {
     CircuitSimulationModel model = modelBuilder.buildModel(circuit);
     JavaCircuitGeneratorImpl generator = new JavaCircuitGeneratorImpl(model);
     StringWriter out = new StringWriter();
     generator.generate(new PrintWriter(out));
+    logger.debug("Compiling source: " + out.toString());
     return JavaCompilerUtil.compile(IMPL_CLASS_NAME, out.toString());
   }
 }

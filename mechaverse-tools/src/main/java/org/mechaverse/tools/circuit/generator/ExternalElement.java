@@ -34,7 +34,34 @@ public class ExternalElement extends Element {
 
   private static final long serialVersionUID = 1L;
 
-  public ExternalElement() {
+  private final int relativeUnitRow;
+  private final int relativeUnitColumn;
+  private final String elementId;
+  private final String outputId;
+
+  public ExternalElement(
+      int relativeUnitRow, int relativeUnitColumn, String elementId, String outputId) {
+    this.relativeUnitRow = relativeUnitRow;
+    this.relativeUnitColumn = relativeUnitColumn;
+    this.elementId = elementId;
+    this.outputId = outputId;
+
     setType(TYPE);
+  }
+
+  public int getRelativeUnitRow() {
+    return relativeUnitRow;
+  }
+
+  public int getRelativeUnitColumn() {
+    return relativeUnitColumn;
+  }
+
+  public String getElementId() {
+    return elementId;
+  }
+
+  public String getOutputId() {
+    return outputId;
   }
 }
