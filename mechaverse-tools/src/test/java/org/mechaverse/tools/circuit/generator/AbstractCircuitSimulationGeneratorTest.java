@@ -23,14 +23,17 @@ public class AbstractCircuitSimulationGeneratorTest {
     public void generate(PrintWriter out) {}
   }
 
+  protected static final Circuit CIRCUIT1 = CircuitTestUtil.createTestCircuit(1, 1,
+    CircuitTestUtil.createRouting3in3OutElementType(), 1, 2);
+
+
   @Before
   public void setUp() throws Exception {}
 
   @Test
   public void testGetVarMappedExpression() {
     CircuitSimulationModelBuilder modelBuilder = new CircuitSimulationModelBuilder();
-    Circuit testCircuit1 = CircuitTestUtil.createTestCircuit1();
-    CircuitSimulationModel model = modelBuilder.buildModel(testCircuit1);
+    CircuitSimulationModel model = modelBuilder.buildModel(CIRCUIT1);
     TestCircuitSimulationGenerator generator = new TestCircuitSimulationGenerator(model);
 
     LogicalUnitInfo logicalUnitInfo = model.getLogicalUnitInfo();

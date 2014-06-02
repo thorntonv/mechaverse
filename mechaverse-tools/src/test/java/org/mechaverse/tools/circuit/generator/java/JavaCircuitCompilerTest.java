@@ -10,12 +10,14 @@ import org.mechaverse.tools.util.compiler.JavaCompilerUtil.CompileException;
 
 public class JavaCircuitCompilerTest {
 
+  private static final Circuit CIRCUIT1 = CircuitTestUtil.createTestCircuit(1, 1,
+    CircuitTestUtil.createRouting3in3OutElementType(), 1, 2);
+
   @Test
   public void testCompile() {
     try {
-      Circuit circuit1 = CircuitTestUtil.createTestCircuit1();
       JavaCircuitCompiler circuitCompiler = new JavaCircuitCompiler();
-      CircuitSimulation circuitSimulation = circuitCompiler.compile(circuit1);
+      CircuitSimulation circuitSimulation = circuitCompiler.compile(CIRCUIT1);
 
       // e1_out1 = (ex_in2 & e1_out1_input2Mask) | (e2_out1 & e1_out1_input3Mask);
       int[] state = new int[18];
