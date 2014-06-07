@@ -68,7 +68,7 @@
               <includePath>${basedir}/src/main</includePath>
               <includePath>${project.build.directory}/sources/</includePath>
             </includePaths>
-            <sourceDirectory>${basedir}</sourceDirectory>
+            <sourceDirectory>${basedir}/src/</sourceDirectory>
           </cpp>
         </configuration>
       </plugin>
