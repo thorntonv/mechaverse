@@ -31,7 +31,7 @@ public abstract class AbstractCircuitSimulationGenerator implements CircuitSimul
    * @return the expression of the given output with placeholder ids replaced with variable names.
    */
   protected String getVarMappedExpression(ElementInfo element, Output output) {
-    final String expression = output.getExpression();
+    final String expression = output.getExpression().trim();
     Matcher matcher = EXPRESSION_VAR_PATTERN.matcher(expression);
 
     StringBuilder out = new StringBuilder();

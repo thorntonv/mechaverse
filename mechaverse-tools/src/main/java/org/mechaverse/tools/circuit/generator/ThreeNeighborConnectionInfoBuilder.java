@@ -106,6 +106,7 @@ public class ThreeNeighborConnectionInfoBuilder implements ConnectionInfoBuilder
 
   protected Input createElementInput(Element element, int outputIdx) {
     ElementType elementType = elementTypeMap.get(element.getType());
-    return new Input(element, elementType.getOutputs().get(outputIdx));
+    return new Input(element, elementType.getOutputs().get(
+        outputIdx % elementType.getOutputs().size()));
   }
 }

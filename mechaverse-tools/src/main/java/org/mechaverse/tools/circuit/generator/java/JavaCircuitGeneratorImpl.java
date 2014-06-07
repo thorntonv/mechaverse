@@ -19,6 +19,12 @@ import org.mechaverse.tools.circuit.generator.CircuitSimulationModelBuilder;
  */
 public class JavaCircuitGeneratorImpl extends AbstractCircuitSimulationGenerator {
 
+  public static final String TYPE = "java";
+
+  private static final String LU_INDEX_VAR_NAME = "luIndex";
+  private static final String STATE_VAR_NAME = "state";
+  private static final String LU_STATE_INDEX_VAR_NAME = "luStateIndex";
+
   public JavaCircuitGeneratorImpl(Circuit circuit) {
     this(new CircuitSimulationModelBuilder().buildModel(circuit));
   }
@@ -36,7 +42,10 @@ public class JavaCircuitGeneratorImpl extends AbstractCircuitSimulationGenerator
     out.println("package org.mechaverse.tools.circuit.generator.java;");
     out.println("public class CircuitSimulationImpl implements CircuitSimulation {");
     out.println("@Override");
-    out.println("public void update(int logicalUnitIndex, int state[]) {");
+    out.printf("public void update(int %s, int %s[]) {\n", LU_INDEX_VAR_NAME, STATE_VAR_NAME);
+
+    out.printf("int %s = %s * %d;\n", LU_STATE_INDEX_VAR_NAME, LU_INDEX_VAR_NAME,
+        model.getLogicalUnitInfo().getStateSize());
 
     // Copy state values into the appropriate external inputs.
     for(ExternalElementInfo externalElement : logicalUnitInfo.getExternalElements()) {
@@ -45,14 +54,14 @@ public class JavaCircuitGeneratorImpl extends AbstractCircuitSimulationGenerator
       String targetVarName = targetElement.getOutputVarName(externalElement.getElement().getOutputId());
       int targetStateIndex = logicalUnitInfo.getStateIndex(targetVarName);
       for(String outputVarName : externalElement.getOutputVarNames()) {
-        String stateIndexExpr = String.format("logicalUnitIndex * %d + (%d) + (%d)",
-          model.getLogicalUnitInfo().getStateSize(),
+        String stateIndexExpr = String.format("%s + (%d) + (%d)",
+          LU_STATE_INDEX_VAR_NAME,
           getRelativeLogicalUnitIndex(externalElement.getElement()), targetStateIndex);
         out.printf("int %s = %s;", outputVarName, stateIndexExpr);
         out.println();
         int totalSize = model.getLogicalUnitInfo().getStateSize() * model.getWidth() * model.getHeight();
-        out.printf("%s = state[(%s > 0 ? %s : %s + %d) %% %d];",
-          outputVarName, outputVarName, outputVarName, outputVarName, totalSize, totalSize);
+        out.printf("%s = %s[(%s > 0 ? %s : %s + %d) %% %d];", outputVarName, STATE_VAR_NAME,
+            outputVarName, outputVarName, outputVarName, totalSize, totalSize);
       }
       out.println();
     }
@@ -63,8 +72,7 @@ public class JavaCircuitGeneratorImpl extends AbstractCircuitSimulationGenerator
       for (Output output : element.getOutputs()) {
         String varName = element.getOutputVarName(output);
         int stateIndex = logicalUnitInfo.getStateIndex(varName);
-        out.printf("int %s = state[%d];", varName, stateIndex);
-        out.println();
+        out.println(loadStateToVarStatement(varName, stateIndex));
       }
     }
     out.println();
@@ -72,15 +80,13 @@ public class JavaCircuitGeneratorImpl extends AbstractCircuitSimulationGenerator
       for (Param param : element.getType().getParams()) {
         String varName = element.getParamVarName(param);
         int stateIndex = logicalUnitInfo.getStateIndex(varName);
-        out.printf("int %s = state[%d];", varName, stateIndex);
-        out.println();
+        out.println(loadStateToVarStatement(varName, stateIndex));
       }
       for (Output output : element.getOutputs()) {
         for (Param param : output.getParams()) {
           String varName = element.getOutputParamVarName(output, param);
           int stateIndex = logicalUnitInfo.getStateIndex(varName);
-          out.printf("int %s = state[%d];", varName, stateIndex);
-          out.println();
+          out.println(loadStateToVarStatement(varName, stateIndex));
         }
       }
       out.println();
@@ -102,13 +108,22 @@ public class JavaCircuitGeneratorImpl extends AbstractCircuitSimulationGenerator
       for (Output output : element.getOutputs()) {
         String varName = element.getOutputVarName(output);
         int stateIndex = logicalUnitInfo.getStateIndex(varName);
-        out.printf("state[%d] = %s;", stateIndex, varName);
-        out.println();
+        out.println(saveVarToStateStatement(varName, stateIndex));
       }
     }
 
     out.println("}");
     out.println("}");
     out.flush();
+  }
+
+  private String loadStateToVarStatement(String varName, int stateIndex) {
+    return String.format("int %s = %s[%s + %d];", varName, STATE_VAR_NAME,
+        LU_STATE_INDEX_VAR_NAME, stateIndex);
+  }
+
+  private String saveVarToStateStatement(String varName, int stateIndex) {
+    return String.format("%s[%s + %d] = %s;", STATE_VAR_NAME, LU_STATE_INDEX_VAR_NAME,
+        stateIndex, varName);
   }
 }
