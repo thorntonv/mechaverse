@@ -8,5 +8,5 @@
  #include <core/simulation/Simulation.h>
  %}
  
- %include "../Simulation.h"
+ %include "Simulation.h"
  

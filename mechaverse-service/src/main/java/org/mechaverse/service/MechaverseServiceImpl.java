@@ -13,11 +13,11 @@ import org.mechaverse.api.model.simulation.ant.Entity;
 import org.mechaverse.api.model.simulation.ant.SimulationState;
 import org.mechaverse.api.proto.simulation.ant.AntSimulation;
 import org.mechaverse.api.service.MechaverseService;
-import org.mechaverse.simulation.ant.Simulation;
+import org.mechaverse.simulation.Simulation;
 
 /**
  * Implementation of {@link MechaverseService}.
- * 
+ *
  * @author thorntonv@mechaverse.org
  */
 public class MechaverseServiceImpl implements MechaverseService {
@@ -100,12 +100,12 @@ public class MechaverseServiceImpl implements MechaverseService {
 
   @Override
   public void registerPeerNode(String nodeId) throws Exception {
-    // TODO(thorntonv): Implement registerPeerNode method.    
+    // TODO(thorntonv): Implement registerPeerNode method.
   }
 
   @Override
   public void unregisterPeerNode(String nodeId) throws Exception {
-    // TODO(thorntonv): Implement unregisterPeerNode method.        
+    // TODO(thorntonv): Implement unregisterPeerNode method.
   }
 
   @Override

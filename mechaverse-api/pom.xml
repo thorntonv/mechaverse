@@ -5,7 +5,7 @@
   <artifactId>mechaverse-api</artifactId>
   <version>1.0-SNAPSHOT</version>
   <name>Mechaverse API</name>
-
+  
   <parent>
     <artifactId>mechaverse</artifactId>
     <groupId>org.mechaverse</groupId>
@@ -56,12 +56,12 @@
                   <arg value="-c++" />
                   <arg value="-java" />
                   <arg value="-package" />
-                  <arg value="org.mechaverse.simulation.ant" />
+                  <arg value="org.mechaverse.simulation" />
                   <arg value="-outdir" />
-                  <arg value="${project.build.directory}/generated-sources/org/mechaverse/simulation/ant/" />
+                  <arg value="${project.build.directory}/generated-sources/org/mechaverse/simulation/" />
                   <arg value="-o" />
-                  <arg value="${project.build.directory}/generated-sources/core/simulation/ant/ant-simulation_wrap.cxx" />
-                  <arg value="src/main/cpp/core/simulation/ant/ant-simulation.i" />
+                  <arg value="${project.build.directory}/generated-sources/core/simulation/simulation_wrap.cxx" />
+                  <arg value="src/main/cpp/core/simulation/simulation.i" />
                 </exec>
               </target>
             </configuration>

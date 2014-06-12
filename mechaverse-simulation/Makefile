@@ -1,4 +1,4 @@
-SHARED_LIBS = $(shell find target/ -type f -name '*.so')
+SHARED_LIBS = $(shell find target/ -type f -name 'libmechaverse-simulation.so')
 
 .PHONY: all
 .PHONY: clean

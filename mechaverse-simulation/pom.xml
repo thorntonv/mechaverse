@@ -18,8 +18,14 @@
       <groupId>org.mechaverse.api</groupId>
       <artifactId>mechaverse-api</artifactId>
       <version>1.0-SNAPSHOT</version>
-      <classifier>sources</classifier>
-      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mechaverse.thirdparty</groupId>
+      <artifactId>gtest</artifactId>
+      <version>1.0</version>      
+      <type>nar</type>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
@@ -45,6 +51,27 @@
         </executions>
       </plugin>
       <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.6</version>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/sources</outputDirectory>
+              <resources>          
+                <resource>
+                  <directory>src/main/</directory>
+                </resource>
+              </resources>              
+            </configuration>            
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>com.github.maven-nar</groupId>
         <artifactId>nar-maven-plugin</artifactId>
         <version>3.0.0</version>
@@ -56,6 +83,9 @@
               <type>jni</type>
               <narSystemPackage>org.mechaverse.simulation</narSystemPackage>
             </library>
+            <library>
+              <type>static</type>
+            </library>
           </libraries>
           <linker>
             <sysLibs>
@@ -66,10 +96,16 @@
           <cpp>
             <includePaths>
               <includePath>${basedir}/src/main</includePath>
-              <includePath>${project.build.directory}/sources/</includePath>
+              <includePath>${project.build.directory}/sources</includePath>
             </includePaths>
-            <sourceDirectory>${basedir}/src/</sourceDirectory>
-          </cpp>
+            <sourceDirectory>${project.build.directory}/sources/core</sourceDirectory>
+          </cpp>          
+          <tests>
+            <test>         
+              <name>mechaverse-simulation-test</name>
+              <link>static</link>
+            </test>
+          </tests>
         </configuration>
       </plugin>
     </plugins>
