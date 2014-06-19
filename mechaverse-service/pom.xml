@@ -4,20 +4,29 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.mechaverse.service</groupId>
   <artifactId>mechaverse-service</artifactId>
-  <version>1.0-SNAPSHOT</version>
   <packaging>war</packaging>
   <name>Mechaverse Service</name>
 
   <parent>
-    <artifactId>mechaverse</artifactId>
     <groupId>org.mechaverse</groupId>
-    <version>1.0</version>
+    <artifactId>mechaverse</artifactId>
+    <version>0.1</version>
   </parent>
 
   <dependencies>
     <dependency>
       <groupId>org.mechaverse.api</groupId>
       <artifactId>mechaverse-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mechaverse.simulation.ant</groupId>
+      <artifactId>mechaverse-simulation-ant-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mechaverse.simulation.ant</groupId>
+      <artifactId>mechaverse-simulation-ant-core</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

@@ -2,8 +2,8 @@ package org.mechaverse.gwt.client.environment;
 
 import java.util.Map;
 
-import org.mechaverse.api.model.simulation.ant.EntityType;
 import org.mechaverse.gwt.client.MechaverseResourceBundle;
+import org.mechaverse.simulation.ant.api.model.EntityType;
 
 import com.google.common.collect.Maps;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -14,7 +14,7 @@ import com.google.gwt.user.client.ui.Image;
 
 /**
  * A toolbar for selecting an entity.
- * 
+ *
  * @author thorntonv@mechaverse.org
  */
 public class EntityToolbar extends HorizontalPanel {
@@ -39,12 +39,13 @@ public class EntityToolbar extends HorizontalPanel {
   private Map<EntityType, EntityButton> entityButtons = Maps.newHashMap();
 
   public EntityToolbar() {
-    
+
     addStyleName(MechaverseResourceBundle.INSTANCE.css().entityToolbar());
-    
+
     for (final EntityType entityType : EntityType.values()) {
       EntityButton button = new EntityButton(entityType);
       button.addClickHandler(new ClickHandler() {
+        @Override
         public void onClick(ClickEvent event) {
           setSelectedEntityType(entityType);
         }

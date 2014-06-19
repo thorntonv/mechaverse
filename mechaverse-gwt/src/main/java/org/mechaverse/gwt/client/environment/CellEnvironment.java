@@ -3,20 +3,20 @@ package org.mechaverse.gwt.client.environment;
 import java.util.Collections;
 import java.util.List;
 
-import org.mechaverse.api.model.simulation.ant.Entity;
-import org.mechaverse.api.model.simulation.ant.Environment;
+import org.mechaverse.simulation.ant.api.model.Entity;
+import org.mechaverse.simulation.ant.api.model.Environment;
 
 import com.google.common.collect.Lists;
 
 /**
  * An environment which tracks entities on a per cell basis.
- *  
+ *
  * @author thorntonv@mechaverse.org
  */
 public class CellEnvironment {
 
   /**
-   * An individual cell. 
+   * An individual cell.
    */
   public class Cell {
 
@@ -54,7 +54,7 @@ public class CellEnvironment {
       environment.getEntities().removeAll(entities);
       entities.clear();
     }
-    
+
     public List<Entity> getEntities() {
       return Collections.unmodifiableList(entities);
     }

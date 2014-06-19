@@ -1,21 +1,21 @@
 package org.mechaverse.gwt.client.environment;
 
-import org.mechaverse.api.model.simulation.ant.Ant;
-import org.mechaverse.api.model.simulation.ant.Barrier;
-import org.mechaverse.api.model.simulation.ant.Direction;
-import org.mechaverse.api.model.simulation.ant.Entity;
-import org.mechaverse.api.model.simulation.ant.Environment;
-import org.mechaverse.api.model.simulation.ant.Food;
-import org.mechaverse.api.model.simulation.ant.Rock;
 import org.mechaverse.gwt.client.environment.CellEnvironment.Cell;
 import org.mechaverse.gwt.client.util.UUID;
+import org.mechaverse.simulation.ant.api.model.Ant;
+import org.mechaverse.simulation.ant.api.model.Barrier;
+import org.mechaverse.simulation.ant.api.model.Direction;
+import org.mechaverse.simulation.ant.api.model.Entity;
+import org.mechaverse.simulation.ant.api.model.Environment;
+import org.mechaverse.simulation.ant.api.model.Food;
+import org.mechaverse.simulation.ant.api.model.Rock;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
  * A presenter for {@link EnvironmentEditorView}.
- * 
+ *
  * @author thorntonv@mechaverse.org
  */
 public class EnvironmentEditorPresenter implements EnvironmentView.Observer, IsWidget {
@@ -34,7 +34,8 @@ public class EnvironmentEditorPresenter implements EnvironmentView.Observer, IsW
     view.setEnvironment(environment);
     view.getEnvironmentView().update();
   }
-  
+
+  @Override
   public void onCellClick(int row, int column) {
     Cell cell = cells.getCell(row, column);
 
@@ -75,6 +76,7 @@ public class EnvironmentEditorPresenter implements EnvironmentView.Observer, IsW
     view.getEnvironmentView().update();
   }
 
+  @Override
   public Widget asWidget() {
     return view;
   }

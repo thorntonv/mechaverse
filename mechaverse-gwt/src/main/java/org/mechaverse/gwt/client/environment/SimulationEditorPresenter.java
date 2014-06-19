@@ -2,11 +2,11 @@ package org.mechaverse.gwt.client.environment;
 
 import java.util.Iterator;
 
-import org.mechaverse.api.model.simulation.ant.Environment;
-import org.mechaverse.api.model.simulation.ant.SimulationState;
-import org.mechaverse.api.simulation.util.SimulationUtil;
 import org.mechaverse.gwt.client.util.UUID;
 import org.mechaverse.gwt.shared.MechaverseGwtRpcServiceAsync;
+import org.mechaverse.simulation.ant.api.SimulationStateUtil;
+import org.mechaverse.simulation.ant.api.model.Environment;
+import org.mechaverse.simulation.ant.api.model.SimulationState;
 
 import com.google.common.base.Preconditions;
 import com.google.gwt.user.client.Window;
@@ -14,7 +14,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * A presenter for {@link SimulationEditorView}.
- * 
+ *
  * @author thorntonv@mechaverse.org
  */
 public class SimulationEditorPresenter {
@@ -42,7 +42,7 @@ public class SimulationEditorPresenter {
     }
   }
 
-  private final MechaverseGwtRpcServiceAsync service = 
+  private final MechaverseGwtRpcServiceAsync service =
       MechaverseGwtRpcServiceAsync.Util.getInstance();
 
   private String key;
@@ -60,7 +60,7 @@ public class SimulationEditorPresenter {
     this.view = view;
     this.environmentEditorPresenter =
         new EnvironmentEditorPresenter(view.getEnvironmentEditorView());
-    
+
     view.setObserver(new SimulationEditorViewObserver());
     loadState();
   }
@@ -79,27 +79,27 @@ public class SimulationEditorPresenter {
       }
     });
   }
-  
+
   public void setState(SimulationState state) {
     this.state = state;
     setEnvironment(environmentId);
-    view.setAvailableEnvironments(SimulationUtil.getEnvironments(state));
+    view.setAvailableEnvironments(SimulationStateUtil.getEnvironments(state));
   }
 
   public void createNewEnvironment() {
     Preconditions.checkNotNull(state);
-    
+
     Environment newEnvironment = new Environment();
     newEnvironment.setId(UUID.uuid().toString());
     newEnvironment.setWidth(25);
     newEnvironment.setHeight(25);
     state.getSubEnvironments().add(newEnvironment);
-    
+
     save();
     environmentId = null;
-    loadState();        
+    loadState();
   }
-  
+
   public void save() {
     Preconditions.checkNotNull(state);
 
@@ -138,7 +138,7 @@ public class SimulationEditorPresenter {
     this.environmentId = environmentId;
     Environment env = state.getEnvironment();
     if (environmentId != null) {
-      env = SimulationUtil.getEnvironment(state, environmentId);
+      env = SimulationStateUtil.getEnvironment(state, environmentId);
       if (env == null) {
         env = state.getEnvironment();
       }
@@ -149,7 +149,7 @@ public class SimulationEditorPresenter {
   public SimulationEditorView getView() {
     return view;
   }
-  
+
   protected void saveInitialState() {
     service.getCurrentState(new AsyncCallback<SimulationState>() {
       @Override
@@ -171,5 +171,5 @@ public class SimulationEditorPresenter {
         });
       }
     });
-  }  
+  }
 }

@@ -2,13 +2,13 @@ package org.mechaverse.gwt.client.environment;
 
 import java.util.Set;
 
-import org.mechaverse.api.model.simulation.ant.Direction;
-import org.mechaverse.api.model.simulation.ant.Entity;
-import org.mechaverse.api.model.simulation.ant.EntityType;
-import org.mechaverse.api.model.simulation.ant.Environment;
 import org.mechaverse.gwt.client.MechaverseResourceBundle;
 import org.mechaverse.gwt.client.util.Coordinate;
 import org.mechaverse.gwt.client.util.EntityUtil;
+import org.mechaverse.simulation.ant.api.model.Direction;
+import org.mechaverse.simulation.ant.api.model.Entity;
+import org.mechaverse.simulation.ant.api.model.EntityType;
+import org.mechaverse.simulation.ant.api.model.Environment;
 
 import com.google.common.collect.Sets;
 import com.google.gwt.canvas.client.Canvas;
@@ -22,13 +22,13 @@ import com.google.gwt.user.client.ui.SimplePanel;
 
 /**
  * A view which displays an environment.
- * 
+ *
  * @author thorntonv@mechaverse.org
  */
 public class EnvironmentView extends SimplePanel {
 
   public static interface Observer {
-    
+
     void onCellClick(int row, int column);
     void onCellAltClick(int row, int column);
   }
@@ -47,15 +47,16 @@ public class EnvironmentView extends SimplePanel {
 
     add(canvas);
     canvas.addClickHandler(new ClickHandler() {
+      @Override
       public void onClick(ClickEvent event) {
         int row = event.getY() / cellHeight;
         int column = event.getX() / cellWidth;
 
         for (Observer observer : observers) {
-          if(event.getNativeButton() == NativeEvent.BUTTON_LEFT) { 
+          if(event.getNativeButton() == NativeEvent.BUTTON_LEFT) {
             observer.onCellClick(row, column);
           } else {
-            observer.onCellAltClick(row, column);            
+            observer.onCellAltClick(row, column);
           }
         }
       }
@@ -76,10 +77,11 @@ public class EnvironmentView extends SimplePanel {
 
     update();
   }
-  
+
   public HandlerRegistration addObserver(final Observer observer) {
     observers.add(observer);
     return new HandlerRegistration() {
+      @Override
       public void removeHandler() {
         observers.remove(observer);
       }

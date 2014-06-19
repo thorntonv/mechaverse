@@ -1,8 +1,7 @@
 package org.mechaverse.gwt.client.environment;
 
-import org.mechaverse.api.model.simulation.ant.SimulationState;
-import org.mechaverse.api.service.MechaverseService.SimulationStatus;
 import org.mechaverse.gwt.shared.MechaverseGwtRpcServiceAsync;
+import org.mechaverse.simulation.ant.api.model.SimulationState;
 
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
@@ -15,7 +14,7 @@ public class SimulationPresenter {
   protected class UpdateTimer extends Timer {
     @Override
     public void run() {
-      service.setStatus(SimulationStatus.STEPPING, new AsyncCallback<Void>() {
+      service.step(new AsyncCallback<Void>() {
         @Override
         public void onFailure(Throwable ex) {
           Window.alert(ex.getMessage());
@@ -39,9 +38,9 @@ public class SimulationPresenter {
     }
   };
 
-  private final MechaverseGwtRpcServiceAsync service = MechaverseGwtRpcServiceAsync.Util
-      .getInstance();
-  
+  private final MechaverseGwtRpcServiceAsync service =
+      MechaverseGwtRpcServiceAsync.Util.getInstance();
+
   private UpdateTimer updateTimer = new UpdateTimer();
   private SimulationView view;
 

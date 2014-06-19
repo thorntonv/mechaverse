@@ -3,7 +3,7 @@ package org.mechaverse.gwt.client.environment;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.mechaverse.api.model.simulation.ant.Environment;
+import org.mechaverse.simulation.ant.api.model.Environment;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -18,7 +18,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 /**
  * A view for editing a simulation.
- * 
+ *
  * @author thorntonv@mechaverse.org
  */
 public class SimulationEditorView extends ResizeComposite {
@@ -33,7 +33,7 @@ public class SimulationEditorView extends ResizeComposite {
 
   interface MyUiBinder extends UiBinder<Widget, SimulationEditorView> {};
   private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  
+
   @UiField EnvironmentDropDown environmentDropDown;
   @UiField Button newButton;
   @UiField Button saveButton;
@@ -42,9 +42,9 @@ public class SimulationEditorView extends ResizeComposite {
 
   private Observer observer;
 
-  public SimulationEditorView() {      
+  public SimulationEditorView() {
     initWidget(uiBinder.createAndBindUi(this));
-    
+
     environmentDropDown.addValueChangeHandler(new ValueChangeHandler<Environment>() {
       @Override
       public void onValueChange(ValueChangeEvent<Environment> event) {
@@ -53,7 +53,7 @@ public class SimulationEditorView extends ResizeComposite {
         }
       }
     });
-    
+
     newButton.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {

@@ -1,0 +1,21 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.mechaverse.simulation</groupId>
+  <artifactId>ant</artifactId>
+  <packaging>pom</packaging>
+  <name>Mechaverse Ant Simulation</name>
+
+  <parent>
+    <artifactId>simulation</artifactId>
+    <groupId>org.mechaverse</groupId>
+    <version>0.1</version>
+  </parent>
+  
+  <modules>
+    <module>mechaverse-simulation-ant-api</module>
+    <module>mechaverse-simulation-ant-core</module>
+  </modules>
+</project>

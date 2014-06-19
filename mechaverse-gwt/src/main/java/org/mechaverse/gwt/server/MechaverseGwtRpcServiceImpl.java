@@ -1,16 +1,16 @@
 package org.mechaverse.gwt.server;
 
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
-import org.mechaverse.api.model.simulation.ant.Entity;
-import org.mechaverse.api.model.simulation.ant.SimulationState;
-import org.mechaverse.api.service.MechaverseService;
 import org.mechaverse.gwt.shared.MechaverseGwtRpcService;
+import org.mechaverse.simulation.ant.api.AntSimulationService;
+import org.mechaverse.simulation.ant.api.model.Entity;
+import org.mechaverse.simulation.ant.api.model.SimulationState;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
  * Implementation of {@link MechaverseGwtRpcService} which forwards requests to the REST service.
- * 
+ *
  * @author thorntonv@mechaverse.org
  */
 public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
@@ -19,8 +19,8 @@ public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
   private static final long serialVersionUID = 1349327476429682957L;
 
   // TODO(thorntonv): Inject this service.
-  private MechaverseService service = JAXRSClientFactory.create(
-      "http://localhost:8080/mechaverse-service", MechaverseService.class);
+  private AntSimulationService service = JAXRSClientFactory.create(
+      "http://localhost:8080/mechaverse-service", AntSimulationService.class);
 
   @Override
   public void setStatus(SimulationStatus status) throws Exception {
@@ -28,8 +28,8 @@ public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
   }
 
   @Override
-  public void step(int count) throws Exception {
-    service.step(count);
+  public void step() throws Exception {
+    service.step();
   }
 
   @Override

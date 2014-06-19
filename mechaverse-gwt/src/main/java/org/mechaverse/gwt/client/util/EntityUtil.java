@@ -1,18 +1,18 @@
 package org.mechaverse.gwt.client.util;
 
-import org.mechaverse.api.model.simulation.ant.Ant;
-import org.mechaverse.api.model.simulation.ant.Barrier;
-import org.mechaverse.api.model.simulation.ant.Conduit;
-import org.mechaverse.api.model.simulation.ant.Dirt;
-import org.mechaverse.api.model.simulation.ant.Entity;
-import org.mechaverse.api.model.simulation.ant.EntityType;
-import org.mechaverse.api.model.simulation.ant.Food;
-import org.mechaverse.api.model.simulation.ant.Pheromone;
-import org.mechaverse.api.model.simulation.ant.Rock;
+import org.mechaverse.simulation.ant.api.model.Ant;
+import org.mechaverse.simulation.ant.api.model.Barrier;
+import org.mechaverse.simulation.ant.api.model.Conduit;
+import org.mechaverse.simulation.ant.api.model.Dirt;
+import org.mechaverse.simulation.ant.api.model.Entity;
+import org.mechaverse.simulation.ant.api.model.EntityType;
+import org.mechaverse.simulation.ant.api.model.Food;
+import org.mechaverse.simulation.ant.api.model.Pheromone;
+import org.mechaverse.simulation.ant.api.model.Rock;
 
 /**
  * Entity utility methods.
- *  
+ *
  * @author thorntonv@mechaverse.org
  */
 public class EntityUtil {

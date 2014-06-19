@@ -1,6 +1,5 @@
 package org.mechaverse.service;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -8,85 +7,67 @@ import java.io.OutputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import org.apache.cxf.helpers.IOUtils;
-import org.mechaverse.api.model.simulation.ant.Entity;
-import org.mechaverse.api.model.simulation.ant.SimulationState;
-import org.mechaverse.api.proto.simulation.ant.AntSimulation;
-import org.mechaverse.api.service.MechaverseService;
-import org.mechaverse.simulation.Simulation;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+
+import org.mechaverse.simulation.ant.api.AntSimulationService;
+import org.mechaverse.simulation.ant.api.model.Entity;
+import org.mechaverse.simulation.ant.api.model.SimulationState;
+import org.mechaverse.simulation.ant.core.AntSimulationImpl;
 
 /**
  * Implementation of {@link MechaverseService}.
  *
  * @author thorntonv@mechaverse.org
  */
-public class MechaverseServiceImpl implements MechaverseService {
+public class MechaverseServiceImpl implements AntSimulationService {
 
-  static {
-    // Load the native simulation library.
-    System.loadLibrary("mechaverse-simulation");
-  }
-
-  private static final Simulation simulation = new Simulation();
+  private final AntSimulationImpl simulation = new AntSimulationImpl();
 
   @Override
   public SimulationState getCurrentState() throws Exception {
-    int stateDataLength = simulation.getStateByteSize();
-    byte[] stateData = new byte[stateDataLength];
-    simulation.getState(stateData);
-    AntSimulation.SimulationState stateProto = AntSimulation.SimulationState.parseFrom(stateData);
-    return ProtoConversionUtil.convert(stateProto);
+    return simulation.getState();
   }
 
   @Override
   public void setCurrentState(SimulationState state) throws Exception {
-    simulation.setState(ProtoConversionUtil.convert(state).toByteArray());
+    simulation.setState(state);
   }
 
   @Override
   public void setStatus(SimulationStatus status) throws Exception {
-    switch (status) {
-      case RUNNING:
-        simulation.start();
-        break;
-      case STEPPING:
-        simulation.step();
-        break;
-      case STOPPED:
-        simulation.stop();
-        break;
-    }
   }
 
   @Override
-  public void step(int count) throws Exception {
-    for (int cnt = 1; cnt <= count; cnt++) {
-      simulation.step();
-    }
+  public void step() throws Exception {
+    simulation.step();
   }
 
   @Override
   public boolean isRunning() throws Exception {
-    return simulation.isRunning();
+    return true;
   }
 
   @Override
   public SimulationState loadState(String key) throws Exception {
-    File simulationFile = new File(getSimulationFilename(key));
-    byte[] data = new byte[(int) simulationFile.length()];
-    InputStream in = new GZIPInputStream(new FileInputStream(simulationFile));
-    data = IOUtils.readBytesFromStream(in);
-    in.close();
-    AntSimulation.SimulationState stateProto = AntSimulation.SimulationState.parseFrom(data);
-    return ProtoConversionUtil.convert(stateProto);
+    InputStream in = new GZIPInputStream(new FileInputStream(getSimulationFilename(key)));
+    try {
+      JAXBContext jaxbContext = JAXBContext.newInstance(SimulationState.class);
+      Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+      return (SimulationState) jaxbUnmarshaller.unmarshal(in);
+    } finally {
+      in.close();
+    }
   }
 
   @Override
   public void saveState(String key, SimulationState state) throws Exception {
     OutputStream out = new GZIPOutputStream(new FileOutputStream(getSimulationFilename(key)));
     try {
-      AntSimulation.SimulationState stateProto = ProtoConversionUtil.convert(state);
-      out.write(stateProto.toByteArray());
+      JAXBContext jaxbContext = JAXBContext.newInstance(SimulationState.class);
+      Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+      jaxbMarshaller.marshal(state, out);
     } finally {
       out.close();
     }
@@ -110,7 +91,7 @@ public class MechaverseServiceImpl implements MechaverseService {
 
   @Override
   public String getDeviceInfo() {
-    return simulation.getDeviceInfo();
+    return "";
   }
 
   /**

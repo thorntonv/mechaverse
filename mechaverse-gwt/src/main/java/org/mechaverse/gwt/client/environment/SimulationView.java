@@ -1,12 +1,12 @@
 package org.mechaverse.gwt.client.environment;
 
-import org.mechaverse.api.model.simulation.ant.Environment;
+import org.mechaverse.simulation.ant.api.model.Environment;
 
 import com.google.gwt.user.client.ui.Composite;
 
 /**
  * A view which displays a simulation.
- * 
+ *
  * @author thorntonv@mechaverse.org
  */
 public class SimulationView extends Composite {

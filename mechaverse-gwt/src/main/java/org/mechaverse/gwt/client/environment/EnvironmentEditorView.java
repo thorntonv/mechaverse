@@ -1,6 +1,6 @@
 package org.mechaverse.gwt.client.environment;
 
-import org.mechaverse.api.model.simulation.ant.Environment;
+import org.mechaverse.simulation.ant.api.model.Environment;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -10,7 +10,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 /**
  * A view for editing an environment.
- * 
+ *
  * @author thorntonv@mechaverse.org
  */
 public class EnvironmentEditorView extends ResizeComposite {
