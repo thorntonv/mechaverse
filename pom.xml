@@ -10,7 +10,6 @@
   <name>Mechaverse</name>
 
   <modules>
-    <module>mechaverse-api</module>
     <module>simulation</module>
     <module>mechaverse-service</module>
     <module>mechaverse-gwt</module>

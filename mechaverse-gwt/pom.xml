@@ -22,18 +22,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.mechaverse.api</groupId>
-      <artifactId>mechaverse-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.mechaverse.api</groupId>
-      <artifactId>mechaverse-api</artifactId>
-      <version>${project.version}</version>
-      <classifier>sources</classifier>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>org.mechaverse.simulation.ant</groupId>
       <artifactId>mechaverse-simulation-ant-api</artifactId>
       <version>${project.version}</version>
