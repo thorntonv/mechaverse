@@ -26,7 +26,9 @@ import javax.tools.ToolProvider;
  *
  * @author thorntonv@mechaverse.org
  */
-public class JavaCompilerUtil {
+public final class JavaCompilerUtil {
+
+  private JavaCompilerUtil() {}
 
   /**
    * An exception which indicates that a compilation error occurred.

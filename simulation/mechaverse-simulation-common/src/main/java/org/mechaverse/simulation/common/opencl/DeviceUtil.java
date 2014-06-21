@@ -10,6 +10,8 @@ import com.jogamp.opencl.CLPlatform;
  */
 public final class DeviceUtil {
 
+  private DeviceUtil() {}
+
   /**
    * Returns a string containing device information.
    */

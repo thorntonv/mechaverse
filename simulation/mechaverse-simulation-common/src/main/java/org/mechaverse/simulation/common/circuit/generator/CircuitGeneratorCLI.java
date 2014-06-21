@@ -20,7 +20,7 @@ import org.mechaverse.simulation.common.circuit.generator.java.JavaCircuitGenera
 import org.mechaverse.simulation.common.opencl.OpenClCircuitGeneratorImpl;
 
 /**
- * Generates source code for simulating a circuit.
+ * Command line interface for generating circuit simulation source code.
  *
  * @author thorntonv@mechaverse.org
  */
