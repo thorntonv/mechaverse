@@ -1,4 +1,4 @@
-package org.mechaverse.simulation.common.circuit;
+package org.mechaverse.simulation.common.circuit.generator;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -16,16 +16,15 @@ import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.mechaverse.circuit.model.Circuit;
-import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationGenerator;
 import org.mechaverse.simulation.common.circuit.generator.java.JavaCircuitGeneratorImpl;
-import org.mechaverse.simulation.common.circuit.generator.opencl.OpenClCircuitGeneratorImpl;
+import org.mechaverse.simulation.common.opencl.OpenClCircuitGeneratorImpl;
 
 /**
  * Generates source code for simulating a circuit.
  *
  * @author thorntonv@mechaverse.org
  */
-public class CircuitGenerator {
+public class CircuitGeneratorCLI {
 
   private static final String DEFAULT_TYPE = "opencl";
 
@@ -54,7 +53,7 @@ public class CircuitGenerator {
       System.out.println(ex.getMessage());
       System.out.println();
       HelpFormatter formatter = new HelpFormatter();
-      formatter.printHelp(CircuitGenerator.class.getName(), options);
+      formatter.printHelp(CircuitGeneratorCLI.class.getName(), options);
     }
   }
 

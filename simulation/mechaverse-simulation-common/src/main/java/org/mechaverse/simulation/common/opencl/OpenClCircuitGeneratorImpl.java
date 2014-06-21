@@ -1,4 +1,4 @@
-package org.mechaverse.simulation.common.circuit.generator.opencl;
+package org.mechaverse.simulation.common.opencl;
 
 import java.io.PrintWriter;
 
@@ -21,5 +21,6 @@ public class OpenClCircuitGeneratorImpl extends AbstractCircuitSimulationGenerat
 
   @Override
   public void generate(PrintWriter out) {
+    // TODO(thorntonv): Implement method.
   }
 }
