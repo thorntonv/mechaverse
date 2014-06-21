@@ -15,6 +15,7 @@
   </parent>
   
   <modules>
+    <module>mechaverse-simulation-common</module>
     <module>ant</module>
   </modules>
 </project>

@@ -3,7 +3,6 @@ package org.mechaverse.simulation.ant.core;
 import org.mechaverse.simulation.ant.api.model.Direction;
 import org.mechaverse.simulation.ant.api.model.Entity;
 
-
 public final class AntSimulationUtil {
 
   private AntSimulationUtil() {}
