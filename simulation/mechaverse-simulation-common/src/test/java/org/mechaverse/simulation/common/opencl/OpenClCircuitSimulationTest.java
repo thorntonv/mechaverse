@@ -69,7 +69,7 @@ public class OpenClCircuitSimulationTest {
     int circuitOutput[] = {0, 0, 0, 0, 0};
 
     try (OpenClCircuitSimulation circuitSimulation = new OpenClCircuitSimulation(
-      2, 5, 5, 5, 10, 1, CLPlatform.getDefault().getMaxFlopsDevice(), KERNAL_SOURCE)) {
+      2, 5, 5, 5, 10, 5, CLPlatform.getDefault().getMaxFlopsDevice(), KERNAL_SOURCE)) {
 
       circuitSimulation.setInput(0, circuitInput1);
       circuitSimulation.setState(0, circuitState1);
@@ -86,6 +86,47 @@ public class OpenClCircuitSimulationTest {
 
       circuitSimulation.getOutput(1, circuitOutput);
       assertArrayEquals(new int[] {20, 21, 22, 23, 14}, circuitOutput);
+    }
+  }
+
+  @Test
+  public void stressTest_updates1000_circuits500_size16() throws Exception {
+    int numUpdates = 1000, numCircuits = 2, size = 16;
+    stressTest(numUpdates, numCircuits, size);
+  }
+
+  private void stressTest(int numUpdates, int numCircuits, int size) throws Exception {
+    int circuitInput[] = new int[size];
+    int circuitState[] = new int[size];
+    int circuitOutput[] = new int[size];
+    for(int idx = 0; idx < size; idx++) {
+      circuitInput[idx] = idx;
+      circuitState[idx] = 1;
+    }
+
+    assertEquals(size, circuitInput.length);
+    assertEquals(size, circuitState.length);
+    assertEquals(size, circuitOutput.length);
+    try (OpenClCircuitSimulation circuitSimulation = new OpenClCircuitSimulation(
+        numCircuits, size, size, size, numCircuits*size, size,
+            CLPlatform.getDefault().getMaxFlopsDevice(), KERNAL_SOURCE)) {
+
+      for(int circuitIdx = 0; circuitIdx < numCircuits; circuitIdx++) {
+        circuitSimulation.setState(circuitIdx, circuitState);
+      }
+
+      for (int cnt = 1; cnt <= numUpdates; cnt++) {
+        for(int circuitIdx = 0; circuitIdx < numCircuits; circuitIdx++) {
+          circuitSimulation.setInput(circuitIdx, circuitInput);
+        }
+
+        circuitSimulation.update();
+
+        for(int circuitIdx = 0; circuitIdx < numCircuits; circuitIdx++) {
+          circuitSimulation.getOutput(0, circuitOutput);
+          assertEquals(circuitOutput[0], circuitOutput[1] - 1);
+        }
+      }
     }
   }
 }

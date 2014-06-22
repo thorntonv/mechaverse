@@ -31,6 +31,7 @@ public final class OpenClCircuitSimulation implements AutoCloseable {
   private final CLBuffer<IntBuffer> inputBuffer;
   private final CLBuffer<IntBuffer> stateBuffer;
   private final CLBuffer<IntBuffer> outputBuffer;
+  private boolean finished = true;
 
   public OpenClCircuitSimulation(int numCircuits, int circuitInputSize, int circuitStateSize,
       int circuitOutputSize, long globalWorkSize, long localWorkSize, CLDevice device,
@@ -57,6 +58,10 @@ public final class OpenClCircuitSimulation implements AutoCloseable {
   }
 
   public void getState(int circuitIndex, int[] circuitState) {
+    if (!finished) {
+      queue.finish();
+      finished = true;
+    }
     queue.putReadBuffer(stateBuffer, true);
     stateBuffer.getBuffer().position(circuitIndex * circuitStateSize);
     stateBuffer.getBuffer().get(circuitState);
@@ -64,6 +69,10 @@ public final class OpenClCircuitSimulation implements AutoCloseable {
   }
 
   public void setState(int circuitIndex, int[] circuitState) {
+    if (!finished) {
+      queue.finish();
+      finished = true;
+    }
     stateBuffer.getBuffer().position(circuitIndex * circuitStateSize);
     stateBuffer.getBuffer().put(circuitState);
     stateBuffer.getBuffer().rewind();
@@ -71,24 +80,35 @@ public final class OpenClCircuitSimulation implements AutoCloseable {
   }
 
   public void setInput(int circuitIndex, int[] circuitInput) {
+    if (!finished) {
+      queue.finish();
+      finished = true;
+    }
     inputBuffer.getBuffer().position(circuitIndex * circuitInputSize);
     inputBuffer.getBuffer().put(circuitInput);
   }
 
   public void getOutput(int circuitIndex, int[] circuitOutput) {
+    if (!finished) {
+      queue.finish();
+      finished = true;
+    }
     outputBuffer.getBuffer().position(circuitIndex * circuitOutputSize);
     outputBuffer.getBuffer().get(circuitOutput);
+    outputBuffer.getBuffer().rewind();
   }
 
   public void update() {
     inputBuffer.getBuffer().rewind();
     queue.putWriteBuffer(inputBuffer, false)
         .put1DRangeKernel(kernel, 0, globalWorkSize, localWorkSize)
-        .putReadBuffer(outputBuffer, true);
+        .putReadBuffer(outputBuffer, false);
+    finished = false;
   }
 
   @Override
   public void close() throws Exception {
+    queue.finish();
     inputBuffer.release();
     stateBuffer.release();
     outputBuffer.release();

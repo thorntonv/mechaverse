@@ -38,6 +38,11 @@
         <version>4.0.0.RELEASE</version>
       </dependency>
       <dependency>
+        <groupId>org.uncommons.maths</groupId>
+        <artifactId>uncommons-maths</artifactId>
+        <version>1.2</version>
+      </dependency>          
+      <dependency>
         <groupId>log4j</groupId>
         <artifactId>log4j</artifactId>
         <version>1.2.17</version>
