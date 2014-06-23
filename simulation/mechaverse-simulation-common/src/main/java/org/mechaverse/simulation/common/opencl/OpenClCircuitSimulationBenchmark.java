@@ -11,7 +11,7 @@ public class OpenClCircuitSimulationBenchmark extends Benchmark {
   @Param(value = {"16"}) int size;
 
   private static final String KERNAL_SOURCE =
-      "void kernel " + OpenClCircuitSimulation.KERNEL_NAME + "(" +
+      "void kernel " + OpenClCircuitSimulator.KERNEL_NAME + "(" +
       "    global const int* input, global int* state, global int* output) {" +
       "  output[get_global_id(0)] = state[get_global_id(0)] + input[get_global_id(0)];" +
       "  state[get_global_id(0)]++;" +
@@ -20,7 +20,7 @@ public class OpenClCircuitSimulationBenchmark extends Benchmark {
   private int[] input;
   private int[] state;
   private int[] output;
-  private OpenClCircuitSimulation circuitSimulation;
+  private OpenClCircuitSimulator circuitSimulation;
 
   @Override
   protected void setUp() throws Exception {
@@ -29,11 +29,11 @@ public class OpenClCircuitSimulationBenchmark extends Benchmark {
     input = new int[size];
     state = new int[size];
     output = new int[size];
-    circuitSimulation = new OpenClCircuitSimulation(numCircuits, size, size, size, 1, 1,
+    circuitSimulation = new OpenClCircuitSimulator(numCircuits, size, size, size, 1, 1,
       CLPlatform.getDefault().getMaxFlopsDevice(), KERNAL_SOURCE);
 
     for(int circuitIdx = 0; circuitIdx < numCircuits; circuitIdx++) {
-      circuitSimulation.setState(circuitIdx, state);
+      circuitSimulation.setCircuitState(circuitIdx, state);
     }
   }
 
@@ -47,13 +47,13 @@ public class OpenClCircuitSimulationBenchmark extends Benchmark {
     int dummy = 0;
     for (int i = 0; i < reps; i++) {
       for (int circuitIdx = 0; circuitIdx < numCircuits; circuitIdx++) {
-        circuitSimulation.setInput(circuitIdx, input);
+        circuitSimulation.setCircuitInput(circuitIdx, input);
       }
 
       circuitSimulation.update();
 
       for (int circuitIdx = 0; circuitIdx < numCircuits; circuitIdx++) {
-        circuitSimulation.getOutput(circuitIdx, output);
+        circuitSimulation.getCircuitOutput(circuitIdx, output);
         dummy += output[0];
       }
     }

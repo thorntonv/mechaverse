@@ -5,6 +5,11 @@ import static org.junit.Assert.assertTrue;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
+/**
+ * Unit test for {@link DeviceUtil}.
+ *
+ * @author thorntonv@mechaverse.org
+ */
 public class DeviceUtilTest {
 
   private Logger logger = Logger.getLogger(DeviceUtilTest.class);

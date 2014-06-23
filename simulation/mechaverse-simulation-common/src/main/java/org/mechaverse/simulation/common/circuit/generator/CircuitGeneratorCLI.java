@@ -48,7 +48,9 @@ public class CircuitGeneratorCLI {
       if (outputFilename != null) {
         out = new PrintWriter(new FileWriter(new File(outputFilename)));
       }
+
       generator.generate(out);
+      out.close();
     } catch (ParseException ex) {
       System.out.println(ex.getMessage());
       System.out.println();

@@ -1,6 +1,13 @@
 package org.mechaverse.simulation.common.opencl;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.IntBuffer;
+
+import org.mechaverse.circuit.model.Circuit;
+import org.mechaverse.simulation.common.circuit.CircuitSimulator;
+import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel;
+import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModelBuilder;
 
 import com.jogamp.opencl.CLBuffer;
 import com.jogamp.opencl.CLCommandQueue;
@@ -11,14 +18,15 @@ import com.jogamp.opencl.CLMemory.Mem;
 import com.jogamp.opencl.CLProgram;
 
 /**
- * Simulates a circuit using an OpenCL device.
+ * Simulates circuits using an OpenCL device.
  *
  * @author thorntonv@mechaverse.org
  */
-public final class OpenClCircuitSimulation implements AutoCloseable {
+public final class OpenClCircuitSimulator implements CircuitSimulator {
 
   public static final String KERNEL_NAME = "circuit_simulation";
 
+  private final int numCircuits;
   private final int circuitInputSize;
   private final int circuitStateSize;
   private final int circuitOutputSize;
@@ -33,9 +41,23 @@ public final class OpenClCircuitSimulation implements AutoCloseable {
   private final CLBuffer<IntBuffer> outputBuffer;
   private boolean finished = true;
 
-  public OpenClCircuitSimulation(int numCircuits, int circuitInputSize, int circuitStateSize,
+  public OpenClCircuitSimulator(int numCircuits, int circuitInputSize,
+      int circuitOutputSize, CLDevice device, Circuit circuit) {
+    this(numCircuits, circuitInputSize, circuitOutputSize, device,
+        new CircuitSimulationModelBuilder().buildModel(circuit));
+  }
+
+  private OpenClCircuitSimulator(int numCircuits, int circuitInputSize,
+      int circuitOutputSize, CLDevice device, CircuitSimulationModel circuitModel) {
+    this(numCircuits, circuitInputSize, numCircuits * circuitModel.getCircuitStateSize(),
+        circuitOutputSize, numCircuits * circuitModel.getLogicalUnitCount(),
+        circuitModel.getLogicalUnitCount(), device, getKernelSource(circuitModel));
+  }
+
+  public OpenClCircuitSimulator(int numCircuits, int circuitInputSize, int circuitStateSize,
       int circuitOutputSize, long globalWorkSize, long localWorkSize, CLDevice device,
       String kernelSource) {
+    this.numCircuits = numCircuits;
     this.circuitInputSize = circuitInputSize;
     this.circuitStateSize = circuitStateSize;
     this.circuitOutputSize = circuitOutputSize;
@@ -57,7 +79,28 @@ public final class OpenClCircuitSimulation implements AutoCloseable {
     kernel.setArg(2, outputBuffer);
   }
 
-  public void getState(int circuitIndex, int[] circuitState) {
+  @Override
+  public int getCircuitCount() {
+    return numCircuits;
+  }
+
+  @Override
+  public int getCircuitInputSize() {
+    return circuitInputSize;
+  }
+
+  @Override
+  public int getCircuitStateSize() {
+    return circuitStateSize;
+  }
+
+  @Override
+  public int getCircuitOutputSize() {
+    return circuitOutputSize;
+  }
+
+  @Override
+  public void getCircuitState(int circuitIndex, int[] circuitState) {
     if (!finished) {
       queue.finish();
       finished = true;
@@ -68,7 +111,8 @@ public final class OpenClCircuitSimulation implements AutoCloseable {
     stateBuffer.getBuffer().rewind();
   }
 
-  public void setState(int circuitIndex, int[] circuitState) {
+  @Override
+  public void setCircuitState(int circuitIndex, int[] circuitState) {
     if (!finished) {
       queue.finish();
       finished = true;
@@ -79,7 +123,8 @@ public final class OpenClCircuitSimulation implements AutoCloseable {
     queue.putWriteBuffer(stateBuffer, true);
   }
 
-  public void setInput(int circuitIndex, int[] circuitInput) {
+  @Override
+  public void setCircuitInput(int circuitIndex, int[] circuitInput) {
     if (!finished) {
       queue.finish();
       finished = true;
@@ -88,7 +133,8 @@ public final class OpenClCircuitSimulation implements AutoCloseable {
     inputBuffer.getBuffer().put(circuitInput);
   }
 
-  public void getOutput(int circuitIndex, int[] circuitOutput) {
+  @Override
+  public void getCircuitOutput(int circuitIndex, int[] circuitOutput) {
     if (!finished) {
       queue.finish();
       finished = true;
@@ -98,6 +144,7 @@ public final class OpenClCircuitSimulation implements AutoCloseable {
     outputBuffer.getBuffer().rewind();
   }
 
+  @Override
   public void update() {
     inputBuffer.getBuffer().rewind();
     queue.putWriteBuffer(inputBuffer, false)
@@ -115,5 +162,13 @@ public final class OpenClCircuitSimulation implements AutoCloseable {
     queue.release();
     kernel.release();
     context.release();
+  }
+
+  private static String getKernelSource(CircuitSimulationModel circuitModel) {
+    OpenClCircuitGeneratorImpl generator = new OpenClCircuitGeneratorImpl(circuitModel);
+    StringWriter strWriter = new StringWriter();
+    PrintWriter out = new PrintWriter(strWriter);
+    generator.generate(out);
+    return strWriter.toString();
   }
 }

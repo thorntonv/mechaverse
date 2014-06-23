@@ -3,12 +3,8 @@ package org.mechaverse.simulation.common.circuit.generator.java;
 import java.io.PrintWriter;
 
 import org.mechaverse.circuit.model.Circuit;
-import org.mechaverse.circuit.model.Output;
-import org.mechaverse.circuit.model.Param;
-import org.mechaverse.simulation.common.circuit.generator.AbstractCircuitSimulationGenerator;
+import org.mechaverse.simulation.common.circuit.generator.AbstractCStyleCircuitSimulationGenerator;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel;
-import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel.ElementInfo;
-import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel.ExternalElementInfo;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel.LogicalUnitInfo;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModelBuilder;
 
@@ -17,7 +13,7 @@ import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel
  *
  * @author thorntonv@mechaverse.org
  */
-public class JavaCircuitGeneratorImpl extends AbstractCircuitSimulationGenerator {
+public class JavaCircuitGeneratorImpl extends AbstractCStyleCircuitSimulationGenerator {
 
   public static final String TYPE = "java";
 
@@ -25,10 +21,6 @@ public class JavaCircuitGeneratorImpl extends AbstractCircuitSimulationGenerator
       ".circuit.generator.java";
 
   static final String IMPL_CLASS_NAME = "CircuitSimulationImpl";
-
-  private static final String LU_INDEX_VAR_NAME = "luIndex";
-  private static final String STATE_VAR_NAME = "state";
-  private static final String LU_STATE_INDEX_VAR_NAME = "luStateIndex";
 
   public JavaCircuitGeneratorImpl(Circuit circuit) {
     this(new CircuitSimulationModelBuilder().buildModel(circuit));
@@ -45,90 +37,41 @@ public class JavaCircuitGeneratorImpl extends AbstractCircuitSimulationGenerator
     LogicalUnitInfo logicalUnitInfo = model.getLogicalUnitInfo();
 
     out.printf("package %s;%n", IMPL_PACKAGE);
-    out.println("public class CircuitSimulationImpl implements CircuitSimulation {");
-    out.println("@Override");
-    out.printf("public void update(int %s, int %s[]) {\n", LU_INDEX_VAR_NAME, STATE_VAR_NAME);
-
-    out.printf("int %s = %s * %d;\n", LU_STATE_INDEX_VAR_NAME, LU_INDEX_VAR_NAME,
-        model.getLogicalUnitInfo().getStateSize());
-
-    // Copy state values into the appropriate external inputs.
-    for(ExternalElementInfo externalElement : logicalUnitInfo.getExternalElements()) {
-      ElementInfo targetElement =
-          logicalUnitInfo.getElementInfo(externalElement.getElement().getElementId());
-      String targetVarName = targetElement.getOutputVarName(externalElement.getElement().getOutputId());
-      int targetStateIndex = logicalUnitInfo.getStateIndex(targetVarName);
-      for(String outputVarName : externalElement.getOutputVarNames()) {
-        String stateIndexExpr = String.format("%s + (%d) + (%d)",
-          LU_STATE_INDEX_VAR_NAME,
-          getRelativeLogicalUnitIndex(externalElement.getElement()), targetStateIndex);
-        out.printf("int %s = %s;", outputVarName, stateIndexExpr);
-        out.println();
-        int totalSize = model.getLogicalUnitInfo().getStateSize() * model.getWidth() * model.getHeight();
-        out.printf("%s = %s[(%s > 0 ? %s : %s + %d) %% %d];", outputVarName, STATE_VAR_NAME,
-            outputVarName, outputVarName, outputVarName, totalSize, totalSize);
-      }
-      out.println();
-    }
-    out.println();
-
-    // Copy state values into the appropriate variables.
-    for (ElementInfo element : logicalUnitInfo.getElements()) {
-      for (Output output : element.getOutputs()) {
-        String varName = element.getOutputVarName(output);
-        int stateIndex = logicalUnitInfo.getStateIndex(varName);
-        out.println(loadStateToVarStatement(varName, stateIndex));
-      }
-    }
-    out.println();
-    for (ElementInfo element : logicalUnitInfo.getElements()) {
-      for (Param param : element.getType().getParams()) {
-        String varName = element.getParamVarName(param);
-        int stateIndex = logicalUnitInfo.getStateIndex(varName);
-        out.println(loadStateToVarStatement(varName, stateIndex));
-      }
-      for (Output output : element.getOutputs()) {
-        for (Param param : output.getParams()) {
-          String varName = element.getOutputParamVarName(output, param);
-          int stateIndex = logicalUnitInfo.getStateIndex(varName);
-          out.println(loadStateToVarStatement(varName, stateIndex));
-        }
-      }
-      out.println();
-    }
-
-    // Perform updates.
-    for (ElementInfo element : logicalUnitInfo.getElements()) {
-      for (Output output : element.getOutputs()) {
-        String expr = getVarMappedExpression(element, output);
-        out.printf("%s = %s;", element.getOutputVarName(output), expr);
-        out.println();
-      }
-    }
-
-    out.println();
-
-    // Copy output values from variables back to state array.
-    for (ElementInfo element : logicalUnitInfo.getElements()) {
-      for (Output output : element.getOutputs()) {
-        String varName = element.getOutputVarName(output);
-        int stateIndex = logicalUnitInfo.getStateIndex(varName);
-        out.println(saveVarToStateStatement(varName, stateIndex));
-      }
-    }
-
-    out.println("}");
+    out.println("public class CircuitSimulationImpl extends AbstractJavaCircuitSimulationImpl {");
+    generateConstructor(logicalUnitInfo, out);
+    generateLogicalUnitUpdateMethod(logicalUnitInfo, out);
     out.println("}");
     out.flush();
   }
 
-  private String loadStateToVarStatement(String varName, int stateIndex) {
-    return String.format("int %s = %s[%s + %d];", varName, STATE_VAR_NAME,
-        LU_STATE_INDEX_VAR_NAME, stateIndex);
+  private void generateConstructor(LogicalUnitInfo logicalUnitInfo, PrintWriter out) {
+    out.println("public CircuitSimulationImpl() {");
+    out.printf("super(%d, %d);%n", model.getLogicalUnitCount(), model.getCircuitStateSize());
+    out.println("}");
   }
 
-  private String saveVarToStateStatement(String varName, int stateIndex) {
-    return String.format("%s[%s + %d] = %s;", STATE_VAR_NAME, LU_STATE_INDEX_VAR_NAME,
-        stateIndex, varName);
+  private void generateLogicalUnitUpdateMethod(LogicalUnitInfo logicalUnitInfo, PrintWriter out) {
+    out.println("@Override");
+    out.printf("public void update(int %s) {%n", LU_INDEX_VAR_NAME);
+
+    out.printf("int %s = %s * %d;%n", LU_STATE_INDEX_VAR_NAME, LU_INDEX_VAR_NAME,
+      logicalUnitInfo.getStateSize());
+
+    // Copy state values into the appropriate external inputs.
+    generateCopyStateValuesToExternalInputs(logicalUnitInfo, out);
+    out.println();
+
+    // Copy state values into the appropriate variables.
+    generateCopyStateValuesToVariables(logicalUnitInfo, out);
+    out.println();
+
+    // Perform updates.
+    generateUpdates(logicalUnitInfo, out);
+    out.println();
+
+    // Copy output values from variables back to state array.
+    generateCopyVariablesToState(logicalUnitInfo, out);
+
+    out.println("}");
   }
 }

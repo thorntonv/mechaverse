@@ -4,13 +4,21 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import org.mechaverse.circuit.model.Circuit;
+import org.mechaverse.simulation.common.circuit.AbstractCircuitSimulatorTest;
+import org.mechaverse.simulation.common.circuit.CircuitSimulator;
 
 import com.jogamp.opencl.CLPlatform;
 
-public class OpenClCircuitSimulationTest {
+/**
+ * Unit test for {@link OpenClCircuitSimulator}.
+ *
+ * @author thorntonv@mechaverse.org
+ */
+public class OpenClCircuitSimulatorTest extends AbstractCircuitSimulatorTest {
 
   private static final String KERNAL_SOURCE =
-      "void kernel " + OpenClCircuitSimulation.KERNEL_NAME + "(" +
+      "void kernel " + OpenClCircuitSimulator.KERNEL_NAME + "(" +
       "    global const int* input, global int* state, global int* output) {" +
       "  output[get_global_id(0)] = state[get_global_id(0)] + input[get_global_id(0)];" +
       "  state[get_global_id(0)]++;" +
@@ -22,13 +30,13 @@ public class OpenClCircuitSimulationTest {
     int state[] = {5};
     int output[] = {0};
 
-    try (OpenClCircuitSimulation circuitSimulation = new OpenClCircuitSimulation(
+    try (OpenClCircuitSimulator circuitSimulation = new OpenClCircuitSimulator(
       1, 1, 1, 1, 1, 1, CLPlatform.getDefault().getMaxFlopsDevice(), KERNAL_SOURCE)) {
-        circuitSimulation.setInput(0, input);
-        circuitSimulation.setState(0, state);
+        circuitSimulation.setCircuitInput(0, input);
+        circuitSimulation.setCircuitState(0, state);
         circuitSimulation.update();
-        circuitSimulation.getOutput(0, output);
-        circuitSimulation.getState(0, state);
+        circuitSimulation.getCircuitOutput(0, output);
+        circuitSimulation.getCircuitState(0, state);
 
         assertEquals(15, output[0]);
         assertEquals(6, state[0]);
@@ -41,18 +49,18 @@ public class OpenClCircuitSimulationTest {
     int state[] = {5};
     int output[] = {0};
 
-    try (OpenClCircuitSimulation circuitSimulation = new OpenClCircuitSimulation(
+    try (OpenClCircuitSimulator circuitSimulation = new OpenClCircuitSimulator(
       1, 1, 1, 1, 1, 1, CLPlatform.getDefault().getMaxFlopsDevice(), KERNAL_SOURCE)) {
-        circuitSimulation.setInput(0, input);
-        circuitSimulation.setState(0, state);
+        circuitSimulation.setCircuitInput(0, input);
+        circuitSimulation.setCircuitState(0, state);
 
       // Perform 10 updates.
       for (int cnt = 1; cnt <= 10; cnt++) {
         circuitSimulation.update();
       }
 
-      circuitSimulation.getOutput(0, output);
-      circuitSimulation.getState(0, state);
+      circuitSimulation.getCircuitOutput(0, output);
+      circuitSimulation.getCircuitState(0, state);
 
       assertEquals(5+9+10, output[0]);
       assertEquals(15, state[0]);
@@ -68,23 +76,23 @@ public class OpenClCircuitSimulationTest {
     int circuitState2[] = {5, 5, 5, 5, 5};
     int circuitOutput[] = {0, 0, 0, 0, 0};
 
-    try (OpenClCircuitSimulation circuitSimulation = new OpenClCircuitSimulation(
+    try (OpenClCircuitSimulator circuitSimulation = new OpenClCircuitSimulator(
       2, 5, 5, 5, 10, 5, CLPlatform.getDefault().getMaxFlopsDevice(), KERNAL_SOURCE)) {
 
-      circuitSimulation.setInput(0, circuitInput1);
-      circuitSimulation.setState(0, circuitState1);
-      circuitSimulation.setInput(1, circuitInput2);
-      circuitSimulation.setState(1, circuitState2);
+      circuitSimulation.setCircuitInput(0, circuitInput1);
+      circuitSimulation.setCircuitState(0, circuitState1);
+      circuitSimulation.setCircuitInput(1, circuitInput2);
+      circuitSimulation.setCircuitState(1, circuitState2);
 
       // Perform 10 updates.
       for (int cnt = 1; cnt <= 10; cnt++) {
         circuitSimulation.update();
       }
 
-      circuitSimulation.getOutput(0, circuitOutput);
+      circuitSimulation.getCircuitOutput(0, circuitOutput);
       assertArrayEquals(new int[] {11, 12, 13, 14, 15}, circuitOutput);
 
-      circuitSimulation.getOutput(1, circuitOutput);
+      circuitSimulation.getCircuitOutput(1, circuitOutput);
       assertArrayEquals(new int[] {20, 21, 22, 23, 14}, circuitOutput);
     }
   }
@@ -107,26 +115,33 @@ public class OpenClCircuitSimulationTest {
     assertEquals(size, circuitInput.length);
     assertEquals(size, circuitState.length);
     assertEquals(size, circuitOutput.length);
-    try (OpenClCircuitSimulation circuitSimulation = new OpenClCircuitSimulation(
+    try (OpenClCircuitSimulator circuitSimulation = new OpenClCircuitSimulator(
         numCircuits, size, size, size, numCircuits*size, size,
             CLPlatform.getDefault().getMaxFlopsDevice(), KERNAL_SOURCE)) {
 
       for(int circuitIdx = 0; circuitIdx < numCircuits; circuitIdx++) {
-        circuitSimulation.setState(circuitIdx, circuitState);
+        circuitSimulation.setCircuitState(circuitIdx, circuitState);
       }
 
       for (int cnt = 1; cnt <= numUpdates; cnt++) {
         for(int circuitIdx = 0; circuitIdx < numCircuits; circuitIdx++) {
-          circuitSimulation.setInput(circuitIdx, circuitInput);
+          circuitSimulation.setCircuitInput(circuitIdx, circuitInput);
         }
 
         circuitSimulation.update();
 
         for(int circuitIdx = 0; circuitIdx < numCircuits; circuitIdx++) {
-          circuitSimulation.getOutput(0, circuitOutput);
+          circuitSimulation.getCircuitOutput(0, circuitOutput);
           assertEquals(circuitOutput[0], circuitOutput[1] - 1);
         }
       }
     }
+  }
+
+  @Override
+  protected CircuitSimulator newCircuitSimulator(Circuit circuit, int circuitCount)
+      throws Exception {
+    return new OpenClCircuitSimulator(
+      circuitCount, 16, 16, CLPlatform.getDefault().getMaxFlopsDevice(), circuit);
   }
 }
