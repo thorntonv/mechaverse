@@ -208,6 +208,7 @@ public class CircuitSimulationModel {
 
       int stateIndex = 0;
       ImmutableMap.Builder<String, Integer> varNameStateIndexMapBuilder = ImmutableMap.builder();
+
       for (ElementInfo element : getElements()) {
         for (Output output : element.getOutputs()) {
           String varName = element.getOutputVarName(output);

@@ -9,14 +9,68 @@ import org.mechaverse.circuit.model.LogicalUnit;
 import org.mechaverse.circuit.model.Output;
 import org.mechaverse.circuit.model.Param;
 import org.mechaverse.circuit.model.Row;
+import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel.ElementInfo;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel.ExternalElementInfo;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel.Input;
+import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModelBuilder;
 import org.mechaverse.simulation.common.circuit.generator.ExternalElement;
 
 public class CircuitTestUtil {
 
   public static final String ROUTING_3IN3OUT_TYPE = "routing3in3out";
+
+  public static class CircuitStateBuilder {
+
+    protected int[] state;
+    protected CircuitSimulationModel model;
+
+    public static CircuitStateBuilder of(Circuit circuit, int circuitCount) {
+      CircuitSimulationModel model = new CircuitSimulationModelBuilder().buildModel(circuit);
+      return new CircuitStateBuilder(new int[circuitCount * model.getCircuitStateSize()], model);
+    }
+
+    public CircuitStateBuilder(int[] state, CircuitSimulationModel model) {
+      this.state = state;
+      this.model = model;
+    }
+
+    public LogicalUnitStateBuilder luStateBuilder(int circuitIdx, int logicalUnitIdx) {
+      return new LogicalUnitStateBuilder(state, circuitIdx * model.getCircuitStateSize()
+          + logicalUnitIdx * model.getLogicalUnitInfo().getStateSize(), model);
+    }
+
+    public int[] getState() {
+      return state;
+    }
+
+    public void setAll(int value) {
+      for (int idx = 0; idx < state.length; idx++) {
+        state[idx] = value;
+      }
+    }
+  }
+
+  public static class LogicalUnitStateBuilder extends CircuitStateBuilder {
+
+    protected int offset;
+
+    public LogicalUnitStateBuilder(int[] state, int offset, CircuitSimulationModel model) {
+      super(state, model);
+      this.offset = offset;
+    }
+
+    public int get(String varName) {
+      int stateIndex = model.getLogicalUnitInfo().getStateIndex(varName);
+      return state[offset + stateIndex];
+    }
+
+    public LogicalUnitStateBuilder set(String varName, int value) {
+      int stateIndex = model.getLogicalUnitInfo().getStateIndex(varName);
+      state[offset + stateIndex] = value;
+      return this;
+    }
+  }
 
   public static class ElementInfoVerifier {
 

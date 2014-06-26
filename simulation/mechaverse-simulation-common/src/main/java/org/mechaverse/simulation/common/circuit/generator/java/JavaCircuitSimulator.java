@@ -102,4 +102,12 @@ public final class JavaCircuitSimulator implements CircuitSimulator {
       JavaCircuitGeneratorImpl.IMPL_PACKAGE + "." + JavaCircuitGeneratorImpl.IMPL_CLASS_NAME,
           out.toString());
   }
+
+  @Override
+  public String toString() {
+    JavaCircuitGeneratorImpl generator = new JavaCircuitGeneratorImpl(circuitModel);
+    StringWriter out = new StringWriter();
+    generator.generate(new PrintWriter(out));
+    return out.toString();
+  }
 }

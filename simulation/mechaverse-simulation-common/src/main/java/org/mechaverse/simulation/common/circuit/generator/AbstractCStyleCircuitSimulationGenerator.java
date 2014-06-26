@@ -30,7 +30,8 @@ public abstract class AbstractCStyleCircuitSimulationGenerator
     for(ExternalElementInfo externalElement : logicalUnitInfo.getExternalElements()) {
       ElementInfo targetElement =
           logicalUnitInfo.getElementInfo(externalElement.getElement().getElementId());
-      String targetVarName = targetElement.getOutputVarName(externalElement.getElement().getOutputId());
+      String targetVarName =
+          targetElement.getOutputVarName(externalElement.getElement().getOutputId());
       int targetStateIndex = logicalUnitInfo.getStateIndex(targetVarName);
       for(String outputVarName : externalElement.getOutputVarNames()) {
         String stateIndexExpr = String.format("%s + (%d) + (%d)", LU_STATE_INDEX_VAR_NAME,

@@ -55,7 +55,7 @@ public class ThreeNeighborConnectionInfoBuilder implements ConnectionInfoBuilder
           inputs[0] = createExternalInput(0, -1, elements[row][colCount - 1], 2);
         }
         // Alternately connect to the row above and below.
-        if(col % 2 == 0) {
+        if(col % 2 == row % 2) {
           // Connect to the row above.
           if (row > 0) {
             inputs[1] = createElementInput(elements[row - 1][col], 1);

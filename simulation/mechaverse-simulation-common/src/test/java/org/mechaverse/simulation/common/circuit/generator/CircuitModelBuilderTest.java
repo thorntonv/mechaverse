@@ -22,7 +22,7 @@ public class CircuitModelBuilderTest {
    * routing3in3out elements in a single row.
    */
   @Test
-  public void testBuildModel_circuit1() {
+  public void testBuildModel_singleRowCircuit() {
     Circuit circuit1 = CircuitTestUtil.createTestCircuit(
         1, 1, CircuitTestUtil.createRouting3in3OutElementType(), 1, 2);
 
@@ -59,34 +59,30 @@ public class CircuitModelBuilderTest {
         .verifyExternalInput(1, "in2")
         .verifyInput(2, element2, element2.getOutputs().get(0))
         .verifyOutputVarNames("e1_out1", "e1_out2", "e1_out3")
-        .verifyOutputParamVarNames(new String[][][]{
-            {{"input2Mask", "e1_out1_input2Mask"}, {"input3Mask", "e1_out1_input3Mask"}},
-            {{"input1Mask", "e1_out2_input1Mask"}, {"input3Mask", "e1_out2_input3Mask"}},
-            {{"input1Mask", "e1_out3_input1Mask"}, {"input2Mask", "e1_out3_input2Mask"}}});
+        .verifyOutputParamVarNames(getExpectedOutputParamNames("e1"));
     ElementInfoVerifier.of(element2).verifyId("2").verifyType(CircuitTestUtil.ROUTING_3IN3OUT_TYPE)
         .verifyInputCount(3)
         .verifyInput(0, element1, element1.getOutputs().get(2))
         .verifyExternalInput(1, "in3")
         .verifyExternalInput(2, "in4")
         .verifyOutputVarNames("e2_out1", "e2_out2", "e2_out3")
-        .verifyOutputParamVarNames(new String[][][]{
-            {{"input2Mask", "e2_out1_input2Mask"}, {"input3Mask", "e2_out1_input3Mask"}},
-            {{"input1Mask", "e2_out2_input1Mask"}, {"input3Mask", "e2_out2_input3Mask"}},
-            {{"input1Mask", "e2_out3_input1Mask"}, {"input2Mask", "e2_out3_input2Mask"}}});
+        .verifyOutputParamVarNames(getExpectedOutputParamNames("e2"));
   }
 
   /**
    * Tests building the model of a circuit with 3x3 logical units that consists of a 3x3 matrix of
    * routing3in3out elements.
    *
-   *    2           3
-   * 1 [1]   [2]   [3] 4
-   * 5 [4]   [5]   [6] 6
-   * 7 [7]   [8]   [9] 9
-   *          8
+   *      [2]     [3]
+   * [1] --1---2---3-- [4]
+   *           |
+   * [5] --4---5---6-- [6]
+   *       |       |
+   * [7] --7---8---9-- [9]
+   *          [8]
    */
   @Test
-  public void testBuildModel_circuit2() {
+  public void testBuildModel_multiRowCircuit() {
     Circuit circuit1 = CircuitTestUtil.createTestCircuit(
         3, 3, CircuitTestUtil.createRouting3in3OutElementType(), 3, 3);
 
@@ -128,5 +124,87 @@ public class CircuitModelBuilderTest {
     ExternalElementInfoVerifier.of(logicalUnitInfo.getExternalElementInfo("in9"))
         .verifyRelativeRow(0).verifyRelativeColumn(1)
         .verifyElementId("7").verifyOutputId("1");
+
+    // Verify elements.
+    ElementInfo element1 = logicalUnitInfo.getElementInfo("1");
+    ElementInfo element2 = logicalUnitInfo.getElementInfo("2");
+    ElementInfo element3 = logicalUnitInfo.getElementInfo("3");
+    ElementInfo element4 = logicalUnitInfo.getElementInfo("4");
+    ElementInfo element5 = logicalUnitInfo.getElementInfo("5");
+    ElementInfo element6 = logicalUnitInfo.getElementInfo("6");
+    ElementInfo element7 = logicalUnitInfo.getElementInfo("7");
+    ElementInfo element8 = logicalUnitInfo.getElementInfo("8");
+    ElementInfo element9 = logicalUnitInfo.getElementInfo("9");
+
+    ElementInfoVerifier.of(element1).verifyId("1").verifyType(CircuitTestUtil.ROUTING_3IN3OUT_TYPE)
+        .verifyInputCount(3)
+        .verifyExternalInput(0, "in1")
+        .verifyExternalInput(1, "in2")
+        .verifyInput(2, element2, element2.getOutputs().get(0))
+        .verifyOutputVarNames("e1_out1", "e1_out2", "e1_out3")
+        .verifyOutputParamVarNames(getExpectedOutputParamNames("e1"));
+    ElementInfoVerifier.of(element2).verifyId("2").verifyType(CircuitTestUtil.ROUTING_3IN3OUT_TYPE)
+        .verifyInputCount(3)
+        .verifyInput(0, element1, element1.getOutputs().get(2))
+        .verifyInput(1, element5, element5.getOutputs().get(1))
+        .verifyInput(2, element3, element3.getOutputs().get(0))
+        .verifyOutputVarNames("e2_out1", "e2_out2", "e2_out3")
+        .verifyOutputParamVarNames(getExpectedOutputParamNames("e2"));
+    ElementInfoVerifier.of(element3).verifyId("3").verifyType(CircuitTestUtil.ROUTING_3IN3OUT_TYPE)
+        .verifyInputCount(3)
+        .verifyInput(0, element2, element2.getOutputs().get(2))
+        .verifyExternalInput(1, "in3")
+        .verifyExternalInput(2, "in4")
+        .verifyOutputVarNames("e3_out1", "e3_out2", "e3_out3")
+        .verifyOutputParamVarNames(getExpectedOutputParamNames("e3"));
+    ElementInfoVerifier.of(element4).verifyId("4").verifyType(CircuitTestUtil.ROUTING_3IN3OUT_TYPE)
+        .verifyInputCount(3)
+        .verifyExternalInput(0, "in5")
+        .verifyInput(1, element7, element2.getOutputs().get(1))
+        .verifyInput(2, element5, element2.getOutputs().get(0))
+        .verifyOutputVarNames("e4_out1", "e4_out2", "e4_out3")
+        .verifyOutputParamVarNames(getExpectedOutputParamNames("e4"));
+    ElementInfoVerifier.of(element5).verifyId("5").verifyType(CircuitTestUtil.ROUTING_3IN3OUT_TYPE)
+        .verifyInputCount(3)
+        .verifyInput(0, element4, element4.getOutputs().get(2))
+        .verifyInput(1, element2, element2.getOutputs().get(1))
+        .verifyInput(2, element6, element6.getOutputs().get(0))
+        .verifyOutputVarNames("e5_out1", "e5_out2", "e5_out3")
+        .verifyOutputParamVarNames(getExpectedOutputParamNames("e5"));
+    ElementInfoVerifier.of(element6).verifyId("6").verifyType(CircuitTestUtil.ROUTING_3IN3OUT_TYPE)
+        .verifyInputCount(3)
+        .verifyInput(0, element5, element5.getOutputs().get(2))
+        .verifyInput(1, element9, element9.getOutputs().get(1))
+        .verifyExternalInput(2, "in6")
+        .verifyOutputVarNames("e6_out1", "e6_out2", "e6_out3")
+        .verifyOutputParamVarNames(getExpectedOutputParamNames("e6"));
+    ElementInfoVerifier.of(element7).verifyId("7").verifyType(CircuitTestUtil.ROUTING_3IN3OUT_TYPE)
+        .verifyInputCount(3)
+        .verifyExternalInput(0, "in7")
+        .verifyInput(1, element4, element4.getOutputs().get(1))
+        .verifyInput(2, element8, element8.getOutputs().get(0))
+        .verifyOutputVarNames("e7_out1", "e7_out2", "e7_out3")
+        .verifyOutputParamVarNames(getExpectedOutputParamNames("e7"));
+    ElementInfoVerifier.of(element8).verifyId("8").verifyType(CircuitTestUtil.ROUTING_3IN3OUT_TYPE)
+        .verifyInputCount(3)
+        .verifyInput(0, element7, element7.getOutputs().get(2))
+        .verifyExternalInput(1, "in8")
+        .verifyInput(2, element9, element9.getOutputs().get(0))
+        .verifyOutputVarNames("e8_out1", "e8_out2", "e8_out3")
+        .verifyOutputParamVarNames(getExpectedOutputParamNames("e8"));
+    ElementInfoVerifier.of(element9).verifyId("9").verifyType(CircuitTestUtil.ROUTING_3IN3OUT_TYPE)
+        .verifyInputCount(3)
+        .verifyInput(0, element8, element8.getOutputs().get(2))
+        .verifyInput(1, element6, element6.getOutputs().get(1))
+        .verifyExternalInput(2, "in9")
+        .verifyOutputVarNames("e9_out1", "e9_out2", "e9_out3")
+        .verifyOutputParamVarNames(getExpectedOutputParamNames("e9"));
+  }
+
+  private String[][][] getExpectedOutputParamNames(String elem) {
+    return new String[][][]{
+        {{"input2Mask", elem + "_out1_input2Mask"}, {"input3Mask", elem + "_out1_input3Mask"}},
+        {{"input1Mask", elem + "_out2_input1Mask"}, {"input3Mask", elem + "_out2_input3Mask"}},
+        {{"input1Mask", elem + "_out3_input1Mask"}, {"input2Mask", elem + "_out3_input2Mask"}}};
   }
 }
