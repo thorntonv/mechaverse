@@ -7,7 +7,8 @@ import java.io.PrintWriter;
 import org.junit.Before;
 import org.junit.Test;
 import org.mechaverse.circuit.model.Circuit;
-import org.mechaverse.simulation.common.circuit.CircuitTestUtil;
+import org.mechaverse.simulation.common.circuit.CircuitBuilder;
+import org.mechaverse.simulation.common.circuit.CircuitBuilder.Routing3In3OutElementType;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel.ElementInfo;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel.LogicalUnitInfo;
 
@@ -23,9 +24,8 @@ public class AbstractCircuitSimulationGeneratorTest {
     public void generate(PrintWriter out) {}
   }
 
-  protected static final Circuit CIRCUIT1 = CircuitTestUtil.createTestCircuit(1, 1,
-    CircuitTestUtil.createRouting3in3OutElementType(), 1, 2);
-
+  protected static final Circuit CIRCUIT1 =
+      CircuitBuilder.newCircuit(1, 1, Routing3In3OutElementType.newInstance(), 1, 2);
 
   @Before
   public void setUp() throws Exception {}

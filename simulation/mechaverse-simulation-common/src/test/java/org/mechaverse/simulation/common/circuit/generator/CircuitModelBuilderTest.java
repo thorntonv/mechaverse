@@ -1,10 +1,12 @@
 package org.mechaverse.simulation.common.circuit.generator;
 
 import static org.junit.Assert.assertEquals;
+import static org.mechaverse.simulation.common.circuit.CircuitBuilder.ROUTING_3IN3OUT_TYPE;
 
 import org.junit.Test;
 import org.mechaverse.circuit.model.Circuit;
-import org.mechaverse.simulation.common.circuit.CircuitTestUtil;
+import org.mechaverse.simulation.common.circuit.CircuitBuilder;
+import org.mechaverse.simulation.common.circuit.CircuitBuilder.Routing3In3OutElementType;
 import org.mechaverse.simulation.common.circuit.CircuitTestUtil.ElementInfoVerifier;
 import org.mechaverse.simulation.common.circuit.CircuitTestUtil.ExternalElementInfoVerifier;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel.ElementInfo;
@@ -23,8 +25,8 @@ public class CircuitModelBuilderTest {
    */
   @Test
   public void testBuildModel_singleRowCircuit() {
-    Circuit circuit1 = CircuitTestUtil.createTestCircuit(
-        1, 1, CircuitTestUtil.createRouting3in3OutElementType(), 1, 2);
+    Circuit circuit1 = 
+        CircuitBuilder.newCircuit(1, 1, Routing3In3OutElementType.newInstance(), 1, 2);
 
     CircuitSimulationModelBuilder modelBuilder = new CircuitSimulationModelBuilder();
     CircuitSimulationModel model = modelBuilder.buildModel(circuit1);
@@ -53,14 +55,14 @@ public class CircuitModelBuilderTest {
     // Verify elements.
     ElementInfo element1 = logicalUnitInfo.getElementInfo("1");
     ElementInfo element2 = logicalUnitInfo.getElementInfo("2");
-    ElementInfoVerifier.of(element1).verifyId("1").verifyType(CircuitTestUtil.ROUTING_3IN3OUT_TYPE)
+    ElementInfoVerifier.of(element1).verifyId("1").verifyType(ROUTING_3IN3OUT_TYPE)
         .verifyInputCount(3)
         .verifyExternalInput(0, "in1")
         .verifyExternalInput(1, "in2")
         .verifyInput(2, element2, element2.getOutputs().get(0))
         .verifyOutputVarNames("e1_out1", "e1_out2", "e1_out3")
         .verifyOutputParamVarNames(getExpectedOutputParamNames("e1"));
-    ElementInfoVerifier.of(element2).verifyId("2").verifyType(CircuitTestUtil.ROUTING_3IN3OUT_TYPE)
+    ElementInfoVerifier.of(element2).verifyId("2").verifyType(ROUTING_3IN3OUT_TYPE)
         .verifyInputCount(3)
         .verifyInput(0, element1, element1.getOutputs().get(2))
         .verifyExternalInput(1, "in3")
@@ -83,8 +85,8 @@ public class CircuitModelBuilderTest {
    */
   @Test
   public void testBuildModel_multiRowCircuit() {
-    Circuit circuit1 = CircuitTestUtil.createTestCircuit(
-        3, 3, CircuitTestUtil.createRouting3in3OutElementType(), 3, 3);
+    Circuit circuit1 = 
+        CircuitBuilder.newCircuit(3, 3, Routing3In3OutElementType.newInstance(), 3, 3);
 
     CircuitSimulationModelBuilder modelBuilder = new CircuitSimulationModelBuilder();
     CircuitSimulationModel model = modelBuilder.buildModel(circuit1);
@@ -136,63 +138,63 @@ public class CircuitModelBuilderTest {
     ElementInfo element8 = logicalUnitInfo.getElementInfo("8");
     ElementInfo element9 = logicalUnitInfo.getElementInfo("9");
 
-    ElementInfoVerifier.of(element1).verifyId("1").verifyType(CircuitTestUtil.ROUTING_3IN3OUT_TYPE)
+    ElementInfoVerifier.of(element1).verifyId("1").verifyType(ROUTING_3IN3OUT_TYPE)
         .verifyInputCount(3)
         .verifyExternalInput(0, "in1")
         .verifyExternalInput(1, "in2")
         .verifyInput(2, element2, element2.getOutputs().get(0))
         .verifyOutputVarNames("e1_out1", "e1_out2", "e1_out3")
         .verifyOutputParamVarNames(getExpectedOutputParamNames("e1"));
-    ElementInfoVerifier.of(element2).verifyId("2").verifyType(CircuitTestUtil.ROUTING_3IN3OUT_TYPE)
+    ElementInfoVerifier.of(element2).verifyId("2").verifyType(ROUTING_3IN3OUT_TYPE)
         .verifyInputCount(3)
         .verifyInput(0, element1, element1.getOutputs().get(2))
         .verifyInput(1, element5, element5.getOutputs().get(1))
         .verifyInput(2, element3, element3.getOutputs().get(0))
         .verifyOutputVarNames("e2_out1", "e2_out2", "e2_out3")
         .verifyOutputParamVarNames(getExpectedOutputParamNames("e2"));
-    ElementInfoVerifier.of(element3).verifyId("3").verifyType(CircuitTestUtil.ROUTING_3IN3OUT_TYPE)
+    ElementInfoVerifier.of(element3).verifyId("3").verifyType(ROUTING_3IN3OUT_TYPE)
         .verifyInputCount(3)
         .verifyInput(0, element2, element2.getOutputs().get(2))
         .verifyExternalInput(1, "in3")
         .verifyExternalInput(2, "in4")
         .verifyOutputVarNames("e3_out1", "e3_out2", "e3_out3")
         .verifyOutputParamVarNames(getExpectedOutputParamNames("e3"));
-    ElementInfoVerifier.of(element4).verifyId("4").verifyType(CircuitTestUtil.ROUTING_3IN3OUT_TYPE)
+    ElementInfoVerifier.of(element4).verifyId("4").verifyType(ROUTING_3IN3OUT_TYPE)
         .verifyInputCount(3)
         .verifyExternalInput(0, "in5")
         .verifyInput(1, element7, element2.getOutputs().get(1))
         .verifyInput(2, element5, element2.getOutputs().get(0))
         .verifyOutputVarNames("e4_out1", "e4_out2", "e4_out3")
         .verifyOutputParamVarNames(getExpectedOutputParamNames("e4"));
-    ElementInfoVerifier.of(element5).verifyId("5").verifyType(CircuitTestUtil.ROUTING_3IN3OUT_TYPE)
+    ElementInfoVerifier.of(element5).verifyId("5").verifyType(ROUTING_3IN3OUT_TYPE)
         .verifyInputCount(3)
         .verifyInput(0, element4, element4.getOutputs().get(2))
         .verifyInput(1, element2, element2.getOutputs().get(1))
         .verifyInput(2, element6, element6.getOutputs().get(0))
         .verifyOutputVarNames("e5_out1", "e5_out2", "e5_out3")
         .verifyOutputParamVarNames(getExpectedOutputParamNames("e5"));
-    ElementInfoVerifier.of(element6).verifyId("6").verifyType(CircuitTestUtil.ROUTING_3IN3OUT_TYPE)
+    ElementInfoVerifier.of(element6).verifyId("6").verifyType(ROUTING_3IN3OUT_TYPE)
         .verifyInputCount(3)
         .verifyInput(0, element5, element5.getOutputs().get(2))
         .verifyInput(1, element9, element9.getOutputs().get(1))
         .verifyExternalInput(2, "in6")
         .verifyOutputVarNames("e6_out1", "e6_out2", "e6_out3")
         .verifyOutputParamVarNames(getExpectedOutputParamNames("e6"));
-    ElementInfoVerifier.of(element7).verifyId("7").verifyType(CircuitTestUtil.ROUTING_3IN3OUT_TYPE)
+    ElementInfoVerifier.of(element7).verifyId("7").verifyType(ROUTING_3IN3OUT_TYPE)
         .verifyInputCount(3)
         .verifyExternalInput(0, "in7")
         .verifyInput(1, element4, element4.getOutputs().get(1))
         .verifyInput(2, element8, element8.getOutputs().get(0))
         .verifyOutputVarNames("e7_out1", "e7_out2", "e7_out3")
         .verifyOutputParamVarNames(getExpectedOutputParamNames("e7"));
-    ElementInfoVerifier.of(element8).verifyId("8").verifyType(CircuitTestUtil.ROUTING_3IN3OUT_TYPE)
+    ElementInfoVerifier.of(element8).verifyId("8").verifyType(ROUTING_3IN3OUT_TYPE)
         .verifyInputCount(3)
         .verifyInput(0, element7, element7.getOutputs().get(2))
         .verifyExternalInput(1, "in8")
         .verifyInput(2, element9, element9.getOutputs().get(0))
         .verifyOutputVarNames("e8_out1", "e8_out2", "e8_out3")
         .verifyOutputParamVarNames(getExpectedOutputParamNames("e8"));
-    ElementInfoVerifier.of(element9).verifyId("9").verifyType(CircuitTestUtil.ROUTING_3IN3OUT_TYPE)
+    ElementInfoVerifier.of(element9).verifyId("9").verifyType(ROUTING_3IN3OUT_TYPE)
         .verifyInputCount(3)
         .verifyInput(0, element8, element8.getOutputs().get(2))
         .verifyInput(1, element6, element6.getOutputs().get(1))

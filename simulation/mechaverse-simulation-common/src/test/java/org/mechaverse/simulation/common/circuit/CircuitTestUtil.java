@@ -2,75 +2,13 @@ package org.mechaverse.simulation.common.circuit;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mechaverse.circuit.model.Circuit;
-import org.mechaverse.circuit.model.Element;
-import org.mechaverse.circuit.model.ElementType;
-import org.mechaverse.circuit.model.LogicalUnit;
 import org.mechaverse.circuit.model.Output;
-import org.mechaverse.circuit.model.Param;
-import org.mechaverse.circuit.model.Row;
-import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel.ElementInfo;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel.ExternalElementInfo;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel.Input;
-import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModelBuilder;
 import org.mechaverse.simulation.common.circuit.generator.ExternalElement;
 
 public class CircuitTestUtil {
-
-  public static final String ROUTING_3IN3OUT_TYPE = "routing3in3out";
-
-  public static class CircuitStateBuilder {
-
-    protected int[] state;
-    protected CircuitSimulationModel model;
-
-    public static CircuitStateBuilder of(Circuit circuit, int circuitCount) {
-      CircuitSimulationModel model = new CircuitSimulationModelBuilder().buildModel(circuit);
-      return new CircuitStateBuilder(new int[circuitCount * model.getCircuitStateSize()], model);
-    }
-
-    public CircuitStateBuilder(int[] state, CircuitSimulationModel model) {
-      this.state = state;
-      this.model = model;
-    }
-
-    public LogicalUnitStateBuilder luStateBuilder(int circuitIdx, int logicalUnitIdx) {
-      return new LogicalUnitStateBuilder(state, circuitIdx * model.getCircuitStateSize()
-          + logicalUnitIdx * model.getLogicalUnitInfo().getStateSize(), model);
-    }
-
-    public int[] getState() {
-      return state;
-    }
-
-    public void setAll(int value) {
-      for (int idx = 0; idx < state.length; idx++) {
-        state[idx] = value;
-      }
-    }
-  }
-
-  public static class LogicalUnitStateBuilder extends CircuitStateBuilder {
-
-    protected int offset;
-
-    public LogicalUnitStateBuilder(int[] state, int offset, CircuitSimulationModel model) {
-      super(state, model);
-      this.offset = offset;
-    }
-
-    public int get(String varName) {
-      int stateIndex = model.getLogicalUnitInfo().getStateIndex(varName);
-      return state[offset + stateIndex];
-    }
-
-    public LogicalUnitStateBuilder set(String varName, int value) {
-      int stateIndex = model.getLogicalUnitInfo().getStateIndex(varName);
-      state[offset + stateIndex] = value;
-      return this;
-    }
-  }
 
   public static class ElementInfoVerifier {
 
@@ -191,62 +129,5 @@ public class CircuitTestUtil {
     public static ExternalElementInfoVerifier of(ExternalElementInfo elementInfo) {
       return new ExternalElementInfoVerifier(elementInfo);
     }
-  }
-
-  /**
-   * Creates a test circuit with a logical unit that consists of a matrix of elements of the given
-   * type.
-   *
-   * @param width the number of logical units per row
-   * @param height the number of logical unit rows
-   * @param elementType the elementType
-   * @param unitRowCount the number of rows in a logical unit
-   * @param unitColumnCount the number of columns in a logical unit
-   */
-  public static Circuit createTestCircuit(int width, int height, ElementType elementType,
-      int unitRowCount, int unitColumnCount) {
-    Circuit circuit = new Circuit();
-    circuit.setWidth(width);
-    circuit.setHeight(height);
-    circuit.getElementTypes().add(elementType);
-    circuit.setLogicalUnit(new LogicalUnit());
-    for (int rowCount = 1; rowCount <= unitRowCount; rowCount++) {
-      Row row = new Row();
-      for (int colCount = 1; colCount <= unitColumnCount; colCount++) {
-        row.getElements().add(createElement(elementType.getId()));
-      }
-      circuit.getLogicalUnit().getRows().add(row);
-    }
-    return circuit;
-  }
-
-  public static ElementType createRouting3in3OutElementType() {
-    ElementType routing = new ElementType();
-    routing.setId(ROUTING_3IN3OUT_TYPE);
-    routing.getOutputs().add(createOutput(
-      "1", "({input2} & {input2Mask}) | ({input3} & {input3Mask})", "input2Mask", "input3Mask"));
-    routing.getOutputs().add(createOutput(
-      "2", "({input1} & {input1Mask}) | ({input3} & {input3Mask})", "input1Mask", "input3Mask"));
-    routing.getOutputs().add(createOutput(
-      "3", "({input1} & {input1Mask}) | ({input2} & {input2Mask})", "input1Mask", "input2Mask"));
-    return routing;
-  }
-
-  public static Output createOutput(String id, String expression, String... paramIds) {
-    Output output = new Output();
-    output.setId(id);
-    output.setExpression(expression);
-    for (String paramId : paramIds) {
-      Param param = new Param();
-      param.setId(paramId);
-      output.getParams().add(param);
-    }
-    return output;
-  }
-
-  public static Element createElement(String type) {
-    Element element = new Element();
-    element.setType(type);
-    return element;
   }
 }

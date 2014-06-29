@@ -4,8 +4,9 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.mechaverse.circuit.model.Circuit;
-import org.mechaverse.simulation.common.circuit.CircuitTestUtil.CircuitStateBuilder;
-import org.mechaverse.simulation.common.circuit.CircuitTestUtil.LogicalUnitStateBuilder;
+import org.mechaverse.simulation.common.circuit.CircuitBuilder.CircuitStateBuilder;
+import org.mechaverse.simulation.common.circuit.CircuitBuilder.LogicalUnitStateBuilder;
+import org.mechaverse.simulation.common.circuit.CircuitBuilder.Routing3In3OutElementType;
 
 /**
  * Abstract base test for {@link CircuitSimulator} implementations.
@@ -27,8 +28,8 @@ public abstract class AbstractCircuitSimulatorTest {
   // [9] ---13---14---15---16--- [12]
   //       [10]      [11]
   //
-  private static final Circuit ROUTING_CIRCUIT = CircuitTestUtil.createTestCircuit(3, 3,
-    CircuitTestUtil.createRouting3in3OutElementType(), 4, 4);
+  private static final Circuit ROUTING_CIRCUIT =
+      CircuitBuilder.newCircuit(3, 3, Routing3In3OutElementType.newInstance(), 4, 4);
 
   protected abstract CircuitSimulator newCircuitSimulator(Circuit circuit, int circuitCount)
       throws Exception;

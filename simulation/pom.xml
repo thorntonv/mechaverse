@@ -16,6 +16,7 @@
   
   <modules>
     <module>mechaverse-simulation-common</module>
+    <module>mechaverse-simulation-benchmark</module>
     <module>ant</module>
   </modules>
 </project>

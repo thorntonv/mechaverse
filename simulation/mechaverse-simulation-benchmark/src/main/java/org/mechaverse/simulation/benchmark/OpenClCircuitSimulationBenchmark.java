@@ -1,7 +1,9 @@
-package org.mechaverse.simulation.common.opencl;
+package org.mechaverse.simulation.benchmark;
 
 import org.mechaverse.circuit.model.Circuit;
-import org.mechaverse.simulation.common.circuit.CircuitTestUtil;
+import org.mechaverse.simulation.common.circuit.CircuitBuilder;
+import org.mechaverse.simulation.common.circuit.CircuitBuilder.Routing3In3OutElementType;
+import org.mechaverse.simulation.common.opencl.OpenClCircuitSimulator;
 
 import com.google.caliper.Benchmark;
 import com.google.caliper.Param;
@@ -30,8 +32,8 @@ public class OpenClCircuitSimulationBenchmark extends Benchmark {
     state = new int[size];
     output = new int[size];
 
-    Circuit circuit = CircuitTestUtil.createTestCircuit(numLogicalUnits, 1,
-        CircuitTestUtil.createRouting3in3OutElementType(), 1, numElements);
+    Circuit circuit = CircuitBuilder.newCircuit(numLogicalUnits, 1,
+        Routing3In3OutElementType.newInstance(), 1, numElements);
     circuitSimulation = new OpenClCircuitSimulator(numCircuits, size, size,
         CLPlatform.getDefault().getMaxFlopsDevice(), circuit);
 
