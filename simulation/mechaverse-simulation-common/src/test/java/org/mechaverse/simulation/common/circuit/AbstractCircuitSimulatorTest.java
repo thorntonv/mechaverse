@@ -45,6 +45,17 @@ public abstract class AbstractCircuitSimulatorTest {
   }
 
   @Test
+  public void multipleCircuit_stateSize() throws Exception {
+    CircuitSimulator circuitSimulator = newCircuitSimulator(ROUTING_CIRCUIT, 5);
+
+    int wordsPerElement = 3 + 2*3; // 3 outputs + 2 params per output.
+    int elementsPerLu = 4 * 4;
+    int luPerCircuit = 3 * 3;
+    assertEquals(wordsPerElement * elementsPerLu * luPerCircuit,
+        circuitSimulator.getCircuitStateSize());
+  }
+
+  @Test
   public void update_internalRoutingElement() throws Exception {
     CircuitStateBuilder stateBuilder = CircuitStateBuilder.of(ROUTING_CIRCUIT, 1);
     LogicalUnitStateBuilder luStateBuilder = stateBuilder.luStateBuilder(0, 0);

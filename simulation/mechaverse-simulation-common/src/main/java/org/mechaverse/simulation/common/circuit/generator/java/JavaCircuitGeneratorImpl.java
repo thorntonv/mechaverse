@@ -66,8 +66,14 @@ public class JavaCircuitGeneratorImpl extends AbstractCStyleCircuitSimulationGen
     out.println();
 
     // Perform updates.
+
+    if (model.getIterationsPerUpdate() > 1) {
+      out.println("for(int cnt = 0; cnt < " + model.getIterationsPerUpdate() + "; cnt++) {");
+    }
     generateUpdates(logicalUnitInfo, out);
-    out.println();
+    if (model.getIterationsPerUpdate() > 1) {
+      out.println("}");
+    }
 
     // Copy output values from variables back to state array.
     generateCopyVariablesToState(logicalUnitInfo, out);

@@ -49,9 +49,9 @@ public final class OpenClCircuitSimulator implements CircuitSimulator {
 
   private OpenClCircuitSimulator(int numCircuits, int circuitInputSize,
       int circuitOutputSize, CLDevice device, CircuitSimulationModel circuitModel) {
-    this(numCircuits, circuitInputSize, numCircuits * circuitModel.getCircuitStateSize(),
-        circuitOutputSize, numCircuits * circuitModel.getLogicalUnitCount(),
-        circuitModel.getLogicalUnitCount(), device, getKernelSource(circuitModel));
+    this(numCircuits, circuitInputSize, circuitModel.getCircuitStateSize(), circuitOutputSize,
+        numCircuits * circuitModel.getLogicalUnitCount(), circuitModel.getLogicalUnitCount(),
+            device, getKernelSource(circuitModel));
   }
 
   public OpenClCircuitSimulator(int numCircuits, int circuitInputSize, int circuitStateSize,

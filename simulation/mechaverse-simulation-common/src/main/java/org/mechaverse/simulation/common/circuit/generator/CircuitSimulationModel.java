@@ -309,6 +309,10 @@ public class CircuitSimulationModel {
     return circuit.getHeight();
   }
 
+  public int getIterationsPerUpdate() {
+    return circuit.getIterationsPerUpdate() != null ? circuit.getIterationsPerUpdate() : 1;
+  }
+
   public int getCircuitStateSize() {
     return logicalUnitInfo.getStateSize() * getLogicalUnitCount();
   }

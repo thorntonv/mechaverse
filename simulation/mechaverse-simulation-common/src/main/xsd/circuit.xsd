@@ -14,6 +14,7 @@
     <attribute name="id" type="string" />
     <attribute name="width" type="int" use="required" />
     <attribute name="height" type="int" use="required" />
+    <attribute name="iterationsPerUpdate" type="int" use="optional" />
   </complexType>
 
   <complexType name="element-type">

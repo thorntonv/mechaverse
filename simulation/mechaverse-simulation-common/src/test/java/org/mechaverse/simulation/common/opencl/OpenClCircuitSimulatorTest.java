@@ -79,6 +79,9 @@ public class OpenClCircuitSimulatorTest extends AbstractCircuitSimulatorTest {
     try (OpenClCircuitSimulator circuitSimulation = new OpenClCircuitSimulator(
       2, 5, 5, 5, 10, 5, CLPlatform.getDefault().getMaxFlopsDevice(), KERNAL_SOURCE)) {
 
+      assertEquals(5, circuitSimulation.getCircuitInputSize());
+      assertEquals(5, circuitSimulation.getCircuitStateSize());
+      assertEquals(5, circuitSimulation.getCircuitOutputSize());
       circuitSimulation.setCircuitInput(0, circuitInput1);
       circuitSimulation.setCircuitState(0, circuitState1);
       circuitSimulation.setCircuitInput(1, circuitInput2);
