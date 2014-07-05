@@ -2,6 +2,8 @@ package org.mechaverse.simulation.common.circuit;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Random;
+
 import org.mechaverse.circuit.model.Output;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel.ElementInfo;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel.ExternalElementInfo;
@@ -128,6 +130,16 @@ public class CircuitTestUtil {
 
     public static ExternalElementInfoVerifier of(ExternalElementInfo elementInfo) {
       return new ExternalElementInfoVerifier(elementInfo);
+    }
+  }
+
+  /**
+   * Sets the given state to a repeatable random state.
+   */
+  public static void setRandomState(int[] state) {
+    Random random = new Random(0b1010010);
+    for (int idx = 0; idx < state.length; idx++) {
+      state[idx] = random.nextInt();
     }
   }
 }

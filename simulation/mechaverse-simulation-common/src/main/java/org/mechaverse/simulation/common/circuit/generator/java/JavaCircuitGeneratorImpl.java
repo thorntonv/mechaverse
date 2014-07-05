@@ -3,8 +3,11 @@ package org.mechaverse.simulation.common.circuit.generator.java;
 import java.io.PrintWriter;
 
 import org.mechaverse.circuit.model.Circuit;
+import org.mechaverse.circuit.model.Output;
 import org.mechaverse.simulation.common.circuit.generator.AbstractCStyleCircuitSimulationGenerator;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel;
+import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel.ElementInfo;
+import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel.Input;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel.LogicalUnitInfo;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModelBuilder;
 
@@ -31,6 +34,16 @@ public class JavaCircuitGeneratorImpl extends AbstractCStyleCircuitSimulationGen
   }
 
   @Override
+  protected String getLogicalUnitIndexExpr() {
+    return "luIndex";
+  }
+
+  @Override
+  protected String getThreadStateOffsetExpr() {
+    return getLogicalUnitIndexExpr();
+  }
+
+  @Override
   public void generate(PrintWriter out) {
     // TODO(thorntonv): Properly indent the generated code.
 
@@ -46,38 +59,48 @@ public class JavaCircuitGeneratorImpl extends AbstractCStyleCircuitSimulationGen
 
   private void generateConstructor(LogicalUnitInfo logicalUnitInfo, PrintWriter out) {
     out.println("public CircuitSimulationImpl() {");
-    out.printf("super(%d, %d);%n", model.getLogicalUnitCount(), model.getCircuitStateSize());
+    out.printf("super(%d, %d, %d, %d);%n", model.getLogicalUnitCount(), numExternalElements,
+        model.getCircuitStateSize(), model.getIterationsPerUpdate());
     out.println("}");
   }
 
   private void generateLogicalUnitUpdateMethod(LogicalUnitInfo logicalUnitInfo, PrintWriter out) {
     out.println("@Override");
-    out.printf("public void update(int %s) {%n", LU_INDEX_VAR_NAME);
-
-    out.printf("int %s = %s * %d;%n", LU_STATE_INDEX_VAR_NAME, LU_INDEX_VAR_NAME,
-      logicalUnitInfo.getStateSize());
-
-    // Copy state values into the appropriate external inputs.
-    generateCopyStateValuesToExternalInputs(logicalUnitInfo, out);
-    out.println();
+    out.printf("public void update(int %s) {%n", luIndexExpr);
 
     // Copy state values into the appropriate variables.
     generateCopyStateValuesToVariables(logicalUnitInfo, out);
     out.println();
 
+    generateCopyStateValuesToExternalInputs("external", logicalUnitInfo, out);
+    out.println();
+
     // Perform updates.
 
-    if (model.getIterationsPerUpdate() > 1) {
-      out.println("for(int cnt = 0; cnt < " + model.getIterationsPerUpdate() + "; cnt++) {");
-    }
     generateUpdates(logicalUnitInfo, out);
-    if (model.getIterationsPerUpdate() > 1) {
-      out.println("}");
-    }
 
     // Copy output values from variables back to state array.
     generateCopyVariablesToState(logicalUnitInfo, out);
 
     out.println("}");
+  }
+
+  @Override
+  protected void printExternalElementDebugInfo(
+      String outputVarName, String stateIndexExpr, PrintWriter out) {
+    out.printf("System.out.println(\"%s: %s = \" + (%s));",
+        outputVarName, stateIndexExpr, outputVarName);
+  }
+
+  @Override
+  protected void printUpdateDebugInfo(ElementInfo element, Output output, String updateExpr,
+      LogicalUnitInfo logicalUnitInfo, PrintWriter out) {
+    out.printf("System.out.println(\"lu\" + luIndex + \":%s=\" + %s + \" %s\");%n",
+        element.getOutputVarName(output), element.getOutputVarName(output), updateExpr);
+    for (Input input : element.getInputs()) {
+      ElementInfo inputElement = logicalUnitInfo.getElementInfo(input.getElement().getId());
+      String inputVarName = inputElement.getOutputVarName(input.getOutput());
+      out.printf("System.out.println(\"  %s = \" + %s);%n", inputVarName, inputVarName);
+    }
   }
 }

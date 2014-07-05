@@ -12,7 +12,7 @@ import org.mechaverse.circuit.model.Output;
 import org.mechaverse.circuit.model.Param;
 import org.mechaverse.simulation.common.circuit.generator.ExternalElement.ExternalElementType;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.Iterables;
 
 /**
@@ -200,32 +200,13 @@ public class CircuitSimulationModel {
 
     private final List<ElementInfo> elements;
     private final List<ExternalElementInfo> externalElements;
-    private final ImmutableMap<String, Integer> varNameStateIndexMap;
+    private final ImmutableBiMap<String, Integer> varNameStateIndexMap;
 
-    public LogicalUnitInfo(List<ElementInfo> elements, List<ExternalElementInfo> externalElements) {
+    public LogicalUnitInfo(List<ElementInfo> elements, List<ExternalElementInfo> externalElements,
+        ImmutableBiMap<String, Integer> varNameStateIndexMap) {
       this.elements = elements;
       this.externalElements = externalElements;
-
-      int stateIndex = 0;
-      ImmutableMap.Builder<String, Integer> varNameStateIndexMapBuilder = ImmutableMap.builder();
-
-      for (ElementInfo element : getElements()) {
-        for (Output output : element.getOutputs()) {
-          String varName = element.getOutputVarName(output);
-          varNameStateIndexMapBuilder.put(varName, stateIndex++);
-        }
-        for (Param param : element.getType().getParams()) {
-          String varName = element.getParamVarName(param);
-          varNameStateIndexMapBuilder.put(varName, stateIndex++);
-        }
-        for (Output output : element.getOutputs()) {
-          for (Param param : output.getParams()) {
-            String varName = element.getOutputParamVarName(output, param);
-            varNameStateIndexMapBuilder.put(varName, stateIndex++);
-          }
-        }
-      }
-      this.varNameStateIndexMap = varNameStateIndexMapBuilder.build();
+      this.varNameStateIndexMap = varNameStateIndexMap;
     }
 
     public List<ElementInfo> getElements() {
@@ -265,6 +246,17 @@ public class CircuitSimulationModel {
      */
     public int getStateIndex(String varName) {
       return varNameStateIndexMap.get(varName);
+    }
+
+    /**
+     * Returns the variable names ordered by state index.
+     */
+    public String[] getVarNames() {
+      String[] varNames = new String[getStateSize()];
+      for (int idx = 0; idx < varNames.length; idx++) {
+        varNames[idx] = varNameStateIndexMap.inverse().get(idx);
+      }
+      return varNames;
     }
 
     /**

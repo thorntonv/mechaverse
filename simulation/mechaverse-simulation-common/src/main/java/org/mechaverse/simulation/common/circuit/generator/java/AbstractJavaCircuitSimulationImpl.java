@@ -9,10 +9,15 @@ public abstract class AbstractJavaCircuitSimulationImpl implements JavaCircuitSi
 
   protected final int numLogicalUnits;
   protected final int[] state;
+  protected final int[] external;
+  protected final int iterationsPerUpdate;
 
-  public AbstractJavaCircuitSimulationImpl(int numLogicalUnits, int stateSize) {
+  public AbstractJavaCircuitSimulationImpl(int numLogicalUnits, int numExternalElements,
+       int stateSize, int iterationsPerUpdate) {
     this.numLogicalUnits = numLogicalUnits;
     this.state = new int[stateSize];
+    this.external = new int[numExternalElements * numLogicalUnits];
+    this.iterationsPerUpdate = iterationsPerUpdate;
   }
 
   @Override
@@ -32,8 +37,13 @@ public abstract class AbstractJavaCircuitSimulationImpl implements JavaCircuitSi
 
   @Override
   public void update() {
-    for (int luIndex = 0; luIndex < numLogicalUnits; luIndex++) {
-      update(luIndex);
+    for (int iteration = 0; iteration < iterationsPerUpdate; iteration++) {
+      for (int idx = 0; idx < external.length; idx++) {
+        external[idx] = state[idx];
+      }
+      for (int luIndex = 0; luIndex < numLogicalUnits; luIndex++) {
+        update(luIndex);
+      }
     }
   }
 

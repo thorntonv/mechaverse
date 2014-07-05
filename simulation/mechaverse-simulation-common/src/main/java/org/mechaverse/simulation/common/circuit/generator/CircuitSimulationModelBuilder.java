@@ -19,6 +19,8 @@ import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel.LogicalUnitInfo;
 import org.mechaverse.simulation.common.circuit.generator.ExternalElement.ExternalElementType;
 
+import com.google.common.collect.ImmutableBiMap;
+
 /**
  * Builds a {@link CircuitSimulationModel} for a {@link Circuit}.
  *
@@ -156,7 +158,58 @@ public class CircuitSimulationModelBuilder {
     for (ExternalElement externalElement : connectionInfo.getExternalElements()) {
       externalElements.add(new ExternalElementInfoBuilder(externalElement).build());
     }
-    return new LogicalUnitInfo(elements, externalElements);
+    return new LogicalUnitInfo(elements, externalElements,
+        buildVarNameStateIndexMap(elements, externalElements));
+  }
+
+  protected ImmutableBiMap<String, Integer> buildVarNameStateIndexMap(
+      Iterable<ElementInfo> elements, Iterable<ExternalElementInfo> externalElements) {
+    int stateIndex = 0;
+    ImmutableBiMap.Builder<String, Integer> varNameStateIndexMapBuilder = ImmutableBiMap.builder();
+
+    // Outputs that are the input of an external element come first.
+    for (ElementInfo element : elements) {
+      for (Output output : element.getOutputs()) {
+        if (isExternalInput(element, output, externalElements)) {
+          String varName = element.getOutputVarName(output);
+          varNameStateIndexMapBuilder.put(varName, stateIndex++);
+        }
+      }
+    }
+
+    for (ElementInfo element : elements) {
+      for (Output output : element.getOutputs()) {
+        if (!isExternalInput(element, output, externalElements)) {
+          String varName = element.getOutputVarName(output);
+          varNameStateIndexMapBuilder.put(varName, stateIndex++);
+        }
+      }
+    }
+
+    for (ElementInfo element : elements) {
+      for (Param param : element.getType().getParams()) {
+        String varName = element.getParamVarName(param);
+        varNameStateIndexMapBuilder.put(varName, stateIndex++);
+      }
+      for (Output output : element.getOutputs()) {
+        for (Param param : output.getParams()) {
+          String varName = element.getOutputParamVarName(output, param);
+          varNameStateIndexMapBuilder.put(varName, stateIndex++);
+        }
+      }
+    }
+    return varNameStateIndexMapBuilder.build();
+  }
+
+  private boolean isExternalInput(
+      ElementInfo element, Output output, Iterable<ExternalElementInfo> externalElements) {
+    for (ExternalElementInfo externalElement : externalElements) {
+      if (externalElement.getElement().getElementId().equals(element.getId())
+          && externalElement.getElement().getOutputId().equals(output.getId())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**

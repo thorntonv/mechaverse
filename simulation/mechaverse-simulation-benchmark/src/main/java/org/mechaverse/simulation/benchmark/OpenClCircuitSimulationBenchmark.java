@@ -12,8 +12,8 @@ import com.jogamp.opencl.CLPlatform;
 
 public class OpenClCircuitSimulationBenchmark extends Benchmark {
 
-  @Param(value = {"8", "12", "16"}) int numElements;
-  @Param(value = {"128", "256"}) int numLogicalUnits;
+  @Param(value = {"12"}) int numElements;
+  @Param(value = {"128"}) int numLogicalUnits;
   @Param(value = {"200"}) int iterationsPerUpdate;
   @Param(value = {"false"}) boolean ioEnabled;
   @Param(value = {"500"}) int numCircuits;
@@ -29,14 +29,15 @@ public class OpenClCircuitSimulationBenchmark extends Benchmark {
     super.setUp();
 
     input = new int[size];
-    state = new int[size];
     output = new int[size];
 
-    Circuit circuit = CircuitBuilder.newCircuit(numLogicalUnits, 1,
-        Routing3In3OutElementType.newInstance(), 1, numElements);
-    circuitSimulation = new OpenClCircuitSimulator(numCircuits, size, size,
-        CLPlatform.getDefault().getMaxFlopsDevice(), circuit);
+    Circuit circuit = CircuitBuilder.newCircuit(
+        numLogicalUnits, 1, Routing3In3OutElementType.newInstance(), 4, numElements / 4);
+    circuit.setIterationsPerUpdate(iterationsPerUpdate);
+    circuitSimulation = new OpenClCircuitSimulator(
+        numCircuits, size, size, CLPlatform.getDefault().getMaxFlopsDevice(), circuit);
 
+    state = new int[circuitSimulation.getCircuitStateSize()];
     for (int circuitIdx = 0; circuitIdx < numCircuits; circuitIdx++) {
       circuitSimulation.setCircuitState(circuitIdx, state);
     }

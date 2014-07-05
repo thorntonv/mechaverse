@@ -62,8 +62,8 @@ public class CircuitBuilder {
     }
 
     public LogicalUnitStateBuilder luStateBuilder(int circuitIdx, int logicalUnitIdx) {
-      return new LogicalUnitStateBuilder(state, circuitIdx * model.getCircuitStateSize()
-          + logicalUnitIdx * model.getLogicalUnitInfo().getStateSize(), model);
+      return new LogicalUnitStateBuilder(state, logicalUnitIdx, 
+          circuitIdx * model.getCircuitStateSize(), model);
     }
 
     public int[] getState() {
@@ -82,21 +82,24 @@ public class CircuitBuilder {
    */
   public static class LogicalUnitStateBuilder extends CircuitStateBuilder {
 
-    protected int offset;
+    private int logicalUnitIndex;
+    private int offset;
 
-    public LogicalUnitStateBuilder(int[] state, int offset, CircuitSimulationModel model) {
+    public LogicalUnitStateBuilder(
+        int[] state, int logicalUnitIndex, int offset, CircuitSimulationModel model) {
       super(state, model);
+      this.logicalUnitIndex = logicalUnitIndex;
       this.offset = offset;
     }
 
     public int get(String varName) {
       int stateIndex = model.getLogicalUnitInfo().getStateIndex(varName);
-      return state[offset + stateIndex];
+      return state[offset + logicalUnitIndex + stateIndex * model.getLogicalUnitCount()];
     }
 
     public LogicalUnitStateBuilder set(String varName, int value) {
       int stateIndex = model.getLogicalUnitInfo().getStateIndex(varName);
-      state[offset + stateIndex] = value;
+      state[offset + logicalUnitIndex + stateIndex * model.getLogicalUnitCount()] = value;
       return this;
     }
   }
