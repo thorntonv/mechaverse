@@ -137,7 +137,7 @@ public class CircuitTestUtil {
    * Sets the given state to a repeatable random state.
    */
   public static void setRandomState(int[] state) {
-    Random random = new Random(0b1010010);
+    Random random = new Random(CircuitTestUtil.class.getName().hashCode());
     for (int idx = 0; idx < state.length; idx++) {
       state[idx] = random.nextInt();
     }

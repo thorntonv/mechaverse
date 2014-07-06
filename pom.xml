@@ -46,7 +46,12 @@
         <groupId>org.uncommons.maths</groupId>
         <artifactId>uncommons-maths</artifactId>
         <version>1.2</version>
-      </dependency>          
+      </dependency>
+      <dependency>
+        <groupId>net.sf.trove4j</groupId>
+        <artifactId>trove4j</artifactId>
+        <version>3.0.3</version>
+      </dependency>      
       <dependency>
         <groupId>log4j</groupId>
         <artifactId>log4j</artifactId>
