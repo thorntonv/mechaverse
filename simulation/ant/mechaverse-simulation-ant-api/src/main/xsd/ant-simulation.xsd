@@ -51,6 +51,7 @@
           <element name="data" type="base64Binary" minOccurs="1" maxOccurs="1" />
           <element name="inputPositions" type="mechaverse:InputPositions" minOccurs="1" maxOccurs="1" />
           <element name="outputPositions" type="mechaverse:OutputPositions" minOccurs="1" maxOccurs="1" />
+          <element name="bitMutationProbability" type="float" minOccurs="1" maxOccurs="1" />
         </sequence>
       </extension>
     </complexContent>
@@ -145,6 +146,7 @@
       <element name="id" type="string" minOccurs="1" maxOccurs="1" />
       <element name="environment" type="mechaverse:Environment" minOccurs="1" maxOccurs="1" />
       <element name="sub_environment" type="mechaverse:Environment" minOccurs="0" maxOccurs="unbounded" />
+      <element name="seed" type="string" minOccurs="1" maxOccurs="1" />
     </sequence>
   </complexType>
 
