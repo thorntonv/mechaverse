@@ -1,5 +1,7 @@
 package org.mechaverse.simulation.common.genetic;
 
+import java.util.Random;
+
 /**
  * Mutates bits in a byte array.
  *
@@ -10,5 +12,5 @@ public interface Mutator {
   /**
    * Mutates bytes in the given array.
    */
-  public void mutate(byte[] data);
+  void mutate(byte[] data, Random random);
 }

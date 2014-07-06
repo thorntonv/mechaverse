@@ -17,21 +17,20 @@ public class BitMutator implements Mutator {
 
   private static final int BITS_PER_BYTE = 8;
 
-  private final float bitMutationProbability;
-  private final Random random;
+  private final double bitMutationProbability;
 
-  public BitMutator(float bitMutationProbability, Random random) {
+  public BitMutator(double bitMutationProbability) {
     Preconditions.checkArgument(bitMutationProbability >= 0.0f && bitMutationProbability <= 1.0f);
     this.bitMutationProbability = bitMutationProbability;
-    this.random = Preconditions.checkNotNull(random);
   }
 
   @Override
-  public void mutate(byte[] data) {
+  public void mutate(byte[] data, Random random) {
     Preconditions.checkNotNull(data);
+    Preconditions.checkNotNull(random);
 
     int bitCount = data.length * BITS_PER_BYTE;
-    int numBitsToMutate = getNumBitsToMutate(bitCount);
+    int numBitsToMutate = getNumBitsToMutate(bitCount, random);
 
     TIntArrayList mutatedBits = new TIntArrayList(numBitsToMutate);
     for (int cnt = 1; cnt <= numBitsToMutate; cnt++) {
@@ -51,7 +50,7 @@ public class BitMutator implements Mutator {
     data[arrayIndex] ^= (1 << bitInByte);
   }
 
-  private int getNumBitsToMutate(int bitCount) {
+  private int getNumBitsToMutate(int bitCount, Random random) {
     if (bitMutationProbability == 0) {
       return 0;
     } else if (bitMutationProbability == 1) {

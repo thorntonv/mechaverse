@@ -24,45 +24,45 @@ public class BitMutatorTest {
 
   @Test
   public void mutate_noBitsMutated() {
-    Mutator mutator = new BitMutator(0.001f, random);
+    Mutator mutator = new BitMutator(0.001f);
 
     byte[] unmodifiedData = new byte[10];
     random.nextBytes(unmodifiedData);
     byte[] data = Arrays.copyOf(unmodifiedData, unmodifiedData.length);
-    mutator.mutate(data);
+    mutator.mutate(data, random);
     assertArrayEquals(unmodifiedData, data);
   }
 
   @Test
   public void mutate_bitsMutated() {
-    Mutator mutator = new BitMutator(0.001f, random);
+    Mutator mutator = new BitMutator(0.001f);
 
     byte[] unmodifiedData = new byte[1024];
     random.nextBytes(unmodifiedData);
     byte[] data = Arrays.copyOf(unmodifiedData, unmodifiedData.length);
-    mutator.mutate(data);
+    mutator.mutate(data, random);
     assertFalse(Arrays.equals(unmodifiedData, data));
   }
 
   @Test
   public void mutate_bitMutationProbabilityZero() {
-    Mutator mutator = new BitMutator(0.0f, random);
+    Mutator mutator = new BitMutator(0.0f);
 
     byte[] unmodifiedData = new byte[1024];
     random.nextBytes(unmodifiedData);
     byte[] data = Arrays.copyOf(unmodifiedData, unmodifiedData.length);
-    mutator.mutate(data);
+    mutator.mutate(data, random);
     assertArrayEquals(unmodifiedData, data);
   }
 
   @Test
   public void mutate_bitMutationProbabilityOne() {
-    Mutator mutator = new BitMutator(1.0f, random);
+    Mutator mutator = new BitMutator(1.0f);
 
     byte[] expectedDataData = new byte[1024];
     random.nextBytes(expectedDataData);
     byte[] data = Arrays.copyOf(expectedDataData, expectedDataData.length);
-    mutator.mutate(data);
+    mutator.mutate(data, random);
 
     // Invert all the bits in the expected data.
     for(int idx = 0; idx < data.length; idx++) {
