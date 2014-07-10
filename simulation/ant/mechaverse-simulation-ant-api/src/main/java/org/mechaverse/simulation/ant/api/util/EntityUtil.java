@@ -1,4 +1,4 @@
-package org.mechaverse.gwt.client.util;
+package org.mechaverse.simulation.ant.api.util;
 
 import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.api.model.Barrier;

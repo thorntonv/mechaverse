@@ -4,11 +4,11 @@ import java.util.Set;
 
 import org.mechaverse.gwt.client.MechaverseResourceBundle;
 import org.mechaverse.gwt.client.util.Coordinate;
-import org.mechaverse.gwt.client.util.EntityUtil;
 import org.mechaverse.simulation.ant.api.model.Direction;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Environment;
+import org.mechaverse.simulation.ant.api.util.EntityUtil;
 
 import com.google.common.collect.Sets;
 import com.google.gwt.canvas.client.Canvas;
