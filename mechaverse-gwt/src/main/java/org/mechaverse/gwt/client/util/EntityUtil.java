@@ -7,6 +7,7 @@ import org.mechaverse.simulation.ant.api.model.Dirt;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Food;
+import org.mechaverse.simulation.ant.api.model.Nest;
 import org.mechaverse.simulation.ant.api.model.Pheromone;
 import org.mechaverse.simulation.ant.api.model.Rock;
 
@@ -28,6 +29,8 @@ public class EntityUtil {
       return EntityType.DIRT;
     } else if (entity instanceof Food) {
       return EntityType.FOOD;
+    } else if (entity instanceof Nest) {
+      return EntityType.NEST;
     } else if (entity instanceof Pheromone) {
       return EntityType.PHEROMONE;
     } else if (entity instanceof Rock) {

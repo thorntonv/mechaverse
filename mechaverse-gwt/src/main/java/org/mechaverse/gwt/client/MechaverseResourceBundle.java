@@ -45,6 +45,8 @@ public interface MechaverseResourceBundle extends ClientBundle {
       ImageUtil.asImageElement(INSTANCE.dirt());
   public static final ImageElement FOOD_IMAGE_ELEMENT =
       ImageUtil.asImageElement(INSTANCE.food());
+  public static final ImageElement NEST_IMAGE_ELEMENT =
+      ImageUtil.asImageElement(INSTANCE.nest());
   public static final ImageElement PHEROMONE_IMAGE_ELEMENT =
       ImageUtil.asImageElement(INSTANCE.pheromone());
   public static final ImageElement RED_ANT_IMAGE_ELEMENT =
@@ -59,6 +61,7 @@ public interface MechaverseResourceBundle extends ClientBundle {
           .put(EntityType.CONDUIT, INSTANCE.conduit())
           .put(EntityType.DIRT, INSTANCE.dirt())
           .put(EntityType.FOOD, INSTANCE.food())
+          .put(EntityType.NEST, INSTANCE.nest())
           .put(EntityType.PHEROMONE, INSTANCE.pheromone())
           .put(EntityType.ROCK, INSTANCE.rock())
           .build();
@@ -70,6 +73,7 @@ public interface MechaverseResourceBundle extends ClientBundle {
           .put(EntityType.CONDUIT, CONDUIT_IMAGE_ELEMENT)
           .put(EntityType.DIRT, DIRT_IMAGE_ELEMENT)
           .put(EntityType.FOOD, FOOD_IMAGE_ELEMENT)
+          .put(EntityType.NEST, NEST_IMAGE_ELEMENT)
           .put(EntityType.PHEROMONE, PHEROMONE_IMAGE_ELEMENT)
           .put(EntityType.ROCK, ROCK_IMAGE_ELEMENT)
           .build();
@@ -121,6 +125,9 @@ public interface MechaverseResourceBundle extends ClientBundle {
 
   @Source("images/food.png")
   ImageResource food();
+
+  @Source("images/nest.png")
+  ImageResource nest();
 
   @Source("images/pheromone.png")
   ImageResource pheromone();

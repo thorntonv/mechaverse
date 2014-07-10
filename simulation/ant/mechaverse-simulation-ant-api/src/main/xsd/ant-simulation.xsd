@@ -26,6 +26,7 @@
       <enumeration value="Conduit" />
       <enumeration value="Dirt" />
       <enumeration value="Food" />
+      <enumeration value="Nest" />
       <enumeration value="Pheromone" />
       <enumeration value="Rock" />
     </restriction>
@@ -110,6 +111,12 @@
   </complexType>
 
   <complexType name="Food">
+    <complexContent>
+      <extension base="mechaverse:Entity" />
+    </complexContent>
+  </complexType>
+
+  <complexType name="Nest">
     <complexContent>
       <extension base="mechaverse:Entity" />
     </complexContent>
