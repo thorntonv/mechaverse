@@ -69,7 +69,6 @@ public class SimulationEditorPresenter {
     service.loadState(key, new AsyncCallback<SimulationState>() {
       @Override
       public void onFailure(Throwable caught) {
-        Window.alert(caught.getMessage());
         saveInitialState();
       }
 
@@ -89,18 +88,29 @@ public class SimulationEditorPresenter {
   public void createNewEnvironment() {
     Preconditions.checkNotNull(state);
 
-    Environment newEnvironment = new Environment();
-    newEnvironment.setId(UUID.uuid().toString());
+    final Environment newEnvironment = new Environment();
+    newEnvironment.setId(UUID.uuid().toString().toLowerCase());
     newEnvironment.setWidth(25);
     newEnvironment.setHeight(25);
     state.getSubEnvironments().add(newEnvironment);
 
-    save();
-    environmentId = null;
-    loadState();
+    save(new AsyncCallback<Void>() {
+      @Override
+      public void onFailure(Throwable error) {}
+
+      @Override
+      public void onSuccess(Void value) {
+        environmentId = newEnvironment.getId();
+        loadState();
+      }
+    });
   }
 
   public void save() {
+    save(null);
+  }
+
+  public void save(final AsyncCallback<Void> callback) {
     Preconditions.checkNotNull(state);
 
     service.saveState(key, state, new AsyncCallback<Void>() {
@@ -110,8 +120,10 @@ public class SimulationEditorPresenter {
       }
 
       @Override
-      public void onSuccess(Void arg0) {
-        Window.alert("Save complete.");
+      public void onSuccess(Void value) {
+        if (callback != null) {
+          callback.onSuccess(value);
+        }
       }
     });
   }
@@ -124,12 +136,18 @@ public class SimulationEditorPresenter {
       Environment env = environmentIt.next();
       if (env.getId().equalsIgnoreCase(environmentId)) {
         environmentIt.remove();
+        save(new AsyncCallback<Void>() {
+          @Override
+          public void onFailure(Throwable arg0) {}
+
+          @Override
+          public void onSuccess(Void arg0) {
+            environmentId = null;
+            loadState();
+          }
+        });
       }
     }
-
-    save();
-    environmentId = null;
-    loadState();
   }
 
   public void setEnvironment(final String environmentId) {
@@ -143,6 +161,7 @@ public class SimulationEditorPresenter {
         env = state.getEnvironment();
       }
     }
+    view.setDeleteEnabled(!env.getId().equals(state.getEnvironment().getId()));
     environmentEditorPresenter.setEnvironment(env);
   }
 

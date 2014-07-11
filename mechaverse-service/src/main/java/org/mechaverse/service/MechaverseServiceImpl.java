@@ -51,25 +51,21 @@ public class MechaverseServiceImpl implements AntSimulationService {
 
   @Override
   public SimulationState loadState(String key) throws Exception {
-    InputStream in = new GZIPInputStream(new FileInputStream(getSimulationFilename(key)));
-    try {
+    String simulationFilename = getSimulationFilename(key);
+    try (InputStream in = new GZIPInputStream(new FileInputStream(simulationFilename))) {
       JAXBContext jaxbContext = JAXBContext.newInstance(SimulationState.class);
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
       return (SimulationState) jaxbUnmarshaller.unmarshal(in);
-    } finally {
-      in.close();
     }
   }
 
   @Override
   public void saveState(String key, SimulationState state) throws Exception {
-    OutputStream out = new GZIPOutputStream(new FileOutputStream(getSimulationFilename(key)));
-    try {
+    String simulationFilename = getSimulationFilename(key);
+    try (OutputStream out = new GZIPOutputStream(new FileOutputStream(simulationFilename))) {
       JAXBContext jaxbContext = JAXBContext.newInstance(SimulationState.class);
       Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
       jaxbMarshaller.marshal(state, out);
-    } finally {
-      out.close();
     }
   }
 

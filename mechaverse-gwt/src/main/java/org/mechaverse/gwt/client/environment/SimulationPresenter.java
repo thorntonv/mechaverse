@@ -5,6 +5,7 @@ import org.mechaverse.simulation.ant.api.model.SimulationState;
 
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.Window.ScrollEvent;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class SimulationPresenter {
@@ -17,7 +18,7 @@ public class SimulationPresenter {
       service.step(new AsyncCallback<Void>() {
         @Override
         public void onFailure(Throwable ex) {
-          Window.alert(ex.getMessage());
+          cancel();
         }
 
         @Override
@@ -46,6 +47,14 @@ public class SimulationPresenter {
 
   public SimulationPresenter(SimulationView view) {
     this(INITIAL_STATE_KEY, view);
+
+    Window.addWindowScrollHandler(new Window.ScrollHandler() {
+      @Override
+      public void onWindowScroll(ScrollEvent arg0) {
+        updateTimer.cancel();
+        updateTimer.scheduleRepeating(1000);
+      }
+    });
   }
 
   public SimulationPresenter(String key, SimulationView view) {

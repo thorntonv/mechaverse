@@ -99,4 +99,8 @@ public class SimulationEditorView extends ResizeComposite {
   public void setEnvironment(Environment environment) {
     environmentEditorView.setEnvironment(environment);
   }
+
+  public void setDeleteEnabled(boolean enabled) {
+    deleteButton.setEnabled(enabled);
+  }
 }
