@@ -11,6 +11,7 @@ import org.mechaverse.simulation.ant.api.model.Dirt;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.Environment;
 import org.mechaverse.simulation.ant.api.model.Food;
+import org.mechaverse.simulation.ant.api.model.Nest;
 import org.mechaverse.simulation.ant.api.model.Pheromone;
 import org.mechaverse.simulation.ant.api.model.Rock;
 
@@ -19,6 +20,7 @@ public final class CellEnvironment {
   private final int rowCount;
   private final int colCount;
   private final Cell[][] cells;
+  private final Environment env;
 
   private final List<Ant> ants = new ArrayList<Ant>();
 
@@ -26,6 +28,7 @@ public final class CellEnvironment {
     this.rowCount = env.getHeight();
     this.colCount = env.getWidth();
     this.cells = new Cell[env.getHeight()][env.getWidth()];
+    this.env = env;
 
     // Allocate cells.
     for (int row = 0; row < env.getHeight(); row++) {
@@ -55,8 +58,20 @@ public final class CellEnvironment {
     }
   }
 
+  public int getRowCount() {
+    return rowCount;
+  }
+
+  public int getColumnCount() {
+    return colCount;
+  }
+
   public List<Ant> getAnts() {
     return ants;
+  }
+
+  public boolean hasCell(int row, int col) {
+    return row >= 0 && col >= 0 && row < cells.length && col < cells[row].length;
   }
 
   public Cell getCell(int row, int col) {
@@ -101,6 +116,34 @@ public final class CellEnvironment {
         break;
     }
     return isValidCellCoordinate(row, col) ? cells[row][col] : null;
+  }
+
+  public void moveAntToCell(Ant ant, Cell fromCell, Cell targetCell) {
+    fromCell.setAnt(null);
+    ant.setX(targetCell.getColumn());
+    ant.setY(targetCell.getRow());
+    targetCell.setAnt(ant);
+  }
+
+  public void addRock(Rock rock, Cell toCell) {
+    rock.setX(toCell.getColumn());
+    rock.setY(toCell.getRow());
+    toCell.setRock(rock);
+    env.getEntities().add(rock);
+  }
+
+  public void addBarrier(Barrier barrier, Cell toCell) {
+    barrier.setX(toCell.getColumn());
+    barrier.setY(toCell.getRow());
+    toCell.setBarrier(barrier);
+    env.getEntities().add(barrier);
+  }
+
+  public void addNest(Nest nest, Cell toCell) {
+    nest.setX(toCell.getColumn());
+    nest.setY(toCell.getRow());
+    toCell.setNest(nest);
+    env.getEntities().add(nest);
   }
 
   private boolean isValidCellCoordinate(int row, int column) {

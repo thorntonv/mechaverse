@@ -5,6 +5,7 @@ import org.mechaverse.simulation.ant.api.model.Barrier;
 import org.mechaverse.simulation.ant.api.model.Conduit;
 import org.mechaverse.simulation.ant.api.model.Dirt;
 import org.mechaverse.simulation.ant.api.model.Food;
+import org.mechaverse.simulation.ant.api.model.Nest;
 import org.mechaverse.simulation.ant.api.model.Pheromone;
 import org.mechaverse.simulation.ant.api.model.Rock;
 
@@ -18,6 +19,7 @@ public final class Cell {
   private Conduit conduit;
   private Dirt dirt;
   private Food food;
+  private Nest nest;
   private Pheromone pheromone;
   private Rock rock;
 
@@ -74,6 +76,14 @@ public final class Cell {
     this.food = food;
   }
 
+  public Nest getNest() {
+    return nest;
+  }
+
+  public void setNest(Nest nest) {
+    this.nest = nest;
+  }
+
   public Pheromone getPheromone() {
     return pheromone;
   }
@@ -88,5 +98,10 @@ public final class Cell {
 
   public void setRock(Rock rock) {
     this.rock = rock;
+  }
+
+  public boolean isEmpty() {
+    return ant == null && barrier == null && conduit == null && dirt == null && food == null
+        && nest == null && pheromone == null && rock == null;
   }
 }
