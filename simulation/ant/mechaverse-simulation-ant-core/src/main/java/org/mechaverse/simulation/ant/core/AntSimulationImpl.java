@@ -12,7 +12,7 @@ import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Environment;
 import org.mechaverse.simulation.ant.api.model.SimulationState;
-import org.mechaverse.simulation.common.cell.EnvironmentGenerator;
+import org.mechaverse.simulation.common.cellautomata.EnvironmentGenerator;
 
 public final class AntSimulationImpl {
 

@@ -1,4 +1,4 @@
-package org.mechaverse.simulation.common.cell;
+package org.mechaverse.simulation.common.cellautomata;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ public abstract class AbstractProbabilisticEnvironmentGenerator<E, T>
   /**
    * An entity probability distribution. Any unused part of the pmf is assigned to the absent entity
    * option.
-   * 
+   *
    * @param <T> the entity type
    */
   public static class EntityDistribution<T> {

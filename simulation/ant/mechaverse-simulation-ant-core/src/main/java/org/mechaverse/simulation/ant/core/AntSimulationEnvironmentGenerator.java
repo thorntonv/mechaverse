@@ -9,7 +9,7 @@ import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Environment;
 import org.mechaverse.simulation.ant.api.model.Nest;
 import org.mechaverse.simulation.ant.api.util.EntityUtil;
-import org.mechaverse.simulation.common.cell.AbstractProbabilisticEnvironmentGenerator;
+import org.mechaverse.simulation.common.cellautomata.AbstractProbabilisticEnvironmentGenerator;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableTable;

@@ -1,4 +1,4 @@
-package org.mechaverse.simulation.common.cell;
+package org.mechaverse.simulation.common.cellautomata;
 
 import java.util.Random;
 
