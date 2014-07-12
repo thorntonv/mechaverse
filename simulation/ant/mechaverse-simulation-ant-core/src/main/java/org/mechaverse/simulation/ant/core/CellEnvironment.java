@@ -11,7 +11,6 @@ import org.mechaverse.simulation.ant.api.model.Dirt;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.Environment;
 import org.mechaverse.simulation.ant.api.model.Food;
-import org.mechaverse.simulation.ant.api.model.Nest;
 import org.mechaverse.simulation.ant.api.model.Pheromone;
 import org.mechaverse.simulation.ant.api.model.Rock;
 
@@ -39,23 +38,12 @@ public final class CellEnvironment {
 
     // Add entities to the appropriate cells.
     for (Entity entity : env.getEntities()) {
-      if (entity instanceof Ant) {
-        getCell(entity).setAnt((Ant) entity);
-        ants.add((Ant) entity);
-      } else if (entity instanceof Barrier) {
-        getCell(entity).setBarrier((Barrier) entity);
-      } else if (entity instanceof Conduit) {
-        getCell(entity).setConduit((Conduit) entity);
-      } else if (entity instanceof Dirt) {
-        getCell(entity).setDirt((Dirt) entity);
-      } else if (entity instanceof Food) {
-        getCell(entity).setFood((Food) entity);
-      } else if (entity instanceof Pheromone) {
-        getCell(entity).setPheromone((Pheromone) entity);
-      } else if (entity instanceof Rock) {
-        getCell(entity).setRock((Rock) entity);
-      }
+      setEntityCell(entity, getCell(entity));
     }
+  }
+
+  public Environment getEnvironment() {
+    return env;
   }
 
   public int getRowCount() {
@@ -118,6 +106,11 @@ public final class CellEnvironment {
     return isValidCellCoordinate(row, col) ? cells[row][col] : null;
   }
 
+  public void addEntity(Entity entity, Cell cell) {
+    env.getEntities().add(entity);
+    setEntityCell(entity, cell);
+  }
+
   public void moveAntToCell(Ant ant, Cell fromCell, Cell targetCell) {
     fromCell.setAnt(null);
     ant.setX(targetCell.getColumn());
@@ -125,25 +118,26 @@ public final class CellEnvironment {
     targetCell.setAnt(ant);
   }
 
-  public void addRock(Rock rock, Cell toCell) {
-    rock.setX(toCell.getColumn());
-    rock.setY(toCell.getRow());
-    toCell.setRock(rock);
-    env.getEntities().add(rock);
-  }
+  private void setEntityCell(Entity entity, Cell cell) {
+    entity.setX(cell.getColumn());
+    entity.setY(cell.getRow());
 
-  public void addBarrier(Barrier barrier, Cell toCell) {
-    barrier.setX(toCell.getColumn());
-    barrier.setY(toCell.getRow());
-    toCell.setBarrier(barrier);
-    env.getEntities().add(barrier);
-  }
-
-  public void addNest(Nest nest, Cell toCell) {
-    nest.setX(toCell.getColumn());
-    nest.setY(toCell.getRow());
-    toCell.setNest(nest);
-    env.getEntities().add(nest);
+    if (entity instanceof Ant) {
+      cell.setAnt((Ant) entity);
+      ants.add((Ant) entity);
+    } else if (entity instanceof Barrier) {
+      cell.setBarrier((Barrier) entity);
+    } else if (entity instanceof Conduit) {
+      cell.setConduit((Conduit) entity);
+    } else if (entity instanceof Dirt) {
+      cell.setDirt((Dirt) entity);
+    } else if (entity instanceof Food) {
+      cell.setFood((Food) entity);
+    } else if (entity instanceof Pheromone) {
+      cell.setPheromone((Pheromone) entity);
+    } else if (entity instanceof Rock) {
+      cell.setRock((Rock) entity);
+    }
   }
 
   private boolean isValidCellCoordinate(int row, int column) {

@@ -5,25 +5,29 @@ import static org.mechaverse.simulation.ant.core.AntSimulationUtil.turnCCW;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import java.util.Random;
 
 import org.mechaverse.simulation.ant.api.SimulationStateUtil;
 import org.mechaverse.simulation.ant.api.model.Ant;
+import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Environment;
 import org.mechaverse.simulation.ant.api.model.SimulationState;
+import org.mechaverse.simulation.common.cell.EnvironmentGenerator;
 
 public final class AntSimulationImpl {
 
+  private static final int DEFAULT_ENVIRONMENT_WIDTH = 200;
+  private static final int DEFAULT_ENVIRONMENT_HEIGHT = 200;
+
   private SimulationState state;
   private final List<CellEnvironment> environments = new ArrayList<CellEnvironment>();
+  private final EnvironmentGenerator<CellEnvironment, EntityType> environmentGenerator =
+      new AntSimulationEnvironmentGenerator();
 
   public AntSimulationImpl() {
     state = new SimulationState();
-    Environment env = new Environment();
-    env.setId(UUID.randomUUID().toString());
-    env.setWidth(10);
-    env.setHeight(10);
-    state.setEnvironment(env);
+    state.setEnvironment(environmentGenerator.generate(
+        DEFAULT_ENVIRONMENT_WIDTH, DEFAULT_ENVIRONMENT_HEIGHT, new Random()).getEnvironment());
   }
 
   public SimulationState getState() {
@@ -58,16 +62,9 @@ public final class AntSimulationImpl {
     Cell cell = env.getCell(ant);
     Cell targetCell = env.getCellInDirection(cell, ant.getDirection());
     if (targetCell != null && canMoveAntToCell(targetCell)) {
-      moveAntToCell(ant, cell, targetCell);
+      env.moveAntToCell(ant, cell, targetCell);
       return true;
     }
     return false;
-  }
-
-  private void moveAntToCell(Ant ant, Cell fromCell, Cell targetCell) {
-    fromCell.setAnt(null);
-    ant.setX(targetCell.getColumn());
-    ant.setY(targetCell.getRow());
-    targetCell.setAnt(ant);
   }
 }
