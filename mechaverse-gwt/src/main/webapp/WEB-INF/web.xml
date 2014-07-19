@@ -13,7 +13,7 @@
 
   <servlet-mapping>
     <servlet-name>mechaverseServlet</servlet-name>
-    <url-pattern>MechaverseClient/service</url-pattern>
+    <url-pattern>/MechaverseClient/service</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
