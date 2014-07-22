@@ -1,31 +1,15 @@
 package org.mechaverse.simulation.ant.core;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.api.model.Direction;
-import org.mechaverse.simulation.ant.api.model.Rock;
 
 /**
  * Unit tests for {@link AntSimulationUtil}.
  */
 public class AntSimulationUtilTest {
-
-  @Test
-  public void canMoveAntToCell_emptyCell() {
-    Cell cell = new Cell(1, 1);
-    assertTrue(AntSimulationUtil.canMoveAntToCell(cell));
-  }
-
-  @Test
-  public void canMoveAntToCell_rockCell() {
-    Cell cell = new Cell(1, 1);
-    cell.setRock(new Rock());
-    assertFalse(AntSimulationUtil.canMoveAntToCell(cell));
-  }
 
   @Test
   public void testTurnCW() {

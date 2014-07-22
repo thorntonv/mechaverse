@@ -3,7 +3,7 @@
 	xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" xmlns:xs="http://www.w3.org/2001/XMLSchema"
 	jaxb:extensionBindingPrefixes="xjc">
 
-	<jaxb:globalBindings>
+	<jaxb:globalBindings fixedAttributeAsConstantProperty="true">
 		<xjc:simple />
 		<xjc:serializable uid="-1" />
 		<jaxb:javaType name="java.util.Calendar" xmlType="xs:dateTime"

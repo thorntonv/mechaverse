@@ -3,6 +3,7 @@ package org.mechaverse.simulation.ant.api.util;
 import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.api.model.Barrier;
 import org.mechaverse.simulation.ant.api.model.Conduit;
+import org.mechaverse.simulation.ant.api.model.Direction;
 import org.mechaverse.simulation.ant.api.model.Dirt;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.EntityType;
@@ -17,6 +18,10 @@ import org.mechaverse.simulation.ant.api.model.Rock;
  * @author thorntonv@mechaverse.org
  */
 public class EntityUtil {
+
+  public static final EntityType[] ENTITY_TYPES = EntityType.values();
+
+  public static final Direction[] DIRECTIONS = Direction.values();
 
   /**
    * Returns the {@link EntityType} of the given {@link Entity}.
@@ -47,6 +52,8 @@ public class EntityUtil {
    */
   public static Entity newEntity(EntityType entityType) {
     switch (entityType) {
+      case NONE:
+        break;
       case ANT:
         return new Ant();
       case BARRIER:

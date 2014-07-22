@@ -1,27 +1,22 @@
 package org.mechaverse.simulation.ant.core;
 
-import org.mechaverse.simulation.ant.api.model.Ant;
-import org.mechaverse.simulation.ant.api.model.Barrier;
-import org.mechaverse.simulation.ant.api.model.Conduit;
-import org.mechaverse.simulation.ant.api.model.Dirt;
-import org.mechaverse.simulation.ant.api.model.Food;
-import org.mechaverse.simulation.ant.api.model.Nest;
-import org.mechaverse.simulation.ant.api.model.Pheromone;
-import org.mechaverse.simulation.ant.api.model.Rock;
+import java.util.List;
+
+import org.mechaverse.simulation.ant.api.model.Entity;
+import org.mechaverse.simulation.ant.api.model.EntityType;
+import org.mechaverse.simulation.ant.api.util.EntityUtil;
+
+import com.google.common.collect.ImmutableList;
 
 public final class Cell {
 
   private final int row;
   private final int column;
 
-  private Ant ant;
-  private Barrier barrier;
-  private Conduit conduit;
-  private Dirt dirt;
-  private Food food;
-  private Nest nest;
-  private Pheromone pheromone;
-  private Rock rock;
+  private Entity primaryEntity;
+  private EntityType primaryEntityType;
+
+  private Entity[] entities = new Entity[EntityType.values().length];
 
   public Cell(int row, int column) {
     this.row = row;
@@ -36,72 +31,63 @@ public final class Cell {
     return column;
   }
 
-  public Ant getAnt() {
-    return ant;
-  }
-
-  public void setAnt(Ant ant) {
-    this.ant = ant;
-  }
-
-  public Barrier getBarrier() {
-    return barrier;
-  }
-
-  public void setBarrier(Barrier barrier) {
-    this.barrier = barrier;
-  }
-
-  public Conduit getConduit() {
-    return conduit;
-  }
-
-  public void setConduit(Conduit conduit) {
-    this.conduit = conduit;
-  }
-
-  public Dirt getDirt() {
-    return dirt;
-  }
-
-  public void setDirt(Dirt dirt) {
-    this.dirt = dirt;
-  }
-
-  public Food getFood() {
-    return food;
-  }
-
-  public void setFood(Food food) {
-    this.food = food;
-  }
-
-  public Nest getNest() {
-    return nest;
-  }
-
-  public void setNest(Nest nest) {
-    this.nest = nest;
-  }
-
-  public Pheromone getPheromone() {
-    return pheromone;
-  }
-
-  public void setPheromone(Pheromone pheromone) {
-    this.pheromone = pheromone;
-  }
-
-  public Rock getRock() {
-    return rock;
-  }
-
-  public void setRock(Rock rock) {
-    this.rock = rock;
-  }
-
   public boolean isEmpty() {
-    return ant == null && barrier == null && conduit == null && dirt == null && food == null
-        && nest == null && pheromone == null && rock == null;
+    return primaryEntity == null;
+  }
+
+  public void setEntity(Entity entity) {
+    setEntity(entity, EntityUtil.getType(entity));
+  }
+
+  public void setEntity(Entity entity, EntityType type) {
+    entities[type.ordinal()] = entity;
+
+    if (primaryEntityType == null || type.ordinal() <= primaryEntityType.ordinal()) {
+      primaryEntity = entity;
+      primaryEntityType = type;
+    }
+  }
+
+  public Entity getEntity() {
+    return primaryEntity;
+  }
+
+  public EntityType getEntityType() {
+    return primaryEntityType;
+  }
+
+  public boolean hasEntity(EntityType type) {
+    return entities[type.ordinal()] != null;
+  }
+
+  public Entity getEntity(EntityType type) {
+    return entities[type.ordinal()];
+  }
+
+  public Entity removeEntity(EntityType type) {
+    Entity removedEntity = entities[type.ordinal()];
+    entities[type.ordinal()] = null;
+    if (primaryEntityType == type) {
+      for (int idx = type.ordinal() + 1; idx < entities.length; idx++) {
+        primaryEntity = entities[idx];
+        if (primaryEntity != null) {
+          primaryEntityType = EntityUtil.ENTITY_TYPES[idx];
+          return removedEntity;
+        }
+      }
+      primaryEntity = null;
+      primaryEntityType = null;
+    }
+    return removedEntity;
+  }
+
+  public List<Entity> getEntities() {
+    ImmutableList.Builder<Entity> builder = ImmutableList.builder();
+    for (Entity entity : entities) {
+      if (entity != null) {
+        builder.add(entity);
+      }
+    }
+    return builder.build();
   }
 }

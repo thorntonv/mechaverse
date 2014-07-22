@@ -1,9 +1,12 @@
 package org.mechaverse.gwt.client.environment;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.mechaverse.gwt.client.MechaverseResourceBundle;
 import org.mechaverse.gwt.client.util.Coordinate;
+import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.api.model.Direction;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.EntityType;
@@ -97,18 +100,38 @@ public class EnvironmentView extends SimplePanel {
     }
     dirtyCells.clear();
 
+    List<Entity> carriedEntities = new ArrayList<>();
     for (Entity entity : environment.getEntities()) {
-      EntityType entityType = EntityUtil.getType(entity);
-      ImageElement image = MechaverseResourceBundle.ENTITY_IMAGE_ELEMENTS.get(entityType);
-      if (entityType == EntityType.ANT) {
-        Direction direction = entity.getDirection();
-        direction = direction != null ? direction : Direction.EAST;
-        image = MechaverseResourceBundle.BLACK_ANT_IMAGE_ELEMENTS.get(direction);
+      if (entity instanceof Ant) {
+        Ant ant = (Ant) entity;
+        if (ant.getCarriedEntity() != null) {
+          carriedEntities.add(ant.getCarriedEntity());
+        }
       }
+    }
+
+    for (Entity entity : environment.getEntities()) {
+      ImageElement image = getImage(entity);
+      drawEntity(entity, image, context);
+    }
+
+    for (Entity entity : carriedEntities) {
+      ImageElement image = getImage(entity);
       drawEntity(entity, image, context);
     }
   }
 
+  private ImageElement getImage(Entity entity) {
+    EntityType entityType = EntityUtil.getType(entity);
+    ImageElement image = MechaverseResourceBundle.ENTITY_IMAGE_ELEMENTS.get(entityType);
+    if (entityType == EntityType.ANT) {
+      Direction direction = entity.getDirection();
+      direction = direction != null ? direction : Direction.EAST;
+      image = MechaverseResourceBundle.BLACK_ANT_IMAGE_ELEMENTS.get(direction);
+    }
+    return image;
+  }
+  
   protected void drawEntity(Entity entity, ImageElement image, Context2d context) {
     Coordinate coord = Coordinate.create(entity.getY(), entity.getX());
     drawImage(image, context, coord.getRow(), coord.getColumn());

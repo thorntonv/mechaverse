@@ -43,16 +43,18 @@ public class EntityToolbar extends HorizontalPanel {
     addStyleName(MechaverseResourceBundle.INSTANCE.css().entityToolbar());
 
     for (final EntityType entityType : EntityType.values()) {
-      EntityButton button = new EntityButton(entityType);
-      button.addClickHandler(new ClickHandler() {
-        @Override
-        public void onClick(ClickEvent event) {
-          setSelectedEntityType(entityType);
-        }
-      });
+      if (entityType != EntityType.NONE) {
+        EntityButton button = new EntityButton(entityType);
+        button.addClickHandler(new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent event) {
+            setSelectedEntityType(entityType);
+          }
+        });
 
-      entityButtons.put(entityType, button);
-      add(button);
+        entityButtons.put(entityType, button);
+        add(button);
+      }
     }
   }
 

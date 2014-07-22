@@ -44,6 +44,7 @@ public class EnvironmentEditorPresenter implements EnvironmentView.Observer, IsW
       switch (view.getToolbar().getSelectedEntityType()) {
         case ANT:
           newEntity = new Ant();
+          newEntity.setId(UUID.uuid().toString());
           newEntity.setDirection(Direction.EAST);
           break;
         case BARRIER:
@@ -60,7 +61,6 @@ public class EnvironmentEditorPresenter implements EnvironmentView.Observer, IsW
       }
 
       if (newEntity != null) {
-        newEntity.setId(UUID.uuid().toString());
         cell.add(newEntity);
       }
     }

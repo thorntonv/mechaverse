@@ -7,12 +7,6 @@ public final class AntSimulationUtil {
 
   private AntSimulationUtil() {}
 
-  public static boolean canMoveAntToCell(Cell cell) {
-    // An an can move to the cell if it does not contain another ant, a barrier, a rock, or dirt.
-    return cell.getAnt() == null && cell.getBarrier() == null && cell.getDirt() == null
-        && cell.getRock() == null;
-  }
-
   public static void turnCW(Entity entity) {
     entity.setDirection(directionCW(entity.getDirection()));
   }
