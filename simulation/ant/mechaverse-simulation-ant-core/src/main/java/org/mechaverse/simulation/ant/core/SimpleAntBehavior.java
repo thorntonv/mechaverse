@@ -12,14 +12,20 @@ import org.mechaverse.simulation.ant.core.AntOutput.TurnDirection;
  */
 public final class SimpleAntBehavior implements AntBehavior {
 
+  private AntInput input;
   private final AntOutput output = new AntOutput();
   private final Random random = new Random();
 
   private boolean ignoreFood = false;
 
   @Override
-  public AntOutput update(AntInput input) {
-    EntityType cellEntityType = input.getCellSensor().getEntityType();
+  public void setInput(AntInput input) {
+    this.input = input;
+  }
+
+  @Override
+  public AntOutput getOutput() {
+    EntityType cellEntityType = input.getCellSensor();
 
     if (input.getCarriedEntityType() == EntityType.NONE) {
       if (cellEntityType == EntityType.FOOD && !ignoreFood) {

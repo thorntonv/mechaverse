@@ -55,27 +55,27 @@ public final class AntInput {
   private static final int CARRIED_ENTITY_TYPE_BIT_IDX = 6;
   private static final int CARRIED_ENTITY_TYPE_MASK = ~(0b1111 << CARRIED_ENTITY_TYPE_BIT_IDX);
 
-  private static final int CELL_SENSOR_IDX = 0;
-  private static final int CELL_ENTITY_TYPE_BIT_IDX = 10;
-  private static final int CELL_ENTITY_TYPE_MASK = ~(0b1111 << CELL_ENTITY_TYPE_BIT_IDX);
-  private static final int CELL_ENTITY_DIRECTION_BIT_IDX = 14;
-  private static final int CELL_ENTITY_DIRECTION_MASK = ~(0b111 << CELL_ENTITY_DIRECTION_BIT_IDX);
-  private static final int CELL_ENTITY_ID_BIT_IDX = 17;
-  private static final int CELL_ENTITY_ID_MASK = ~(0b1111 << CELL_ENTITY_ID_BIT_IDX);
-
   private static final int FRONT_SENSOR_IDX = 0;
-  private static final int FRONT_ENTITY_TYPE_BIT_IDX = 21;
+  private static final int FRONT_ENTITY_TYPE_BIT_IDX = 10;
   private static final int FRONT_ENTITY_TYPE_MASK = ~(0b1111 << FRONT_ENTITY_TYPE_BIT_IDX);
-  private static final int FRONT_ENTITY_DIRECTION_BIT_IDX = 25;
+  private static final int FRONT_ENTITY_DIRECTION_BIT_IDX = 14;
   private static final int FRONT_ENTITY_DIRECTION_MASK = ~(0b111 << FRONT_ENTITY_DIRECTION_BIT_IDX);
-  private static final int FRONT_ENTITY_ID_BIT_IDX = 28;
+  private static final int FRONT_ENTITY_ID_BIT_IDX = 17;
   private static final int FRONT_ENTITY_ID_MASK = ~(0b1111 << FRONT_ENTITY_ID_BIT_IDX);
+
+  private static final int PHEROMONE_TYPE_IDX = 0;
+  private static final int PHEROMONE_TYPE_BIT_IDX = 21;
+  private static final int PHEROMONE_TYPE_MASK = ~(0b111 << PHEROMONE_TYPE_BIT_IDX);
+
+  private static final int GENERAL_INPUT_IDX = 0;
+  private static final int GENERAL_INPUT_BIT_IDX = 24;
+  private static final int GENERAL_INPUT_MASK = ~(0b11111111 << GENERAL_INPUT_BIT_IDX);
 
   // IDX = 1
 
-  private static final int PHEROMONE_TYPE_IDX = 1;
-  private static final int PHEROMONE_TYPE_BIT_IDX = 0;
-  private static final int PHEROMONE_TYPE_MASK = ~(0b1111 << PHEROMONE_TYPE_BIT_IDX);
+  private static final int CELL_SENSOR_IDX = 1;
+  private static final int CELL_ENTITY_TYPE_BIT_IDX = 0;
+  private static final int CELL_ENTITY_TYPE_MASK = ~(0b1111 << CELL_ENTITY_TYPE_BIT_IDX);
 
   private static final int FRONT_LEFT_SENSOR_IDX = 1;
   private static final int FRONT_LEFT_ENTITY_TYPE_BIT_IDX = 4;
@@ -158,17 +158,16 @@ public final class AntInput {
     return (data[PHEROMONE_TYPE_IDX] & ~PHEROMONE_TYPE_MASK) >> PHEROMONE_TYPE_BIT_IDX;
   }
 
-  public SensorInfo getCellSensor() {
-    return getSensorData(CELL_SENSOR_IDX, CELL_ENTITY_TYPE_MASK, CELL_ENTITY_TYPE_BIT_IDX,
-        CELL_ENTITY_DIRECTION_MASK, CELL_ENTITY_DIRECTION_BIT_IDX,
-        CELL_ENTITY_ID_MASK, CELL_ENTITY_ID_BIT_IDX);
+  public EntityType getCellSensor() {
+    int entityType = ((data[CELL_SENSOR_IDX] & ~CELL_ENTITY_TYPE_MASK)
+        >> CELL_ENTITY_TYPE_BIT_IDX) & 0b1111;
+    return entityType < EntityUtil.ENTITY_TYPES.length ? EntityUtil.ENTITY_TYPES[entityType] : null;
   }
 
-  public void setCellSensor(EntityType entityType, Direction entityDirection, String entityId) {
-    setSensorData(entityType, entityDirection, entityId, CELL_SENSOR_IDX,
-        CELL_ENTITY_TYPE_MASK, CELL_ENTITY_TYPE_BIT_IDX,
-        CELL_ENTITY_DIRECTION_MASK, CELL_ENTITY_DIRECTION_BIT_IDX,
-        CELL_ENTITY_ID_MASK, CELL_ENTITY_ID_BIT_IDX);
+  public void setCellSensor(EntityType entityType) {
+    int entityTypeValue = entityType != null ? entityType.ordinal() : 0b1111;
+    data[CELL_SENSOR_IDX] = (data[CELL_SENSOR_IDX] & CELL_ENTITY_TYPE_MASK)
+        | (entityTypeValue << CELL_ENTITY_TYPE_BIT_IDX);
   }
 
   public SensorInfo getFrontSensor() {
@@ -182,6 +181,15 @@ public final class AntInput {
         FRONT_ENTITY_TYPE_MASK, FRONT_ENTITY_TYPE_BIT_IDX,
         FRONT_ENTITY_DIRECTION_MASK, FRONT_ENTITY_DIRECTION_BIT_IDX,
         FRONT_ENTITY_ID_MASK, FRONT_ENTITY_ID_BIT_IDX);
+  }
+
+  public int getGeneralInput() {
+    return ((data[GENERAL_INPUT_IDX] & ~GENERAL_INPUT_MASK) >> GENERAL_INPUT_BIT_IDX) & 0b11111111;
+  }
+
+  public void setGeneralInput(int value) {
+    data[GENERAL_INPUT_IDX] = (data[GENERAL_INPUT_IDX] & GENERAL_INPUT_MASK)
+        | (value << GENERAL_INPUT_BIT_IDX);
   }
 
   public SensorInfo getFrontLeftSensor() {

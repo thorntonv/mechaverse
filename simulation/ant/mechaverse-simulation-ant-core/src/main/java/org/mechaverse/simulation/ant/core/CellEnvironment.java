@@ -9,7 +9,7 @@ import org.mechaverse.simulation.ant.api.model.Environment;
 
 import com.google.common.collect.Sets;
 
-public final class CellEnvironment {
+public class CellEnvironment {
 
   private final int rowCount;
   private final int colCount;

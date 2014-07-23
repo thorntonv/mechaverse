@@ -8,7 +8,8 @@ import org.mechaverse.simulation.ant.api.model.EntityType;
  */
 public interface ActiveEntity {
 
-  void update(CellEnvironment env);
+  void updateInput(CellEnvironment env);
+  void performAction(CellEnvironment env);
 
   Entity getEntity();
   EntityType getType();

@@ -12,7 +12,20 @@ import org.mechaverse.simulation.ant.api.model.Environment;
 import org.mechaverse.simulation.ant.api.model.SimulationState;
 import org.mechaverse.simulation.common.cellautomata.EnvironmentGenerator;
 
+import com.google.common.base.Optional;
+
 public final class AntSimulationImpl {
+
+  private static class SimpleActiveEntityProvider implements ActiveEntityProvider {
+
+    @Override
+    public Optional<ActiveEntity> getActiveEntity(Entity entity) {
+      if (entity instanceof Ant) {
+        return Optional.<ActiveEntity>of(new ActiveAnt((Ant) entity, new SimpleAntBehavior()));
+      }
+      return Optional.absent();
+    }
+  }
 
   private static final int DEFAULT_ENVIRONMENT_WIDTH = 200;
   private static final int DEFAULT_ENVIRONMENT_HEIGHT = 200;
@@ -21,11 +34,16 @@ public final class AntSimulationImpl {
   private final List<CellEnvironment> environments = new ArrayList<CellEnvironment>();
   private final EnvironmentGenerator<CellEnvironment, EntityType> environmentGenerator =
       new AntSimulationEnvironmentGenerator();
+  private final ActiveEntityProvider activeEntityProvider;
 
   public AntSimulationImpl() {
+    this(new SimpleActiveEntityProvider());
+  }
+  public AntSimulationImpl(ActiveEntityProvider activeEntityProvider) {
     state = new SimulationState();
-    state.setEnvironment(environmentGenerator.generate(
-        DEFAULT_ENVIRONMENT_WIDTH, DEFAULT_ENVIRONMENT_HEIGHT, new Random()).getEnvironment());
+    state.setEnvironment(environmentGenerator.generate(DEFAULT_ENVIRONMENT_WIDTH,
+        DEFAULT_ENVIRONMENT_HEIGHT, new Random()).getEnvironment());
+    this.activeEntityProvider = activeEntityProvider;
     setState(state);
   }
 
@@ -41,8 +59,9 @@ public final class AntSimulationImpl {
       CellEnvironment cells = new CellEnvironment(environment);
       environments.add(cells);
       for (Entity entity : environment.getEntities()) {
-        if (entity instanceof Ant) {
-          cells.addActiveEntity(new ActiveAnt((Ant) entity, new SimpleAntBehavior()));
+        Optional<ActiveEntity> activeEntity = activeEntityProvider.getActiveEntity(entity);
+        if(activeEntity.isPresent()) {
+          cells.addActiveEntity(activeEntity.get());
         }
       }
     }
@@ -51,7 +70,10 @@ public final class AntSimulationImpl {
   public void step() {
     for (CellEnvironment env : environments) {
       for (ActiveEntity activeEntity : env.getActiveEntities()) {
-        activeEntity.update(env);
+        activeEntity.updateInput(env);
+      }
+      for (ActiveEntity activeEntity : env.getActiveEntities()) {
+        activeEntity.performAction(env);
       }
     }
   }

@@ -21,9 +21,14 @@ public final class ActiveAnt implements ActiveEntity {
   public static interface AntBehavior {
 
     /**
-     * Updates the internal state of the ant and returns output values based on the given input.
+     * Sets the current input
      */
-    AntOutput update(AntInput input);
+    void setInput(AntInput input);
+
+    /**
+     * Returns output values based on the current input.
+     */
+    AntOutput getOutput();
   }
 
   private static final EntityType[] CARRIABLE_ENTITY_TYPES =
@@ -43,7 +48,7 @@ public final class ActiveAnt implements ActiveEntity {
   }
 
   @Override
-  public final void update(CellEnvironment env) {
+  public void updateInput(CellEnvironment env) {
     input.resetToDefault();
     input.setEnergy(antEntity.getEnergy(), antEntity.getMaxEnergy());
     input.setDirection(antEntity.getDirection());
@@ -54,7 +59,7 @@ public final class ActiveAnt implements ActiveEntity {
     for (EntityType cellEntityType : EntityUtil.ENTITY_TYPES) {
       Entity cellEntity = cell.getEntity(cellEntityType);
       if (cellEntity != null && cellEntity != antEntity) {
-        input.setCellSensor(cellEntityType, cellEntity.getDirection(), cellEntity.getId());
+        input.setCellSensor(cellEntityType);
         break;
       }
     }
@@ -125,16 +130,27 @@ public final class ActiveAnt implements ActiveEntity {
       Pheromone pheromone = (Pheromone) pheromoneEntity;
       input.setPheromoneType(pheromone.getValue());
     }
+    behavior.setInput(input);
+  }
 
-    AntOutput output = behavior.update(input);
+  @Override
+  public void performAction(CellEnvironment env) {
+    AntOutput output = behavior.getOutput();
+
+    Cell cell = env.getCell(antEntity);
+    Cell frontCell = env.getCellInDirection(cell, antEntity.getDirection());
 
     // Pickup / Drop action.
     if (carriedEntityType == EntityType.NONE && output.pickUp()) {
       if (pickup(cell, env)) {
         return;
+      } else if (pickup(frontCell, env)) {
+        return;
       }
     } else if (carriedEntityType != EntityType.NONE && output.drop()) {
-      if (drop(cell, env)) {
+      if (carriedEntityType == EntityType.FOOD && drop(cell, env)) {
+        return;
+      } else if (frontCell != null && drop(frontCell, env)) {
         return;
       }
     }
@@ -166,12 +182,12 @@ public final class ActiveAnt implements ActiveEntity {
   }
 
   @Override
-  public final Ant getEntity() {
+  public Ant getEntity() {
     return antEntity;
   }
 
   @Override
-  public final EntityType getType() {
+  public EntityType getType() {
     return EntityType.ANT;
   }
 

@@ -10,6 +10,9 @@ import org.mechaverse.simulation.ant.api.model.Direction;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.core.AntInput.SensorInfo;
 
+/**
+ * Unit test for {@link AntInput}.
+ */
 public class AntInputTest {
 
   private Random random;
@@ -33,10 +36,7 @@ public class AntInputTest {
     assertEquals(Direction.values()[0], input.getDirection());
     assertEquals(0, input.getPheromoneType());
     assertEquals(EntityType.NONE, input.getCarriedEntityType());
-    assertEquals(EntityType.NONE, input.getCellSensor().getEntityType());
-    assertEquals(Direction.values()[0], input.getCellSensor().getDirection());
-    assertEquals(0, input.getCellSensor().getIdHash());
-    assertEquals(EntityType.NONE, input.getFrontSensor().getEntityType());
+    assertEquals(EntityType.NONE, input.getCellSensor());
     assertEquals(Direction.values()[0], input.getFrontSensor().getDirection());
     assertEquals(0, input.getFrontSensor().getIdHash());
     assertEquals(EntityType.NONE, input.getFrontLeftSensor().getEntityType());
@@ -99,23 +99,25 @@ public class AntInputTest {
 
   @Test
   public void pheromoneType() {
-    for(int pheromoneType = 0; pheromoneType < 0b1111; pheromoneType++) {
+    for(int pheromoneType = 0; pheromoneType < 0b111; pheromoneType++) {
       input.setPheromoneType(pheromoneType);
       assertEquals(pheromoneType, input.getPheromoneType());
     }
   }
 
   @Test
+  public void generalInput() {
+    for (int value = 0; value < 255; value++) {
+      input.setGeneralInput(value);
+      assertEquals(value, input.getGeneralInput());
+    }
+  }
+
+  @Test
   public void cellSensor() {
     for (EntityType entityType : EntityType.values()) {
-      for (Direction direction : Direction.values()) {
-        String id = String.valueOf(random.nextInt());
-        input.setCellSensor(entityType, direction, id);
-        SensorInfo sensorInfo = input.getCellSensor();
-        assertEquals(entityType, sensorInfo.getEntityType());
-        assertEquals(direction, sensorInfo.getDirection());
-        assertEquals(id.hashCode() & 0b1111, sensorInfo.getIdHash());
-      }
+      input.setCellSensor(entityType);
+      assertEquals(entityType, input.getCellSensor());
     }
   }
 

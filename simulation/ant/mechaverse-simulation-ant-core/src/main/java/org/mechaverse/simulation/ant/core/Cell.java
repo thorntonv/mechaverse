@@ -8,7 +8,7 @@ import org.mechaverse.simulation.ant.api.util.EntityUtil;
 
 import com.google.common.collect.ImmutableList;
 
-public final class Cell {
+public class Cell {
 
   private final int row;
   private final int column;

@@ -9,6 +9,9 @@ import org.junit.Test;
 import org.mechaverse.simulation.ant.core.AntOutput.MoveDirection;
 import org.mechaverse.simulation.ant.core.AntOutput.TurnDirection;
 
+/**
+ * Unit test for {@link AntOutput}.
+ */
 public class AntOutputTest {
 
   private Random random;
