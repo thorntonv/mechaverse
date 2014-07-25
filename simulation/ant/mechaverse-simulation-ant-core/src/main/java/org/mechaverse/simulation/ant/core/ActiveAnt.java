@@ -14,8 +14,6 @@ import org.mechaverse.simulation.ant.api.util.EntityUtil;
  */
 public final class ActiveAnt implements ActiveEntity {
 
-  // TODO(thorntonv): Implement a unit test for this class.
-
   /**
    * Determines the action an ant should take based on the input.
    */
