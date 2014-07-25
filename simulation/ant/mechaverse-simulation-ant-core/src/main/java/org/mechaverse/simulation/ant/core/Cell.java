@@ -64,6 +64,10 @@ public class Cell {
     return entities[type.ordinal()];
   }
 
+  public Entity removeEntity(Entity entity) {
+    return removeEntity(EntityUtil.getType(entity));
+  }
+
   public Entity removeEntity(EntityType type) {
     Entity removedEntity = entities[type.ordinal()];
     entities[type.ordinal()] = null;

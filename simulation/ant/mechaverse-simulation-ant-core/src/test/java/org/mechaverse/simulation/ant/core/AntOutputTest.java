@@ -34,9 +34,9 @@ public class AntOutputTest {
 
     assertEquals(MoveDirection.NONE, output.getMoveDirection());
     assertEquals(TurnDirection.NONE, output.getTurnDirection());
-    assertEquals(false, output.pickUp());
-    assertEquals(false, output.drop());
-    assertEquals(0, output.getLeavePheromone());
+    assertEquals(false, output.shouldPickUp());
+    assertEquals(false, output.shouldDrop());
+    assertEquals(0, output.shouldLeavePheromone());
   }
 
   @Test
@@ -58,27 +58,36 @@ public class AntOutputTest {
   @Test
   public void pickUp() {
     output.setPickUp(true);
-    assertEquals(true, output.pickUp());
+    assertEquals(true, output.shouldPickUp());
 
     output.setPickUp(false);
-    assertEquals(false, output.pickUp());
+    assertEquals(false, output.shouldPickUp());
   }
 
   @Test
   public void drop() {
     output.setDrop(true);
-    assertEquals(true, output.drop());
+    assertEquals(true, output.shouldDrop());
 
     output.setDrop(false);
-    assertEquals(false, output.drop());
+    assertEquals(false, output.shouldDrop());
   }
 
   @Test
   public void leavePheromone() {
     for (int type = 0; type < 15; type++) {
       output.setLeavePheromone(type);
-      assertEquals(type, output.getLeavePheromone());
+      assertEquals(type, output.shouldLeavePheromone());
     }
+  }
+
+  @Test
+  public void consume() {
+    output.setConsume(true);
+    assertEquals(true, output.shouldConsume());
+
+    output.setConsume(false);
+    assertEquals(false, output.shouldConsume());
   }
 
   @Test

@@ -16,11 +16,10 @@ public final class AntOutput {
   public static final MoveDirection[] MOVE_DIRECTIONS = MoveDirection.values();
   public static final TurnDirection[] TURN_DIRECTIONS = TurnDirection.values();
 
-
   public static final int DATA_SIZE = 1;
 
   // TODO(thorntonv) Implement general output.
-  // TODO(thorntonv) Implement interaction output.
+  // TODO(thorntonv) Implement attack output.
 
   private static final int MOVE_DIRECTION_IDX = 0;
   private static final int MOVE_DIRECTION_MASK = ~0b11;
@@ -40,6 +39,10 @@ public final class AntOutput {
   private static final int LEAVE_PHEROMONE_IDX = 0;
   private static final int LEAVE_PHEROMONE_BIT_IDX = 6;
   private static final int LEAVE_PHEROMONE_MASK = 0b1111 << LEAVE_PHEROMONE_BIT_IDX;
+
+  private static final int CONSUME_IDX = 0;
+  private static final int CONSUME_BIT_IDX = 10;
+  private static final int CONSUME_MASK = 0b1 << CONSUME_BIT_IDX;
 
   private final int[] data;
 
@@ -76,33 +79,42 @@ public final class AntOutput {
         (data[TURN_DIRECTION_IDX] & TURN_DIRECTION_MASK) | (value << TURN_DIRECTION_BIT_IDX);
   }
 
-  public boolean pickUp() {
+  public boolean shouldPickUp() {
     int pickUp = (data[PICKUP_IDX] & ~PICKUP_MASK) >> PICKUP_BIT_IDX;
     return pickUp == 1;
   }
 
-  public void setPickUp(boolean pickUp) {
-    int value = pickUp ? 1 : 0;
+  public void setPickUp(boolean shouldPickUp) {
+    int value = shouldPickUp ? 1 : 0;
     data[PICKUP_IDX] = (data[PICKUP_IDX] & PICKUP_MASK) | (value << PICKUP_BIT_IDX);
   }
 
-  public boolean drop() {
-    int drop = (data[DROP_IDX] & ~DROP_MASK) >> DROP_BIT_IDX;
-    return drop == 1;
+  public boolean shouldDrop() {
+    int value = (data[DROP_IDX] & ~DROP_MASK) >> DROP_BIT_IDX;
+    return value == 1;
   }
 
-  public void setDrop(boolean drop) {
-    int value = drop ? 1 : 0;
+  public void setDrop(boolean shouldDrop) {
+    int value = shouldDrop ? 1 : 0;
     data[DROP_IDX] = (data[DROP_IDX] & DROP_MASK) | (value << DROP_BIT_IDX);
   }
 
-  public int getLeavePheromone() {
+  public int shouldLeavePheromone() {
     return (data[LEAVE_PHEROMONE_IDX] & LEAVE_PHEROMONE_MASK) >> LEAVE_PHEROMONE_BIT_IDX;
   }
 
   public void setLeavePheromone(int type) {
     data[LEAVE_PHEROMONE_IDX] =
         (data[LEAVE_PHEROMONE_IDX] & ~LEAVE_PHEROMONE_MASK) | (type << LEAVE_PHEROMONE_BIT_IDX);
+  }
+
+  public boolean shouldConsume() {
+    return (data[CONSUME_IDX] & CONSUME_MASK) >> CONSUME_BIT_IDX == 1;
+  }
+
+  public void setConsume(boolean shouldConsume) {
+    int value = shouldConsume ? 1 : 0;
+    data[CONSUME_IDX] = (data[CONSUME_IDX] & ~CONSUME_MASK) | (value << CONSUME_BIT_IDX);
   }
 
   public int[] getData() {

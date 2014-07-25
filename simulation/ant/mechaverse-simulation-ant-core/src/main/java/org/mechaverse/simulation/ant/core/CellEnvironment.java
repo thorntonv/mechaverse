@@ -1,13 +1,9 @@
 package org.mechaverse.simulation.ant.core;
 
-import java.util.Set;
-
 import org.mechaverse.simulation.ant.api.model.Direction;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Environment;
-
-import com.google.common.collect.Sets;
 
 public class CellEnvironment {
 
@@ -15,8 +11,6 @@ public class CellEnvironment {
   private final int colCount;
   private final Cell[][] cells;
   private final Environment env;
-
-  private final Set<ActiveEntity> activeEntities = Sets.newIdentityHashSet();
 
   public CellEnvironment(Environment env) {
     this.rowCount = env.getHeight();
@@ -37,17 +31,8 @@ public class CellEnvironment {
     }
   }
 
-  public void addActiveEntity(ActiveEntity activeEntity) {
-    activeEntities.add(activeEntity);
-  }
-
   public Environment getEnvironment() {
-    env.getEntities().clear();
-    for(int row = 0; row < cells.length; row++) {
-      for(int col = 0; col < cells.length; col++) {
-        env.getEntities().addAll(cells[row][col].getEntities());
-      }
-    }
+    updateModel();
     return env;
   }
 
@@ -57,10 +42,6 @@ public class CellEnvironment {
 
   public int getColumnCount() {
     return colCount;
-  }
-
-  public Iterable<ActiveEntity> getActiveEntities() {
-    return activeEntities;
   }
 
   public boolean hasCell(int row, int col) {
@@ -131,5 +112,14 @@ public class CellEnvironment {
 
   private boolean isValidCellCoordinate(int row, int column) {
     return row >= 0 && row < rowCount && column >= 0 && column < colCount;
+  }
+
+  public void updateModel() {
+    env.getEntities().clear();
+    for(int row = 0; row < cells.length; row++) {
+      for(int col = 0; col < cells[row].length; col++) {
+        env.getEntities().addAll(cells[row][col].getEntities());
+      }
+    }
   }
 }

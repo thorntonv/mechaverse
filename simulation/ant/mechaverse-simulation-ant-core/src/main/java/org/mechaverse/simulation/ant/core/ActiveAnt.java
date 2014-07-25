@@ -1,5 +1,6 @@
 package org.mechaverse.simulation.ant.core;
 
+import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.api.model.Direction;
 import org.mechaverse.simulation.ant.api.model.Entity;
@@ -8,7 +9,7 @@ import org.mechaverse.simulation.ant.api.model.Pheromone;
 import org.mechaverse.simulation.ant.api.util.EntityUtil;
 
 /**
- * An ant that active in the simulation. An active an receives sensory information about itself and
+ * An ant that active in the simulation. An active ant receives sensory information about itself and
  * the environment and is able to perform actions.
  */
 public final class ActiveAnt implements ActiveEntity {
@@ -48,7 +49,7 @@ public final class ActiveAnt implements ActiveEntity {
   }
 
   @Override
-  public void updateInput(CellEnvironment env) {
+  public void updateInput(CellEnvironment env, RandomGenerator random) {
     input.resetToDefault();
     input.setEnergy(antEntity.getEnergy(), antEntity.getMaxEnergy());
     input.setDirection(antEntity.getDirection());
@@ -134,25 +135,55 @@ public final class ActiveAnt implements ActiveEntity {
   }
 
   @Override
-  public void performAction(CellEnvironment env) {
+  public void performAction(
+      CellEnvironment env, EntityManager entityManager, RandomGenerator random) {
     AntOutput output = behavior.getOutput();
+
+    antEntity.setEnergy(antEntity.getEnergy() - 1);
+    if (antEntity.getEnergy() <= 0) {
+      entityManager.removeEntity(this);
+      return;
+    }
 
     Cell cell = env.getCell(antEntity);
     Cell frontCell = env.getCellInDirection(cell, antEntity.getDirection());
 
+    // Consume.
+    if (output.shouldConsume()) {
+      if(carriedEntityType == EntityType.FOOD) {
+        // Consume food that the ant is carrying.
+        if(consumeFood(antEntity.getCarriedEntity(), entityManager)) {
+          antEntity.setCarriedEntity(null);
+          carriedEntityType = EntityType.NONE;
+          return;
+        }
+      } else if (consumeFood(cell.getEntity(EntityType.FOOD), entityManager)) {
+        return;
+      } else if (consumeFoodFromNest(cell.getEntity(EntityType.NEST))) {
+        return;
+      }
+    }
+
     // Pickup / Drop action.
-    if (carriedEntityType == EntityType.NONE && output.pickUp()) {
-      if (pickup(cell, env)) {
+    if (carriedEntityType == EntityType.NONE && output.shouldPickUp()) {
+      if (pickup(cell)) {
         return;
-      } else if (pickup(frontCell, env)) {
-        return;
-      }
-    } else if (carriedEntityType != EntityType.NONE && output.drop()) {
-      if (carriedEntityType == EntityType.FOOD && drop(cell, env)) {
-        return;
-      } else if (frontCell != null && drop(frontCell, env)) {
+      } else if (pickup(frontCell)) {
         return;
       }
+    } else if (carriedEntityType != EntityType.NONE && output.shouldDrop()) {
+      if (carriedEntityType == EntityType.FOOD && drop(cell)) {
+        return;
+      } else if (frontCell != null && drop(frontCell)) {
+        return;
+      }
+    }
+
+    // Leave pheromone action.
+    int pheromoneType = output.shouldLeavePheromone();
+    if (pheromoneType > 0) {
+      leavePheromone(cell, pheromoneType, entityManager);
+      return;
     }
 
     // Move action.
@@ -206,7 +237,7 @@ public final class ActiveAnt implements ActiveEntity {
         && !cell.hasEntity(EntityType.DIRT) && !cell.hasEntity(EntityType.ROCK);
   }
 
-  private boolean pickup(Cell cell, CellEnvironment env) {
+  private boolean pickup(Cell cell) {
     for (EntityType type : CARRIABLE_ENTITY_TYPES) {
       Entity carriableEntity = cell.getEntity(type);
       if (carriableEntity != null) {
@@ -220,7 +251,7 @@ public final class ActiveAnt implements ActiveEntity {
     return false;
   }
 
-  private boolean drop(Cell cell, CellEnvironment env) {
+  private boolean drop(Cell cell) {
     // The cell must not already have an entity of the given type.
     if (cell.getEntity(carriedEntityType) == null) {
       Entity carriedEntity = antEntity.getCarriedEntity();
@@ -232,11 +263,46 @@ public final class ActiveAnt implements ActiveEntity {
     return false;
   }
 
+  private void leavePheromone(Cell cell, int type, EntityManager entityManager) {
+    Pheromone pheromone = new Pheromone();
+    pheromone.setX(cell.getColumn());
+    pheromone.setY(cell.getRow());
+    pheromone.setValue(type);
+    pheromone.setMaxEnergy(15);
+    pheromone.setEnergy(15);
+    cell.setEntity(pheromone, EntityType.PHEROMONE);
+    entityManager.addEntity(pheromone);
+  }
+
+  private boolean consumeFood(Entity food, EntityManager entityManager) {
+    if (food != null) {
+      addEnergy(food.getEnergy());
+      entityManager.removeEntity(food);
+      return true;
+    }
+    return false;
+  }
+
+  private boolean consumeFoodFromNest(Entity nest) {
+    if(nest != null) {
+      int energyNeeded = antEntity.getMaxEnergy() - antEntity.getEnergy();
+      int energy = energyNeeded <= nest.getEnergy() ? energyNeeded : nest.getEnergy();
+      addEnergy(energy);
+      nest.setEnergy(nest.getEnergy() - energy);
+    }
+    return false;
+  }
+
   private void updateCarriedEntityLocation() {
     Entity carriedEntity = antEntity.getCarriedEntity();
     if (carriedEntity != null) {
       carriedEntity.setX(antEntity.getX());
       carriedEntity.setY(antEntity.getY());
     }
+  }
+
+  private void addEnergy(int amount) {
+    int energy = antEntity.getEnergy() + amount;
+    antEntity.setEnergy(energy <= antEntity.getMaxEnergy() ? energy : antEntity.getMaxEnergy());
   }
 }

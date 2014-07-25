@@ -42,18 +42,25 @@ public final class SimpleAntBehavior implements AntBehavior {
       }
     }
 
-    EntityType frontEntityType = input.getFrontSensor().getEntityType();
-    if (frontEntityType == EntityType.NONE || frontEntityType == EntityType.FOOD) {
-      output.setMoveDirection(MoveDirection.FORWARD);
-      output.setTurnDirection(TurnDirection.NONE);
-      ignoreFood = false;
+    if(input.getPheromoneType() == 0) {
+      output.setLeavePheromone(4);
+      return output;
     } else {
+      output.setLeavePheromone(0);
+    }
+    EntityType frontEntityType = input.getFrontSensor().getEntityType();
+    if (frontEntityType == null || frontEntityType == EntityType.ANT
+        || frontEntityType == EntityType.ROCK || frontEntityType == EntityType.BARRIER) {
       output.setMoveDirection(MoveDirection.NONE);
       if (random.nextInt(2) == 0) {
         output.setTurnDirection(TurnDirection.COUNTERCLOCKWISE);
       } else {
         output.setTurnDirection(TurnDirection.CLOCKWISE);
       }
+    } else {
+      output.setMoveDirection(MoveDirection.FORWARD);
+      output.setTurnDirection(TurnDirection.NONE);
+      ignoreFood = false;
     }
     return output;
   }
