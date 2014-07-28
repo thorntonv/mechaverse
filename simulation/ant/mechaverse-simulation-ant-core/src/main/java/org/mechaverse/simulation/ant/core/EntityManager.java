@@ -7,7 +7,16 @@ import org.mechaverse.simulation.ant.api.model.Entity;
  */
 public interface EntityManager {
 
-  void addEntity(Entity newEntity);
+  public static interface Observer {
+
+    void onAddEntity(Entity entity);
+    void onRemoveEntity(Entity entity);
+  }
+
+  void addEntity(Entity entity);
   void removeEntity(Entity entity);
   void removeEntity(ActiveEntity activeEntity);
+
+  void addObserver(EntityManager.Observer observer);
+  void removeObserver(EntityManager.Observer observer);
 }

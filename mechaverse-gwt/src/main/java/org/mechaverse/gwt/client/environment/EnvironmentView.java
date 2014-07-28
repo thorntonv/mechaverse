@@ -11,6 +11,7 @@ import org.mechaverse.simulation.ant.api.model.Direction;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Environment;
+import org.mechaverse.simulation.ant.api.model.Rock;
 import org.mechaverse.simulation.ant.api.util.EntityUtil;
 
 import com.google.common.collect.Sets;
@@ -35,6 +36,10 @@ public class EnvironmentView extends SimplePanel {
     void onCellClick(int row, int column);
     void onCellAltClick(int row, int column);
   }
+
+  private static final EntityType[] ENTITY_TYPE_DRAW_ORDER = {EntityType.DIRT, EntityType.BARRIER,
+      EntityType.PHEROMONE, EntityType.CONDUIT, EntityType.NEST, EntityType.ROCK, EntityType.FOOD,
+      EntityType.ANT};
 
   private int cellWidth = MechaverseResourceBundle.INSTANCE.dirt().getWidth();
   private int cellHeight = MechaverseResourceBundle.INSTANCE.dirt().getHeight();
@@ -110,14 +115,22 @@ public class EnvironmentView extends SimplePanel {
       }
     }
 
-    for (Entity entity : environment.getEntities()) {
-      ImageElement image = getImage(entity);
-      drawEntity(entity, image, context);
+    for (EntityType entityType : ENTITY_TYPE_DRAW_ORDER) {
+      for (Entity entity : environment.getEntities()) {
+        if (EntityUtil.getType(entity) == entityType) {
+          ImageElement image = getImage(entity);
+          drawEntity(entity, image, context);
+        }
+      }
     }
 
     for (Entity entity : carriedEntities) {
       ImageElement image = getImage(entity);
-      drawEntity(entity, image, context);
+      double scale = .85;
+      if(entity instanceof Rock) {
+        scale = .5;
+      }
+      drawEntity(entity, image, scale, context);
     }
   }
 
@@ -131,16 +144,29 @@ public class EnvironmentView extends SimplePanel {
     }
     return image;
   }
-  
+
   protected void drawEntity(Entity entity, ImageElement image, Context2d context) {
+    double scale = 1;
+    drawEntity(entity, image, scale, context);
+  }
+
+  protected void drawEntity(Entity entity, ImageElement image, double scale, Context2d context) {
     Coordinate coord = Coordinate.create(entity.getY(), entity.getX());
-    drawImage(image, context, coord.getRow(), coord.getColumn());
+    drawImage(image, context, coord.getRow(), coord.getColumn(), scale);
     dirtyCells.add(coord);
   }
 
   protected void drawImage(ImageElement image, Context2d context, int row, int column) {
-    int xOffset = (cellWidth - image.getWidth()) / 2;
-    int yOffset = (cellHeight - image.getHeight()) / 2;
-    context.drawImage(image, column * cellWidth + xOffset, row * cellHeight + yOffset);
+    drawImage(image, context, row, column, 1);
+  }
+
+  protected void drawImage(
+      ImageElement image, Context2d context, int row, int column, double scale) {
+    int width = (int) (image.getWidth() * scale);
+    int height = (int) (image.getHeight() * scale);
+    int xOffset = (cellWidth - width) / 2;
+    int yOffset = (cellHeight - height) / 2;
+    context.drawImage(image, column * cellWidth + xOffset, row * cellHeight + yOffset,
+        width, height);
   }
 }

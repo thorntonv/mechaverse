@@ -10,6 +10,7 @@
   <!-- Other module inherits                                      -->
   <inherits name="com.google.common.collect.Collect"/>
   <inherits name="org.mechaverse.simulation.ant.api"/>
+  <inherits name="org.mechaverse.simulation.ant.core"/>
   
   <!-- Specify the app entry point class.                         -->
   <entry-point class='org.mechaverse.gwt.client.MechaverseClient' />

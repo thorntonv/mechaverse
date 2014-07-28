@@ -20,51 +20,53 @@ public final class ActiveAnt implements ActiveEntity {
   public static interface AntBehavior {
 
     /**
-     * Sets the current input
+     * Sets the current input.
      */
     void setInput(AntInput input);
 
     /**
      * Returns output values based on the current input.
      */
-    AntOutput getOutput();
+    AntOutput getOutput(RandomGenerator random);
+
+    void updateModel();
   }
 
   private static final EntityType[] CARRIABLE_ENTITY_TYPES =
       {EntityType.DIRT, EntityType.FOOD,EntityType.ROCK};
 
-  private final Ant antEntity;
+  private final Ant entity;
   private final AntBehavior behavior;
   private EntityType carriedEntityType = EntityType.NONE;
   private final AntInput input = new AntInput();
 
   public ActiveAnt(Ant entity, AntBehavior behavior) {
-    this.antEntity = entity;
+    this.entity = entity;
     this.behavior = behavior;
-    if (antEntity.getCarriedEntity() != null) {
-      this.carriedEntityType = EntityUtil.getType(antEntity.getCarriedEntity());
+    if (entity.getCarriedEntity() != null) {
+      this.carriedEntityType = EntityUtil.getType(entity.getCarriedEntity());
     }
   }
 
   @Override
   public void updateInput(CellEnvironment env, RandomGenerator random) {
     input.resetToDefault();
-    input.setEnergy(antEntity.getEnergy(), antEntity.getMaxEnergy());
-    input.setDirection(antEntity.getDirection());
+    input.setEnergy(entity.getEnergy(), entity.getMaxEnergy());
+    input.setDirection(entity.getDirection());
     input.setCarriedEntityType(carriedEntityType);
 
     // Cell sensor.
-    Cell cell = env.getCell(antEntity);
+    Cell cell = env.getCell(entity);
     for (EntityType cellEntityType : EntityUtil.ENTITY_TYPES) {
       Entity cellEntity = cell.getEntity(cellEntityType);
-      if (cellEntity != null && cellEntity != antEntity) {
+      if (cellEntity != null && cellEntity != entity) {
         input.setCellSensor(cellEntityType);
         break;
       }
     }
 
     // Front cell sensor.
-    Cell frontCell = env.getCellInDirection(cell, antEntity.getDirection());
+    Cell frontCell = env.getCellInDirection(cell, entity.getDirection());
     if (frontCell != null) {
       Entity frontEntity = frontCell.getEntity();
       if (frontEntity != null) {
@@ -76,7 +78,7 @@ public final class ActiveAnt implements ActiveEntity {
     }
 
     // Front left cell sensor.
-    Direction frontLeftDirection = AntSimulationUtil.directionCCW(antEntity.getDirection());
+    Direction frontLeftDirection = AntSimulationUtil.directionCCW(entity.getDirection());
     Cell frontLeftCell = env.getCellInDirection(cell, frontLeftDirection);
     if (frontLeftCell != null) {
       Entity frontLeftEntity = frontLeftCell.getEntity();
@@ -100,7 +102,7 @@ public final class ActiveAnt implements ActiveEntity {
     }
 
     // Front right cell sensor.
-    Direction frontRightDirection = AntSimulationUtil.directionCW(antEntity.getDirection());
+    Direction frontRightDirection = AntSimulationUtil.directionCW(entity.getDirection());
     Cell frontRightCell = env.getCellInDirection(cell, frontRightDirection);
     if (frontRightCell != null) {
       Entity frontRightEntity = frontRightCell.getEntity();
@@ -135,23 +137,30 @@ public final class ActiveAnt implements ActiveEntity {
   @Override
   public void performAction(
       CellEnvironment env, EntityManager entityManager, RandomGenerator random) {
-    AntOutput output = behavior.getOutput();
+    AntOutput output = behavior.getOutput(random);
 
-    antEntity.setEnergy(antEntity.getEnergy() - 1);
-    if (antEntity.getEnergy() <= 0) {
+    Cell cell = env.getCell(entity);
+    Cell frontCell = env.getCellInDirection(cell, entity.getDirection());
+
+    entity.setEnergy(entity.getEnergy() - 1);
+    if (entity.getEnergy() <= 0) {
       entityManager.removeEntity(this);
+
+      // Attempt to drop the carried entity.
+      if (entity.getCarriedEntity() != null) {
+        if (!drop(cell)) {
+          drop(frontCell);
+        }
+      }
       return;
     }
 
-    Cell cell = env.getCell(antEntity);
-    Cell frontCell = env.getCellInDirection(cell, antEntity.getDirection());
-
-    // Consume.
+    // Consume action.
     if (output.shouldConsume()) {
       if(carriedEntityType == EntityType.FOOD) {
         // Consume food that the ant is carrying.
-        if(consumeFood(antEntity.getCarriedEntity(), entityManager)) {
-          antEntity.setCarriedEntity(null);
+        if(consumeFood(entity.getCarriedEntity(), entityManager)) {
+          entity.setCarriedEntity(null);
           carriedEntityType = EntityType.NONE;
           return;
         }
@@ -202,17 +211,17 @@ public final class ActiveAnt implements ActiveEntity {
       case NONE:
         break;
       case CLOCKWISE:
-        AntSimulationUtil.turnCW(antEntity);
+        AntSimulationUtil.turnCW(entity);
         return;
       case COUNTERCLOCKWISE:
-        AntSimulationUtil.turnCCW(antEntity);
+        AntSimulationUtil.turnCCW(entity);
         return;
     }
   }
 
   @Override
   public Ant getEntity() {
-    return antEntity;
+    return entity;
   }
 
   @Override
@@ -240,8 +249,10 @@ public final class ActiveAnt implements ActiveEntity {
       Entity carriableEntity = cell.getEntity(type);
       if (carriableEntity != null) {
         cell.removeEntity(type);
-        antEntity.setCarriedEntity(carriableEntity);
+        entity.setCarriedEntity(carriableEntity);
         this.carriedEntityType = type;
+        carriableEntity.setX(entity.getX());
+        carriableEntity.setY(entity.getY());
         return true;
       }
     }
@@ -252,9 +263,9 @@ public final class ActiveAnt implements ActiveEntity {
   private boolean drop(Cell cell) {
     // The cell must not already have an entity of the given type.
     if (cell.getEntity(carriedEntityType) == null) {
-      Entity carriedEntity = antEntity.getCarriedEntity();
+      Entity carriedEntity = entity.getCarriedEntity();
       cell.setEntity(carriedEntity, carriedEntityType);
-      antEntity.setCarriedEntity(null);
+      entity.setCarriedEntity(null);
       carriedEntityType = EntityType.NONE;
       return true;
     }
@@ -263,8 +274,6 @@ public final class ActiveAnt implements ActiveEntity {
 
   private void leavePheromone(Cell cell, int type, EntityManager entityManager) {
     Pheromone pheromone = new Pheromone();
-    pheromone.setX(cell.getColumn());
-    pheromone.setY(cell.getRow());
     pheromone.setValue(type);
     pheromone.setMaxEnergy(15);
     pheromone.setEnergy(15);
@@ -283,7 +292,7 @@ public final class ActiveAnt implements ActiveEntity {
 
   private boolean consumeFoodFromNest(Entity nest) {
     if(nest != null) {
-      int energyNeeded = antEntity.getMaxEnergy() - antEntity.getEnergy();
+      int energyNeeded = entity.getMaxEnergy() - entity.getEnergy();
       int energy = energyNeeded <= nest.getEnergy() ? energyNeeded : nest.getEnergy();
       addEnergy(energy);
       nest.setEnergy(nest.getEnergy() - energy);
@@ -292,15 +301,20 @@ public final class ActiveAnt implements ActiveEntity {
   }
 
   private void updateCarriedEntityLocation() {
-    Entity carriedEntity = antEntity.getCarriedEntity();
+    Entity carriedEntity = entity.getCarriedEntity();
     if (carriedEntity != null) {
-      carriedEntity.setX(antEntity.getX());
-      carriedEntity.setY(antEntity.getY());
+      carriedEntity.setX(entity.getX());
+      carriedEntity.setY(entity.getY());
     }
   }
 
   private void addEnergy(int amount) {
-    int energy = antEntity.getEnergy() + amount;
-    antEntity.setEnergy(energy <= antEntity.getMaxEnergy() ? energy : antEntity.getMaxEnergy());
+    int energy = entity.getEnergy() + amount;
+    entity.setEnergy(energy <= entity.getMaxEnergy() ? energy : entity.getMaxEnergy());
+  }
+
+  @Override
+  public void updateModel() {
+    behavior.updateModel();
   }
 }

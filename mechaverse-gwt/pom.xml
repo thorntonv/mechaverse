@@ -34,6 +34,18 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>org.mechaverse.simulation.ant</groupId>
+      <artifactId>mechaverse-simulation-ant-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mechaverse.simulation.ant</groupId>
+      <artifactId>mechaverse-simulation-ant-core</artifactId>
+      <version>${project.version}</version>
+      <classifier>sources</classifier>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-servlet</artifactId>
       <version>${gwtVersion}</version>
@@ -78,6 +90,7 @@
   </dependencies>
 
   <build>
+    <finalName>ant-simulation-ui</finalName> 
     <!-- Generate compiled stuff in the folder used for developing mode -->
     <outputDirectory>${webappDirectory}/WEB-INF/classes</outputDirectory>
     <plugins>

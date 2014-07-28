@@ -12,6 +12,8 @@ public class SimulationPresenter {
 
   public static final String INITIAL_STATE_KEY = "0000000000";
 
+  private static final int UPDATE_INTERVAL = 500;
+
   protected class UpdateTimer extends Timer {
     @Override
     public void run() {
@@ -52,7 +54,7 @@ public class SimulationPresenter {
       @Override
       public void onWindowScroll(ScrollEvent arg0) {
         updateTimer.cancel();
-        updateTimer.scheduleRepeating(1000);
+        updateTimer.scheduleRepeating(UPDATE_INTERVAL);
       }
     });
   }
@@ -77,7 +79,7 @@ public class SimulationPresenter {
 
           @Override
           public void onSuccess(Void result) {
-            updateTimer.scheduleRepeating(1000);
+            updateTimer.scheduleRepeating(UPDATE_INTERVAL);
           }
         });
       }

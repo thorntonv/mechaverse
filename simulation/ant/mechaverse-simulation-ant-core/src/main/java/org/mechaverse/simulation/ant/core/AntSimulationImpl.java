@@ -8,30 +8,12 @@ import java.util.Random;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
 import org.mechaverse.simulation.ant.api.SimulationStateUtil;
-import org.mechaverse.simulation.ant.api.model.Ant;
-import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Environment;
-import org.mechaverse.simulation.ant.api.model.Pheromone;
 import org.mechaverse.simulation.ant.api.model.SimulationState;
 import org.mechaverse.simulation.common.cellautomata.EnvironmentGenerator;
 
-import com.google.common.base.Optional;
-
 public final class AntSimulationImpl {
-
-  private static class SimpleActiveEntityProvider implements ActiveEntityProvider {
-
-    @Override
-    public Optional<ActiveEntity> getActiveEntity(Entity entity) {
-      if (entity instanceof Ant) {
-        return Optional.<ActiveEntity>of(new ActiveAnt((Ant) entity, new SimpleAntBehavior()));
-      } else if (entity instanceof Pheromone) {
-        return Optional.<ActiveEntity>of(new ActivePheromone((Pheromone) entity));
-      }
-      return Optional.absent();
-    }
-  }
 
   private static final int DEFAULT_ENVIRONMENT_WIDTH = 200;
   private static final int DEFAULT_ENVIRONMENT_HEIGHT = 200;

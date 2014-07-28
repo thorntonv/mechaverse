@@ -37,4 +37,7 @@ public class ActivePheromone implements ActiveEntity {
   public EntityType getType() {
     return EntityType.PHEROMONE;
   }
+
+  @Override
+  public void updateModel() {}
 }

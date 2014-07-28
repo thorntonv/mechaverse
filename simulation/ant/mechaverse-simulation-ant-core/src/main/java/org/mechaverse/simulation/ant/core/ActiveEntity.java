@@ -14,4 +14,5 @@ public interface ActiveEntity {
 
   Entity getEntity();
   EntityType getType();
+  void updateModel();
 }

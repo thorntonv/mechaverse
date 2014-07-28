@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.Environment;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Sets;
 
 /**
  * Simulates an environment.
@@ -19,6 +21,7 @@ public class EnvironmentSimulator implements EntityManager {
   private final CellEnvironment environment;
   private final Map<Entity, ActiveEntity> activeEntities = new IdentityHashMap<>();
   private final ActiveEntityProvider activeEntityProvider;
+  private final Set<EntityManager.Observer> observers = Sets.newIdentityHashSet();
 
   public EnvironmentSimulator(Environment environment, ActiveEntityProvider activeEntityProvider) {
     this.environment = new CellEnvironment(environment);
@@ -40,6 +43,9 @@ public class EnvironmentSimulator implements EntityManager {
   }
 
   public void updateModel() {
+    for (ActiveEntity activeEntity : activeEntities.values()) {
+      activeEntity.updateModel();
+    }
     environment.updateModel();
   }
 
@@ -49,17 +55,36 @@ public class EnvironmentSimulator implements EntityManager {
     if (activeEntity.isPresent()) {
       activeEntities.put(activeEntity.get().getEntity(), activeEntity.get());
     }
+    for (EntityManager.Observer observer : observers) {
+      observer.onAddEntity(entity);
+    }
   }
 
   @Override
   public void removeEntity(Entity entity) {
     activeEntities.remove(entity);
     environment.getCell(entity).removeEntity(entity);
+    for (EntityManager.Observer observer : observers) {
+      observer.onRemoveEntity(entity);
+    }
   }
 
   @Override
   public void removeEntity(ActiveEntity activeEntity) {
     activeEntities.remove(activeEntity.getEntity());
     environment.getCell(activeEntity.getEntity()).removeEntity(activeEntity.getType());
+    for (EntityManager.Observer observer : observers) {
+      observer.onRemoveEntity(activeEntity.getEntity());
+    }
+  }
+
+  @Override
+  public void addObserver(Observer observer) {
+    observers.add(observer);
+  }
+
+  @Override
+  public void removeObserver(Observer observer) {
+    observers.remove(observer);
   }
 }

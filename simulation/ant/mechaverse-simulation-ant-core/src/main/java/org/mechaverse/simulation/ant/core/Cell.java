@@ -40,6 +40,8 @@ public class Cell {
   }
 
   public void setEntity(Entity entity, EntityType type) {
+    entity.setX(column);
+    entity.setY(row);
     entities[type.ordinal()] = entity;
 
     if (primaryEntityType == null || type.ordinal() <= primaryEntityType.ordinal()) {
@@ -93,5 +95,13 @@ public class Cell {
       }
     }
     return builder.build();
+  }
+
+  public void clear() {
+    primaryEntity = null;
+    primaryEntityType = null;
+    for (int idx = 0; idx < entities.length; idx++) {
+      entities[idx] = null;
+    }
   }
 }

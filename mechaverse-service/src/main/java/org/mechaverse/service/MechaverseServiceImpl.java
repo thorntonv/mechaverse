@@ -1,5 +1,6 @@
 package org.mechaverse.service;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -94,6 +95,6 @@ public class MechaverseServiceImpl implements AntSimulationService {
    * @return the file name for the simulation with the given key
    */
   private String getSimulationFilename(String key) {
-    return "simulation/" + key;
+    return new File("simulation/" + key).getAbsolutePath();
   }
 }

@@ -120,4 +120,10 @@ public final class AntOutput {
   public int[] getData() {
     return data;
   }
+
+  public void resetToDefault() {
+    for (int idx = 0; idx < data.length; idx++) {
+      data[idx] = 0;
+    }
+  }
 }

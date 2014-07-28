@@ -1,5 +1,8 @@
 package org.mechaverse.simulation.ant.core;
 
+import java.util.IdentityHashMap;
+import java.util.Map;
+
 import org.mechaverse.simulation.ant.api.model.Direction;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.EntityType;
@@ -11,6 +14,8 @@ public class CellEnvironment {
   private final int colCount;
   private final Cell[][] cells;
   private final Environment env;
+  private Map<Cell, Direction[][]> cellDirectionIndex =
+      new IdentityHashMap<Cell, Direction[][]>();
 
   public CellEnvironment(Environment env) {
     this.rowCount = env.getHeight();
@@ -56,6 +61,13 @@ public class CellEnvironment {
     return cells[entity.getY()][entity.getX()];
   }
 
+  public Direction getDirection(Cell fromCell, Cell toCell) {
+    if (!cellDirectionIndex.containsKey(toCell)) {
+      buildCellDirectionIndex(toCell);
+    }
+    return cellDirectionIndex.get(toCell)[fromCell.getRow()][fromCell.getColumn()];
+  }
+
   public Cell getCellInDirection(Cell cell, Direction direction) {
     int row = cell.getRow();
     int col = cell.getColumn();
@@ -99,9 +111,16 @@ public class CellEnvironment {
 
   public void moveEntityToCell(EntityType entityType, Cell fromCell, Cell targetCell) {
     Entity entity = fromCell.removeEntity(entityType);
-    entity.setX(targetCell.getColumn());
-    entity.setY(targetCell.getRow());
     targetCell.setEntity(entity, entityType);
+  }
+
+  public void updateModel() {
+    env.getEntities().clear();
+    for(int row = 0; row < cells.length; row++) {
+      for(int col = 0; col < cells[row].length; col++) {
+        env.getEntities().addAll(cells[row][col].getEntities());
+      }
+    }
   }
 
   private void setEntityCell(Entity entity, Cell cell) {
@@ -114,12 +133,30 @@ public class CellEnvironment {
     return row >= 0 && row < rowCount && column >= 0 && column < colCount;
   }
 
-  public void updateModel() {
-    env.getEntities().clear();
-    for(int row = 0; row < cells.length; row++) {
-      for(int col = 0; col < cells[row].length; col++) {
-        env.getEntities().addAll(cells[row][col].getEntities());
+  private static final double[] DIRECTION_ANGLES = {
+      0, Math.PI / 4, Math.PI / 2, 3 * Math.PI / 4, Math.PI, 5 * Math.PI / 4, 3 * Math.PI / 2, 7 * Math.PI / 4};
+
+  private void buildCellDirectionIndex(Cell toCell) {
+    Direction[][] directions = new Direction[rowCount][colCount];
+
+    for (int fromRow = 0; fromRow < cells.length; fromRow++) {
+      for (int fromCol = 0; fromCol < cells[fromRow].length; fromCol++) {
+        int deltaY = toCell.getRow() - fromRow;
+        int deltaX = toCell.getColumn() - fromCol;
+        double angle = Math.atan2(deltaY, deltaX);
+
+        directions[fromRow][fromCol] = Direction.EAST;
+        for (int ordinal = 0; ordinal < Direction.values().length; ordinal++) {
+          double directionAngleDelta = Math.abs(DIRECTION_ANGLES[ordinal] - angle);
+          double closestDirectionAngleDelta =
+              Math.abs(DIRECTION_ANGLES[directions[fromRow][fromCol].ordinal()] - angle);
+          if (directionAngleDelta < closestDirectionAngleDelta) {
+            directions[fromRow][fromCol] = Direction.values()[ordinal];
+          }
+        }
       }
     }
+
+    cellDirectionIndex.put(toCell, directions);
   }
 }
