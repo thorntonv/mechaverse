@@ -103,4 +103,11 @@ public class SimulationEditorView extends ResizeComposite {
   public void setDeleteEnabled(boolean enabled) {
     deleteButton.setEnabled(enabled);
   }
+
+  public void setEnabled(boolean enabled) {
+    newButton.setEnabled(enabled);
+    saveButton.setEnabled(enabled);
+    deleteButton.setEnabled(enabled);
+    environmentDropDown.setEnabled(enabled);
+  }
 }

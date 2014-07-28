@@ -9,7 +9,6 @@ import org.mechaverse.simulation.ant.api.model.Environment;
 import org.mechaverse.simulation.ant.api.model.SimulationState;
 
 import com.google.common.base.Preconditions;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -66,6 +65,7 @@ public class SimulationEditorPresenter {
   }
 
   public void loadState() {
+    view.setEnabled(false);
     service.loadState(key, new AsyncCallback<SimulationState>() {
       @Override
       public void onFailure(Throwable caught) {
@@ -75,6 +75,7 @@ public class SimulationEditorPresenter {
       @Override
       public void onSuccess(final SimulationState state) {
         setState(state);
+        view.setEnabled(true);
       }
     });
   }
@@ -113,17 +114,17 @@ public class SimulationEditorPresenter {
   public void save(final AsyncCallback<Void> callback) {
     Preconditions.checkNotNull(state);
 
+    view.setEnabled(false);
     service.saveState(key, state, new AsyncCallback<Void>() {
       @Override
-      public void onFailure(Throwable cause) {
-        Window.alert(cause.getMessage());
-      }
+      public void onFailure(Throwable cause) {}
 
       @Override
       public void onSuccess(Void value) {
         if (callback != null) {
           callback.onSuccess(value);
         }
+        view.setEnabled(true);
       }
     });
   }
@@ -170,6 +171,7 @@ public class SimulationEditorPresenter {
   }
 
   protected void saveInitialState() {
+    view.setEnabled(false);
     service.getCurrentState(new AsyncCallback<SimulationState>() {
       @Override
       public void onFailure(Throwable arg0) {}
@@ -178,14 +180,12 @@ public class SimulationEditorPresenter {
       public void onSuccess(SimulationState state) {
         service.saveState(key, state, new AsyncCallback<Void>() {
           @Override
-          public void onFailure(Throwable cause) {
-            Window.alert(cause.getMessage());
-          }
+          public void onFailure(Throwable cause) {}
 
           @Override
           public void onSuccess(Void arg0) {
-            Window.alert("Created initial state.");
             loadState();
+            view.setEnabled(true);
           }
         });
       }
