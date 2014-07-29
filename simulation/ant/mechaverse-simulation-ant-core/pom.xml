@@ -27,10 +27,6 @@
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.uncommons.maths</groupId>
-      <artifactId>uncommons-maths</artifactId>
-    </dependency>
-    <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
     </dependency>

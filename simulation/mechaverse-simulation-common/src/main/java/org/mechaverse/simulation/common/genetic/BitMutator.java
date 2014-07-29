@@ -2,16 +2,13 @@ package org.mechaverse.simulation.common.genetic;
 
 import gnu.trove.list.array.TIntArrayList;
 
-import java.util.Random;
-
-import org.uncommons.maths.random.BinomialGenerator;
+import org.apache.commons.math3.distribution.BinomialDistribution;
+import org.apache.commons.math3.random.RandomGenerator;
 
 import com.google.common.base.Preconditions;
 
 /**
  * Mutates bits in a byte array at random with a given probability.
- *
- * @author thorntonv@mechaverse.org
  */
 public class BitMutator implements Mutator {
 
@@ -25,7 +22,7 @@ public class BitMutator implements Mutator {
   }
 
   @Override
-  public void mutate(byte[] data, Random random) {
+  public void mutate(byte[] data, RandomGenerator random) {
     Preconditions.checkNotNull(data);
     Preconditions.checkNotNull(random);
 
@@ -50,13 +47,13 @@ public class BitMutator implements Mutator {
     data[arrayIndex] ^= (1 << bitInByte);
   }
 
-  private int getNumBitsToMutate(int bitCount, Random random) {
+  private int getNumBitsToMutate(int bitCount, RandomGenerator random) {
     if (bitMutationProbability == 0) {
       return 0;
     } else if (bitMutationProbability == 1) {
       return bitCount;
     }
 
-    return new BinomialGenerator(bitCount, bitMutationProbability, random).nextValue();
+    return new BinomialDistribution(random, bitCount, bitMutationProbability).sample();
   }
 }

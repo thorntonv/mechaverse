@@ -1,16 +1,14 @@
 package org.mechaverse.simulation.common.genetic;
 
-import java.util.Random;
+import org.apache.commons.math3.random.RandomGenerator;
 
 /**
  * Mutates bits in a byte array.
- *
- * @author thorntonv@mechaverse.org
  */
 public interface Mutator {
 
   /**
    * Mutates bytes in the given array.
    */
-  void mutate(byte[] data, Random random);
+  void mutate(byte[] data, RandomGenerator random);
 }

@@ -3,16 +3,14 @@ package org.mechaverse.simulation.common.genetic;
 import gnu.trove.list.array.TIntArrayList;
 
 import java.io.ByteArrayOutputStream;
-import java.util.Random;
 
-import org.uncommons.maths.random.Probability;
+import org.apache.commons.math3.random.RandomGenerator;
+import org.mechaverse.simulation.common.util.RandomUtil;
 
 import com.google.common.base.Preconditions;
 
 /**
  * Performs genetic recombination using cut and split crossover.
- *
- * @author thorntonv@mechaverse.org
  */
 public class CutAndSplitCrossoverGeneticRecombinator
     implements GeneticRecombinator<CrossoverGeneticData> {
@@ -51,7 +49,7 @@ public class CutAndSplitCrossoverGeneticRecombinator
 
   @Override
   public CrossoverGeneticData recombine(
-      CrossoverGeneticData parent1Data, CrossoverGeneticData parent2Data, Random random) {
+      CrossoverGeneticData parent1Data, CrossoverGeneticData parent2Data, RandomGenerator random) {
     Preconditions.checkNotNull(parent1Data);
     Preconditions.checkNotNull(parent2Data);
     Preconditions.checkNotNull(random);
@@ -66,7 +64,7 @@ public class CutAndSplitCrossoverGeneticRecombinator
 
     while(parent1.hasNextCrossoverPoint() || parent2.hasNextCrossoverPoint()) {
       // Choose a parent at random.
-      RecombinationState selectedParent = Probability.EVENS.nextEvent(random) ? parent1 : parent2;
+      RecombinationState selectedParent = RandomUtil.nextEvent(.5, random) ? parent1 : parent2;
       RecombinationState otherParent = selectedParent == parent1 ? parent2 : parent1;
 
       // Child will have bytes from the chosen parent until a crossover point is reached.

@@ -5,18 +5,22 @@ import gnu.trove.list.array.TIntArrayList;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.Random;
 
+import org.apache.commons.math3.random.RandomGenerator;
+import org.apache.commons.math3.random.Well19937c;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * A unit test for {@link CutAndSplitCrossoverGeneticRecombinator}.
+ */
 public class CutAndSplitCrossoverGeneticRecombinatorTest {
 
-  private Random random;
+  private RandomGenerator random;
 
   @Before
   public void setUp() {
-    random = new Random(BitMutatorTest.class.getName().hashCode());
+    random = new Well19937c(BitMutatorTest.class.getName().hashCode());
   }
 
   @Test

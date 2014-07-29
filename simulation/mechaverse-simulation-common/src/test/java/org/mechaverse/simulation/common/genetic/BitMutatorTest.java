@@ -5,8 +5,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import java.util.Arrays;
-import java.util.Random;
 
+import org.apache.commons.math3.random.RandomGenerator;
+import org.apache.commons.math3.random.Well19937c;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,11 +16,11 @@ import org.junit.Test;
  */
 public class BitMutatorTest {
 
-  private Random random;
+  private RandomGenerator random;
 
   @Before
   public void setUp() {
-    random = new Random(BitMutatorTest.class.getName().hashCode());
+    random = new Well19937c(BitMutatorTest.class.getName().hashCode());
   }
 
   @Test
