@@ -14,6 +14,10 @@ public class AntSimulationBenchmark extends Benchmark {
     super.setUp();
 
     simulation = new AntSimulationImpl();
+
+    for(int cnt = 0; cnt < 10000; cnt++) {
+      simulation.step();
+    }
   }
 
   public int timeUpdate(int reps) throws Exception {
