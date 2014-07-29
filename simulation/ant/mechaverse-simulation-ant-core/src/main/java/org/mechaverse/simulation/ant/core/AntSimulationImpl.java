@@ -3,7 +3,6 @@ package org.mechaverse.simulation.ant.core;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
@@ -32,7 +31,7 @@ public final class AntSimulationImpl {
   public AntSimulationImpl(ActiveEntityProvider activeEntityProvider) {
     state = new SimulationState();
     state.setEnvironment(environmentGenerator.generate(DEFAULT_ENVIRONMENT_WIDTH,
-        DEFAULT_ENVIRONMENT_HEIGHT, new Random()).getEnvironment());
+        DEFAULT_ENVIRONMENT_HEIGHT, random).getEnvironment());
     this.activeEntityProvider = activeEntityProvider;
     setState(state);
   }

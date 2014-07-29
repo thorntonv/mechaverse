@@ -2,15 +2,17 @@ package org.mechaverse.simulation.ant.core;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
+import org.apache.commons.math3.random.RandomGenerator;
+import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Environment;
 import org.mechaverse.simulation.ant.api.model.Nest;
 import org.mechaverse.simulation.ant.api.util.EntityUtil;
 import org.mechaverse.simulation.common.cellautomata.AbstractProbabilisticEnvironmentGenerator;
 
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableTable;
 
@@ -21,6 +23,14 @@ import com.google.common.collect.ImmutableTable;
  */
 public class AntSimulationEnvironmentGenerator
     extends AbstractProbabilisticEnvironmentGenerator<CellEnvironment, EntityType> {
+
+  public static final Function<EntityType, Entity> DEFAULT_ENTITY_FACTORY =
+      new Function<EntityType, Entity>() {
+        @Override
+        public Entity apply(EntityType entityType) {
+          return EntityUtil.newEntity(entityType);
+        }
+      };
 
   private static final ProbabilisticLocalGenerator<EntityType> ROCK_GENERATOR =
       new ProbabilisticLocalGenerator<EntityType>(.01,
@@ -36,12 +46,19 @@ public class AntSimulationEnvironmentGenerator
               .put(2, 2, EntityDistribution.of(EntityType.ROCK, .50))
               .build());
 
+  private final Function<EntityType, Entity> entityFactory;
+
   public AntSimulationEnvironmentGenerator() {
+    this(DEFAULT_ENTITY_FACTORY);
+  }
+
+  public AntSimulationEnvironmentGenerator(Function<EntityType, Entity> entityFactory) {
     super(ImmutableList.of(ROCK_GENERATOR));
+    this.entityFactory = entityFactory;
   }
 
   @Override
-  protected CellEnvironment createEnvironment(int width, int height, Random random) {
+  protected CellEnvironment createEnvironment(int width, int height, RandomGenerator random) {
     Environment env = new Environment();
     env.setId(UUID.randomUUID().toString());
     env.setWidth(width);
@@ -64,12 +81,12 @@ public class AntSimulationEnvironmentGenerator
       Cell cell = env.getCell(row, column);
 
       if (cell.isEmpty()) {
-        env.addEntity(EntityUtil.newEntity(entityType), cell);
+        env.addEntity(entityFactory.apply(entityType), cell);
       }
     }
   }
 
-  private Cell getRandomEmptyCell(CellEnvironment env, Random random) {
+  private Cell getRandomEmptyCell(CellEnvironment env, RandomGenerator random) {
     List<Cell> emptyCells = new ArrayList<>();
     for (int row = 0; row < env.getRowCount(); row++) {
       for (int col = 0; col < env.getColumnCount(); col++) {

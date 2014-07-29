@@ -11,6 +11,7 @@ import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.Environment;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 /**
@@ -20,19 +21,35 @@ public class EnvironmentSimulator implements EntityManager {
 
   private final CellEnvironment environment;
   private final Map<Entity, ActiveEntity> activeEntities = new IdentityHashMap<>();
+  private final Set<EnvironmentSimulationModule> modules = Sets.newIdentityHashSet();
   private final ActiveEntityProvider activeEntityProvider;
   private final Set<EntityManager.Observer> observers = Sets.newIdentityHashSet();
 
   public EnvironmentSimulator(Environment environment, ActiveEntityProvider activeEntityProvider) {
+    this(environment, ImmutableSet.<EnvironmentSimulationModule>of(
+      new FoodGenerator()), activeEntityProvider);
+  }
+
+  public EnvironmentSimulator(Environment environment, Set<EnvironmentSimulationModule> modules,
+      ActiveEntityProvider activeEntityProvider) {
     this.environment = new CellEnvironment(environment);
     this.activeEntityProvider = activeEntityProvider;
 
     for (Entity entity : environment.getEntities()) {
       addEntity(entity);
     }
+
+    this.modules.addAll(modules);
+    for(EnvironmentSimulationModule module : modules) {
+      addObserver(module);
+    }
   }
 
   public void update(RandomGenerator random) {
+    for (EnvironmentSimulationModule module : modules) {
+      module.update(environment, this, random);
+    }
+
     List<ActiveEntity> activeEntityList = new ArrayList<>(activeEntities.values());
     for (ActiveEntity activeEntity : activeEntityList) {
       activeEntity.updateInput(environment, random);

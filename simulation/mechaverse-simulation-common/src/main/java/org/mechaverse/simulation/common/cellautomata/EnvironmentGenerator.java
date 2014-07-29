@@ -1,6 +1,8 @@
 package org.mechaverse.simulation.common.cellautomata;
 
-import java.util.Random;
+import java.util.List;
+
+import org.apache.commons.math3.random.RandomGenerator;
 
 import com.google.common.base.Optional;
 
@@ -29,10 +31,13 @@ public interface EnvironmentGenerator<E, T> {
   /**
    * Generates a new environment with the given dimensions.
    */
-  E generate(int width, int height, Random random);
+  E generate(int width, int height, RandomGenerator random);
 
   /**
    * Applies a {@link LocalGenerator} to the environment at the given coordinate.
+   *
+   * @return a list that contains all generated entities
    */
-  void apply(LocalGenerator<T> localGenerator, E env, int row, int column, Random random);
+  List<T> apply(
+      LocalGenerator<T> localGenerator, E env, int row, int column, RandomGenerator random);
 }

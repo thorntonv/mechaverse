@@ -2,11 +2,11 @@ package org.mechaverse.simulation.common.cellautomata;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
+import org.apache.commons.math3.distribution.BinomialDistribution;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
+import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.util.Pair;
-import org.uncommons.maths.random.BinomialGenerator;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -97,7 +97,7 @@ public abstract class AbstractProbabilisticEnvironmentGenerator<E, T>
   /**
    * Creates a new environment with the given dimensions.
    */
-  protected abstract E createEnvironment(int width, int height, Random random);
+  protected abstract E createEnvironment(int width, int height, RandomGenerator random);
 
   /**
    * Adds an entity of the given type at the specified position in the environment.
@@ -110,12 +110,13 @@ public abstract class AbstractProbabilisticEnvironmentGenerator<E, T>
   }
 
   @Override
-  public final E generate(int width, int height, Random random) {
+  public final E generate(int width, int height, RandomGenerator random) {
     E env = createEnvironment(width, height, random);
 
     for (ProbabilisticLocalGenerator<T> localGenerator : localGenerators) {
-      int count = new BinomialGenerator(
-        width * height, localGenerator.getProbability(), random).nextValue();
+      BinomialDistribution distribution =
+          new BinomialDistribution(random, width * height, localGenerator.getProbability());
+      int count = distribution.sample();
       for (int cnt = 1; cnt <= count; cnt++) {
         int originRow = random.nextInt(height);
         int originCol = random.nextInt(width);
@@ -127,8 +128,9 @@ public abstract class AbstractProbabilisticEnvironmentGenerator<E, T>
   }
 
   @Override
-  public void apply(LocalGenerator<T> localGenerator,
-      E env, int originRow, int originCol, Random random) {
+  public List<T> apply(LocalGenerator<T> localGenerator,
+      E env, int originRow, int originCol, RandomGenerator random) {
+    List<T> generatedEntities = new ArrayList<T>();
     int rowOffset = originRow - localGenerator.getHeight() / 2;
     int colOffset = originCol - localGenerator.getWidth() / 2;
 
@@ -138,8 +140,10 @@ public abstract class AbstractProbabilisticEnvironmentGenerator<E, T>
 
         if (entity.isPresent()) {
           addEntity(entity.get(), rowOffset + row, colOffset + col, env);
+          generatedEntities.add(entity.get());
         }
       }
     }
+    return generatedEntities;
   }
 }

@@ -15,9 +15,12 @@ import com.google.common.collect.Sets;
  */
 public class ActiveNest implements ActiveEntity, EntityManager.Observer {
 
+  // TODO(thorntonv): Make these values configurable.
+  private final int targetAntCount = 500;
+  private final int initialAntEnergy = 1000;
+
   private final Nest nest;
   private final Set<Entity> ants = Sets.newIdentityHashSet();
-  private final int targetAntCount = 500;
   private Cell cell;
 
   public ActiveNest(Nest entity) {
@@ -48,7 +51,7 @@ public class ActiveNest implements ActiveEntity, EntityManager.Observer {
       Ant ant = new Ant();
       ant.setDirection(AntSimulationUtil.randomDirection(random));
       cell.setEntity(ant, EntityType.ANT);
-      ant.setMaxEnergy(2 * 60);
+      ant.setMaxEnergy(initialAntEnergy);
       ant.setEnergy(ant.getMaxEnergy());
       entityManager.addEntity(ant);
     }
