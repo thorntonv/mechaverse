@@ -142,6 +142,8 @@ public final class ActiveAnt implements ActiveEntity {
     Cell cell = env.getCell(entity);
     Cell frontCell = env.getCellInDirection(cell, entity.getDirection());
 
+    entity.setAge(entity.getAge() + 1);
+    
     entity.setEnergy(entity.getEnergy() - 1);
     if (entity.getEnergy() <= 0) {
       entityManager.removeEntity(this);
@@ -296,6 +298,23 @@ public final class ActiveAnt implements ActiveEntity {
       int energy = energyNeeded <= nest.getEnergy() ? energyNeeded : nest.getEnergy();
       addEnergy(energy);
       nest.setEnergy(nest.getEnergy() - energy);
+    }
+    return false;
+  }
+
+  private boolean feed(Entity entityToFeed, EntityManager entityManager, CellEnvironment env) {
+    if (carriedEntityType == EntityType.FOOD) {
+      Entity food = entity.getCarriedEntity();
+
+      if (food != null) {
+        int energy = entityToFeed.getEnergy() + food.getEnergy();
+        entityToFeed.setEnergy(energy <= entityToFeed.getMaxEnergy()
+            ? energy : entityToFeed.getMaxEnergy());
+        carriedEntityType = EntityType.NONE;
+        entity.setCarriedEntity(null);
+        entityManager.removeEntity(food);
+        return true;
+      }
     }
     return false;
   }

@@ -50,6 +50,7 @@
     <complexContent>
       <extension base="mechaverse:Entity">
         <sequence>
+          <element name="age" type="long" minOccurs="1" maxOccurs="1" />
           <element name="carriedEntity" type="mechaverse:Entity" minOccurs="0" maxOccurs="1" />
           <element name="data" type="base64Binary" minOccurs="1" maxOccurs="1" />
           <element name="bitMutationProbability" type="float" minOccurs="1" maxOccurs="1" />

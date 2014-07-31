@@ -67,11 +67,6 @@
         <groupId>org.codehaus.jackson</groupId>
         <artifactId>jackson-jaxrs</artifactId>
         <version>${jackson.version}</version>
-      </dependency>      
-      <dependency>
-        <groupId>org.uncommons.maths</groupId>
-        <artifactId>uncommons-maths</artifactId>
-        <version>1.2</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>

@@ -27,7 +27,7 @@ public class EnvironmentSimulator implements EntityManager {
 
   public EnvironmentSimulator(Environment environment, ActiveEntityProvider activeEntityProvider) {
     this(environment, ImmutableSet.<EnvironmentSimulationModule>of(
-      new FoodGenerator()), activeEntityProvider);
+      new FoodGenerator(), new AntReproductionModule()), activeEntityProvider);
   }
 
   public EnvironmentSimulator(Environment environment, Set<EnvironmentSimulationModule> modules,
@@ -35,13 +35,13 @@ public class EnvironmentSimulator implements EntityManager {
     this.environment = new CellEnvironment(environment);
     this.activeEntityProvider = activeEntityProvider;
 
-    for (Entity entity : environment.getEntities()) {
-      addEntity(entity);
-    }
-
     this.modules.addAll(modules);
     for(EnvironmentSimulationModule module : modules) {
       addObserver(module);
+    }
+
+    for (Entity entity : environment.getEntities()) {
+      addEntity(entity);
     }
   }
 

@@ -12,7 +12,7 @@ public class SimulationPresenter {
 
   public static final String INITIAL_STATE_KEY = "0000000000";
 
-  private static final int UPDATE_INTERVAL = 500;
+  private static final int UPDATE_INTERVAL = 1000;
 
   protected class UpdateTimer extends Timer {
     @Override
@@ -27,9 +27,7 @@ public class SimulationPresenter {
         public void onSuccess(Void arg0) {
           service.getCurrentState(new AsyncCallback<SimulationState>() {
             @Override
-            public void onFailure(Throwable ex) {
-              Window.alert(ex.getMessage());
-            }
+            public void onFailure(Throwable ex) {}
 
             @Override
             public void onSuccess(SimulationState state) {
