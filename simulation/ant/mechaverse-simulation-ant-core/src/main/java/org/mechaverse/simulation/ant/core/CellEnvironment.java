@@ -1,21 +1,21 @@
 package org.mechaverse.simulation.ant.core;
 
-import java.util.IdentityHashMap;
-import java.util.Map;
-
 import org.mechaverse.simulation.ant.api.model.Direction;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Environment;
+import org.mechaverse.simulation.ant.api.util.EntityUtil;
 
 public class CellEnvironment {
+
+  private static final double[] DIRECTION_ANGLES = {
+      0, Math.PI / 4, Math.PI / 2, 3 * Math.PI / 4, Math.PI, 5 * Math.PI / 4, 3 * Math.PI / 2,
+      7 * Math.PI / 4};
 
   private final int rowCount;
   private final int colCount;
   private final Cell[][] cells;
   private final Environment env;
-  private Map<Cell, Direction[][]> cellDirectionIndex =
-      new IdentityHashMap<Cell, Direction[][]>();
 
   public CellEnvironment(Environment env) {
     this.rowCount = env.getHeight();
@@ -61,13 +61,6 @@ public class CellEnvironment {
     return cells[entity.getY()][entity.getX()];
   }
 
-  public Direction getDirection(Cell fromCell, Cell toCell) {
-    if (!cellDirectionIndex.containsKey(toCell)) {
-      buildCellDirectionIndex(toCell);
-    }
-    return cellDirectionIndex.get(toCell)[fromCell.getRow()][fromCell.getColumn()];
-  }
-
   public Cell getCellInDirection(Cell cell, Direction direction) {
     int row = cell.getRow();
     int col = cell.getColumn();
@@ -104,6 +97,29 @@ public class CellEnvironment {
     return isValidCellCoordinate(row, col) ? cells[row][col] : null;
   }
 
+  public int getDistance(Cell fromCell, Cell toCell) {
+    return Math.abs(fromCell.getRow() - toCell.getRow())
+        + Math.abs(fromCell.getColumn() - toCell.getColumn());
+  }
+
+  public Direction getDirection(Cell fromCell, Cell toCell) {
+    int deltaY = toCell.getRow() - fromCell.getRow();
+    int deltaX = toCell.getColumn() - fromCell.getColumn();
+    double angle = Math.atan2(deltaY, deltaX);
+
+    Direction closestDirection = null;
+    double closestDirectionAngleDelta = Double.MAX_VALUE;
+    for (int ordinal = 0; ordinal < EntityUtil.DIRECTIONS.length; ordinal++) {
+      double directionAngleDelta = Math.abs(DIRECTION_ANGLES[ordinal] - angle);
+      if (closestDirection == null || directionAngleDelta < closestDirectionAngleDelta) {
+        closestDirection = EntityUtil.DIRECTIONS[ordinal];
+        closestDirectionAngleDelta = directionAngleDelta;
+      }
+    }
+
+    return closestDirection;
+  }
+
   public void addEntity(Entity entity, Cell cell) {
     env.getEntities().add(entity);
     setEntityCell(entity, cell);
@@ -131,32 +147,5 @@ public class CellEnvironment {
 
   private boolean isValidCellCoordinate(int row, int column) {
     return row >= 0 && row < rowCount && column >= 0 && column < colCount;
-  }
-
-  private static final double[] DIRECTION_ANGLES = {
-      0, Math.PI / 4, Math.PI / 2, 3 * Math.PI / 4, Math.PI, 5 * Math.PI / 4, 3 * Math.PI / 2, 7 * Math.PI / 4};
-
-  private void buildCellDirectionIndex(Cell toCell) {
-    Direction[][] directions = new Direction[rowCount][colCount];
-
-    for (int fromRow = 0; fromRow < cells.length; fromRow++) {
-      for (int fromCol = 0; fromCol < cells[fromRow].length; fromCol++) {
-        int deltaY = toCell.getRow() - fromRow;
-        int deltaX = toCell.getColumn() - fromCol;
-        double angle = Math.atan2(deltaY, deltaX);
-
-        directions[fromRow][fromCol] = Direction.EAST;
-        for (int ordinal = 0; ordinal < Direction.values().length; ordinal++) {
-          double directionAngleDelta = Math.abs(DIRECTION_ANGLES[ordinal] - angle);
-          double closestDirectionAngleDelta =
-              Math.abs(DIRECTION_ANGLES[directions[fromRow][fromCol].ordinal()] - angle);
-          if (directionAngleDelta < closestDirectionAngleDelta) {
-            directions[fromRow][fromCol] = Direction.values()[ordinal];
-          }
-        }
-      }
-    }
-
-    cellDirectionIndex.put(toCell, directions);
   }
 }

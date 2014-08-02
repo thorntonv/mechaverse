@@ -127,6 +127,7 @@
       <element name="id" type="string" minOccurs="1" maxOccurs="1" />
       <element name="environment" type="mechaverse:Environment" minOccurs="1" maxOccurs="1" />
       <element name="sub_environment" type="mechaverse:Environment" minOccurs="0" maxOccurs="unbounded" />
+      <element name="iteration" type="long" minOccurs="1" maxOccurs="1" />
       <element name="seed" type="string" minOccurs="1" maxOccurs="1" />
     </sequence>
   </complexType>

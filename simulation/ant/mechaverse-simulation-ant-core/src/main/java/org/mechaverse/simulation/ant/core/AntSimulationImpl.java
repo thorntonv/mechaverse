@@ -30,6 +30,7 @@ public final class AntSimulationImpl {
 
   public AntSimulationImpl(ActiveEntityProvider activeEntityProvider) {
     state = new SimulationState();
+    state.setIteration(0);
     state.setEnvironment(environmentGenerator.generate(DEFAULT_ENVIRONMENT_WIDTH,
         DEFAULT_ENVIRONMENT_HEIGHT, random).getEnvironment());
     this.activeEntityProvider = activeEntityProvider;
@@ -69,5 +70,7 @@ public final class AntSimulationImpl {
     long seed = random.nextLong();
     random.setSeed(seed);
     state.setSeed(String.valueOf(seed));
+
+    state.setIteration(state.getIteration()+1);
   }
 }
