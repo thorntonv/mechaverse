@@ -22,18 +22,20 @@ public final class AntSimulationImpl {
   private final EnvironmentGenerator<CellEnvironment, EntityType> environmentGenerator =
       new AntSimulationEnvironmentGenerator();
   private final ActiveEntityProvider activeEntityProvider;
-  private RandomGenerator random = new Well19937c();
+  private final RandomGenerator random;
 
   public AntSimulationImpl() {
-    this(new SimpleActiveEntityProvider());
+    this(new SimpleActiveEntityProvider(), new Well19937c());
   }
 
-  public AntSimulationImpl(ActiveEntityProvider activeEntityProvider) {
+  public AntSimulationImpl(ActiveEntityProvider activeEntityProvider, RandomGenerator random) {
+    this.activeEntityProvider = activeEntityProvider;
+    this.random = random;
+
     state = new SimulationState();
     state.setIteration(0);
     state.setEnvironment(environmentGenerator.generate(DEFAULT_ENVIRONMENT_WIDTH,
         DEFAULT_ENVIRONMENT_HEIGHT, random).getEnvironment());
-    this.activeEntityProvider = activeEntityProvider;
     setState(state);
   }
 

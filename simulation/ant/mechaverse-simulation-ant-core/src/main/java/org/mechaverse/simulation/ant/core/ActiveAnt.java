@@ -143,7 +143,7 @@ public final class ActiveAnt implements ActiveEntity {
     Cell frontCell = env.getCellInDirection(cell, entity.getDirection());
 
     entity.setAge(entity.getAge() + 1);
-    
+
     entity.setEnergy(entity.getEnergy() - 1);
     if (entity.getEnergy() <= 0) {
       entityManager.removeEntity(this);
@@ -183,7 +183,7 @@ public final class ActiveAnt implements ActiveEntity {
     } else if (carriedEntityType != EntityType.NONE && output.shouldDrop()) {
       if (carriedEntityType == EntityType.FOOD && drop(cell)) {
         return;
-      } else if (frontCell != null && drop(frontCell)) {
+      } else if (drop(frontCell)) {
         return;
       }
     }
@@ -247,24 +247,25 @@ public final class ActiveAnt implements ActiveEntity {
   }
 
   private boolean pickup(Cell cell) {
-    for (EntityType type : CARRIABLE_ENTITY_TYPES) {
-      Entity carriableEntity = cell.getEntity(type);
-      if (carriableEntity != null) {
-        cell.removeEntity(type);
-        entity.setCarriedEntity(carriableEntity);
-        this.carriedEntityType = type;
-        carriableEntity.setX(entity.getX());
-        carriableEntity.setY(entity.getY());
-        return true;
+    if(cell != null) {
+      for (EntityType type : CARRIABLE_ENTITY_TYPES) {
+        Entity carriableEntity = cell.getEntity(type);
+        if (carriableEntity != null) {
+          cell.removeEntity(type);
+          entity.setCarriedEntity(carriableEntity);
+          this.carriedEntityType = type;
+          carriableEntity.setX(entity.getX());
+          carriableEntity.setY(entity.getY());
+          return true;
+        }
       }
     }
-
     return false;
   }
 
   private boolean drop(Cell cell) {
     // The cell must not already have an entity of the given type.
-    if (cell.getEntity(carriedEntityType) == null) {
+    if (cell != null && cell.getEntity(carriedEntityType) == null) {
       Entity carriedEntity = entity.getCarriedEntity();
       cell.setEntity(carriedEntity, carriedEntityType);
       entity.setCarriedEntity(null);

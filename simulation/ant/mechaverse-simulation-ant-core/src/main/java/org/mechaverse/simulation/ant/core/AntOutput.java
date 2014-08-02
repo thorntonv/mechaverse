@@ -61,7 +61,9 @@ public final class AntOutput {
   }
 
   public MoveDirection getMoveDirection() {
-    return MOVE_DIRECTIONS[(data[MOVE_DIRECTION_IDX] & ~MOVE_DIRECTION_MASK)];
+    int moveDirectionOrdinal = (data[MOVE_DIRECTION_IDX] & ~MOVE_DIRECTION_MASK);
+    moveDirectionOrdinal = moveDirectionOrdinal < MOVE_DIRECTIONS.length ? moveDirectionOrdinal : 0;
+    return MOVE_DIRECTIONS[moveDirectionOrdinal];
   }
 
   public void setMoveDirection(MoveDirection moveDirection) {
@@ -70,7 +72,10 @@ public final class AntOutput {
   }
 
   public TurnDirection getTurnDirection() {
-    return TURN_DIRECTIONS[(data[TURN_DIRECTION_IDX] & ~TURN_DIRECTION_MASK) >> TURN_DIRECTION_BIT_IDX];
+    int turnDirectionOrdinal =
+        (data[TURN_DIRECTION_IDX] & ~TURN_DIRECTION_MASK) >> TURN_DIRECTION_BIT_IDX;
+    turnDirectionOrdinal = turnDirectionOrdinal < TURN_DIRECTIONS.length ? turnDirectionOrdinal : 0;
+    return TURN_DIRECTIONS[turnDirectionOrdinal];
   }
 
   public void setTurnDirection(TurnDirection turnDirection) {
@@ -119,6 +124,10 @@ public final class AntOutput {
 
   public int[] getData() {
     return data;
+  }
+
+  public void setData(int[] data) {
+    System.arraycopy(data, 0, this.data, 0, DATA_SIZE);
   }
 
   public void resetToDefault() {

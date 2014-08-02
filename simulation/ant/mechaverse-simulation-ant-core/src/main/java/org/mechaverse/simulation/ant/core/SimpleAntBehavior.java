@@ -10,7 +10,7 @@ import org.mechaverse.simulation.common.util.RandomUtil;
 /**
  * An ant behavior that is based on a simple algorithm.
  */
-public final class SimpleAntBehavior implements AntBehavior {
+public class SimpleAntBehavior implements AntBehavior {
 
   private AntInput input;
   private final AntOutput output = new AntOutput();
