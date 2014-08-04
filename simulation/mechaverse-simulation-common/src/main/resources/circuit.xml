@@ -26,9 +26,9 @@
     </output>
   </element-type>
 
-  <element-type id="boolean3in1out">
-    <param id="invert" />
-    <output id="1">
+  <element-type id="boolean3in3out">
+    <output id="{1,2,3}">
+      <param id="invert" />
       <!-- Term 1 -->
       <param id="t1InvertInput1" />
       <param id="t1MaskInput1" />
@@ -74,8 +74,8 @@
     </row>
     <row>
       <element type="routing3in3out" />
-      <element type="routing3in3out" />
-      <element type="routing3in3out" />
+      <element type="boolean3in3out" outputs="{1}" />
+      <element type="boolean3in3out" />
       <element type="routing3in3out" />
     </row>
     <row>

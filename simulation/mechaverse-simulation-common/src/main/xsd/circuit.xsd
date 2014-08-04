@@ -41,6 +41,7 @@
   <complexType name="element">
     <attribute name="id" type="string" />
     <attribute name="type" type="string" use="required" />
+    <attribute name="outputs" type="string" />
   </complexType>
 
   <complexType name="output">

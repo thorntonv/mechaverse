@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.mechaverse.circuit.model.Circuit;
 import org.mechaverse.circuit.model.Element;
@@ -27,6 +29,8 @@ import com.google.common.collect.ImmutableBiMap;
  * @author thorntonv@mechaverse.org
  */
 public class CircuitSimulationModelBuilder {
+
+  private static final Pattern ID_PATTERN = Pattern.compile("\\d+");
 
   protected abstract class AbstractElementInfoBuilder<E extends Element, I extends ElementInfo> {
 
@@ -118,9 +122,31 @@ public class CircuitSimulationModelBuilder {
     Map<String, ElementType> map = new HashMap<>();
     map.put(ExternalElement.TYPE, ExternalElementType.INSTANCE);
     for (ElementType elementType : circuit.getElementTypes()) {
-      map.put(elementType.getId(), elementType);
+      map.put(elementType.getId(), preprocessElementType(elementType));
     }
     return map;
+  }
+
+  /**
+   * Preprocesses an element type. If an output has an id that specified multiple outputs eg.
+   * {1,2,3} then the output will be duplicated for each of the specified ids.
+   */
+  private ElementType preprocessElementType(ElementType elementType) {
+    ElementType processedElementType = new ElementType();
+    processedElementType.setId(elementType.getId());
+    processedElementType.getParams().addAll(elementType.getParams());
+
+    for (Output output : elementType.getOutputs()) {
+      Matcher matcher = ID_PATTERN.matcher(output.getId());
+      while (matcher.find()) {
+        Output newOutput = new Output();
+        newOutput.setId(matcher.group());
+        newOutput.getParams().addAll(output.getParams());
+        newOutput.setExpression(output.getExpression());
+        processedElementType.getOutputs().add(newOutput);
+      }
+    }
+    return processedElementType;
   }
 
   private LogicalUnitInfo buildLogicalUnitInfo(LogicalUnit unit,
@@ -138,7 +164,7 @@ public class CircuitSimulationModelBuilder {
           element.setId(String.valueOf(id));
           id++;
         }
-        matrix[rowIdx][colIdx] = element;
+        matrix[rowIdx][colIdx] = preprocessElement(element, elementTypeMap);
       }
     }
 
@@ -160,6 +186,40 @@ public class CircuitSimulationModelBuilder {
     }
     return new LogicalUnitInfo(elements, externalElements,
         buildVarNameStateIndexMap(elements, externalElements));
+  }
+
+  /**
+   * Preprocesses an element. If the outputs attribute is set a new element type will be created for
+   * the element that only includes the specified outputs.
+   */
+  private Element preprocessElement(Element element, Map<String, ElementType> elementTypeMap) {
+    if (element.getOutputs() != null) {
+      ElementType elementType = elementTypeMap.get(element.getType());
+      ElementType newElementType = new ElementType();
+      newElementType.getParams().addAll(elementType.getParams());
+      newElementType.setId(element.getType() + "_e" + element.getId());
+
+      Matcher matcher = ID_PATTERN.matcher(element.getOutputs());
+      while (matcher.find()) {
+        String outputId = matcher.group();
+        Output output = getOutput(outputId, elementType);
+        if (output != null) {
+          newElementType.getOutputs().add(output);
+        }
+      }
+      elementTypeMap.put(newElementType.getId(), newElementType);
+      element.setType(newElementType.getId());
+    }
+    return element;
+  }
+
+  private Output getOutput(String id, ElementType elementType) {
+    for (Output output : elementType.getOutputs()) {
+      if (output.getId().equalsIgnoreCase(id)) {
+        return output;
+      }
+    }
+    return null;
   }
 
   protected ImmutableBiMap<String, Integer> buildVarNameStateIndexMap(

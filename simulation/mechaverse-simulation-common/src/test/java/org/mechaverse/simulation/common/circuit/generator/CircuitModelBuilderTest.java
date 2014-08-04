@@ -19,13 +19,15 @@ import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel
  */
 public class CircuitModelBuilderTest {
 
+  // TODO(thorntonv): Test element type output duplication and restriction.
+
   /**
    * Tests building the model of a circuit with a single logical unit that consists of two
    * routing3in3out elements in a single row.
    */
   @Test
   public void testBuildModel_singleRowCircuit() {
-    Circuit circuit1 = 
+    Circuit circuit1 =
         CircuitBuilder.newCircuit(1, 1, Routing3In3OutElementType.newInstance(), 1, 2);
 
     CircuitSimulationModelBuilder modelBuilder = new CircuitSimulationModelBuilder();
@@ -85,7 +87,7 @@ public class CircuitModelBuilderTest {
    */
   @Test
   public void testBuildModel_multiRowCircuit() {
-    Circuit circuit1 = 
+    Circuit circuit1 =
         CircuitBuilder.newCircuit(3, 3, Routing3In3OutElementType.newInstance(), 3, 3);
 
     CircuitSimulationModelBuilder modelBuilder = new CircuitSimulationModelBuilder();
