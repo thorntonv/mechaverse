@@ -1,11 +1,9 @@
 package org.mechaverse.simulation.common.circuit.generator;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -16,13 +14,12 @@ import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.mechaverse.circuit.model.Circuit;
+import org.mechaverse.simulation.common.circuit.CircuitReader;
 import org.mechaverse.simulation.common.circuit.generator.java.JavaCircuitGeneratorImpl;
 import org.mechaverse.simulation.common.opencl.OpenClCircuitGeneratorImpl;
 
 /**
  * Command line interface for generating circuit simulation source code.
- *
- * @author thorntonv@mechaverse.org
  */
 public class CircuitGeneratorCLI {
 
@@ -39,10 +36,7 @@ public class CircuitGeneratorCLI {
       String inputFilename = cmd.getOptionValue('i');
       String outputFilename = cmd.getOptionValue('o');
 
-      JAXBContext jaxbContext = JAXBContext.newInstance(Circuit.class);
-      Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-      File XMLfile = new File(inputFilename);
-      Circuit circuit = (Circuit) jaxbUnmarshaller.unmarshal(XMLfile);
+      Circuit circuit = CircuitReader.read(new FileInputStream(inputFilename));
       CircuitSimulationGenerator generator = createGenerator(type, circuit);
       PrintWriter out = new PrintWriter(System.out);
       if (outputFilename != null) {

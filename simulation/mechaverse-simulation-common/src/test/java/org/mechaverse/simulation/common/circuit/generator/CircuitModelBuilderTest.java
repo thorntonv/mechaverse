@@ -20,6 +20,7 @@ import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel
 public class CircuitModelBuilderTest {
 
   // TODO(thorntonv): Test element type output duplication and restriction.
+  // TODO(thorntonv): Test logical units with elements with fewer than 3 elements on the boundary.
 
   /**
    * Tests building the model of a circuit with a single logical unit that consists of two

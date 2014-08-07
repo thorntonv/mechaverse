@@ -85,7 +85,7 @@ public class ThreeNeighborConnectionInfoBuilder implements ConnectionInfoBuilder
   }
 
   protected Input createExternalInput(int relativeUnitRow, int relativeUnitCol,
-                                      Element element, int outputIdx) {
+      Element element, int outputIdx) {
     ExternalElement externalElement =
         createExternalElement(relativeUnitRow, relativeUnitCol, element, outputIdx);
     Input input = new Input(externalElement, ExternalElementType.INSTANCE.getOutput());
@@ -96,7 +96,7 @@ public class ThreeNeighborConnectionInfoBuilder implements ConnectionInfoBuilder
       Element element, int outputIdx) {
     int id = externalElements.size() + 1;
     ElementType elementType = elementTypeMap.get(element.getType());
-    Output output = elementType.getOutputs().get(outputIdx);
+    Output output = elementType.getOutputs().get(outputIdx % elementType.getOutputs().size());
     ExternalElement externalElement =
         new ExternalElement(relativeUnitRow, relativeUnitCol, element.getId(), output.getId());
     externalElement.setId(CircuitSimulationModel.EXTERNAL_INPUT_ID_PREFIX + String.valueOf(id));
