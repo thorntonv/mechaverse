@@ -38,7 +38,7 @@ public final class AntInput {
     }
   }
 
-  public static int DATA_SIZE = 2;
+  public static int DATA_SIZE = 4;
 
   // TODO(thorntonv) Implement general input.
   // TODO(thorntonv) Implement random input.
@@ -105,6 +105,11 @@ public final class AntInput {
   private static final int RIGHT_ENTITY_DIRECTION_BIT_IDX = 29;
   private static final int RIGHT_ENTITY_DIRECTION_MASK = ~(0b111 << RIGHT_ENTITY_DIRECTION_BIT_IDX);
 
+  // IDX = 3
+  private static final int NEST_DIRECTION_IDX = 3;
+  private static final int NEST_DIRECTION_BIT_IDX = 3;
+  private static final int NEST_DIRECTION_MASK = ~(0b111 << NEST_DIRECTION_BIT_IDX);
+
   private final int[] data;
 
   public AntInput() {
@@ -135,6 +140,17 @@ public final class AntInput {
 
   public Direction getDirection() {
     int direction = (data[DIRECTION_IDX] & ~DIRECTION_MASK) >> DIRECTION_BIT_IDX;
+    return EntityUtil.DIRECTIONS[direction];
+  }
+
+  public void setNestDirection(Direction direction) {
+    int value = direction.ordinal();
+    data[NEST_DIRECTION_IDX] =
+        (data[NEST_DIRECTION_IDX] & NEST_DIRECTION_MASK) | (value << NEST_DIRECTION_BIT_IDX);
+  }
+
+  public Direction getNestDirection() {
+    int direction = (data[NEST_DIRECTION_IDX] & ~NEST_DIRECTION_MASK) >> NEST_DIRECTION_BIT_IDX;
     return EntityUtil.DIRECTIONS[direction];
   }
 

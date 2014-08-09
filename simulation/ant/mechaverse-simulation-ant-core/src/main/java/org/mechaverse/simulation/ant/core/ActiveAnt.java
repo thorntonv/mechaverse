@@ -35,6 +35,9 @@ public final class ActiveAnt implements ActiveEntity {
   private static final EntityType[] CARRIABLE_ENTITY_TYPES =
       {EntityType.DIRT, EntityType.FOOD,EntityType.ROCK};
 
+  // TODO(thorntonv): Make these values configurable.
+  private final int pheromoneInitialEnergy = 2 * 60 * 60;
+
   private final Ant entity;
   private final AntBehavior behavior;
   private EntityType carriedEntityType = EntityType.NONE;
@@ -64,6 +67,9 @@ public final class ActiveAnt implements ActiveEntity {
         break;
       }
     }
+
+    // Nest direction sensor.
+    input.setNestDirection(env.getNestDirection(cell));
 
     // Front cell sensor.
     Cell frontCell = env.getCellInDirection(cell, entity.getDirection());
@@ -231,6 +237,11 @@ public final class ActiveAnt implements ActiveEntity {
     return EntityType.ANT;
   }
 
+  @Override
+  public void updateModel() {
+    behavior.updateModel();
+  }
+
   private boolean moveForward(Cell cell, Cell frontCell, CellEnvironment env) {
     if (frontCell != null && canMoveToCell(frontCell)) {
       env.moveEntityToCell(EntityType.ANT, cell, frontCell);
@@ -278,8 +289,8 @@ public final class ActiveAnt implements ActiveEntity {
   private void leavePheromone(Cell cell, int type, EntityManager entityManager) {
     Pheromone pheromone = new Pheromone();
     pheromone.setValue(type);
-    pheromone.setMaxEnergy(15);
-    pheromone.setEnergy(15);
+    pheromone.setMaxEnergy(pheromoneInitialEnergy);
+    pheromone.setEnergy(pheromoneInitialEnergy);
     cell.setEntity(pheromone, EntityType.PHEROMONE);
     entityManager.addEntity(pheromone);
   }
@@ -331,10 +342,5 @@ public final class ActiveAnt implements ActiveEntity {
   private void addEnergy(int amount) {
     int energy = entity.getEnergy() + amount;
     entity.setEnergy(energy <= entity.getMaxEnergy() ? energy : entity.getMaxEnergy());
-  }
-
-  @Override
-  public void updateModel() {
-    behavior.updateModel();
   }
 }

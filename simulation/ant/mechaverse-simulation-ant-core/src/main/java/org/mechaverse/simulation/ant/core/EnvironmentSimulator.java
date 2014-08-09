@@ -27,7 +27,8 @@ public class EnvironmentSimulator implements EntityManager {
 
   public EnvironmentSimulator(Environment environment, ActiveEntityProvider activeEntityProvider) {
     this(environment, ImmutableSet.<EnvironmentSimulationModule>of(
-      new FoodGenerator(), new AntReproductionModule()), activeEntityProvider);
+      new FoodGenerator(), new AntReproductionModule(), new PheromoneDecayModule()),
+      activeEntityProvider);
   }
 
   public EnvironmentSimulator(Environment environment, Set<EnvironmentSimulationModule> modules,

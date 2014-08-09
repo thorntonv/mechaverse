@@ -43,7 +43,6 @@
       <element name="maxEnergy" type="int" minOccurs="1" maxOccurs="1" />
       <element name="direction" type="mechaverse:Direction" minOccurs="0" maxOccurs="1" />      
     </sequence>
-        
   </complexType>
 
   <complexType name="Ant">
@@ -52,8 +51,6 @@
         <sequence>
           <element name="age" type="long" minOccurs="1" maxOccurs="1" />
           <element name="carriedEntity" type="mechaverse:Entity" minOccurs="0" maxOccurs="1" />
-          <element name="data" type="base64Binary" minOccurs="1" maxOccurs="1" />
-          <element name="bitMutationProbability" type="float" minOccurs="1" maxOccurs="1" />
         </sequence>
 
         <attribute name="type" type="mechaverse:EntityType" fixed="ANT"/> 

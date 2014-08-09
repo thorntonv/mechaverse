@@ -1,6 +1,7 @@
 package org.mechaverse.simulation.ant.core;
 
 import org.apache.commons.math3.random.RandomGenerator;
+import org.mechaverse.simulation.ant.api.model.Direction;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.core.ActiveAnt.AntBehavior;
 import org.mechaverse.simulation.ant.core.AntOutput.MoveDirection;
@@ -16,6 +17,7 @@ public class SimpleAntBehavior implements AntBehavior {
   private final AntOutput output = new AntOutput();
 
   private TurnDirection turnDirection = TurnDirection.NONE;
+  private boolean leavePheromone = false;
 
   @Override
   public void setInput(AntInput input) {
@@ -41,7 +43,8 @@ public class SimpleAntBehavior implements AntBehavior {
       if (cellEntityType == EntityType.FOOD) {
         output.setPickUp(true);
         return output;
-      } else if (input.getFrontSensor().getEntityType() == EntityType.FOOD) {
+      } else if (input.getFrontSensor().getEntityType() == EntityType.FOOD
+          && RandomUtil.nextEvent(.9, random)) {
         output.setMoveDirection(MoveDirection.FORWARD);
         return output;
       } else if (input.getFrontLeftSensor().getEntityType() == EntityType.FOOD
@@ -76,9 +79,18 @@ public class SimpleAntBehavior implements AntBehavior {
       return output;
     }
 
-    turnDirection = TurnDirection.NONE;
+    if(input.getCarriedEntityType() == EntityType.FOOD && turnDirection == TurnDirection.NONE) {
+      // Attempt to return to the nest.
+      TurnDirection turnDirectionToNest =
+          getTurnDirection(input.getDirection(), input.getNestDirection());
+      if(turnDirectionToNest != TurnDirection.NONE && RandomUtil.nextEvent(.5, random)) {
+        output.setTurnDirection(turnDirectionToNest);
+        return output;
+      }
+    }
 
-    if(RandomUtil.nextEvent(.1, random)) {
+    turnDirection = TurnDirection.NONE;
+    if (RandomUtil.nextEvent(.2, random)) {
       turnDirection = RandomUtil.nextEvent(.5, random)
           ? TurnDirection.COUNTERCLOCKWISE : TurnDirection.CLOCKWISE;
 
@@ -92,11 +104,42 @@ public class SimpleAntBehavior implements AntBehavior {
       return output;
     }
 
-    output.setMoveDirection(MoveDirection.FORWARD);
+    if(leavePheromone && input.getCellSensor() != EntityType.PHEROMONE) {
+      output.setLeavePheromone(1);
+      leavePheromone = false;
+      return output;
+    }
 
+    output.setMoveDirection(MoveDirection.FORWARD);
+    if (input.getCarriedEntityType() == EntityType.FOOD) {
+      leavePheromone = true;
+    }
     return output;
   }
 
   @Override
   public void updateModel() {}
+
+  private TurnDirection getTurnDirection(Direction currentDirection, Direction targetDirection) {
+    if (currentDirection == targetDirection) {
+      return TurnDirection.NONE;
+    }
+    int cwCount = 0;
+    Direction direction = currentDirection;
+    while (direction != targetDirection) {
+      direction = AntSimulationUtil.directionCW(direction);
+      cwCount++;
+    }
+    int ccwCount = 0;
+    direction = currentDirection;
+    while (direction != targetDirection) {
+      direction = AntSimulationUtil.directionCCW(direction);
+      ccwCount++;
+    }
+    if (cwCount < ccwCount) {
+      return TurnDirection.CLOCKWISE;
+    } else {
+      return TurnDirection.COUNTERCLOCKWISE;
+    }
+  }
 }

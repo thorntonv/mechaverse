@@ -44,7 +44,7 @@ public final class AntOutput {
   private static final int CONSUME_BIT_IDX = 10;
   private static final int CONSUME_MASK = 0b1 << CONSUME_BIT_IDX;
 
-  private final int[] data;
+  private int[] data;
 
   public AntOutput() {
     this(new int[DATA_SIZE]);
@@ -127,7 +127,7 @@ public final class AntOutput {
   }
 
   public void setData(int[] data) {
-    System.arraycopy(data, 0, this.data, 0, DATA_SIZE);
+    this.data = data;
   }
 
   public void resetToDefault() {

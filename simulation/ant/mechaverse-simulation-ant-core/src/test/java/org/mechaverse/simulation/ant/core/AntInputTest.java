@@ -47,6 +47,7 @@ public class AntInputTest {
     assertEquals(Direction.values()[0], input.getLeftSensor().getDirection());
     assertEquals(EntityType.NONE, input.getRightSensor().getEntityType());
     assertEquals(Direction.values()[0], input.getRightSensor().getDirection());
+    assertEquals(Direction.values()[0], input.getNestDirection());
   }
 
   @Test
@@ -86,6 +87,14 @@ public class AntInputTest {
     for(Direction direction : Direction.values()) {
       input.setDirection(direction);
       assertEquals(direction, input.getDirection());
+    }
+  }
+
+  @Test
+  public void nestDirection() {
+    for(Direction direction : Direction.values()) {
+      input.setNestDirection(direction);
+      assertEquals(direction, input.getNestDirection());
     }
   }
 

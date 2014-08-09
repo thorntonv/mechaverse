@@ -62,6 +62,7 @@ public class ActiveAntTest {
     when(mockAntEntity.getDirection()).thenReturn(Direction.EAST);
     when(mockEnvironment.getCell(mockAntEntity)).thenReturn(mockCell);
     when(mockEnvironment.getCellInDirection(mockCell, Direction.EAST)).thenReturn(mockFrontCell);
+    when(mockEnvironment.getNestDirection(any(Cell.class))).thenReturn(Direction.EAST);
   }
 
   @Test

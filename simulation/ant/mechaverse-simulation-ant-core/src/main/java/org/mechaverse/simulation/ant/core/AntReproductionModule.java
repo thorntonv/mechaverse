@@ -11,7 +11,6 @@ import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Nest;
-import org.mechaverse.simulation.common.genetic.CrossoverGeneticData;
 import org.mechaverse.simulation.common.genetic.CutAndSplitCrossoverGeneticRecombinator;
 
 import com.google.common.collect.Sets;
@@ -105,15 +104,6 @@ public class AntReproductionModule implements EnvironmentSimulationModule {
       parent2 = antFitnessDistribution.sample();
     }
 
-    CrossoverGeneticData parent1GeneticData = new CrossoverGeneticData(parent1.getData(), null);
-    CrossoverGeneticData parent2GeneticData = new CrossoverGeneticData(parent2.getData(), null);
-
-    ant.setBitMutationProbability(
-        (parent1.getBitMutationProbability() + parent2.getBitMutationProbability()) / 2);
-    CrossoverGeneticData antGeneticData =
-        geneticRecombinator.recombine(parent1GeneticData, parent2GeneticData, random);
-
-    ant.setData(antGeneticData.getData());
     return ant;
   }
 

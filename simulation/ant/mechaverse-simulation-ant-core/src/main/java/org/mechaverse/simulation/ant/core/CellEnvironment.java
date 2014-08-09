@@ -4,9 +4,12 @@ import org.mechaverse.simulation.ant.api.model.Direction;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Environment;
+import org.mechaverse.simulation.ant.api.model.Nest;
 import org.mechaverse.simulation.ant.api.util.EntityUtil;
 
 public class CellEnvironment {
+
+  // TODO(thorntonv): Handle multiple nests and nests of different types.
 
   private static final double[] DIRECTION_ANGLES = {
       0, Math.PI / 4, Math.PI / 2, 3 * Math.PI / 4, Math.PI, 5 * Math.PI / 4, 3 * Math.PI / 2,
@@ -16,6 +19,8 @@ public class CellEnvironment {
   private final int colCount;
   private final Cell[][] cells;
   private final Environment env;
+
+  private Direction[][] nestDirectionIndex;
 
   public CellEnvironment(Environment env) {
     this.rowCount = env.getHeight();
@@ -33,6 +38,15 @@ public class CellEnvironment {
     // Add entities to the appropriate cells.
     for (Entity entity : env.getEntities()) {
       setEntityCell(entity, getCell(entity));
+      if (entity instanceof Nest) {
+        Cell nestCell = getCell(entity);
+        nestDirectionIndex = new Direction[rowCount][colCount];
+        for (int row = 0; row < rowCount; row++) {
+          for (int col = 0; col < colCount; col++) {
+            nestDirectionIndex[row][col] = getDirection(cells[row][col], nestCell);
+          }
+        }
+      }
     }
   }
 
@@ -103,9 +117,12 @@ public class CellEnvironment {
   }
 
   public Direction getDirection(Cell fromCell, Cell toCell) {
-    int deltaY = toCell.getRow() - fromCell.getRow();
+    // Reverse the order of subtraction to adjust for the graphical coordinate system.
+    int deltaY = fromCell.getRow() - toCell.getRow();
     int deltaX = toCell.getColumn() - fromCell.getColumn();
     double angle = Math.atan2(deltaY, deltaX);
+    angle = angle >= 0 ? angle : angle + 2 * Math.PI;
+
 
     Direction closestDirection = null;
     double closestDirectionAngleDelta = Double.MAX_VALUE;
@@ -118,6 +135,10 @@ public class CellEnvironment {
     }
 
     return closestDirection;
+  }
+
+  public Direction getNestDirection(Cell fromCell) {
+    return nestDirectionIndex[fromCell.getRow()][fromCell.getColumn()];
   }
 
   public void addEntity(Entity entity, Cell cell) {
