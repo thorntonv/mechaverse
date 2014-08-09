@@ -4,14 +4,12 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.mechaverse.gwt.shared.MechaverseGwtRpcService;
 import org.mechaverse.simulation.ant.api.AntSimulationService;
 import org.mechaverse.simulation.ant.api.model.Entity;
-import org.mechaverse.simulation.ant.api.model.SimulationState;
+import org.mechaverse.simulation.ant.api.model.SimulationModel;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
  * Implementation of {@link MechaverseGwtRpcService} which forwards requests to the REST service.
- *
- * @author thorntonv@mechaverse.org
  */
 public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
     implements MechaverseGwtRpcService {
@@ -38,12 +36,12 @@ public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
   }
 
   @Override
-  public SimulationState loadState(String key) throws Exception {
+  public SimulationModel loadState(String key) throws Exception {
     return service.loadState(key);
   }
 
   @Override
-  public void saveState(String key, SimulationState state) throws Exception {
+  public void saveState(String key, SimulationModel state) throws Exception {
     service.saveState(key, state);
   }
 
@@ -64,12 +62,12 @@ public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
   }
 
   @Override
-  public SimulationState getCurrentState() throws Exception {
+  public SimulationModel getCurrentState() throws Exception {
     return service.getCurrentState();
   }
 
   @Override
-  public void setCurrentState(SimulationState state) throws Exception {
+  public void setCurrentState(SimulationModel state) throws Exception {
     service.setCurrentState(state);
   }
 

@@ -14,25 +14,23 @@ import javax.xml.bind.Unmarshaller;
 
 import org.mechaverse.simulation.ant.api.AntSimulationService;
 import org.mechaverse.simulation.ant.api.model.Entity;
-import org.mechaverse.simulation.ant.api.model.SimulationState;
+import org.mechaverse.simulation.ant.api.model.SimulationModel;
 import org.mechaverse.simulation.ant.core.AntSimulationImpl;
 
 /**
  * Implementation of {@link MechaverseService}.
- *
- * @author thorntonv@mechaverse.org
  */
 public class MechaverseServiceImpl implements AntSimulationService {
 
   private final AntSimulationImpl simulation = new AntSimulationImpl();
 
   @Override
-  public SimulationState getCurrentState() throws Exception {
+  public SimulationModel getCurrentState() throws Exception {
     return simulation.getState();
   }
 
   @Override
-  public void setCurrentState(SimulationState state) throws Exception {
+  public void setCurrentState(SimulationModel state) throws Exception {
     simulation.setState(state);
   }
 
@@ -51,20 +49,20 @@ public class MechaverseServiceImpl implements AntSimulationService {
   }
 
   @Override
-  public SimulationState loadState(String key) throws Exception {
+  public SimulationModel loadState(String key) throws Exception {
     String simulationFilename = getSimulationFilename(key);
     try (InputStream in = new GZIPInputStream(new FileInputStream(simulationFilename))) {
-      JAXBContext jaxbContext = JAXBContext.newInstance(SimulationState.class);
+      JAXBContext jaxbContext = JAXBContext.newInstance(SimulationModel.class);
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-      return (SimulationState) jaxbUnmarshaller.unmarshal(in);
+      return (SimulationModel) jaxbUnmarshaller.unmarshal(in);
     }
   }
 
   @Override
-  public void saveState(String key, SimulationState state) throws Exception {
+  public void saveState(String key, SimulationModel state) throws Exception {
     String simulationFilename = getSimulationFilename(key);
     try (OutputStream out = new GZIPOutputStream(new FileOutputStream(simulationFilename))) {
-      JAXBContext jaxbContext = JAXBContext.newInstance(SimulationState.class);
+      JAXBContext jaxbContext = JAXBContext.newInstance(SimulationModel.class);
       Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
       jaxbMarshaller.marshal(state, out);
     }

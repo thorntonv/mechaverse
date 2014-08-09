@@ -6,10 +6,10 @@ import java.util.List;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
-import org.mechaverse.simulation.ant.api.SimulationStateUtil;
+import org.mechaverse.simulation.ant.api.SimulationModelUtil;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Environment;
-import org.mechaverse.simulation.ant.api.model.SimulationState;
+import org.mechaverse.simulation.ant.api.model.SimulationModel;
 import org.mechaverse.simulation.common.cellautomata.EnvironmentGenerator;
 
 public final class AntSimulationImpl {
@@ -17,7 +17,7 @@ public final class AntSimulationImpl {
   private static final int DEFAULT_ENVIRONMENT_WIDTH = 200;
   private static final int DEFAULT_ENVIRONMENT_HEIGHT = 200;
 
-  private SimulationState state;
+  private SimulationModel model;
   private final List<EnvironmentSimulator> environmentSimulations = new ArrayList<>();
   private final EnvironmentGenerator<CellEnvironment, EntityType> environmentGenerator =
       new AntSimulationEnvironmentGenerator();
@@ -32,25 +32,25 @@ public final class AntSimulationImpl {
     this.activeEntityProvider = activeEntityProvider;
     this.random = random;
 
-    state = new SimulationState();
-    state.setIteration(0);
-    state.setEnvironment(environmentGenerator.generate(DEFAULT_ENVIRONMENT_WIDTH,
+    model = new SimulationModel();
+    model.setIteration(0);
+    model.setEnvironment(environmentGenerator.generate(DEFAULT_ENVIRONMENT_WIDTH,
         DEFAULT_ENVIRONMENT_HEIGHT, random).getEnvironment());
-    setState(state);
+    setState(model);
   }
 
-  public SimulationState getState() {
+  public SimulationModel getState() {
     for(EnvironmentSimulator environmentSimulation : environmentSimulations) {
       environmentSimulation.updateModel();
     }
-    return state;
+    return model;
   }
 
-  public void setState(SimulationState state) {
-    this.state = state;
+  public void setState(SimulationModel state) {
+    this.model = state;
 
     environmentSimulations.clear();
-    for (Environment environment : SimulationStateUtil.getEnvironments(state)) {
+    for (Environment environment : SimulationModelUtil.getEnvironments(state)) {
       environmentSimulations.add(new EnvironmentSimulator(environment, activeEntityProvider));
     }
 
@@ -71,8 +71,8 @@ public final class AntSimulationImpl {
     // Set the seed to be used for the next step.
     long seed = random.nextLong();
     random.setSeed(seed);
-    state.setSeed(String.valueOf(seed));
+    model.setSeed(String.valueOf(seed));
 
-    state.setIteration(state.getIteration()+1);
+    model.setIteration(model.getIteration()+1);
   }
 }

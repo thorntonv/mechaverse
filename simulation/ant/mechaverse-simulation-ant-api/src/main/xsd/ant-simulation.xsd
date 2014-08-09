@@ -2,7 +2,7 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.mechaverse.org/simulation/ant/api/model"
   xmlns:mechaverse="http://www.mechaverse.org/simulation/ant/api/model" elementFormDefault="qualified">
 
-  <element name="SimulationState" type="mechaverse:SimulationState"></element>
+  <element name="SimulationModel" type="mechaverse:SimulationModel"></element>
   <element name="Environment" type="mechaverse:Environment"></element>
   <element name="Ant" type="mechaverse:Ant"></element>
 
@@ -119,7 +119,7 @@
     </sequence>
   </complexType>
 
-  <complexType name="SimulationState">
+  <complexType name="SimulationModel">
     <sequence>
       <element name="id" type="string" minOccurs="1" maxOccurs="1" />
       <element name="environment" type="mechaverse:Environment" minOccurs="1" maxOccurs="1" />

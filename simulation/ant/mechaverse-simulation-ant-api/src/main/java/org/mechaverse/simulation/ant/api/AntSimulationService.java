@@ -12,12 +12,10 @@ import javax.ws.rs.QueryParam;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.mechaverse.simulation.ant.api.model.Entity;
-import org.mechaverse.simulation.ant.api.model.SimulationState;
+import org.mechaverse.simulation.ant.api.model.SimulationModel;
 
 /**
  * Interface for the mechaverse ant simulation service.
- *
- * @author thorntonv@mechaverse.org
  */
 @Path("/")
 public interface AntSimulationService {
@@ -37,17 +35,17 @@ public interface AntSimulationService {
   @GET
   @Path("/simulation/state/current")
   @Produces("application/xml")
-  SimulationState getCurrentState() throws Exception;
+  SimulationModel getCurrentState() throws Exception;
 
   /**
    * Sets the current simulation state.
-   * @param state the new state
+   * @param model the new state
    * @throws Exception if an error occurs while processing the request
    */
   @POST
   @Path("/simulation/state/current")
   @Consumes("application/xml")
-  void setCurrentState(SimulationState state) throws Exception;
+  void setCurrentState(SimulationModel model) throws Exception;
 
   /**
    * Sets the execution status of the simulation.
@@ -87,7 +85,7 @@ public interface AntSimulationService {
   @GET
   @Path("/simulation/state/{key}")
   @Produces("application/xml")
-  SimulationState loadState(@PathParam("key") String key) throws Exception;
+  SimulationModel loadState(@PathParam("key") String key) throws Exception;
 
   /**
    * Saves the given state with the given key.
@@ -99,7 +97,7 @@ public interface AntSimulationService {
   @POST
   @Path("/simulation/state/{key}")
   @Consumes("application/xml")
-  void saveState(@PathParam("key") String key, SimulationState state) throws Exception;
+  void saveState(@PathParam("key") String key, SimulationModel state) throws Exception;
 
   /**
    * Attempts to transfer the specified entity from the source environment to the specified target

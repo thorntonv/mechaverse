@@ -4,17 +4,15 @@ import java.util.Iterator;
 
 import org.mechaverse.gwt.client.util.UUID;
 import org.mechaverse.gwt.shared.MechaverseGwtRpcServiceAsync;
-import org.mechaverse.simulation.ant.api.SimulationStateUtil;
+import org.mechaverse.simulation.ant.api.SimulationModelUtil;
 import org.mechaverse.simulation.ant.api.model.Environment;
-import org.mechaverse.simulation.ant.api.model.SimulationState;
+import org.mechaverse.simulation.ant.api.model.SimulationModel;
 
 import com.google.common.base.Preconditions;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * A presenter for {@link SimulationEditorView}.
- *
- * @author thorntonv@mechaverse.org
  */
 public class SimulationEditorPresenter {
 
@@ -46,7 +44,7 @@ public class SimulationEditorPresenter {
 
   private String key;
   private String environmentId;
-  private SimulationState state;
+  private SimulationModel state;
   private final EnvironmentEditorPresenter environmentEditorPresenter;
   private final SimulationEditorView view;
 
@@ -66,24 +64,24 @@ public class SimulationEditorPresenter {
 
   public void loadState() {
     view.setEnabled(false);
-    service.loadState(key, new AsyncCallback<SimulationState>() {
+    service.loadState(key, new AsyncCallback<SimulationModel>() {
       @Override
       public void onFailure(Throwable caught) {
         saveInitialState();
       }
 
       @Override
-      public void onSuccess(final SimulationState state) {
+      public void onSuccess(final SimulationModel state) {
         setState(state);
         view.setEnabled(true);
       }
     });
   }
 
-  public void setState(SimulationState state) {
+  public void setState(SimulationModel state) {
     this.state = state;
     setEnvironment(environmentId);
-    view.setAvailableEnvironments(SimulationStateUtil.getEnvironments(state));
+    view.setAvailableEnvironments(SimulationModelUtil.getEnvironments(state));
   }
 
   public void createNewEnvironment() {
@@ -157,7 +155,7 @@ public class SimulationEditorPresenter {
     this.environmentId = environmentId;
     Environment env = state.getEnvironment();
     if (environmentId != null) {
-      env = SimulationStateUtil.getEnvironment(state, environmentId);
+      env = SimulationModelUtil.getEnvironment(state, environmentId);
       if (env == null) {
         env = state.getEnvironment();
       }
@@ -172,12 +170,12 @@ public class SimulationEditorPresenter {
 
   protected void saveInitialState() {
     view.setEnabled(false);
-    service.getCurrentState(new AsyncCallback<SimulationState>() {
+    service.getCurrentState(new AsyncCallback<SimulationModel>() {
       @Override
       public void onFailure(Throwable arg0) {}
 
       @Override
-      public void onSuccess(SimulationState state) {
+      public void onSuccess(SimulationModel state) {
         service.saveState(key, state, new AsyncCallback<Void>() {
           @Override
           public void onFailure(Throwable cause) {}

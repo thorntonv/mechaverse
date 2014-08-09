@@ -1,7 +1,7 @@
 package org.mechaverse.gwt.client.environment;
 
 import org.mechaverse.gwt.shared.MechaverseGwtRpcServiceAsync;
-import org.mechaverse.simulation.ant.api.model.SimulationState;
+import org.mechaverse.simulation.ant.api.model.SimulationModel;
 
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
@@ -25,12 +25,12 @@ public class SimulationPresenter {
 
         @Override
         public void onSuccess(Void arg0) {
-          service.getCurrentState(new AsyncCallback<SimulationState>() {
+          service.getCurrentState(new AsyncCallback<SimulationModel>() {
             @Override
             public void onFailure(Throwable ex) {}
 
             @Override
-            public void onSuccess(SimulationState state) {
+            public void onSuccess(SimulationModel state) {
               setState(state);
             }
           });
@@ -60,7 +60,7 @@ public class SimulationPresenter {
   public SimulationPresenter(String key, SimulationView view) {
     this.view = view;
 
-    service.loadState(key, new AsyncCallback<SimulationState>() {
+    service.loadState(key, new AsyncCallback<SimulationModel>() {
 
       @Override
       public void onFailure(Throwable cause) {
@@ -68,7 +68,7 @@ public class SimulationPresenter {
       }
 
       @Override
-      public void onSuccess(SimulationState state) {
+      public void onSuccess(SimulationModel state) {
         service.setCurrentState(state, new AsyncCallback<Void>() {
           @Override
           public void onFailure(Throwable cause) {
@@ -84,7 +84,7 @@ public class SimulationPresenter {
     });
   }
 
-  public void setState(SimulationState state) {
+  public void setState(SimulationModel state) {
     view.setEnvironment(state.getEnvironment());
   }
 
