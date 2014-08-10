@@ -16,6 +16,7 @@ import org.mechaverse.simulation.ant.api.AntSimulationService;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.SimulationModel;
 import org.mechaverse.simulation.ant.core.AntSimulationImpl;
+import org.mechaverse.simulation.common.opencl.DeviceUtil;
 
 /**
  * Implementation of {@link MechaverseService}.
@@ -86,13 +87,15 @@ public class MechaverseServiceImpl implements AntSimulationService {
 
   @Override
   public String getDeviceInfo() {
-    return "";
+    return DeviceUtil.getDeviceInfo();
   }
 
   /**
    * @return the file name for the simulation with the given key
    */
   private String getSimulationFilename(String key) {
-    return new File("simulation/" + key).getAbsolutePath();
+    File simulationFile = new File("simulation/" + key);
+    simulationFile.getParentFile().mkdirs();
+    return simulationFile.getAbsolutePath();
   }
 }

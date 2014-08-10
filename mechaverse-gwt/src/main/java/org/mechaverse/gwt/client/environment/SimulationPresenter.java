@@ -60,28 +60,7 @@ public class SimulationPresenter {
   public SimulationPresenter(String key, SimulationView view) {
     this.view = view;
 
-    service.loadState(key, new AsyncCallback<SimulationModel>() {
-
-      @Override
-      public void onFailure(Throwable cause) {
-        Window.alert(cause.getMessage());
-      }
-
-      @Override
-      public void onSuccess(SimulationModel state) {
-        service.setCurrentState(state, new AsyncCallback<Void>() {
-          @Override
-          public void onFailure(Throwable cause) {
-            Window.alert(cause.getMessage());
-          }
-
-          @Override
-          public void onSuccess(Void result) {
-            updateTimer.scheduleRepeating(UPDATE_INTERVAL);
-          }
-        });
-      }
-    });
+    updateTimer.scheduleRepeating(UPDATE_INTERVAL);
   }
 
   public void setState(SimulationModel state) {
