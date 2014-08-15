@@ -14,8 +14,8 @@ public class OpenClCircuitSimulationBenchmark extends Benchmark {
   @Param(value = {"200"}) int iterationsPerUpdate;
   @Param(value = {"500"}) int numCircuits;
   @Param(value = {"16"}) int size;
-  @Param(value = {"16"}) int luWidth;
-  @Param(value = {"16"}) int luHeight;
+  @Param(value = {"16"}) int width;
+  @Param(value = {"16"}) int height;
 
   private int[] input;
   private int[] state;
@@ -31,8 +31,8 @@ public class OpenClCircuitSimulationBenchmark extends Benchmark {
 
     Circuit circuit = CircuitReader.read(ClassLoader.getSystemResourceAsStream("circuit.xml"));
     circuit.setIterationsPerUpdate(iterationsPerUpdate);
-    circuit.setWidth(luHeight);
-    circuit.setHeight(luHeight);
+    circuit.setWidth(height);
+    circuit.setHeight(height);
 
     circuitSimulation = new OpenClCircuitSimulator(
         numCircuits, size, size, CLPlatform.getDefault().getMaxFlopsDevice(), circuit);
