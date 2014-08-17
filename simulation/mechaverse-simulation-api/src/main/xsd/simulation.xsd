@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.mechaverse.org/simulation/api/model"
+  xmlns:mechaverse="http://www.mechaverse.org/simulation/api/model" elementFormDefault="qualified">
+  
+  <simpleType name="Direction">
+    <restriction base="string">
+      <enumeration value="EAST" />
+      <enumeration value="NORTH_EAST" />
+      <enumeration value="NORTH" />
+      <enumeration value="NORTH_WEST" />
+      <enumeration value="WEST" />
+      <enumeration value="SOUTH_WEST" />
+      <enumeration value="SOUTH" />
+      <enumeration value="SOUTH_EAST" />
+    </restriction>
+  </simpleType>
+
+  <simpleType name="TurnDirection">
+    <restriction base="string">
+      <enumeration value="NONE" />
+      <enumeration value="CLOCKWISE" />
+      <enumeration value="COUNTERCLOCKWISE" />
+    </restriction>
+  </simpleType>
+
+  <simpleType name="MoveDirection">
+    <restriction base="string">
+      <enumeration value="NONE" />
+      <enumeration value="FORWARD" />
+      <enumeration value="BACKWARD" />
+    </restriction>
+  </simpleType>
+</schema>
