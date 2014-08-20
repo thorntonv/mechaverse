@@ -6,6 +6,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -35,6 +36,17 @@ public interface SimulationService {
   byte[] getState(@PathParam("instanceIdx") int instanceIdx) throws Exception;
 
   /**
+   * Returns the state of the specified instance.
+   *
+   * @throws Exception if an error occurs while processing the request
+   */
+  @GET
+  @Path("/instance/{instanceIdx}/state")
+  @Produces(MediaType.APPLICATION_OCTET_STREAM)
+  byte[] getStateValue(@PathParam("instanceIdx") int instanceIdx, @QueryParam("key") String key)
+      throws Exception;
+
+  /**
    * Sets the state of the specified instance.
    *
    * @throws Exception if an error occurs while processing the request
@@ -43,6 +55,17 @@ public interface SimulationService {
   @Path("/instance/{instanceIdx}/state")
   @Consumes("*/*")
   void setState(@PathParam("instanceIdx") int instanceIdx, byte[] state) throws Exception;
+
+  /**
+   * Sets the state of the specified instance.
+   *
+   * @throws Exception if an error occurs while processing the request
+   */
+  @POST
+  @Path("/instance/{instanceIdx}/state")
+  @Consumes("*/*")
+  void setStateValue(@PathParam("instanceIdx") int instanceIdx, @QueryParam("key") String key,
+      byte[] value) throws Exception;
 
   /**
    * Generates a random state.

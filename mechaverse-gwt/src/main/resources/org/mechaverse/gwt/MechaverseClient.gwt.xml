@@ -9,6 +9,7 @@
 
   <!-- Other module inherits                                      -->
   <inherits name="com.google.common.collect.Collect"/>
+  <inherits name="org.mechaverse.simulation.api"/>
   <inherits name="org.mechaverse.simulation.ant.api"/>
   <inherits name="org.mechaverse.simulation.ant.core"/>
   

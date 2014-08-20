@@ -7,6 +7,7 @@ import org.mechaverse.gwt.shared.MechaverseGwtRpcServiceAsync;
 import org.mechaverse.simulation.ant.api.SimulationModelUtil;
 import org.mechaverse.simulation.ant.api.model.Environment;
 import org.mechaverse.simulation.ant.api.model.SimulationModel;
+import org.mechaverse.simulation.api.SimulationStateKey;
 
 import com.google.common.base.Preconditions;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -42,18 +43,15 @@ public class SimulationEditorPresenter {
   private final MechaverseGwtRpcServiceAsync service =
       MechaverseGwtRpcServiceAsync.Util.getInstance();
 
-  private String key;
+  private SimulationStateKey simulationStateKey;
   private String environmentId;
   private SimulationModel state;
   private final EnvironmentEditorPresenter environmentEditorPresenter;
   private final SimulationEditorView view;
 
-  public SimulationEditorPresenter(SimulationEditorView view) {
-    this(SimulationPresenter.INITIAL_STATE_KEY, view);
-  }
-
-  public SimulationEditorPresenter(String key, SimulationEditorView view) {
-    this.key = key;
+  public SimulationEditorPresenter(
+      SimulationStateKey simulationStateKey, SimulationEditorView view) {
+    this.simulationStateKey = simulationStateKey;
     this.view = view;
     this.environmentEditorPresenter =
         new EnvironmentEditorPresenter(view.getEnvironmentEditorView());
@@ -64,7 +62,8 @@ public class SimulationEditorPresenter {
 
   public void loadState() {
     view.setEnabled(false);
-    service.loadState(key, new AsyncCallback<SimulationModel>() {
+    service.loadState(simulationStateKey.getSimulationId(), simulationStateKey.getInstanceId(),
+      simulationStateKey.getIteration(), new AsyncCallback<SimulationModel>() {
       @Override
       public void onFailure(Throwable caught) {
         saveInitialState();
@@ -113,7 +112,8 @@ public class SimulationEditorPresenter {
     Preconditions.checkNotNull(state);
 
     view.setEnabled(false);
-    service.saveState(key, state, new AsyncCallback<Void>() {
+    service.saveState(simulationStateKey.getSimulationId(), simulationStateKey.getInstanceId(),
+      simulationStateKey.getIteration(), new AsyncCallback<Void>() {
       @Override
       public void onFailure(Throwable cause) {}
 
@@ -170,13 +170,13 @@ public class SimulationEditorPresenter {
 
   protected void saveInitialState() {
     view.setEnabled(false);
-    service.getCurrentState(new AsyncCallback<SimulationModel>() {
+    service.getModel(new AsyncCallback<SimulationModel>() {
       @Override
       public void onFailure(Throwable arg0) {}
 
       @Override
       public void onSuccess(SimulationModel state) {
-        service.saveState(key, state, new AsyncCallback<Void>() {
+        service.setModel(state, new AsyncCallback<Void>() {
           @Override
           public void onFailure(Throwable cause) {}
 

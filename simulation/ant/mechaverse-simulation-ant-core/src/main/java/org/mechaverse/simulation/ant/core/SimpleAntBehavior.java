@@ -4,8 +4,8 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.api.model.Direction;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.core.ActiveAnt.AntBehavior;
-import org.mechaverse.simulation.ant.core.AntOutput.MoveDirection;
-import org.mechaverse.simulation.ant.core.AntOutput.TurnDirection;
+import org.mechaverse.simulation.api.model.MoveDirection;
+import org.mechaverse.simulation.api.model.TurnDirection;
 import org.mechaverse.simulation.common.util.RandomUtil;
 
 /**

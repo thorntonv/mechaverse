@@ -6,8 +6,8 @@ import java.util.Random;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mechaverse.simulation.ant.core.AntOutput.MoveDirection;
-import org.mechaverse.simulation.ant.core.AntOutput.TurnDirection;
+import org.mechaverse.simulation.api.model.MoveDirection;
+import org.mechaverse.simulation.api.model.TurnDirection;
 
 /**
  * Unit test for {@link AntOutput}.

@@ -2,14 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.mechaverse.service</groupId>
-  <artifactId>mechaverse-service</artifactId>
+  <groupId>org.mechaverse.simulation.ant</groupId>
+  <artifactId>mechaverse-simulation-ant-service</artifactId>
   <packaging>war</packaging>
-  <name>Mechaverse Service</name>
+  <name>Mechaverse Ant Simulation Service</name>
 
   <parent>
-    <groupId>org.mechaverse</groupId>
-    <artifactId>mechaverse</artifactId>
+    <artifactId>ant</artifactId>
+    <groupId>org.mechaverse.simulation</groupId>
     <version>0.1</version>
   </parent>
 
@@ -72,7 +72,7 @@
   </dependencies>
 
   <build>
-    <finalName>mechaverse-service</finalName> 
+    <finalName>mechaverse-ant-simulation-service</finalName> 
     <pluginManagement>
       <plugins>
         <plugin>

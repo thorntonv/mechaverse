@@ -23,7 +23,6 @@ import com.jogamp.opencl.CLPlatform;
  */
 public class CircuitSimulatorImplsTest {
 
-
   @Test
   public void randomRoutingCircuits() throws CompileException {
     int numCircuits = 10;

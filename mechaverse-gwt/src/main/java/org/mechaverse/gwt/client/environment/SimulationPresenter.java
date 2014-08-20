@@ -2,6 +2,7 @@ package org.mechaverse.gwt.client.environment;
 
 import org.mechaverse.gwt.shared.MechaverseGwtRpcServiceAsync;
 import org.mechaverse.simulation.ant.api.model.SimulationModel;
+import org.mechaverse.simulation.api.SimulationStateKey;
 
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
@@ -9,8 +10,6 @@ import com.google.gwt.user.client.Window.ScrollEvent;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class SimulationPresenter {
-
-  public static final String INITIAL_STATE_KEY = "0000000000";
 
   private static final int UPDATE_INTERVAL = 1000;
 
@@ -25,7 +24,7 @@ public class SimulationPresenter {
 
         @Override
         public void onSuccess(Void arg0) {
-          service.getCurrentState(new AsyncCallback<SimulationModel>() {
+          service.getModel(new AsyncCallback<SimulationModel>() {
             @Override
             public void onFailure(Throwable ex) {}
 
@@ -45,8 +44,10 @@ public class SimulationPresenter {
   private UpdateTimer updateTimer = new UpdateTimer();
   private SimulationView view;
 
-  public SimulationPresenter(SimulationView view) {
-    this(INITIAL_STATE_KEY, view);
+  public SimulationPresenter(SimulationStateKey simulationStateKey, SimulationView view) {
+    this.view = view;
+
+    updateTimer.scheduleRepeating(UPDATE_INTERVAL);
 
     Window.addWindowScrollHandler(new Window.ScrollHandler() {
       @Override
@@ -55,12 +56,6 @@ public class SimulationPresenter {
         updateTimer.scheduleRepeating(UPDATE_INTERVAL);
       }
     });
-  }
-
-  public SimulationPresenter(String key, SimulationView view) {
-    this.view = view;
-
-    updateTimer.scheduleRepeating(UPDATE_INTERVAL);
   }
 
   public void setState(SimulationModel state) {

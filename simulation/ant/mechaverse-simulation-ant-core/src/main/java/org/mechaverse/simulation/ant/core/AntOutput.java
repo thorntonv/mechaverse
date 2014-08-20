@@ -1,17 +1,12 @@
 package org.mechaverse.simulation.ant.core;
 
+import org.mechaverse.simulation.api.model.MoveDirection;
+import org.mechaverse.simulation.api.model.TurnDirection;
+
 /**
  * Encodes and decodes the output of an ant.
  */
 public final class AntOutput {
-
-  public static enum MoveDirection {
-    NONE, FORWARD, BACKWARD
-  }
-
-  public static enum TurnDirection {
-    NONE, CLOCKWISE, COUNTERCLOCKWISE
-  }
 
   public static final MoveDirection[] MOVE_DIRECTIONS = MoveDirection.values();
   public static final TurnDirection[] TURN_DIRECTIONS = TurnDirection.values();
