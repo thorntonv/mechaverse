@@ -3,14 +3,14 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.mechaverse.gwt</groupId>
-  <artifactId>mechaverse-gwt</artifactId>
+  <groupId>org.mechaverse.simulation.ant</groupId>
+  <artifactId>mechaverse-simulation-ant-ui</artifactId>
   <packaging>war</packaging>
-  <name>Mechaverse GWT</name>
+  <name>Mechaverse Ant Simulation UI</name>
 
   <parent>
-    <artifactId>mechaverse</artifactId>
-    <groupId>org.mechaverse</groupId>
+    <artifactId>ant</artifactId>
+    <groupId>org.mechaverse.simulation</groupId>
     <version>0.1</version>
   </parent>
 

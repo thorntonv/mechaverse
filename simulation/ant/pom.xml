@@ -17,5 +17,7 @@
   <modules>
     <module>mechaverse-simulation-ant-api</module>
     <module>mechaverse-simulation-ant-core</module>
+    <module>mechaverse-simulation-ant-service</module>
+    <module>mechaverse-simulation-ant-ui</module>
   </modules>
 </project>
