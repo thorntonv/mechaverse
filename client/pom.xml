@@ -3,22 +3,18 @@
                              http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.mechaverse.simulation</groupId>
-  <artifactId>ant</artifactId>
+  <groupId>org.mechaverse</groupId>
+  <artifactId>client</artifactId>
   <packaging>pom</packaging>
-  <name>Mechaverse Ant Simulation</name>
+  <name>Mechaverse Client</name>
 
   <parent>
-    <artifactId>simulation</artifactId>
+    <artifactId>mechaverse</artifactId>
     <groupId>org.mechaverse</groupId>
     <version>0.1</version>
   </parent>
   
   <modules>
-    <module>mechaverse-simulation-ant-api</module>
-    <module>mechaverse-simulation-ant-core</module>
-    <module>mechaverse-simulation-ant-service</module>
-    <module>mechaverse-simulation-ant-client</module>
-    <module>mechaverse-simulation-ant-ui</module>
+    <module>mechaverse-client-common</module>
   </modules>
 </project>

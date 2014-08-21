@@ -1,13 +1,15 @@
-package org.mechaverse.simulation.ant.service;
+package org.mechaverse.simulation.ant.core;
 
 import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.core.AntSimulationImpl;
 import org.mechaverse.simulation.api.SimulationService;
 import org.mechaverse.simulation.common.opencl.DeviceUtil;
+import org.springframework.stereotype.Service;
 
 /**
  * Implementation of {@link SimulationService}.
  */
+@Service
 public class AntSimulationServiceImpl implements SimulationService {
 
   private final AntSimulationImpl[] instances = {new AntSimulationImpl()};
