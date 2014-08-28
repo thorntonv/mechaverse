@@ -4,3 +4,4 @@
 target
 *.launch
 .DS_Store
+META-INF
