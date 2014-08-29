@@ -17,5 +17,7 @@
   <modules>
     <module>mechaverse-manager-api</module>
     <module>mechaverse-manager</module>
+    <module>mechaverse-storage-service-api</module>
+    <module>mechaverse-storage-service</module>
   </modules>
 </project>

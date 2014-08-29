@@ -17,18 +17,22 @@ public final class SimulationDataStore {
 
   private final Map<String, byte[]> dataStore = new HashMap<>();
 
-  public static SimulationDataStore deserialize(byte[] data) throws IOException {
+  public static void deserialize(byte[] data, Map<String, byte[]> targetMap) throws IOException {
     DataInputStream in = new DataInputStream(new ByteArrayInputStream(data));
 
-    SimulationDataStore dataStore = new SimulationDataStore();
     int size = in.readInt();
     for (int cnt = 1; cnt <= size; cnt++) {
       String key = in.readUTF();
       int dataLength = in.readInt();
       byte[] value = new byte[dataLength];
       in.read(value);
-      dataStore.put(key, value);
+      targetMap.put(key, value);
     }
+  }
+
+  public static SimulationDataStore deserialize(byte[] data) throws IOException {
+    SimulationDataStore dataStore = new SimulationDataStore();
+    deserialize(data, dataStore.dataStore);
     return dataStore;
   }
 

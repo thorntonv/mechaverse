@@ -4,13 +4,13 @@
   <groupId>org.mechaverse.simulation.ant</groupId>
   <artifactId>mechaverse-simulation-ant-api</artifactId>
   <name>Mechaverse Ant Simulation API</name>
-  
+
   <parent>
     <artifactId>ant</artifactId>
     <groupId>org.mechaverse.simulation</groupId>
     <version>0.1</version>
   </parent>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.mechaverse.simulation</groupId>
@@ -29,7 +29,7 @@
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-jaxrs</artifactId>
-    </dependency>    
+    </dependency>
   </dependencies>
 
   <build>
@@ -71,7 +71,7 @@
             </goals>
           </execution>
         </executions>
-      </plugin>         
-    </plugins>    
+      </plugin>
+    </plugins>
   </build>
 </project>
