@@ -1,13 +1,18 @@
 package org.mechaverse.service.manager;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.List;
 
+import org.apache.cxf.helpers.IOUtils;
 import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
@@ -20,6 +25,8 @@ import org.mechaverse.service.manager.api.model.SimulationConfig;
 import org.mechaverse.service.manager.api.model.SimulationConfigProperty;
 import org.mechaverse.service.manager.api.model.SimulationInfo;
 import org.mechaverse.service.manager.api.model.Task;
+import org.mechaverse.service.storage.api.MechaverseStorageService;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -39,6 +46,7 @@ public class MechaverseManagerImplTest {
 
   @Autowired private SessionFactory sessionFactory;
   @Autowired private MechaverseManager service;
+  @Autowired private MechaverseStorageService mockStorageService;
 
   @Test
   public void hasSessionFactory() {
@@ -162,8 +170,9 @@ public class MechaverseManagerImplTest {
     simulationInfo.getConfig().setTaskIterationCount(60 * 300);
     service.updateSimulationConfig(simulationInfo.getConfig());
 
+    byte[] resultData = "simulation state".getBytes();
     Task task = service.getTask();
-    ByteArrayInputStream resultDataInput = new ByteArrayInputStream("simulation state".getBytes());
+    ByteArrayInputStream resultDataInput = new ByteArrayInputStream(resultData);
     service.submitResult(task.getId(), resultDataInput);
 
     simulationInfo = service.getSimulationInfo(simulationInfo.getSimulationId());
@@ -176,6 +185,16 @@ public class MechaverseManagerImplTest {
     List<Task> taskList = criteria.list();
 
     assertEquals(0, taskList.size());
+
+    // Verify that the state was sent to the storage service.
+
+    ArgumentCaptor<InputStream> stateInputCaptor = ArgumentCaptor.forClass(InputStream.class);
+    verify(mockStorageService).setState(
+      eq(task.getSimulationId()), eq(task.getInstanceId()), eq(instanceInfo.getIteration()),
+      stateInputCaptor.capture());
+
+    InputStream stateInput = stateInputCaptor.getValue();
+    assertArrayEquals(resultData, IOUtils.readStringFromStream(stateInput).getBytes());
   }
 
   @Test

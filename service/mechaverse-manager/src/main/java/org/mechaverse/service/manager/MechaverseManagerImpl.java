@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import javax.annotation.Resource;
+
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -17,6 +19,7 @@ import org.mechaverse.service.manager.api.model.SimulationConfig;
 import org.mechaverse.service.manager.api.model.SimulationConfigProperty;
 import org.mechaverse.service.manager.api.model.SimulationInfo;
 import org.mechaverse.service.manager.api.model.Task;
+import org.mechaverse.service.storage.api.MechaverseStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +34,7 @@ public class MechaverseManagerImpl implements MechaverseManager {
   // TODO(thorntonv): Periodically remove inactive tasks.
 
   @Autowired private SessionFactory sessionFactory;
+  @Resource private MechaverseStorageService storageService;
 
   @Override
   public Task getTask() throws Exception {
@@ -80,6 +84,9 @@ public class MechaverseManagerImpl implements MechaverseManager {
     if (task == null) {
       return;
     }
+
+    // TODO(thorntonv): Verify that the task belongs to the authenticated user.
+
     InstanceInfo instanceInfo =
         (InstanceInfo) session.get(InstanceInfo.class, task.getInstanceId());
 
@@ -99,7 +106,9 @@ public class MechaverseManagerImpl implements MechaverseManager {
     session.save(instanceInfo);
     session.delete(task);
 
-    // TODO(thorntonv): Commit the result data to the storage service.
+    // Commit the result data to the storage service.
+    storageService.setState(task.getSimulationId(), task.getInstanceId(),
+        instanceInfo.getIteration(), resultDataInput);
   }
 
   @Override
