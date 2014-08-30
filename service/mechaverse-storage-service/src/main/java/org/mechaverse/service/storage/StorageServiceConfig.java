@@ -1,5 +1,7 @@
 package org.mechaverse.service.storage;
 
+import java.io.File;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +17,10 @@ public class StorageServiceConfig {
 
   public String getBasePath() {
     return basePath;
+  }
+
+  public String getTempPath() {
+    return basePath + File.separator + "temp";
   }
 
   public void setBasePath(String basePath) {

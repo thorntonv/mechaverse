@@ -15,8 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class MechaverseStorageServiceImpl implements MechaverseStorageService {
 
-  // TODO(thorntonv): Support atomic read/write.
-
   @Autowired private StorageServiceConfig config;
 
   @Override
@@ -34,14 +32,23 @@ public class MechaverseStorageServiceImpl implements MechaverseStorageService {
   @Override
   public void setState(String simulationId, String instanceId, long iteration,
       InputStream stateInput) throws Exception {
-    File stateFile = new File(getFilename(simulationId, instanceId, iteration));
-    stateFile.getParentFile().mkdirs();
-    OutputStream out = new FileOutputStream(stateFile);
+    // Write the state to a temporary file.
+    File tempDirectory = new File(config.getTempPath());
+    tempDirectory.mkdirs();
+    String tempPrefix = String.format("%s-%s-%s", simulationId, instanceId, iteration);
+    File tempFile = File.createTempFile(tempPrefix, null, tempDirectory);
+    tempFile.deleteOnExit();
+    OutputStream out = new FileOutputStream(tempFile);
     try {
       IOUtils.copyAndCloseInput(stateInput, out);
     } finally {
       out.close();
     }
+
+    // Move the temporary file to the proper location.
+    File stateFile = new File(getFilename(simulationId, instanceId, iteration));
+    stateFile.getParentFile().mkdirs();
+    tempFile.renameTo(stateFile);
   }
 
   @Override
