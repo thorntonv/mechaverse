@@ -18,7 +18,7 @@ public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
 
   // TODO(thorntonv): Inject this service.
   private SimulationService service = JAXRSClientFactory.create(
-      "http://localhost:8080/mechaverse-simulation-ant-service", SimulationService.class);
+      "http://localhost:9100/mechaverse-simulation-ant-service", SimulationService.class);
 
   @Override
   public SimulationModel loadState(String simulationId, String instanceId, long iteration)

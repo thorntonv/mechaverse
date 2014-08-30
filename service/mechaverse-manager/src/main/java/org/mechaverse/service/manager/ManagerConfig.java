@@ -6,13 +6,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 /**
  * Mechaverse manager configuration.
  */
 @Configuration
-@PropertySource("classpath:manager.properties")
+@PropertySources(value = {@PropertySource("classpath:/mechaverse-manager.properties")})
 public class ManagerConfig {
 
   @Value("${org.mechaverse.service.manager.storageServiceUrl}")
