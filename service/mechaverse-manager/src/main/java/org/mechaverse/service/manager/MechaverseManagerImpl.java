@@ -102,7 +102,11 @@ public class MechaverseManagerImpl implements MechaverseManager {
       }
     });
 
-    instanceInfo.setIteration(instanceInfo.getIteration() + task.getIterationCount());
+    if (instanceInfo.getIteration() >= 0) {
+      instanceInfo.setIteration(instanceInfo.getIteration() + task.getIterationCount());
+    } else {
+      instanceInfo.setIteration(0);
+    }
     session.save(instanceInfo);
     session.delete(task);
 
@@ -189,7 +193,8 @@ public class MechaverseManagerImpl implements MechaverseManager {
 
   private InstanceInfo createInstance(SimulationInfo simulationInfo) {
     InstanceInfo instanceInfo = new InstanceInfo();
-    instanceInfo.setIteration(0);
+    // No iterations have been performed.
+    instanceInfo.setIteration(-1);
     simulationInfo.getInstances().add(instanceInfo);
 
     instanceInfo.setInstanceId((String) sessionFactory.getCurrentSession().save(simulationInfo));
@@ -203,12 +208,19 @@ public class MechaverseManagerImpl implements MechaverseManager {
     task.setInstanceId(instanceInfo.getInstanceId());
     task.setIteration(instanceInfo.getIteration());
     task.setClientId(clientId);
-    task.setIterationCount(simulationInfo.getConfig().getTaskIterationCount());
+    if (instanceInfo.getIteration() >= 0) {
+      task.setIterationCount(simulationInfo.getConfig().getTaskIterationCount());
+    } else {
+      // No iterations have been performed, task is to create initial state.
+      task.setIterationCount(0);
+    }
     task.setStartTime(new Timestamp(new Date().getTime()));
 
     instanceInfo.getExecutingTasks().add(task);
     instanceInfo.setPreferredClientId(clientId);
 
+    Long taskId = (Long) sessionFactory.getCurrentSession().save(task);
+    task.setId(taskId);
     sessionFactory.getCurrentSession().save(instanceInfo);
 
     return task;

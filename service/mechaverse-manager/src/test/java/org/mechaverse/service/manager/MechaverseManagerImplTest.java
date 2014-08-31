@@ -148,8 +148,8 @@ public class MechaverseManagerImplTest {
     assertNotNull(task);
     assertNotNull(task.getId());
     assertEquals("test-client", task.getClientId());
-    assertEquals(0, task.getIteration());
-    assertEquals(60*300, task.getIterationCount());
+    assertEquals(-1, task.getIteration());
+    assertEquals(0, task.getIterationCount());
     assertEquals(simulationInfo.getSimulationId(), task.getSimulationId());
 
     simulationInfo = service.getSimulationInfo(simulationInfo.getSimulationId());
@@ -177,7 +177,7 @@ public class MechaverseManagerImplTest {
 
     simulationInfo = service.getSimulationInfo(simulationInfo.getSimulationId());
     InstanceInfo instanceInfo = Iterables.getOnlyElement(simulationInfo.getInstances());
-    assertEquals(60 * 300, instanceInfo.getIteration());
+    assertEquals(0, instanceInfo.getIteration());
     assertEquals(0, instanceInfo.getExecutingTasks().size());
 
     Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Task.class);
@@ -205,9 +205,13 @@ public class MechaverseManagerImplTest {
     simulationInfo.getConfig().setTaskMaxDurationInSeconds(300);
     service.updateSimulationConfig(simulationInfo.getConfig());
 
+    byte[] state = "simulation state".getBytes();
     Task task = service.getTask();
-    ByteArrayInputStream resultDataInput = new ByteArrayInputStream("simulation state".getBytes());
-    service.submitResult(task.getId(), resultDataInput);
+    service.submitResult(task.getId(), new ByteArrayInputStream(state));
+
+    task = service.getTask();
+    assertEquals(0, task.getIteration());
+    service.submitResult(task.getId(), new ByteArrayInputStream(state));
 
     task = service.getTask();
     assertEquals(60 * 300, task.getIteration());
@@ -229,7 +233,7 @@ public class MechaverseManagerImplTest {
     sessionFactory.getCurrentSession().save(instanceInfo);
 
     task = service.getTask();
-    assertEquals(0, task.getIteration());
+    assertEquals(-1, task.getIteration());
   }
 
   @Test
