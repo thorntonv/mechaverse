@@ -6,14 +6,13 @@
 
   <bean id="manager" class="org.mockito.Mockito" factory-method="mock"> 
     <constructor-arg value="org.mechaverse.service.manager.api.MechaverseManager" /> 
-  </bean> 
+  </bean>
 
   <bean id="storageService" class="org.mockito.Mockito" factory-method="mock"> 
     <constructor-arg value="org.mechaverse.service.storage.api.MechaverseStorageService" /> 
-  </bean> 
+  </bean>
 
   <bean id="simulationService" class="org.mockito.Mockito" factory-method="mock"> 
     <constructor-arg value="org.mechaverse.simulation.api.SimulationService" /> 
-  </bean> 
-
+  </bean>
 </beans>
