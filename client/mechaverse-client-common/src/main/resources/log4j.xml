@@ -7,11 +7,16 @@
     <layout class="org.apache.log4j.PatternLayout"> 
       <param name="ConversionPattern" value="%-5p %c{1} - %m%n"/> 
     </layout> 
-  </appender> 
+  </appender>
+
+  <logger name="org.springframework" additivity="false">
+    <level value="warn" />
+    <appender-ref ref="console" />
+  </logger>
 
   <root> 
-    <priority value ="debug" /> 
+    <priority value ="info" /> 
     <appender-ref ref="console" /> 
   </root>
-  
+
 </log4j:configuration>
