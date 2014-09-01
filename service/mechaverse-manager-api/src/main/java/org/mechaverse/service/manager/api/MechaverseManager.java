@@ -35,7 +35,7 @@ public interface MechaverseManager {
    */
   @POST
   @Path("/task/{taskId}/result")
-  @Consumes(MediaType.APPLICATION_OCTET_STREAM)
+  @Consumes("*/*")
   void submitResult(@PathParam("taskId") long taskId, InputStream resultDataInput) throws Exception;
 
   /**

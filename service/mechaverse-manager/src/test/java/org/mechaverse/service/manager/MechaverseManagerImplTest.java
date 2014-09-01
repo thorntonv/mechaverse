@@ -2,6 +2,7 @@ package org.mechaverse.service.manager;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.eq;
@@ -158,6 +159,8 @@ public class MechaverseManagerImplTest {
     InstanceInfo instanceInfo = Iterables.getOnlyElement(simulationInfo.getInstances());
     assertEquals(instanceInfo.getInstanceId(), task.getInstanceId());
     assertEquals(task.getClientId(), instanceInfo.getPreferredClientId());
+
+    assertNotEquals(simulationInfo.getSimulationId(), instanceInfo.getInstanceId());
 
     assertEquals(1, instanceInfo.getExecutingTasks().size());
     assertEquals(task.getId(), Iterables.getOnlyElement(instanceInfo.getExecutingTasks()).getId());

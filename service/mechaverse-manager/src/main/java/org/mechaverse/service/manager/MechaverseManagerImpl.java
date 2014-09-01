@@ -37,6 +37,7 @@ public class MechaverseManagerImpl implements MechaverseManager {
   @Resource private MechaverseStorageService storageService;
 
   @Override
+  @Transactional
   public Task getTask() throws Exception {
     // TODO(thorntonv): Get client id.
     String clientId = "test-client";
@@ -77,6 +78,7 @@ public class MechaverseManagerImpl implements MechaverseManager {
   }
 
   @Override
+  @Transactional
   public void submitResult(long taskId, InputStream resultDataInput) throws Exception {
     Session session = sessionFactory.getCurrentSession();
     final Task task = (Task) session.get(Task.class, taskId);
@@ -129,6 +131,7 @@ public class MechaverseManagerImpl implements MechaverseManager {
   }
 
   @Override
+  @Transactional
   public SimulationInfo getSimulationInfo(String simulationId) {
     Session session = sessionFactory.getCurrentSession();
 
@@ -159,6 +162,10 @@ public class MechaverseManagerImpl implements MechaverseManager {
     SimulationConfig currentConfig =
         (SimulationConfig) session.get(SimulationConfig.class, updatedConfig.getId());
     // TODO(thorntonv): Determine why orphan removal isn't working.
+    if(currentConfig == null) {
+      throw new IllegalStateException("Configuration with id " + updatedConfig.getId()
+          + " does not exist.");
+    }
     for(SimulationConfigProperty property : currentConfig.getConfigProperties()) {
       session.delete(property);
     }
@@ -193,11 +200,12 @@ public class MechaverseManagerImpl implements MechaverseManager {
 
   private InstanceInfo createInstance(SimulationInfo simulationInfo) {
     InstanceInfo instanceInfo = new InstanceInfo();
+    instanceInfo.setInstanceId(UUID.randomUUID().toString());
     // No iterations have been performed.
     instanceInfo.setIteration(-1);
     simulationInfo.getInstances().add(instanceInfo);
 
-    instanceInfo.setInstanceId((String) sessionFactory.getCurrentSession().save(simulationInfo));
+    sessionFactory.getCurrentSession().save(simulationInfo);
     return instanceInfo;
   }
 
