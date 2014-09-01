@@ -1,8 +1,10 @@
 package org.mechaverse.service.storage.api;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -26,7 +28,7 @@ public interface MechaverseStorageService {
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
   InputStream getState(@PathParam("simulationId") String simulationId,
       @PathParam("instanceId") String instanceId,
-      @PathParam("iteration") long iteration) throws Exception;
+      @PathParam("iteration") long iteration) throws IOException;
 
   /**
    * Returns the state of the specified instance.
@@ -39,7 +41,7 @@ public interface MechaverseStorageService {
   InputStream getStateValue(@PathParam("simulationId") String simulationId,
       @PathParam("instanceId") String instanceId,
       @PathParam("iteration") long iteration,
-      @PathParam("key") String key) throws Exception;
+      @PathParam("key") String key) throws IOException;
 
   /**
    * Sets the state of the specified instance.
@@ -52,7 +54,7 @@ public interface MechaverseStorageService {
   void setState(@PathParam("simulationId") String simulationId,
       @PathParam("instanceId") String instanceId,
       @PathParam("iteration") long iteration,
-      InputStream stateInput) throws Exception;
+      InputStream stateInput) throws IOException;
 
   /**
    * Sets the state of the specified instance.
@@ -66,5 +68,20 @@ public interface MechaverseStorageService {
       @PathParam("instanceId") String instanceId,
       @PathParam("iteration") long iteration,
       @PathParam("key") String key,
-      InputStream valueInput) throws Exception;
+      InputStream valueInput) throws IOException;
+
+  /**
+   * Deletes a simulation.
+   */
+  @DELETE
+  @Path("/simulation/{simulationId}")
+  void deleteSimulation(@PathParam("simulationId") String simulationId) throws IOException;
+
+  /**
+   * Deletes a simulation instance.
+   */
+  @DELETE
+  @Path("/simulation/{simulationId}/{instanceId}")
+  void deleteInstance(@PathParam("simulationId") String simulationId,
+      @PathParam("instanceId") String instanceId) throws IOException;
 }
