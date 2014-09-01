@@ -52,7 +52,15 @@ public interface MechaverseManager {
   @POST
   @Path("/simulation")
   @Produces(MediaType.APPLICATION_JSON)
-  SimulationInfo createSimulation() throws Exception;
+  SimulationInfo createSimulation(String name) throws Exception;
+
+  /**
+   * Activates or deactivates a simulation.
+   */
+  @POST
+  @Path("/simulation/{simulationId}/active")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void setSimulationActive(@PathParam("simulationId") String simulationId, boolean active);
 
   /**
    * Returns information about a simulation.

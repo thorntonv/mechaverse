@@ -9,7 +9,6 @@ import java.util.UUID;
 import javax.annotation.Resource;
 
 import org.hibernate.Criteria;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Expression;
@@ -33,6 +32,14 @@ public class MechaverseManagerImpl implements MechaverseManager {
 
   // TODO(thorntonv): Periodically remove inactive tasks.
 
+  private static final Predicate<SimulationInfo> ACTIVE_SIMULATION_PREDICATE =
+      new Predicate<SimulationInfo>() {
+        @Override
+        public boolean apply(SimulationInfo simulationInfo) {
+          return simulationInfo.isActive();
+        }
+      };
+
   @Autowired private SessionFactory sessionFactory;
   @Resource private MechaverseStorageService storageService;
 
@@ -42,10 +49,11 @@ public class MechaverseManagerImpl implements MechaverseManager {
     // TODO(thorntonv): Get client id.
     String clientId = "test-client";
 
-    List<SimulationInfo> simulationInfoList = getSimulationInfo();
+    Iterable<SimulationInfo> activeSimulationInfoList = Iterables.filter(
+      getSimulationInfo(), ACTIVE_SIMULATION_PREDICATE);
 
     // Search for an instance that has no active tasks and prefers the client.
-    for (SimulationInfo simulationInfo : simulationInfoList) {
+    for (SimulationInfo simulationInfo : activeSimulationInfoList) {
       long taskMaxDurationSeconds = simulationInfo.getConfig().getTaskMaxDurationInSeconds();
       for (InstanceInfo instanceInfo : simulationInfo.getInstances()) {
         if (!hasActiveTask(instanceInfo, taskMaxDurationSeconds)
@@ -56,7 +64,7 @@ public class MechaverseManagerImpl implements MechaverseManager {
     }
 
     // Search for an instance that has no active tasks.
-    for (SimulationInfo simulationInfo : simulationInfoList) {
+    for (SimulationInfo simulationInfo : activeSimulationInfoList) {
       long taskMaxDurationSeconds = simulationInfo.getConfig().getTaskMaxDurationInSeconds();
       for (InstanceInfo instanceInfo : simulationInfo.getInstances()) {
         if (!hasActiveTask(instanceInfo, taskMaxDurationSeconds)) {
@@ -66,7 +74,7 @@ public class MechaverseManagerImpl implements MechaverseManager {
     }
 
     // Attempt to create a new instance.
-    for (SimulationInfo simulationInfo : simulationInfoList) {
+    for (SimulationInfo simulationInfo : activeSimulationInfoList) {
       int maxInstanceCount = simulationInfo.getConfig().getMaxInstanceCount();
       if (simulationInfo.getInstances().size() < maxInstanceCount) {
         InstanceInfo instanceInfo = createInstance(simulationInfo);
@@ -144,15 +152,25 @@ public class MechaverseManagerImpl implements MechaverseManager {
 
   @Override
   @Transactional
-  public SimulationInfo createSimulation() {
+  public SimulationInfo createSimulation(String name) {
     Session session = sessionFactory.getCurrentSession();
 
     SimulationInfo simulationInfo = new SimulationInfo();
     simulationInfo.setSimulationId(UUID.randomUUID().toString());
+    simulationInfo.setName(name);
+    simulationInfo.setActive(true);
     simulationInfo.setConfig(new SimulationConfig());
     session.save(simulationInfo);
 
     return simulationInfo;
+  }
+
+  @Override
+  @Transactional
+  public void setSimulationActive(String simulationId, boolean active) {
+    SimulationInfo simulationInfo = getSimulationInfo(simulationId);
+    simulationInfo.setActive(active);
+    sessionFactory.getCurrentSession().save(simulationInfo);
   }
 
   @Override
@@ -178,9 +196,10 @@ public class MechaverseManagerImpl implements MechaverseManager {
   public void deleteSimulation(String simulationId) throws Exception {
     Session session = sessionFactory.getCurrentSession();
 
-    Query q = session.createQuery("delete from SimulationInfo where simulationId = :id");
-    q.setString("id", simulationId);
-    q.executeUpdate();
+    SimulationInfo simulationInfo = getSimulationInfo(simulationId);
+    session.delete(simulationInfo);
+
+    storageService.deleteSimulation(simulationId);
   }
 
   private boolean hasActiveTask(InstanceInfo instanceInfo, long taskMaxDurationSeconds) {

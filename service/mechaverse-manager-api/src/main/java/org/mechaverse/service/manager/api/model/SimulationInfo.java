@@ -27,6 +27,9 @@ public class SimulationInfo {
   @XmlElement
   private String simulationId;
 
+  @XmlElement private String name;
+  @XmlElement private boolean active;
+
   @OneToMany(fetch=FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
   @XmlElement
   private Set<InstanceInfo> instances = new HashSet<>();
@@ -49,6 +52,22 @@ public class SimulationInfo {
 
   public SimulationConfig getConfig() {
     return config;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public boolean isActive() {
+    return active;
+  }
+
+  public void setActive(boolean active) {
+    this.active = active;
   }
 
   public void setConfig(SimulationConfig config) {

@@ -2,9 +2,11 @@ package org.mechaverse.service.manager;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 
@@ -61,7 +63,7 @@ public class MechaverseManagerImplTest {
 
   @Test
   public void createSimulation() throws Exception {
-    SimulationInfo simulationInfo = service.createSimulation();
+    SimulationInfo simulationInfo = service.createSimulation("test");
     List<SimulationInfo> simulationInfoList = service.getSimulationInfo();
     assertEquals(1, simulationInfoList.size());
     assertEquals(simulationInfo.getSimulationId(), simulationInfoList.get(0).getSimulationId());
@@ -71,7 +73,7 @@ public class MechaverseManagerImplTest {
 
   @Test
   public void getSimulationById() throws Exception {
-    SimulationInfo simulationInfo = service.createSimulation();
+    SimulationInfo simulationInfo = service.createSimulation("test");
 
     SimulationInfo retrievedSimulationInfo =
         service.getSimulationInfo(simulationInfo.getSimulationId());
@@ -80,7 +82,7 @@ public class MechaverseManagerImplTest {
 
   @Test
   public void updateSimulationConfig() throws Exception {
-    SimulationInfo simulationInfo = service.createSimulation();
+    SimulationInfo simulationInfo = service.createSimulation("test");
     sessionFactory.getCurrentSession().flush();
     sessionFactory.getCurrentSession().evict(simulationInfo.getConfig());
     sessionFactory.getCurrentSession().evict(simulationInfo);
@@ -110,7 +112,7 @@ public class MechaverseManagerImplTest {
   public void deleteSimulationConfigProperty() throws Exception {
     sessionFactory.getCurrentSession().setFlushMode(FlushMode.ALWAYS);
 
-    SimulationInfo simulationInfo = service.createSimulation();
+    SimulationInfo simulationInfo = service.createSimulation("test");
     sessionFactory.getCurrentSession().flush();
 
     SimulationConfig config = new SimulationConfig();
@@ -140,7 +142,7 @@ public class MechaverseManagerImplTest {
 
   @Test
   public void getTask() throws Exception {
-    SimulationInfo simulationInfo = service.createSimulation();
+    SimulationInfo simulationInfo = service.createSimulation("test");
     simulationInfo.getConfig().setMaxInstanceCount(1);
     simulationInfo.getConfig().setTaskIterationCount(60*300);
     service.updateSimulationConfig(simulationInfo.getConfig());
@@ -168,7 +170,7 @@ public class MechaverseManagerImplTest {
 
   @Test
   public void submitResult() throws Exception {
-    SimulationInfo simulationInfo = service.createSimulation();
+    SimulationInfo simulationInfo = service.createSimulation("test");
     simulationInfo.getConfig().setMaxInstanceCount(1);
     simulationInfo.getConfig().setTaskIterationCount(60 * 300);
     service.updateSimulationConfig(simulationInfo.getConfig());
@@ -183,11 +185,7 @@ public class MechaverseManagerImplTest {
     assertEquals(0, instanceInfo.getIteration());
     assertEquals(0, instanceInfo.getExecutingTasks().size());
 
-    Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Task.class);
-    @SuppressWarnings("unchecked")
-    List<Task> taskList = criteria.list();
-
-    assertEquals(0, taskList.size());
+    verifyNoObjectsOfType(Task.class);
 
     // Verify that the state was sent to the storage service.
 
@@ -202,7 +200,7 @@ public class MechaverseManagerImplTest {
 
   @Test
   public void getTask_afterSubmit() throws Exception {
-    SimulationInfo simulationInfo = service.createSimulation();
+    SimulationInfo simulationInfo = service.createSimulation("test");
     simulationInfo.getConfig().setMaxInstanceCount(1);
     simulationInfo.getConfig().setTaskIterationCount(60 * 300);
     simulationInfo.getConfig().setTaskMaxDurationInSeconds(300);
@@ -222,7 +220,7 @@ public class MechaverseManagerImplTest {
 
   @Test
   public void getTask_inactiveTask() throws Exception {
-    SimulationInfo simulationInfo = service.createSimulation();
+    SimulationInfo simulationInfo = service.createSimulation("test");
     simulationInfo.getConfig().setMaxInstanceCount(1);
     simulationInfo.getConfig().setTaskIterationCount(60 * 300);
     simulationInfo.getConfig().setTaskMaxDurationInSeconds(300);
@@ -241,7 +239,7 @@ public class MechaverseManagerImplTest {
 
   @Test
   public void getTask_simulationMaxTasks() throws Exception {
-    SimulationInfo simulationInfo = service.createSimulation();
+    SimulationInfo simulationInfo = service.createSimulation("test");
     simulationInfo.getConfig().setMaxInstanceCount(1);
     simulationInfo.getConfig().setTaskIterationCount(60 * 300);
     simulationInfo.getConfig().setTaskMaxDurationInSeconds(300);
@@ -254,11 +252,54 @@ public class MechaverseManagerImplTest {
   }
 
   @Test
+  public void getTask_inactiveSimulation() throws Exception {
+    SimulationInfo simulationInfo = service.createSimulation("test");
+    simulationInfo.getConfig().setMaxInstanceCount(1);
+    simulationInfo.getConfig().setTaskIterationCount(60 * 300);
+    simulationInfo.getConfig().setTaskMaxDurationInSeconds(300);
+    service.updateSimulationConfig(simulationInfo.getConfig());
+    service.setSimulationActive(simulationInfo.getSimulationId(), false);
+
+    Task task = service.getTask();
+    assertNull(task);
+  }
+
+  @Test
   public void deleteSimulation() throws Exception {
-    SimulationInfo simulationInfo = service.createSimulation();
+    SimulationInfo simulationInfo = service.createSimulation("test");
+    simulationInfo.getConfig().setMaxInstanceCount(1);
+    simulationInfo.getConfig().setTaskIterationCount(60 * 300);
+    simulationInfo.getConfig().setTaskMaxDurationInSeconds(300);
+    simulationInfo.getConfig().getConfigProperties()
+        .add(createProperty("test1", "This is a test".getBytes()));
+    service.updateSimulationConfig(simulationInfo.getConfig());
+
+    Task task = service.getTask();
+    assertNotNull(task);
     assertEquals(1, service.getSimulationInfo().size());
+
     service.deleteSimulation(simulationInfo.getSimulationId());
+    sessionFactory.getCurrentSession().flush();
+
     assertEquals(0, service.getSimulationInfo().size());
+
+    verify(mockStorageService).deleteSimulation(simulationInfo.getSimulationId());
+
+    verifyNoObjectsOfType(SimulationInfo.class);
+    verifyNoObjectsOfType(InstanceInfo.class);
+    verifyNoObjectsOfType(Task.class);
+    verifyNoObjectsOfType(SimulationConfig.class);
+    verifyNoObjectsOfType(SimulationConfigProperty.class);
+  }
+
+  @Test
+  public void setActive() throws Exception {
+    SimulationInfo simulationInfo = service.createSimulation("test");
+    assertTrue(simulationInfo.isActive());
+    service.setSimulationActive(simulationInfo.getSimulationId(), false);
+    assertFalse(service.getSimulationInfo(simulationInfo.getSimulationId()).isActive());
+    service.setSimulationActive(simulationInfo.getSimulationId(), true);
+    assertTrue(service.getSimulationInfo(simulationInfo.getSimulationId()).isActive());
   }
 
   private SimulationConfigProperty createProperty(String name, byte[] value) {
@@ -266,5 +307,12 @@ public class MechaverseManagerImplTest {
     property.setName(name);
     property.setValue(value);
     return property;
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T> void verifyNoObjectsOfType(Class<T> type) {
+    Criteria criteria = sessionFactory.getCurrentSession().createCriteria(type);
+    List<T> objectList = criteria.list();
+    assertEquals(0, objectList.size());
   }
 }
