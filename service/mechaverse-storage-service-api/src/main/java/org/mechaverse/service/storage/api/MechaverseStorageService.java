@@ -8,7 +8,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -35,12 +34,12 @@ public interface MechaverseStorageService {
    * @throws Exception if an error occurs while processing the request
    */
   @GET
-  @Path("/simulation/{simulationId}/{instanceId}/{iteration}")
+  @Path("/simulation/{simulationId}/{instanceId}/{iteration}/{key}")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
   InputStream getStateValue(@PathParam("simulationId") String simulationId,
       @PathParam("instanceId") String instanceId,
       @PathParam("iteration") long iteration,
-      @QueryParam("key") String key) throws Exception;
+      @PathParam("key") String key) throws Exception;
 
   /**
    * Sets the state of the specified instance.
@@ -61,11 +60,11 @@ public interface MechaverseStorageService {
    * @throws Exception if an error occurs while processing the request
    */
   @POST
-  @Path("/simulation/{simulationId}/{instanceId}/{iteration}")
+  @Path("/simulation/{simulationId}/{instanceId}/{iteration}/{key}")
   @Consumes("*/*")
   void setStateValue(@PathParam("simulationId") String simulationId,
       @PathParam("instanceId") String instanceId,
       @PathParam("iteration") long iteration,
-      @QueryParam("key") String key,
+      @PathParam("key") String key,
       InputStream valueInput) throws Exception;
 }
