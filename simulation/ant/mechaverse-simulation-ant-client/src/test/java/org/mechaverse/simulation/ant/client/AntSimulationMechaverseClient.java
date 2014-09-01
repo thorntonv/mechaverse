@@ -7,7 +7,7 @@ import org.mechaverse.client.MechaverseClient;
  */
 public class AntSimulationMechaverseClient {
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws Exception {
     MechaverseClient.main(args);
   }
 }

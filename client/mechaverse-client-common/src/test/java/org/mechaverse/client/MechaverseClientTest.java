@@ -12,7 +12,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.UUID;
 
-import org.apache.cxf.helpers.IOUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -73,7 +73,7 @@ public class MechaverseClientTest {
     verify(mockSimulationService).step(0, 20);
     ArgumentCaptor<InputStream> stateIn = ArgumentCaptor.forClass(InputStream.class);
     verify(mockManager).submitResult(eq(task.getId()), stateIn.capture());
-    assertArrayEquals(newState, IOUtils.readBytesFromStream(stateIn.getValue()));
+    assertArrayEquals(newState, IOUtils.toByteArray(stateIn.getValue()));
   }
 
   @Test
@@ -94,6 +94,6 @@ public class MechaverseClientTest {
     verify(mockSimulationService, never()).step(anyInt(), anyInt());
     ArgumentCaptor<InputStream> stateIn = ArgumentCaptor.forClass(InputStream.class);
     verify(mockManager).submitResult(eq(task.getId()), stateIn.capture());
-    assertArrayEquals(state, IOUtils.readBytesFromStream(stateIn.getValue()));
+    assertArrayEquals(state, IOUtils.toByteArray(stateIn.getValue()));
   }
 }

@@ -1,6 +1,8 @@
 package org.mechaverse.client;
 
-import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
+import java.net.URI;
+
+import org.jboss.resteasy.client.ClientRequestFactory;
 import org.mechaverse.service.manager.api.MechaverseManager;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
 import org.mechaverse.simulation.api.SimulationService;
@@ -33,12 +35,14 @@ public class MechaverseClientConfig {
 
   @Bean
   public MechaverseManager getManager() {
-    return JAXRSClientFactory.create(managerUrl, MechaverseManager.class);
+    ClientRequestFactory clientFactory = new ClientRequestFactory(URI.create(managerUrl));
+    return clientFactory.createProxy(MechaverseManager.class);
   }
 
   @Bean
   public MechaverseStorageService getStorageService() {
-    return JAXRSClientFactory.create(storageServiceUrl, MechaverseStorageService.class);
+    ClientRequestFactory clientFactory = new ClientRequestFactory(URI.create(storageServiceUrl));
+    return clientFactory.createProxy(MechaverseStorageService.class);
   }
 
   @Bean
