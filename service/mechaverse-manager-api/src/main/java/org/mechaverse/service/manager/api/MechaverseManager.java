@@ -51,6 +51,7 @@ public interface MechaverseManager {
    */
   @POST
   @Path("/simulation")
+  @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   SimulationInfo createSimulation(String name) throws Exception;
 
