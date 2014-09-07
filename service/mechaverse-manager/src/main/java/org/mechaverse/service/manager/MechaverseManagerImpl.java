@@ -130,8 +130,8 @@ public class MechaverseManagerImpl implements MechaverseManager {
   public List<SimulationInfo> getSimulationInfo() {
     Session session = sessionFactory.getCurrentSession();
 
-    Criteria criteria = session.createCriteria(SimulationInfo.class);
-
+    Criteria criteria = session.createCriteria(SimulationInfo.class)
+        .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
     @SuppressWarnings("unchecked")
     List<SimulationInfo> simulationInfoList = criteria.list();
 

@@ -199,6 +199,28 @@ public class MechaverseManagerImplTest {
   }
 
   @Test
+  public void getTask_multipleInstances() throws Exception {
+    SimulationInfo simulationInfo = service.createSimulation("test");
+    simulationInfo.getConfig().setMaxInstanceCount(10);
+    simulationInfo.getConfig().setTaskIterationCount(60 * 300);
+    simulationInfo.getConfig().setTaskMaxDurationInSeconds(300);
+    service.updateSimulationConfig(simulationInfo.getConfig());
+
+    byte[] state = "simulation state".getBytes();
+    Task task1 = service.getTask();
+    Task task2 = service.getTask();
+    Task task3 = service.getTask();
+
+    service.submitResult(task1.getId(), new ByteArrayInputStream(state));
+    service.submitResult(task2.getId(), new ByteArrayInputStream(state));
+    service.submitResult(task3.getId(), new ByteArrayInputStream(state));
+
+    List<SimulationInfo> simulationInfoList = service.getSimulationInfo();
+    assertEquals(1, simulationInfoList.size());
+    assertEquals(3, simulationInfoList.get(0).getInstances().size());
+  }
+
+  @Test
   public void getTask_afterSubmit() throws Exception {
     SimulationInfo simulationInfo = service.createSimulation("test");
     simulationInfo.getConfig().setMaxInstanceCount(1);
