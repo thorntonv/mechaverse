@@ -11,6 +11,6 @@
 
   <bean id="managerImpl" class="org.mechaverse.service.storage.MechaverseStorageServiceImpl" />
 
-  <context:component-scan base-package="org.mechaverse" />
+  <context:component-scan base-package="org.mechaverse.service.storage" />
 
 </beans> 
