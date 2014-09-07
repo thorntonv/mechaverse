@@ -1,5 +1,6 @@
 package org.mechaverse.service.manager.api.model;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,8 +12,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -21,21 +20,20 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @XmlRootElement
 @Table(name = "config")
-public class SimulationConfig {
+public class SimulationConfig implements Serializable {
+
+  private static final long serialVersionUID = -3040420226275039589L;
 
   @Id
-  @XmlID
-  @XmlElement
   @GeneratedValue(strategy=GenerationType.AUTO)
   private Long id;
 
-  @XmlElement private int minInstanceCount;
-  @XmlElement private int maxInstanceCount;
-  @XmlElement private int taskIterationCount;
-  @XmlElement private long taskMaxDurationInSeconds;
+  private int minInstanceCount;
+  private int maxInstanceCount;
+  private int taskIterationCount;
+  private long taskMaxDurationInSeconds;
 
   @OneToMany(fetch=FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-  @XmlElement
   private Set<SimulationConfigProperty> configProperties = new HashSet<>();
 
   public int getMinInstanceCount() {
@@ -80,5 +78,10 @@ public class SimulationConfig {
 
   public Set<SimulationConfigProperty> getConfigProperties() {
     return configProperties;
+  }
+
+  public void setConfigProperties(Set<SimulationConfigProperty> properties) {
+    this.configProperties.clear();
+    this.configProperties.addAll(configProperties);
   }
 }

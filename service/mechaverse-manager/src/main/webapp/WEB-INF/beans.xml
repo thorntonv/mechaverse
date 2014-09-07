@@ -17,7 +17,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
   <context:spring-configured />
   <context:annotation-config />
 
-  <context:component-scan base-package="org.mechaverse.service.manager" />
+  <context:component-scan base-package="org.mechaverse.service.manager, org.mechaverse.common" />
 
   <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
     <property name="configLocation"><value>classpath:hibernate.cfg.xml</value></property>

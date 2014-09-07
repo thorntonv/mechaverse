@@ -1,5 +1,6 @@
 package org.mechaverse.service.manager.api.model;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -9,7 +10,6 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -19,23 +19,21 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @XmlRootElement
 @Table(name = "instance")
-public class InstanceInfo {
+public class InstanceInfo implements Serializable {
+
+  private static final long serialVersionUID = -6809364169796167082L;
 
   @Id
-  @XmlID
-  @XmlElement
   private String instanceId;
 
-  @XmlElement
   private long iteration;
 
-  @XmlElement
   private String preferredClientId;
 
   @OneToMany(fetch=FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-  @XmlElement
   private Set<Task> executingTasks = new HashSet<>();
 
+  @XmlID
   public String getInstanceId() {
     return instanceId;
   }
@@ -54,6 +52,11 @@ public class InstanceInfo {
 
   public Set<Task> getExecutingTasks() {
     return executingTasks;
+  }
+
+  public void setExecutingTasks(Set<Task> executingTasks) {
+    this.executingTasks.clear();
+    this.executingTasks.addAll(executingTasks);
   }
 
   public String getPreferredClientId() {

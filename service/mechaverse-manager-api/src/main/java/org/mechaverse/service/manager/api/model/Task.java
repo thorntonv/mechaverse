@@ -1,14 +1,13 @@
 package org.mechaverse.service.manager.api.model;
 
-import java.sql.Timestamp;
+import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -17,35 +16,35 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @XmlRootElement
 @Table(name = "task")
-public class Task {
+public class Task implements Serializable {
+
+  private static final long serialVersionUID = 5958546141000173564L;
 
   @Id
-  @XmlID
-  @XmlElement
   @GeneratedValue(strategy=GenerationType.AUTO)
   private Long id;
 
-  @XmlElement private String simulationId;
-  @XmlElement private String instanceId;
-  @XmlElement private long iteration;
-  @XmlElement private int iterationCount;
-  @XmlElement private String clientId;
-  @XmlElement private Timestamp startTime;
-  @XmlElement private Timestamp completionTime;
+  private String simulationId;
+  private String instanceId;
+  private long iteration;
+  private int iterationCount;
+  private String clientId;
+  private Date startTime;
+  private Date completionTime;
 
-  public Timestamp getStartTime() {
+  public Date getStartTime() {
     return startTime;
   }
 
-  public void setStartTime(Timestamp startTime) {
+  public void setStartTime(Date startTime) {
     this.startTime = startTime;
   }
 
-  public Timestamp getCompletionTime() {
+  public Date getCompletionTime() {
     return completionTime;
   }
 
-  public void setCompletionTime(Timestamp completionTime) {
+  public void setCompletionTime(Date completionTime) {
     this.completionTime = completionTime;
   }
 

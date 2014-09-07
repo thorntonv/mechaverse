@@ -6,8 +6,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -20,15 +18,12 @@ public class Result {
 
   @Id
   @GeneratedValue(strategy=GenerationType.AUTO)
-  @XmlID
-  @XmlElement
   private Long id;
 
   @OneToOne
-  @XmlElement
   private Task task;
 
-  @XmlElement private String temporaryDataFilename;
+  private String temporaryDataFilename;
 
   public long getId() {
     return id;

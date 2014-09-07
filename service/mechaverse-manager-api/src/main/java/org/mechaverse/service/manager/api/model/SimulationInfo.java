@@ -1,5 +1,6 @@
 package org.mechaverse.service.manager.api.model;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,7 +11,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -20,24 +20,23 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @XmlRootElement
 @Table(name = "simulation")
-public class SimulationInfo {
+public class SimulationInfo implements Serializable {
+
+  private static final long serialVersionUID = 159877921410539157L;
 
   @Id
-  @XmlID
-  @XmlElement
   private String simulationId;
 
-  @XmlElement private String name;
-  @XmlElement private boolean active;
+  private String name;
+  private boolean active;
 
   @OneToMany(fetch=FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
-  @XmlElement
   private Set<InstanceInfo> instances = new HashSet<>();
 
   @OneToOne(fetch=FetchType.EAGER, cascade = CascadeType.ALL)
-  @XmlElement
   private SimulationConfig config;
 
+  @XmlID
   public String getSimulationId() {
     return simulationId;
   }
@@ -48,6 +47,11 @@ public class SimulationInfo {
 
   public Set<InstanceInfo> getInstances() {
     return instances;
+  }
+
+  public void setInstances(Set<InstanceInfo> instances) {
+    this.instances.clear();
+    this.instances.addAll(instances);
   }
 
   public SimulationConfig getConfig() {
