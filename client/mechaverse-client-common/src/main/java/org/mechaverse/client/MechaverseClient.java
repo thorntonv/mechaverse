@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.io.IOUtils;
+import org.mechaverse.common.MechaverseConfig;
 import org.mechaverse.service.manager.api.MechaverseManager;
 import org.mechaverse.service.manager.api.model.Task;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
@@ -35,7 +36,7 @@ public class MechaverseClient {
   public static void main(String[] args) throws Exception {
     try (ClassPathXmlApplicationContext context =
         new ClassPathXmlApplicationContext("spring/applicationContext.xml")) {
-      final MechaverseClientConfig config = context.getBean(MechaverseClientConfig.class);
+      final MechaverseConfig config = context.getBean(MechaverseConfig.class);
 
       SimulationService simulationService = config.getSimulationService();
 
