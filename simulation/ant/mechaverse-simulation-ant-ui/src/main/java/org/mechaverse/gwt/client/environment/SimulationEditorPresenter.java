@@ -2,7 +2,7 @@ package org.mechaverse.gwt.client.environment;
 
 import java.util.Iterator;
 
-import org.mechaverse.gwt.client.util.UUID;
+import org.mechaverse.gwt.common.client.util.UUID;
 import org.mechaverse.gwt.shared.MechaverseGwtRpcServiceAsync;
 import org.mechaverse.simulation.ant.api.SimulationModelUtil;
 import org.mechaverse.simulation.ant.api.model.Environment;

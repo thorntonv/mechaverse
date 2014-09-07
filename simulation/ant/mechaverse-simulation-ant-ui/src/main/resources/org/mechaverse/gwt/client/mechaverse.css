@@ -1,25 +1,25 @@
-
 .entityToolbar {
-	background-color: #E0E0E0;
-	padding: 2px;
-	border-radius: 3px;
+  background-color: #E0E0E0;
+  padding: 2px;
+  border-radius: 3px;
 }
 
 .entityButton {
-	width: 24px;
-	height: 24px;
-    background-color: #F4F4F4;
-    border: 1px solid silver;
-    border-radius: 3px;
-    padding: 4px;
-    margin: 2px;
-    outline: 0;
+  width: 24px;
+  height: 24px;
+  background-color: #F4F4F4;
+  border: 1px solid silver;
+  border-radius: 3px;
+  padding: 4px;
+  margin: 2px;
+  outline: 0;
 }
 
 .entityButtonSelected {
-	border: 1px solid #909090;
-    background-color: #E4E4E4;
+  border: 1px solid #909090;
+  background-color: #E4E4E4;
 }
 
 .environmentPanel {
+  zoom: .7;
 }

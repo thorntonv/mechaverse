@@ -1,6 +1,8 @@
 package org.mechaverse.gwt.server;
 
-import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
+import java.net.URI;
+
+import org.jboss.resteasy.client.ClientRequestFactory;
 import org.mechaverse.gwt.shared.MechaverseGwtRpcService;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.model.SimulationModel;
@@ -17,8 +19,9 @@ public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
   private static final long serialVersionUID = 1349327476429682957L;
 
   // TODO(thorntonv): Inject this service.
-  private SimulationService service = JAXRSClientFactory.create(
-      "http://localhost:9100/mechaverse-simulation-ant-service", SimulationService.class);
+  private final SimulationService service = new ClientRequestFactory(URI.create(
+      "http://localhost:9100/mechaverse-simulation-ant-service"))
+        .createProxy(SimulationService.class);
 
   @Override
   public SimulationModel loadState(String simulationId, String instanceId, long iteration)

@@ -1,6 +1,6 @@
 package org.mechaverse.gwt.client.environment;
 
-import org.mechaverse.gwt.client.util.UUID;
+import org.mechaverse.gwt.common.client.util.UUID;
 import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.api.model.Barrier;
 import org.mechaverse.simulation.ant.api.model.Direction;

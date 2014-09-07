@@ -1,6 +1,6 @@
 package org.mechaverse.gwt.client;
 
-import org.mechaverse.gwt.client.util.ImageUtil;
+import org.mechaverse.gwt.common.client.util.ImageUtil;
 import org.mechaverse.simulation.ant.api.model.Direction;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 
@@ -16,10 +16,10 @@ import com.google.gwt.resources.client.ImageResource;
  *
  * @author thorntonv@mechaverse.org
  */
-public interface MechaverseResourceBundle extends ClientBundle {
+public interface AntSimulationResourceBundle extends ClientBundle {
 
-  public static final MechaverseResourceBundle INSTANCE =
-      GWT.create(MechaverseResourceBundle.class);
+  public static final AntSimulationResourceBundle INSTANCE =
+      GWT.create(AntSimulationResourceBundle.class);
 
   public static final ImageElement BARRIER_IMAGE_ELEMENT =
       ImageUtil.asImageElement(INSTANCE.barrier());
@@ -137,7 +137,6 @@ public interface MechaverseResourceBundle extends ClientBundle {
 
   @Source("images/rock.png")
   ImageResource rock();
-
 
   public static interface Style extends CssResource {
 

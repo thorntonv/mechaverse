@@ -2,7 +2,7 @@ package org.mechaverse.gwt.client.environment;
 
 import java.util.Map;
 
-import org.mechaverse.gwt.client.MechaverseResourceBundle;
+import org.mechaverse.gwt.client.AntSimulationResourceBundle;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 
 import com.google.common.collect.Maps;
@@ -22,15 +22,15 @@ public class EntityToolbar extends HorizontalPanel {
   private static class EntityButton extends FocusPanel {
 
     public EntityButton(EntityType entityType) {
-      addStyleName(MechaverseResourceBundle.INSTANCE.css().entityButton());
-      add(new Image(MechaverseResourceBundle.ENTITY_IMAGES.get(entityType)));
+      addStyleName(AntSimulationResourceBundle.INSTANCE.css().entityButton());
+      add(new Image(AntSimulationResourceBundle.ENTITY_IMAGES.get(entityType)));
     }
 
     public void setSelected(boolean selected) {
       if(selected) {
-        addStyleName(MechaverseResourceBundle.INSTANCE.css().entityButtonSelected());
+        addStyleName(AntSimulationResourceBundle.INSTANCE.css().entityButtonSelected());
       } else {
-        removeStyleName(MechaverseResourceBundle.INSTANCE.css().entityButtonSelected());
+        removeStyleName(AntSimulationResourceBundle.INSTANCE.css().entityButtonSelected());
       }
     }
   }
@@ -40,7 +40,7 @@ public class EntityToolbar extends HorizontalPanel {
 
   public EntityToolbar() {
 
-    addStyleName(MechaverseResourceBundle.INSTANCE.css().entityToolbar());
+    addStyleName(AntSimulationResourceBundle.INSTANCE.css().entityToolbar());
 
     for (final EntityType entityType : EntityType.values()) {
       if (entityType != EntityType.NONE) {

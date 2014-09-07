@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.mechaverse.gwt.client.MechaverseResourceBundle;
-import org.mechaverse.gwt.client.util.Coordinate;
+import org.mechaverse.gwt.client.AntSimulationResourceBundle;
+import org.mechaverse.gwt.common.client.util.Coordinate;
 import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.api.model.Direction;
 import org.mechaverse.simulation.ant.api.model.Entity;
@@ -41,8 +41,8 @@ public class EnvironmentView extends SimplePanel {
       EntityType.PHEROMONE, EntityType.CONDUIT, EntityType.NEST, EntityType.ROCK, EntityType.FOOD,
       EntityType.ANT};
 
-  private int cellWidth = MechaverseResourceBundle.INSTANCE.dirt().getWidth();
-  private int cellHeight = MechaverseResourceBundle.INSTANCE.dirt().getHeight();
+  private int cellWidth = AntSimulationResourceBundle.INSTANCE.dirt().getWidth();
+  private int cellHeight = AntSimulationResourceBundle.INSTANCE.dirt().getHeight();
 
   private Canvas canvas;
   private Environment environment;
@@ -50,7 +50,7 @@ public class EnvironmentView extends SimplePanel {
   private Set<Observer> observers = Sets.newHashSet();
 
   public EnvironmentView() {
-    addStyleName(MechaverseResourceBundle.INSTANCE.css().environmentPanel());
+    addStyleName(AntSimulationResourceBundle.INSTANCE.css().environmentPanel());
     this.canvas = Canvas.createIfSupported();
 
     add(canvas);
@@ -100,7 +100,7 @@ public class EnvironmentView extends SimplePanel {
     Context2d context = canvas.getContext2d();
 
     for (Coordinate coordinate : dirtyCells) {
-      drawImage(MechaverseResourceBundle.DIRT_IMAGE_ELEMENT, context, coordinate.getRow(),
+      drawImage(AntSimulationResourceBundle.DIRT_IMAGE_ELEMENT, context, coordinate.getRow(),
           coordinate.getColumn());
     }
     dirtyCells.clear();
@@ -136,11 +136,11 @@ public class EnvironmentView extends SimplePanel {
 
   private ImageElement getImage(Entity entity) {
     EntityType entityType = EntityUtil.getType(entity);
-    ImageElement image = MechaverseResourceBundle.ENTITY_IMAGE_ELEMENTS.get(entityType);
+    ImageElement image = AntSimulationResourceBundle.ENTITY_IMAGE_ELEMENTS.get(entityType);
     if (entityType == EntityType.ANT) {
       Direction direction = entity.getDirection();
       direction = direction != null ? direction : Direction.EAST;
-      image = MechaverseResourceBundle.BLACK_ANT_IMAGE_ELEMENTS.get(direction);
+      image = AntSimulationResourceBundle.BLACK_ANT_IMAGE_ELEMENTS.get(direction);
     }
     return image;
   }

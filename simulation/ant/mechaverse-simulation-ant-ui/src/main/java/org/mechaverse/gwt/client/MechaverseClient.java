@@ -1,15 +1,22 @@
 package org.mechaverse.gwt.client;
 
-import org.mechaverse.gwt.client.environment.SimulationEditorPresenter;
-import org.mechaverse.gwt.client.environment.SimulationEditorView;
-import org.mechaverse.gwt.client.environment.SimulationPresenter;
-import org.mechaverse.gwt.client.environment.SimulationView;
-import org.mechaverse.simulation.api.SimulationStateKey;
+import org.mechaverse.gwt.client.manager.DefaultManagerClientFactoryImpl;
+import org.mechaverse.gwt.client.manager.ManagerActivityMapper;
+import org.mechaverse.gwt.client.manager.ManagerClientFactory;
+import org.mechaverse.gwt.client.manager.ManagerDashboardPresenter.ManagerDashboardPlace;
+import org.mechaverse.gwt.client.manager.ManagerPlaceHistoryMapper;
+import org.mechaverse.gwt.common.client.webconsole.WebConsoleResourceBundle;
+import org.mechaverse.gwt.common.client.webconsole.WebConsoleResourceBundle.TableResources;
 
+import com.google.gwt.activity.shared.ActivityManager;
+import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.user.client.Window;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.place.shared.Place;
+import com.google.gwt.place.shared.PlaceController;
+import com.google.gwt.place.shared.PlaceHistoryHandler;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
-import com.google.gwt.user.client.ui.RootPanel;
+import com.google.web.bindery.event.shared.EventBus;
 
 /**
  * The main entry point.
@@ -18,23 +25,35 @@ import com.google.gwt.user.client.ui.RootPanel;
  */
 public class MechaverseClient implements EntryPoint {
 
+  private Place defaultPlace = new ManagerDashboardPlace();
+
   @Override
   public void onModuleLoad() {
     ensureCssInjected();
 
-    SimulationStateKey simulationStateKey = new SimulationStateKey("", "", 0);
-    String editParam = Window.Location.getParameter("edit");
-    if (editParam != null && editParam.equalsIgnoreCase("true")) {
-      SimulationEditorPresenter presenter =
-          new SimulationEditorPresenter(simulationStateKey, new SimulationEditorView());
-      RootLayoutPanel.get().add(presenter.getView());
-    } else {
-      SimulationPresenter presenter = new SimulationPresenter(simulationStateKey, new SimulationView());
-      RootPanel.get().add(presenter.getView());
-    }
+    ManagerClientFactory clientFactory = new DefaultManagerClientFactoryImpl();
+
+    EventBus eventBus = clientFactory.getEventBus();
+    PlaceController placeController = clientFactory.getPlaceController();
+
+    // Start ActivityManager for the main widget with our ActivityMapper
+    ActivityMapper activityMapper = new ManagerActivityMapper(clientFactory);
+    ActivityManager activityManager = new ActivityManager(activityMapper, eventBus);
+    activityManager.setDisplay(clientFactory.getLayoutView());
+
+    // Start PlaceHistoryHandler with our PlaceHistoryMapper
+    ManagerPlaceHistoryMapper historyMapper= GWT.create(ManagerPlaceHistoryMapper.class);
+    PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);
+    historyHandler.register(placeController, eventBus, defaultPlace);
+
+    RootLayoutPanel.get().add(clientFactory.getLayoutView());
+
+    historyHandler.handleCurrentHistory();
   }
 
   protected static void ensureCssInjected() {
-    MechaverseResourceBundle.INSTANCE.css().ensureInjected();
+    AntSimulationResourceBundle.INSTANCE.css().ensureInjected();
+    WebConsoleResourceBundle.INSTANCE.css().ensureInjected();
+    TableResources.INSTANCE.cellTableStyle().ensureInjected();
   }
 }
