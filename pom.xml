@@ -13,6 +13,7 @@
     <module>client</module>
     <module>service</module>
     <module>simulation</module>
+    <module>mechaverse-common</module>
   </modules>
 
   <properties>
@@ -95,6 +96,11 @@
       </dependency>
       <dependency>
         <groupId>org.jboss.resteasy</groupId>
+        <artifactId>resteasy-jaxb-provider</artifactId>
+        <version>2.2.0.GA</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.resteasy</groupId>
         <artifactId>resteasy-jackson-provider</artifactId>
         <version>3.0.4.Final</version>
       </dependency>
@@ -154,9 +160,19 @@
         <version>3.0.3</version>
       </dependency>
       <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.7.7</version>
+      </dependency>
+      <dependency>  
         <groupId>log4j</groupId>
         <artifactId>log4j</artifactId>
         <version>1.2.17</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>1.1.2</version>
       </dependency>
       <dependency>
         <groupId>org.mockito</groupId>
