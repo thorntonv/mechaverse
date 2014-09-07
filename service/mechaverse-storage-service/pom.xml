@@ -20,6 +20,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.mechaverse.common</groupId>
+      <artifactId>mechaverse-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.mechaverse.simulation</groupId>
       <artifactId>mechaverse-simulation-common</artifactId>
       <version>${project.version}</version>
@@ -31,6 +36,10 @@
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-mapper-asl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-frontend-jaxrs</artifactId>
     </dependency>
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
