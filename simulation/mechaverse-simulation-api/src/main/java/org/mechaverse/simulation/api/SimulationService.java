@@ -53,7 +53,7 @@ public interface SimulationService {
    */
   @POST
   @Path("/instance/{instanceIdx}/state")
-  @Consumes("*/*")
+  @Consumes(MediaType.WILDCARD)
   void setState(@PathParam("instanceIdx") int instanceIdx, byte[] state) throws Exception;
 
   /**
@@ -63,7 +63,7 @@ public interface SimulationService {
    */
   @POST
   @Path("/instance/{instanceIdx}/state")
-  @Consumes("*/*")
+  @Consumes(MediaType.WILDCARD)
   void setStateValue(@PathParam("instanceIdx") int instanceIdx, @QueryParam("key") String key,
       byte[] value) throws Exception;
 
@@ -84,6 +84,7 @@ public interface SimulationService {
    */
   @POST
   @Path("/instance/{instanceIdx}/step")
+  @Consumes(MediaType.APPLICATION_JSON)
   void step(@PathParam("instanceIdx") int instanceIdx, int stepCount) throws Exception;
 
   /**

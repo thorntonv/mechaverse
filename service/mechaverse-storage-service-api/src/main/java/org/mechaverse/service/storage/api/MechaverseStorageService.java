@@ -50,7 +50,7 @@ public interface MechaverseStorageService {
    */
   @POST
   @Path("/simulation/{simulationId}/{instanceId}/{iteration}")
-  @Consumes("*/*")
+  @Consumes(MediaType.WILDCARD)
   void setState(@PathParam("simulationId") String simulationId,
       @PathParam("instanceId") String instanceId,
       @PathParam("iteration") long iteration,
@@ -63,7 +63,7 @@ public interface MechaverseStorageService {
    */
   @POST
   @Path("/simulation/{simulationId}/{instanceId}/{iteration}/{key}")
-  @Consumes("*/*")
+  @Consumes(MediaType.WILDCARD)
   void setStateValue(@PathParam("simulationId") String simulationId,
       @PathParam("instanceId") String instanceId,
       @PathParam("iteration") long iteration,
@@ -75,6 +75,7 @@ public interface MechaverseStorageService {
    */
   @DELETE
   @Path("/simulation/{simulationId}")
+  @Consumes(MediaType.WILDCARD)
   void deleteSimulation(@PathParam("simulationId") String simulationId) throws IOException;
 
   /**
@@ -82,6 +83,7 @@ public interface MechaverseStorageService {
    */
   @DELETE
   @Path("/simulation/{simulationId}/{instanceId}")
+  @Consumes(MediaType.WILDCARD)
   void deleteInstance(@PathParam("simulationId") String simulationId,
       @PathParam("instanceId") String instanceId) throws IOException;
 }
