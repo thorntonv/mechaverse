@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module rename-to='common'>
+  <inherits name='com.google.gwt.activity.Activity'/>
+  <inherits name='com.google.gwt.place.Place'/>
+  
+  <inherits name="com.google.common.collect.Collect"/>
+  <inherits name="org.mechaverse.service.manager.api"/>
+  <inherits name="org.mechaverse.simulation.api"/>
+  
+  <source path='common/client' />
+  <source path='common/shared' />
+  <source path='javax.persistence'/>
+</module>

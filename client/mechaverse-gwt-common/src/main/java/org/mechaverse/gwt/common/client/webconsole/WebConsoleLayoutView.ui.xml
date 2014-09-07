@@ -1,0 +1,67 @@
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder' xmlns:g='urn:import:com.google.gwt.user.client.ui' >
+
+  <ui:style>
+  .appNameLabel {
+    font-size: 26px;
+    line-height:60px;
+    vertical-align: middle;
+    margin-left: 10px;
+    color: #606060;
+    font-family: seif;
+  }
+  .pageNameLabel {
+    color: #DD4B39;
+    font-size: 20px;
+    padding-left: 30px;
+  }
+  .topPanel {
+    background-color: #F5F5F5;
+    border-bottom: 1px solid #C5C5C5;
+  }
+  .contentPanel {
+    background-color: #FEFEFE;
+  }
+  .actionBarPanel {
+    border-bottom: 1px solid #ECECEC;
+    float: left;
+  }
+  .actionPanel {
+    float: left;
+    margin-top: 16px;
+  }  
+  .navPanel {
+    padding-top: 20px;
+    border-right: 1px solid #ECECEC;
+  }
+  .pageNamePanel {
+    float: left;
+    width: 200px;
+    line-height: 60px;
+  }
+  </ui:style>
+
+  <g:DockLayoutPanel>
+  <g:north size="60" unit="PX">
+    <g:SimplePanel ui:field="topPanel" addStyleNames="{style.topPanel}">
+    <g:Label addStyleNames="{style.appNameLabel}" >mechaverse</g:Label>
+    </g:SimplePanel>
+  </g:north>
+  <g:center >
+    <g:DockLayoutPanel>
+      <g:north size="60">
+        <g:FlowPanel addStyleNames="{style.actionBarPanel}">
+          <g:SimplePanel addStyleNames="{style.pageNamePanel}">
+          <g:Label addStyleNames="{style.pageNameLabel}" >Manager</g:Label></g:SimplePanel>
+          <g:FlowPanel ui:field="actionPanel" addStyleNames="{style.actionPanel}" />
+        </g:FlowPanel>
+      </g:north>
+      <g:west size="180" unit="PX">
+        <g:SimplePanel ui:field="navPanel" addStyleNames="{style.navPanel}" />
+      </g:west>
+      <g:center>
+        <g:SimpleLayoutPanel ui:field="contentPanel" addStyleNames="{style.contentPanel}" />
+      </g:center>
+    </g:DockLayoutPanel>
+  </g:center>
+  </g:DockLayoutPanel>
+</ui:UiBinder>
