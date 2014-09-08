@@ -26,7 +26,7 @@ import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.ListDataProvider;
 
 /**
- * A view that displays information about a simulation. A form for editing the simulation 
+ * A view that displays information about a simulation. A form for editing the simulation
  * configuration and a list of instances are shown.
  */
 public class SimulationInfoView extends Composite {
@@ -35,6 +35,7 @@ public class SimulationInfoView extends Composite {
 
     void updateConfig(SimulationConfig config);
     void onSelectInstance(InstanceInfo instance);
+    void onRefresh();
   }
 
 
@@ -114,8 +115,18 @@ public class SimulationInfoView extends Composite {
       }
     });
 
+    RefreshButton refreshButton = new RefreshButton();
+    refreshButton.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        if (observer != null) {
+          observer.onRefresh();
+        }
+      }
+    });
+
     layoutView.addActionButton(saveConfigButton);
-    layoutView.addActionButton(new RefreshButton());
+    layoutView.addActionButton(refreshButton);
   }
 
   public void setObserver(Observer observer) {

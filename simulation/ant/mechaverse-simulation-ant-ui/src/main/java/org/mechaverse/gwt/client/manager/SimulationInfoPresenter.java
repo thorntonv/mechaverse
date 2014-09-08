@@ -100,4 +100,9 @@ public class SimulationInfoPresenter extends AbstractActivity
     placeController.goTo(new SimulationPlace(
       simulationId, instance.getInstanceId(), instance.getIteration()));
   }
+
+  @Override
+  public void onRefresh() {
+    setSimulationId(simulationId);
+  }
 }

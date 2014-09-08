@@ -91,15 +91,18 @@ public class SimulationPresenter extends AbstractActivity {
   public SimulationPresenter(SimulationStateKey simulationStateKey, SimulationView view) {
     this.view = view;
 
-    updateTimer.scheduleRepeating(UPDATE_INTERVAL);
+    service.loadState(simulationStateKey.getSimulationId(), simulationStateKey.getInstanceId(),
+        simulationStateKey.getIteration(), new AsyncCallback<SimulationModel>() {
+          @Override
+          public void onFailure(Throwable ex) {}
 
-    Window.addWindowScrollHandler(new Window.ScrollHandler() {
-      @Override
-      public void onWindowScroll(ScrollEvent arg0) {
-        updateTimer.cancel();
-        updateTimer.scheduleRepeating(UPDATE_INTERVAL);
-      }
-    });
+          @Override
+          public void onSuccess(SimulationModel model) {
+            setState(model);
+            addScrollHandler();
+            updateTimer.scheduleRepeating(UPDATE_INTERVAL);
+          }
+        });
   }
 
   @Override
@@ -113,5 +116,15 @@ public class SimulationPresenter extends AbstractActivity {
 
   public SimulationView getView() {
     return view;
+  }
+
+  private void addScrollHandler() {
+    Window.addWindowScrollHandler(new Window.ScrollHandler() {
+      @Override
+      public void onWindowScroll(ScrollEvent arg0) {
+        updateTimer.cancel();
+        updateTimer.scheduleRepeating(UPDATE_INTERVAL);
+      }
+    });
   }
 }
