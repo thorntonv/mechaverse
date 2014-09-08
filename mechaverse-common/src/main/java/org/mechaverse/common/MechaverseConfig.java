@@ -1,8 +1,7 @@
 package org.mechaverse.common;
 
-import java.net.URI;
-
-import org.jboss.resteasy.client.ClientRequestFactory;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
+import org.codehaus.jackson.jaxrs.JacksonJaxbJsonProvider;
 import org.mechaverse.service.manager.api.MechaverseManager;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
 import org.mechaverse.simulation.api.SimulationService;
@@ -13,6 +12,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Common configuration.
@@ -35,14 +36,14 @@ public class MechaverseConfig {
 
   @Bean
   public MechaverseManager getManager() {
-    ClientRequestFactory clientFactory = new ClientRequestFactory(URI.create(managerUrl));
-    return clientFactory.createProxy(MechaverseManager.class);
+    return JAXRSClientFactory.create(managerUrl, MechaverseManager.class,
+        ImmutableList.of(new JacksonJaxbJsonProvider()));
   }
 
   @Bean
   public MechaverseStorageService getStorageService() {
-    ClientRequestFactory clientFactory = new ClientRequestFactory(URI.create(storageServiceUrl));
-    return clientFactory.createProxy(MechaverseStorageService.class);
+    return JAXRSClientFactory.create(storageServiceUrl, MechaverseStorageService.class,
+        ImmutableList.of(new JacksonJaxbJsonProvider()));
   }
 
   @Bean

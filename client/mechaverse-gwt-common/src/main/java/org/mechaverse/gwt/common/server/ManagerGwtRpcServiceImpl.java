@@ -1,14 +1,15 @@
 package org.mechaverse.gwt.common.server;
 
-import java.net.URI;
 import java.util.List;
 
-import org.jboss.resteasy.client.ClientRequestFactory;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
+import org.codehaus.jackson.jaxrs.JacksonJaxbJsonProvider;
 import org.mechaverse.gwt.common.shared.ManagerGwtRpcService;
 import org.mechaverse.service.manager.api.MechaverseManager;
 import org.mechaverse.service.manager.api.model.SimulationConfig;
 import org.mechaverse.service.manager.api.model.SimulationInfo;
 
+import com.google.common.collect.ImmutableList;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
@@ -21,9 +22,9 @@ public class ManagerGwtRpcServiceImpl extends RemoteServiceServlet implements Ma
   private static final long serialVersionUID = -1273742074908104295L;
 
   // TODO(thorntonv): Inject this service.
-  private final MechaverseManager manager = new ClientRequestFactory(URI.create(
-      "http://localhost:8080/mechaverse-manager"))
-        .createProxy(MechaverseManager.class);
+  private final MechaverseManager manager = JAXRSClientFactory.create(
+      "http://localhost:8080/mechaverse-manager", MechaverseManager.class,
+      ImmutableList.of(new JacksonJaxbJsonProvider()));
 
   @Override
   public List<SimulationInfo> getSimulationInfo() throws Exception {

@@ -57,7 +57,7 @@ public class MechaverseClient {
       }
 
       executorService.shutdown();
-      while(executorService.awaitTermination(10, TimeUnit.SECONDS)) {}
+      while(!executorService.awaitTermination(10, TimeUnit.SECONDS)) {}
     }
   }
 

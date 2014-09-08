@@ -13,6 +13,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.mechaverse.common</groupId>
+      <artifactId>mechaverse-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>  
+    <dependency>
       <groupId>org.mechaverse.client</groupId>
       <artifactId>mechaverse-client-common</artifactId>
       <version>${project.version}</version>

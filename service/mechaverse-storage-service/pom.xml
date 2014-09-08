@@ -70,7 +70,7 @@
   </dependencies>
 
   <build>
-    <finalName>mechaverse-ant-simulation-service</finalName> 
+    <finalName>mechaverse-storage-service</finalName> 
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
