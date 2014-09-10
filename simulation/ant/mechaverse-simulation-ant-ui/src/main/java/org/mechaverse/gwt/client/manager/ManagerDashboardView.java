@@ -118,11 +118,12 @@ public class ManagerDashboardView extends Composite {
         }
       }
     });
-    layoutView.addActionButton(refreshButton);
 
     layoutView.setNavWidget(BasicNavMenu.newBuilder(placeHistoryMapper)
-        .addLink("Dashboard", new ManagerDashboardPlace())
+        .addLink(ManagerDashboardPlace.NAME, new ManagerDashboardPlace())
         .build());
+
+    layoutView.addActionButton(refreshButton);
 
     initSimulationTable();
   }
@@ -154,7 +155,6 @@ public class ManagerDashboardView extends Composite {
     simulationInfoTable.addColumn(deleteColumn);
 
     simulationInfoTable.setEmptyTableWidget(new Label("No simulations"));
-    simulationInfoTable.setWidth("100%");
 
     deleteColumn.setFieldUpdater(new FieldUpdater<SimulationInfo, String>() {
       @Override

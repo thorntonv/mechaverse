@@ -1,6 +1,7 @@
 package org.mechaverse.gwt.client.manager;
 
 import org.mechaverse.gwt.client.environment.SimulationView;
+import org.mechaverse.gwt.common.client.webconsole.NotificationBar;
 import org.mechaverse.gwt.common.client.webconsole.WebConsoleLayoutView;
 
 import com.google.gwt.place.shared.PlaceController;
@@ -14,4 +15,5 @@ public interface ManagerClientFactory {
   SimulationInfoView getSimulationInfoView();
   SimulationView getSimulationView();
   WebConsoleLayoutView getLayoutView();
+  NotificationBar getNotificationBar();
 }

@@ -2,7 +2,9 @@ package org.mechaverse.gwt.client.manager;
 
 import java.util.ArrayList;
 
+import org.mechaverse.gwt.client.manager.ManagerDashboardPresenter.ManagerDashboardPlace;
 import org.mechaverse.gwt.common.client.webconsole.ActionButton;
+import org.mechaverse.gwt.common.client.webconsole.BasicNavMenu;
 import org.mechaverse.gwt.common.client.webconsole.RefreshButton;
 import org.mechaverse.gwt.common.client.webconsole.WebConsoleLayoutView;
 import org.mechaverse.gwt.common.client.webconsole.WebConsoleResourceBundle.TableResources;
@@ -14,6 +16,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.BrowserEvents;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.place.shared.PlaceHistoryMapper;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -89,7 +92,8 @@ public class SimulationInfoView extends Composite {
 
   private Observer observer;
 
-  public SimulationInfoView(WebConsoleLayoutView layoutView) {
+  public SimulationInfoView(
+      WebConsoleLayoutView layoutView, PlaceHistoryMapper placeHistoryMapper) {
     initWidget(uiBinder.createAndBindUi(this));
 
     dataProvider.addDataDisplay(instanceTable);
@@ -124,6 +128,10 @@ public class SimulationInfoView extends Composite {
         }
       }
     });
+
+    layoutView.setNavWidget(BasicNavMenu.newBuilder(placeHistoryMapper)
+      .addLink(ManagerDashboardPlace.NAME, new ManagerDashboardPlace())
+      .build());
 
     layoutView.addActionButton(saveConfigButton);
     layoutView.addActionButton(refreshButton);

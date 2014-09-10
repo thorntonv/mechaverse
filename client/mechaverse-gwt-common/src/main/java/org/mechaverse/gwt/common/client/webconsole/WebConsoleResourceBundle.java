@@ -23,6 +23,8 @@ public interface WebConsoleResourceBundle extends ClientBundle {
 
     String actionButton();
     String menuLink();
+    String notificationNoticeText();
+    String notificationErrorText();
   }
 
   public interface TableResources extends CellTable.Resources {

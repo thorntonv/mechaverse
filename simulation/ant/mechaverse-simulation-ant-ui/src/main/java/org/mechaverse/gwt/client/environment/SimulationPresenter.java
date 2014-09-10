@@ -1,5 +1,7 @@
 package org.mechaverse.gwt.client.environment;
 
+import org.mechaverse.gwt.client.manager.ManagerClientFactory;
+import org.mechaverse.gwt.common.client.webconsole.NotificationBar;
 import org.mechaverse.gwt.shared.MechaverseGwtRpcServiceAsync;
 import org.mechaverse.simulation.ant.api.model.SimulationModel;
 import org.mechaverse.simulation.api.SimulationStateKey;
@@ -62,15 +64,20 @@ public class SimulationPresenter extends AbstractActivity {
       service.step(new AsyncCallback<Void>() {
         @Override
         public void onFailure(Throwable ex) {
-          Window.alert(ex.getMessage());
+          notificationBar.showError("Step failed: " + ex.getMessage());
+          ex.printStackTrace();
           cancel();
         }
 
         @Override
-        public void onSuccess(Void arg0) {
+        public void onSuccess(Void result) {
           service.getModel(new AsyncCallback<SimulationModel>() {
             @Override
-            public void onFailure(Throwable ex) {}
+            public void onFailure(Throwable ex) {
+              notificationBar.showError("Get model failed: " + ex.getMessage());
+              cancel();
+              ex.printStackTrace();
+            }
 
             @Override
             public void onSuccess(SimulationModel state) {
@@ -86,23 +93,15 @@ public class SimulationPresenter extends AbstractActivity {
       MechaverseGwtRpcServiceAsync.Util.getInstance();
 
   private UpdateTimer updateTimer = new UpdateTimer();
+  private final NotificationBar notificationBar;
   private SimulationView view;
 
-  public SimulationPresenter(SimulationStateKey simulationStateKey, SimulationView view) {
-    this.view = view;
+  public SimulationPresenter(SimulationStateKey simulationStateKey,
+      ManagerClientFactory clientFactory) {
+    this.notificationBar = clientFactory.getNotificationBar();
+    this.view = clientFactory.getSimulationView();
 
-    service.loadState(simulationStateKey.getSimulationId(), simulationStateKey.getInstanceId(),
-        simulationStateKey.getIteration(), new AsyncCallback<SimulationModel>() {
-          @Override
-          public void onFailure(Throwable ex) {}
-
-          @Override
-          public void onSuccess(SimulationModel model) {
-            setState(model);
-            addScrollHandler();
-            updateTimer.scheduleRepeating(UPDATE_INTERVAL);
-          }
-        });
+    loadState(simulationStateKey);
   }
 
   @Override
@@ -116,6 +115,25 @@ public class SimulationPresenter extends AbstractActivity {
 
   public SimulationView getView() {
     return view;
+  }
+
+  private void loadState(SimulationStateKey simulationStateKey) {
+    notificationBar.showLoading();
+    service.loadState(simulationStateKey.getSimulationId(), simulationStateKey.getInstanceId(),
+        simulationStateKey.getIteration(), new AsyncCallback<SimulationModel>() {
+          @Override
+          public void onFailure(Throwable ex) {
+            notificationBar.showError(ex.getMessage());
+          }
+
+          @Override
+          public void onSuccess(SimulationModel model) {
+            notificationBar.hide();
+            setState(model);
+            addScrollHandler();
+            updateTimer.scheduleRepeating(UPDATE_INTERVAL);
+          }
+        });
   }
 
   private void addScrollHandler() {

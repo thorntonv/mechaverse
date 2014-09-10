@@ -1,0 +1,27 @@
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder' xmlns:g='urn:import:com.google.gwt.user.client.ui'
+  xmlns:cell='urn:import:com.google.gwt.user.cellview.client' xmlns:manager='urn:import:org.mechaverse.gwt.client.manager'>
+
+  <ui:style>
+  .rootPanel {
+    overflow: hidden;
+    position: absolute !important;
+    left: 0;
+    right: 0;
+    top: 48px;
+    padding: 0px;
+    z-order: 10000;
+  }
+  .notificationBar {
+    position: relative;
+    left: 50%;
+    float: left;
+    overflow: visible !important;
+  }
+  </ui:style>
+
+  <g:AbsolutePanel addStyleNames="{style.rootPanel}">
+    <g:AbsolutePanel addStyleNames="{style.notificationBar}">
+      <g:Label ui:field="label" />
+    </g:AbsolutePanel>
+  </g:AbsolutePanel>
+</ui:UiBinder>
