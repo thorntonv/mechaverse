@@ -7,12 +7,14 @@ import org.mechaverse.simulation.ant.api.model.SimulationModel;
 import org.mechaverse.simulation.api.SimulationStateKey;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.event.dom.client.ScrollEvent;
+import com.google.gwt.event.dom.client.ScrollHandler;
+import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.Window.ScrollEvent;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 
@@ -95,13 +97,28 @@ public class SimulationPresenter extends AbstractActivity {
   private UpdateTimer updateTimer = new UpdateTimer();
   private final NotificationBar notificationBar;
   private SimulationView view;
+  private HandlerRegistration scrollHandler;
 
-  public SimulationPresenter(SimulationStateKey simulationStateKey,
+  public SimulationPresenter(final SimulationStateKey simulationStateKey,
       ManagerClientFactory clientFactory) {
     this.notificationBar = clientFactory.getNotificationBar();
     this.view = clientFactory.getSimulationView();
 
-    loadState(simulationStateKey);
+    view.addAttachHandler(new AttachEvent.Handler() {
+      @Override
+      public void onAttachOrDetach(AttachEvent event) {
+        if (event.isAttached()) {
+          loadState(simulationStateKey);
+          addScrollHandler();
+        } else {
+          if (scrollHandler != null) {
+            scrollHandler.removeHandler();
+            scrollHandler = null;
+          }
+          updateTimer.cancel();
+        }
+      }
+    });
   }
 
   @Override
@@ -130,16 +147,18 @@ public class SimulationPresenter extends AbstractActivity {
           public void onSuccess(SimulationModel model) {
             notificationBar.hide();
             setState(model);
-            addScrollHandler();
             updateTimer.scheduleRepeating(UPDATE_INTERVAL);
           }
         });
   }
 
   private void addScrollHandler() {
-    Window.addWindowScrollHandler(new Window.ScrollHandler() {
+    if (scrollHandler != null) {
+      scrollHandler.removeHandler();
+    }
+    scrollHandler = view.addScrollHandler(new ScrollHandler() {
       @Override
-      public void onWindowScroll(ScrollEvent arg0) {
+      public void onScroll(ScrollEvent event) {
         updateTimer.cancel();
         updateTimer.scheduleRepeating(UPDATE_INTERVAL);
       }
