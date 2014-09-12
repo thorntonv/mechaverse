@@ -26,7 +26,7 @@ public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
   private final SimulationService service = new AntSimulationServiceImpl();
 
   private final MechaverseStorageService storageService = JAXRSClientFactory.create(
-    "http://localhost:8080/mechaverse-storage-service", MechaverseStorageService.class,
+    "http://mechaverse.org:8080/mechaverse-storage-service", MechaverseStorageService.class,
         ImmutableList.of(new JacksonJaxbJsonProvider()));
 
   @Override

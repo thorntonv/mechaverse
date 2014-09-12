@@ -23,7 +23,7 @@ public class ManagerGwtRpcServiceImpl extends RemoteServiceServlet implements Ma
 
   // TODO(thorntonv): Inject this service.
   private final MechaverseManager manager = JAXRSClientFactory.create(
-      "http://localhost:8080/mechaverse-manager", MechaverseManager.class,
+      "http://mechaverse.org:8080/mechaverse-manager", MechaverseManager.class,
       ImmutableList.of(new JacksonJaxbJsonProvider()));
 
   @Override

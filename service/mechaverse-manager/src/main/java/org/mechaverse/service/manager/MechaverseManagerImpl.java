@@ -2,6 +2,7 @@ package org.mechaverse.service.manager;
 
 import java.io.InputStream;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -11,7 +12,7 @@ import javax.annotation.Resource;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Expression;
+import org.hibernate.criterion.Restrictions;
 import org.mechaverse.service.manager.api.MechaverseManager;
 import org.mechaverse.service.manager.api.model.InstanceInfo;
 import org.mechaverse.service.manager.api.model.SimulationConfig;
@@ -144,7 +145,7 @@ public class MechaverseManagerImpl implements MechaverseManager {
     Session session = sessionFactory.getCurrentSession();
 
     Criteria criteria = session.createCriteria(SimulationInfo.class);
-    criteria.add(Expression.eq("simulationId", simulationId));
+    criteria.add(Restrictions.eq("simulationId", simulationId));
     SimulationInfo simulationInfo = (SimulationInfo) criteria.uniqueResult();
 
     return simulationInfo;
@@ -230,6 +231,13 @@ public class MechaverseManagerImpl implements MechaverseManager {
 
   private Task createTask(
       SimulationInfo simulationInfo, InstanceInfo instanceInfo, String clientId) {
+    // Remove inactive tasks.
+    for (Task task : getInactiveTasks(instanceInfo,
+        simulationInfo.getConfig().getTaskMaxDurationInSeconds())) {
+      sessionFactory.getCurrentSession().delete(task);
+      instanceInfo.getExecutingTasks().remove(task);
+    }
+
     Task task = new Task();
     task.setSimulationId(simulationInfo.getSimulationId());
     task.setInstanceId(instanceInfo.getInstanceId());
@@ -251,5 +259,15 @@ public class MechaverseManagerImpl implements MechaverseManager {
     sessionFactory.getCurrentSession().save(instanceInfo);
 
     return task;
+  }
+
+  private List<Task> getInactiveTasks(InstanceInfo instanceInfo, long taskMaxDurationSeconds) {
+    List<Task> inactiveTasks = new ArrayList<>();
+    for (Task task : instanceInfo.getExecutingTasks()) {
+      if (!isActive(task, taskMaxDurationSeconds)) {
+        inactiveTasks.add(task);
+      }
+    }
+    return inactiveTasks;
   }
 }
