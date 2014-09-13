@@ -24,12 +24,12 @@
       <enumeration value="NONE" />
       <enumeration value="ANT" />
       <enumeration value="BARRIER" />
+      <enumeration value="ROCK" />
       <enumeration value="CONDUIT" />
       <enumeration value="DIRT" />
       <enumeration value="FOOD" />
       <enumeration value="NEST" />
       <enumeration value="PHEROMONE" />
-      <enumeration value="ROCK" />
     </restriction>
   </simpleType>
 
