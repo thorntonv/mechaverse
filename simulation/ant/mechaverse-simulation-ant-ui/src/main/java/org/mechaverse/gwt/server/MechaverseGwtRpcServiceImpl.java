@@ -47,15 +47,10 @@ public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
 
   @Override
   public SimulationModel getModel() throws Exception {
-    try {
-      SimulationService service = getSimulationService();
-      synchronized (service) {
-        byte[] modelData = service.getStateValue(0, AntSimulationState.MODEL_KEY);
-        return AntSimulationState.deserializeModel(modelData);
-      }
-    } catch (Throwable ex) {
-      ex.printStackTrace();
-      throw ex;
+    SimulationService service = getSimulationService();
+    synchronized (service) {
+      byte[] modelData = service.getStateValue(0, AntSimulationState.MODEL_KEY);
+      return AntSimulationState.deserializeModel(modelData);
     }
   }
 

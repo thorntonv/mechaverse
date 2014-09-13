@@ -8,6 +8,7 @@ import org.mechaverse.gwt.common.client.webconsole.BasicNavMenu;
 import org.mechaverse.gwt.common.client.webconsole.RefreshButton;
 import org.mechaverse.gwt.common.client.webconsole.WebConsoleLayoutView;
 import org.mechaverse.gwt.common.client.webconsole.WebConsoleResourceBundle.TableResources;
+import org.mechaverse.service.manager.api.MechaverseManagerUtil;
 import org.mechaverse.service.manager.api.model.InstanceInfo;
 import org.mechaverse.service.manager.api.model.SimulationInfo;
 
@@ -75,7 +76,9 @@ public class ManagerDashboardView extends Composite {
     public String getValue(SimulationInfo simulationInfo) {
       int taskCount = 0;
       for (InstanceInfo instanceInfo : simulationInfo.getInstances()) {
-        taskCount += instanceInfo.getExecutingTasks().size();
+        long taskMaxDurationSeconds = simulationInfo.getConfig().getTaskMaxDurationInSeconds();
+        taskCount += MechaverseManagerUtil.getActiveTasks(
+          instanceInfo.getExecutingTasks(), taskMaxDurationSeconds).size();
       }
       return String.valueOf(taskCount);
     }

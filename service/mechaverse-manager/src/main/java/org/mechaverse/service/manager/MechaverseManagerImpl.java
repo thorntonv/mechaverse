@@ -1,8 +1,10 @@
 package org.mechaverse.service.manager;
 
+import static org.mechaverse.service.manager.api.MechaverseManagerUtil.getInactiveTasks;
+import static org.mechaverse.service.manager.api.MechaverseManagerUtil.hasActiveTask;
+
 import java.io.InputStream;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -57,7 +59,7 @@ public class MechaverseManagerImpl implements MechaverseManager {
     for (SimulationInfo simulationInfo : activeSimulationInfoList) {
       long taskMaxDurationSeconds = simulationInfo.getConfig().getTaskMaxDurationInSeconds();
       for (InstanceInfo instanceInfo : simulationInfo.getInstances()) {
-        if (!hasActiveTask(instanceInfo, taskMaxDurationSeconds)
+        if (!hasActiveTask(instanceInfo.getExecutingTasks(), taskMaxDurationSeconds)
             && clientId.equalsIgnoreCase(instanceInfo.getPreferredClientId())) {
           return createTask(simulationInfo, instanceInfo, clientId);
         }
@@ -68,7 +70,7 @@ public class MechaverseManagerImpl implements MechaverseManager {
     for (SimulationInfo simulationInfo : activeSimulationInfoList) {
       long taskMaxDurationSeconds = simulationInfo.getConfig().getTaskMaxDurationInSeconds();
       for (InstanceInfo instanceInfo : simulationInfo.getInstances()) {
-        if (!hasActiveTask(instanceInfo, taskMaxDurationSeconds)) {
+        if (!hasActiveTask(instanceInfo.getExecutingTasks(), taskMaxDurationSeconds)) {
           return createTask(simulationInfo, instanceInfo, clientId);
         }
       }
@@ -203,21 +205,6 @@ public class MechaverseManagerImpl implements MechaverseManager {
     storageService.deleteSimulation(simulationId);
   }
 
-  private boolean hasActiveTask(InstanceInfo instanceInfo, long taskMaxDurationSeconds) {
-    for (Task task : instanceInfo.getExecutingTasks()) {
-      if (isActive(task, taskMaxDurationSeconds)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  private boolean isActive(Task task, long taskMaxDurationSeconds) {
-    long taskMaxDurationMS = taskMaxDurationSeconds * 1000;
-    long now = new Date().getTime();
-    return (now - task.getStartTime().getTime() < taskMaxDurationMS);
-  }
-
   private InstanceInfo createInstance(SimulationInfo simulationInfo) {
     InstanceInfo instanceInfo = new InstanceInfo();
     instanceInfo.setInstanceId(UUID.randomUUID().toString());
@@ -232,7 +219,7 @@ public class MechaverseManagerImpl implements MechaverseManager {
   private Task createTask(
       SimulationInfo simulationInfo, InstanceInfo instanceInfo, String clientId) {
     // Remove inactive tasks.
-    for (Task task : getInactiveTasks(instanceInfo,
+    for (Task task : getInactiveTasks(instanceInfo.getExecutingTasks(),
         simulationInfo.getConfig().getTaskMaxDurationInSeconds())) {
       sessionFactory.getCurrentSession().delete(task);
       instanceInfo.getExecutingTasks().remove(task);
@@ -259,15 +246,5 @@ public class MechaverseManagerImpl implements MechaverseManager {
     sessionFactory.getCurrentSession().save(instanceInfo);
 
     return task;
-  }
-
-  private List<Task> getInactiveTasks(InstanceInfo instanceInfo, long taskMaxDurationSeconds) {
-    List<Task> inactiveTasks = new ArrayList<>();
-    for (Task task : instanceInfo.getExecutingTasks()) {
-      if (!isActive(task, taskMaxDurationSeconds)) {
-        inactiveTasks.add(task);
-      }
-    }
-    return inactiveTasks;
   }
 }

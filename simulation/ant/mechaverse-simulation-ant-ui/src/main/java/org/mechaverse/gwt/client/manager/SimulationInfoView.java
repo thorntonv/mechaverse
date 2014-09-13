@@ -8,6 +8,7 @@ import org.mechaverse.gwt.common.client.webconsole.BasicNavMenu;
 import org.mechaverse.gwt.common.client.webconsole.RefreshButton;
 import org.mechaverse.gwt.common.client.webconsole.WebConsoleLayoutView;
 import org.mechaverse.gwt.common.client.webconsole.WebConsoleResourceBundle.TableResources;
+import org.mechaverse.service.manager.api.MechaverseManagerUtil;
 import org.mechaverse.service.manager.api.model.InstanceInfo;
 import org.mechaverse.service.manager.api.model.SimulationConfig;
 import org.mechaverse.service.manager.api.model.SimulationInfo;
@@ -66,7 +67,9 @@ public class SimulationInfoView extends Composite {
   private final TextColumn<InstanceInfo> taskCountColumn = new TextColumn<InstanceInfo>() {
     @Override
     public String getValue(InstanceInfo instanceInfo) {
-      return String.valueOf(instanceInfo.getExecutingTasks().size());
+      long taskMaxDurationSeconds = simulationInfo.getConfig().getTaskMaxDurationInSeconds();
+      return String.valueOf(MechaverseManagerUtil.getActiveTasks(
+          instanceInfo.getExecutingTasks(), taskMaxDurationSeconds).size());
     }
   };
 
@@ -77,8 +80,7 @@ public class SimulationInfoView extends Composite {
     }
   };
 
-  @UiField
-  Label simulationIdLabel;
+  @UiField Label simulationIdLabel;
 
   @UiField(provided = true)
   CellTable<InstanceInfo> instanceTable = new CellTable<InstanceInfo>(DEFAULT_PAGE_SIZE,
@@ -89,6 +91,8 @@ public class SimulationInfoView extends Composite {
 
   private final ListDataProvider<InstanceInfo> dataProvider = new ListDataProvider<>();
   private final Button saveConfigButton = new ActionButton("SAVE");
+
+  private SimulationInfo simulationInfo;
 
   private Observer observer;
 
@@ -142,6 +146,8 @@ public class SimulationInfoView extends Composite {
   }
 
   public void setSimulationInfo(SimulationInfo simulationInfo) {
+    this.simulationInfo = simulationInfo;
+
     simulationIdLabel.setText("Simulation " + simulationInfo.getSimulationId());
     dataProvider.setList(new ArrayList<>(simulationInfo.getInstances()));
     editConfigView.setSimulationConfig(simulationInfo.getConfig());
