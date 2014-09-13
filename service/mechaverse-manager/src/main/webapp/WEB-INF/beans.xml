@@ -35,7 +35,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
       <bean class="org.mechaverse.service.manager.MechaverseManagerImpl" />
     </jaxrs:serviceBeans>
     <jaxrs:providers>
-      <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />
+      <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider" />
     </jaxrs:providers>
   </jaxrs:server>
 

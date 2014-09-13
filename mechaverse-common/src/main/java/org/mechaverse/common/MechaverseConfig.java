@@ -1,7 +1,6 @@
 package org.mechaverse.common;
 
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
-import org.codehaus.jackson.jaxrs.JacksonJaxbJsonProvider;
 import org.mechaverse.service.manager.api.MechaverseManager;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
 import org.mechaverse.simulation.api.SimulationService;
@@ -13,6 +12,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.google.common.collect.ImmutableList;
 
 /**

@@ -3,12 +3,12 @@ package org.mechaverse.gwt.common.server;
 import java.util.List;
 
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
-import org.codehaus.jackson.jaxrs.JacksonJaxbJsonProvider;
 import org.mechaverse.gwt.common.shared.ManagerGwtRpcService;
 import org.mechaverse.service.manager.api.MechaverseManager;
 import org.mechaverse.service.manager.api.model.SimulationConfig;
 import org.mechaverse.service.manager.api.model.SimulationInfo;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.google.common.collect.ImmutableList;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
