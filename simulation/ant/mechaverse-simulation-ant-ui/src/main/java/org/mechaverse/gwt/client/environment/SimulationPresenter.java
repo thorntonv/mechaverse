@@ -61,14 +61,31 @@ public class SimulationPresenter extends AbstractActivity {
   private static final int UPDATE_INTERVAL = 1000;
 
   protected class UpdateTimer extends Timer {
+
+    private boolean inProgress = false;
+    private boolean readyForUpdate = false;
+
     @Override
     public void run() {
+      if(!view.isAttached()) {
+        return;
+      }
+
+      if (inProgress) {
+        readyForUpdate = true;
+        return;
+      }
+
+      inProgress = true;
+      readyForUpdate = false;
+      schedule(UPDATE_INTERVAL);
+
       service.step(new AsyncCallback<Void>() {
         @Override
         public void onFailure(Throwable ex) {
-          notificationBar.showError("Step failed: " + ex.getMessage());
-          ex.printStackTrace();
-          cancel();
+          notificationBar.showError("Step failed: " + ex.getClass().getName() + ": "
+              + ex.getMessage());
+          finishUpdate();
         }
 
         @Override
@@ -76,25 +93,39 @@ public class SimulationPresenter extends AbstractActivity {
           service.getModel(new AsyncCallback<SimulationModel>() {
             @Override
             public void onFailure(Throwable ex) {
-              notificationBar.showError("Get model failed: " + ex.getMessage());
-              cancel();
-              ex.printStackTrace();
+              notificationBar.showError("Get model failed: " + ex.getClass().getName() + ": "
+                  + ex.getMessage());
+              finishUpdate();
             }
 
             @Override
             public void onSuccess(SimulationModel state) {
               setState(state);
+              finishUpdate();
             }
           });
         }
       });
+    }
+
+    @Override
+    public void cancel() {
+      super.cancel();
+      readyForUpdate = false;
+    }
+
+    private void finishUpdate() {
+      inProgress = false;
+      if (readyForUpdate) {
+        schedule(0);
+      }
     }
   };
 
   private final MechaverseGwtRpcServiceAsync service =
       MechaverseGwtRpcServiceAsync.Util.getInstance();
 
-  private UpdateTimer updateTimer = new UpdateTimer();
+  private final UpdateTimer updateTimer = new UpdateTimer();
   private final NotificationBar notificationBar;
   private SimulationView view;
   private HandlerRegistration scrollHandler;
@@ -111,11 +142,11 @@ public class SimulationPresenter extends AbstractActivity {
           loadState(simulationStateKey);
           addScrollHandler();
         } else {
+          updateTimer.cancel();
           if (scrollHandler != null) {
             scrollHandler.removeHandler();
             scrollHandler = null;
           }
-          updateTimer.cancel();
         }
       }
     });
@@ -146,8 +177,8 @@ public class SimulationPresenter extends AbstractActivity {
           @Override
           public void onSuccess(SimulationModel model) {
             notificationBar.hide();
+            updateTimer.schedule(UPDATE_INTERVAL);
             setState(model);
-            updateTimer.scheduleRepeating(UPDATE_INTERVAL);
           }
         });
   }
@@ -160,7 +191,7 @@ public class SimulationPresenter extends AbstractActivity {
       @Override
       public void onScroll(ScrollEvent event) {
         updateTimer.cancel();
-        updateTimer.scheduleRepeating(UPDATE_INTERVAL);
+        updateTimer.schedule(UPDATE_INTERVAL);
       }
     });
   }
