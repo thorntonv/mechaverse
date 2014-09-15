@@ -67,7 +67,8 @@ public class Cell {
   }
 
   public Entity removeEntity(Entity entity) {
-    return removeEntity(EntityUtil.getType(entity));
+    EntityType type = EntityUtil.getType(entity);
+    return entities[type.ordinal()] == entity ? removeEntity(type) : null;
   }
 
   public Entity removeEntity(EntityType type) {

@@ -13,11 +13,17 @@ import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Environment;
 import org.mechaverse.simulation.ant.api.model.SimulationModel;
 import org.mechaverse.simulation.common.cellautomata.EnvironmentGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.annotations.VisibleForTesting;
 
 public final class AntSimulationImpl {
 
   private static final int DEFAULT_ENVIRONMENT_WIDTH = 200;
   private static final int DEFAULT_ENVIRONMENT_HEIGHT = 200;
+
+  private static final Logger logger = LoggerFactory.getLogger(AntSimulationServiceImpl.class);
 
   private AntSimulationState state;
   private final List<EnvironmentSimulator> environmentSimulations = new ArrayList<>();
@@ -36,6 +42,7 @@ public final class AntSimulationImpl {
     state.getModel().setEnvironment(environmentGenerator
         .generate(DEFAULT_ENVIRONMENT_WIDTH, DEFAULT_ENVIRONMENT_HEIGHT, random)
         .getEnvironment());
+    state.getModel().setSeed(String.valueOf(random.nextLong()));
     return state;
   }
 
@@ -66,27 +73,38 @@ public final class AntSimulationImpl {
     for (Environment environment : SimulationModelUtil.getEnvironments(simulationModel)) {
       environmentSimulations.add(new EnvironmentSimulator(environment, activeEntityProvider));
     }
-
-    long seed = new SecureRandom().nextLong();
-    if (simulationModel.getSeed() != null) {
-      seed = Long.valueOf(simulationModel.getSeed());
-    } else {
-      simulationModel.setSeed(String.valueOf(seed));
-    }
-    random.setSeed(seed);
   }
 
   public void step() {
     SimulationModel simulationModel = state.getModel();
+
+    if (logger.isDebugEnabled()) {
+      logger.debug("Performing iteration {}", simulationModel.getIteration());
+    }
+
+    if (simulationModel.getSeed() == null) {
+      simulationModel.setSeed(String.valueOf(new SecureRandom().nextLong()));
+    }
+
+    random.setSeed(Long.valueOf(simulationModel.getSeed()));
+    
+    if (logger.isDebugEnabled()) {
+      logger.debug("seed = {}", simulationModel.getSeed());
+    }
+
     for (EnvironmentSimulator environmentSimulation : environmentSimulations) {
-      environmentSimulation.update(random);
+      environmentSimulation.update(state, random);
     }
 
     // Set the seed to be used for the next step.
-    long seed = random.nextLong();
-    random.setSeed(seed);
-    simulationModel.setSeed(String.valueOf(seed));
-
+    simulationModel.setSeed(String.valueOf(random.nextLong()));
     simulationModel.setIteration(simulationModel.getIteration()+1);
+  }
+
+  @VisibleForTesting
+  void addObserver(EntityManager.Observer observer) {
+    for (EnvironmentSimulator environmentSimulator : environmentSimulations) {
+      environmentSimulator.addObserver(observer);
+    }
   }
 }

@@ -4,9 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -65,22 +62,21 @@ public class AntSimulationState extends SimulationState<SimulationModel> {
   }
 
   private byte[] serializeModel() throws IOException {
-    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-    try (OutputStream out = new GZIPOutputStream(byteOut)) {
+    try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
       JAXBContext jaxbContext = JAXBContext.newInstance(SimulationModel.class);
       Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
       jaxbMarshaller.marshal(model, out);
+      return out.toByteArray();
     } catch (JAXBException e) {
       throw new IOException(e);
     }
-    return byteOut.toByteArray();
   }
 
   public static SimulationModel deserializeModel(byte[] data) throws IOException {
     if (data == null) {
       return new SimulationModel();
     }
-    try (InputStream in = new GZIPInputStream(new ByteArrayInputStream(data))) {
+    try (InputStream in = new ByteArrayInputStream(data)) {
       JAXBContext jaxbContext = JAXBContext.newInstance(SimulationModel.class);
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
       return (SimulationModel) jaxbUnmarshaller.unmarshal(in);

@@ -5,7 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -15,7 +15,7 @@ import java.util.Set;
  */
 public final class SimulationDataStore {
 
-  private final Map<String, byte[]> dataStore = new HashMap<>();
+  private final Map<String, byte[]> dataStore = new LinkedHashMap<>();
 
   public static void deserialize(byte[] data, Map<String, byte[]> targetMap) throws IOException {
     DataInputStream in = new DataInputStream(new ByteArrayInputStream(data));

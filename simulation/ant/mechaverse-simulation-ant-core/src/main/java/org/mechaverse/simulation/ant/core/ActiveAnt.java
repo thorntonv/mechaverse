@@ -157,7 +157,10 @@ public final class ActiveAnt implements ActiveEntity {
       // Attempt to drop the carried entity.
       if (entity.getCarriedEntity() != null) {
         if (!drop(cell)) {
-          drop(frontCell);
+          if (!drop(frontCell)) {
+            // Unable to drop the carried entity. Remove the entity occupying the cell and drop.
+            entityManager.removeEntity(entity.getCarriedEntity());
+          }
         }
       }
       return;
@@ -291,6 +294,11 @@ public final class ActiveAnt implements ActiveEntity {
     pheromone.setValue(type);
     pheromone.setMaxEnergy(pheromoneInitialEnergy);
     pheromone.setEnergy(pheromoneInitialEnergy);
+
+    Entity existingPheromone = cell.getEntity(EntityType.PHEROMONE);
+    if (existingPheromone != null) {
+      entityManager.removeEntity(existingPheromone);
+    }
     cell.setEntity(pheromone, EntityType.PHEROMONE);
     entityManager.addEntity(pheromone);
   }

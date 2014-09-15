@@ -1,19 +1,20 @@
 package org.mechaverse.simulation.ant.core;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.util.Pair;
+import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Nest;
 import org.mechaverse.simulation.common.genetic.CutAndSplitCrossoverGeneticRecombinator;
-
-import com.google.common.collect.Sets;
 
 /**
  * An environment simulation module that maintains a target ant population size.
@@ -62,14 +63,14 @@ public class AntReproductionModule implements EnvironmentSimulationModule {
   private final int targetAntCount = 500;
   private final int initialAntEnergy = 1000;
 
-  private final Set<Ant> ants = Sets.newIdentityHashSet();
+  private final Set<Ant> ants = new LinkedHashSet<>();
   private Nest nest;
   private final CutAndSplitCrossoverGeneticRecombinator geneticRecombinator =
       new CutAndSplitCrossoverGeneticRecombinator();
   private final AntFitnessCalculator fitnessCalculator = new SimpleAntFitnessCalculator();
 
   @Override
-  public void update(CellEnvironment env, EntityManager entityManager, RandomGenerator random) {
+  public void update(AntSimulationState state, CellEnvironment env, EntityManager entityManager, RandomGenerator random) {
     if (ants.size() < targetAntCount && nest != null) {
       Cell cell = env.getCell(nest);
       if (cell.getEntity(EntityType.ANT) == null) {
@@ -82,6 +83,7 @@ public class AntReproductionModule implements EnvironmentSimulationModule {
 
   public Ant generateRandomAnt(RandomGenerator random) {
     Ant ant = new Ant();
+    ant.setId(new UUID(random.nextLong(), random.nextLong()).toString());
     ant.setDirection(AntSimulationUtil.randomDirection(random));
     ant.setMaxEnergy(initialAntEnergy);
     ant.setEnergy(ant.getMaxEnergy());

@@ -1,15 +1,15 @@
 package org.mechaverse.simulation.ant.core;
 
 import org.apache.commons.math3.random.RandomGenerator;
+import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Food;
-import org.mechaverse.simulation.ant.api.util.EntityUtil;
 import org.mechaverse.simulation.common.cellautomata.AbstractProbabilisticEnvironmentGenerator.EntityDistribution;
 import org.mechaverse.simulation.common.cellautomata.AbstractProbabilisticEnvironmentGenerator.ProbabilisticLocalGenerator;
-import org.mechaverse.simulation.common.cellautomata.EnvironmentGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Table;
 
@@ -49,6 +49,8 @@ public class FoodGenerator implements EnvironmentSimulationModule {
     }
   }
 
+  private static Logger logger = LoggerFactory.getLogger(FoodGenerator.class);
+
   // TODO(thorntonv): Make these values configurable.
   private int minFoodCount = 1000;
   private int foodClusterRadius = 15;
@@ -56,30 +58,22 @@ public class FoodGenerator implements EnvironmentSimulationModule {
 
   private int foodCount = 0;
 
-  private final EnvironmentGenerator<CellEnvironment, EntityType> environmentGenerator =
-      new AntSimulationEnvironmentGenerator(new Function<EntityType, Entity>() {
-        @Override
-        public Entity apply(EntityType entityType) {
-          Entity entity = EntityUtil.newEntity(entityType);
-          onAddEntity(entity);
-          return entity;
-        }
-      });
-
   private final FoodLocalGenerator foodLocalGenerator;
-
 
   public FoodGenerator() {
     this.foodLocalGenerator = FoodLocalGenerator.newInstance(1, foodClusterRadius);
   }
 
   @Override
-  public void update(CellEnvironment env, EntityManager entityManager, RandomGenerator random) {
+  public void update(AntSimulationState state, CellEnvironment env, EntityManager entityManager,
+      RandomGenerator random) {
     if (foodCount < minFoodCount) {
       int row = random.nextInt(env.getRowCount());
       int col = random.nextInt(env.getColumnCount());
 
-      environmentGenerator.apply(foodLocalGenerator, env, row, col, random);
+      logger.debug("Generating food at ({}, {})", row, col);
+      new AntSimulationEnvironmentGenerator(entityManager)
+          .apply(foodLocalGenerator, env, row, col, random);
     }
   }
 

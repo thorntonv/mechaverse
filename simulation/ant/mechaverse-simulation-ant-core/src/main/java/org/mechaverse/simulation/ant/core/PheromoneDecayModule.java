@@ -1,6 +1,7 @@
 package org.mechaverse.simulation.ant.core;
 
 import org.apache.commons.math3.random.RandomGenerator;
+import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 
@@ -11,7 +12,6 @@ import org.mechaverse.simulation.ant.api.model.EntityType;
 public class PheromoneDecayModule implements EnvironmentSimulationModule {
 
   private int decayInterval = 60 * 60;
-  private int updateCount = 0;
 
   @Override
   public void onAddEntity(Entity entity) {}
@@ -20,11 +20,11 @@ public class PheromoneDecayModule implements EnvironmentSimulationModule {
   public void onRemoveEntity(Entity entity) {}
 
   @Override
-  public void update(CellEnvironment env, EntityManager entityManager, RandomGenerator random) {
-    updateCount++;
-    if (updateCount >= decayInterval) {
+  public void update(AntSimulationState state, CellEnvironment env, EntityManager entityManager,
+      RandomGenerator random) {
+
+    if (state.getModel().getIteration() % decayInterval == 0) {
       decayPheromones(decayInterval, env, entityManager);
-      updateCount = 0;
     }
   }
 

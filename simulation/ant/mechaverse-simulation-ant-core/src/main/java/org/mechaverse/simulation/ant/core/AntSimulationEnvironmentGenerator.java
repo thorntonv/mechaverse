@@ -12,7 +12,6 @@ import org.mechaverse.simulation.ant.api.model.Nest;
 import org.mechaverse.simulation.ant.api.util.EntityUtil;
 import org.mechaverse.simulation.common.cellautomata.AbstractProbabilisticEnvironmentGenerator;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableTable;
 
@@ -23,14 +22,6 @@ import com.google.common.collect.ImmutableTable;
  */
 public class AntSimulationEnvironmentGenerator
     extends AbstractProbabilisticEnvironmentGenerator<CellEnvironment, EntityType> {
-
-  public static final Function<EntityType, Entity> DEFAULT_ENTITY_FACTORY =
-      new Function<EntityType, Entity>() {
-        @Override
-        public Entity apply(EntityType entityType) {
-          return EntityUtil.newEntity(entityType);
-        }
-      };
 
   private static final ProbabilisticLocalGenerator<EntityType> ROCK_GENERATOR =
       new ProbabilisticLocalGenerator<EntityType>(.01,
@@ -46,15 +37,16 @@ public class AntSimulationEnvironmentGenerator
               .put(2, 2, EntityDistribution.of(EntityType.ROCK, .50))
               .build());
 
-  private final Function<EntityType, Entity> entityFactory;
+  private final EntityManager entityManager;
 
   public AntSimulationEnvironmentGenerator() {
-    this(DEFAULT_ENTITY_FACTORY);
+    this(null);
   }
 
-  public AntSimulationEnvironmentGenerator(Function<EntityType, Entity> entityFactory) {
+  public AntSimulationEnvironmentGenerator(EntityManager entityManager) {
     super(ImmutableList.of(ROCK_GENERATOR));
-    this.entityFactory = entityFactory;
+
+    this.entityManager = entityManager;
   }
 
   @Override
@@ -81,7 +73,11 @@ public class AntSimulationEnvironmentGenerator
       Cell cell = env.getCell(row, column);
 
       if (cell.isEmpty()) {
-        env.addEntity(entityFactory.apply(entityType), cell);
+        Entity entity = EntityUtil.newEntity(entityType);
+        env.addEntity(entity, cell);
+        if (entityManager != null) {
+          entityManager.addEntity(entity);
+        }
       }
     }
   }
