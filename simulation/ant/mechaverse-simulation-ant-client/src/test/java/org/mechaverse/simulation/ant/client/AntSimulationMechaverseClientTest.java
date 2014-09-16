@@ -20,10 +20,8 @@ import org.mechaverse.service.storage.api.MechaverseStorageService;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.api.model.Entity;
-import org.mechaverse.simulation.ant.api.model.SimulationModel;
 import org.mechaverse.simulation.ant.core.AntSimulationServiceImpl;
 import org.mechaverse.simulation.api.SimulationService;
-import org.mechaverse.simulation.common.SimulationDataStore;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -74,11 +72,8 @@ public class AntSimulationMechaverseClientTest {
     byte[] newState = IOUtils.toByteArray(stateIn.getValue());
     assertTrue(newState.length > 0);
 
-    SimulationDataStore stateData = SimulationDataStore.deserialize(newState);
-    SimulationModel model = AntSimulationState.deserializeModel(
-        stateData.get(AntSimulationState.MODEL_KEY));
-
-    assertTrue(getAntCount(model.getEnvironment().getEntities()) > 0);
+    AntSimulationState stateData = AntSimulationState.deserialize(newState);
+    assertTrue(getAntCount(stateData.getModel().getEnvironment().getEntities()) > 0);
   }
 
   private int getAntCount(Iterable<Entity> entities) {

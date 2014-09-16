@@ -40,7 +40,7 @@ public class SimulationDataStoreTest {
     }
 
     byte[] serialized = dataStore.serialize();
-    assertEquals(1024 * 1025 / 2 + (4+2+4) * testValues.length + 4, serialized.length);
+    assertEquals(1024 * 1025 / 2 + (4 + 2 + 4) * testValues.length + 4, serialized.length);
 
     dataStore = SimulationDataStore.deserialize(serialized);
     assertEquals(testValues.length, dataStore.size());

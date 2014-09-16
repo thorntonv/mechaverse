@@ -1,5 +1,7 @@
 package org.mechaverse.simulation.common;
 
+import java.util.Set;
+
 /**
  * Represents a simulation state.
  *
@@ -36,6 +38,14 @@ public abstract class SimulationState<M> {
 
   public M getModel() {
     return model;
+  }
+
+  public Set<String> keySet() {
+    return dataStore.keySet();
+  }
+
+  public boolean containsKey(String key) {
+    return dataStore.containsKey(key);
   }
 
   public byte[] getData(String key) {

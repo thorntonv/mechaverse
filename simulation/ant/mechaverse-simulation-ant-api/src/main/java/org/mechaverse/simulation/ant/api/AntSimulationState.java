@@ -4,6 +4,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -19,7 +22,11 @@ public class AntSimulationState extends SimulationState<SimulationModel> {
   public static final String MODEL_KEY = "model";
 
   public static AntSimulationState deserialize(byte[] data) throws IOException {
-    SimulationDataStore dataStore = SimulationDataStore.deserialize(data);
+    return deserialize(new ByteArrayInputStream(data));
+  }
+
+  public static AntSimulationState deserialize(InputStream in) throws IOException {
+    SimulationDataStore dataStore = SimulationDataStore.deserialize(in);
     return new AntSimulationState(dataStore);
   }
 
@@ -28,7 +35,8 @@ public class AntSimulationState extends SimulationState<SimulationModel> {
   }
 
   public AntSimulationState(SimulationDataStore dataStore) throws IOException {
-    super(deserializeModel(dataStore.get(MODEL_KEY)));
+    super(deserializeModel(new GZIPInputStream(
+        new ByteArrayInputStream(dataStore.get(MODEL_KEY)))));
   }
 
   @Override
@@ -57,26 +65,39 @@ public class AntSimulationState extends SimulationState<SimulationModel> {
   }
 
   public byte[] serialize() throws IOException {
+    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+    serialize(byteOut);
+    return byteOut.toByteArray();
+  }
+
+  public void serialize(OutputStream out) throws IOException {
     setData(MODEL_KEY, serializeModel());
-    return dataStore.serialize();
+    dataStore.serialize(out);
   }
 
   private byte[] serializeModel() throws IOException {
-    try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+    try (OutputStream out = new GZIPOutputStream(byteOut)) {
+      serializeModel(model, out);
+    }
+    return byteOut.toByteArray();
+  }
+
+  public static void serializeModel(SimulationModel model, OutputStream out) throws IOException {
+    try {
       JAXBContext jaxbContext = JAXBContext.newInstance(SimulationModel.class);
       Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
       jaxbMarshaller.marshal(model, out);
-      return out.toByteArray();
     } catch (JAXBException e) {
       throw new IOException(e);
     }
   }
 
-  public static SimulationModel deserializeModel(byte[] data) throws IOException {
-    if (data == null) {
+  public static SimulationModel deserializeModel(InputStream in) throws IOException {
+    if (in == null) {
       return new SimulationModel();
     }
-    try (InputStream in = new ByteArrayInputStream(data)) {
+    try {
       JAXBContext jaxbContext = JAXBContext.newInstance(SimulationModel.class);
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
       return (SimulationModel) jaxbUnmarshaller.unmarshal(in);

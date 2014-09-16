@@ -1,6 +1,8 @@
 package org.mechaverse.gwt.server;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.zip.GZIPInputStream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -50,7 +52,8 @@ public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
     SimulationService service = getSimulationService();
     synchronized (service) {
       byte[] modelData = service.getStateValue(0, AntSimulationState.MODEL_KEY);
-      return AntSimulationState.deserializeModel(modelData);
+      return AntSimulationState.deserializeModel(new GZIPInputStream(
+          new ByteArrayInputStream(modelData)));
     }
   }
 

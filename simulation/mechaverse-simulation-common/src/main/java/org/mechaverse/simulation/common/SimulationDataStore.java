@@ -5,6 +5,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -17,22 +19,27 @@ public final class SimulationDataStore {
 
   private final Map<String, byte[]> dataStore = new LinkedHashMap<>();
 
-  public static void deserialize(byte[] data, Map<String, byte[]> targetMap) throws IOException {
-    DataInputStream in = new DataInputStream(new ByteArrayInputStream(data));
-
-    int size = in.readInt();
-    for (int cnt = 1; cnt <= size; cnt++) {
-      String key = in.readUTF();
-      int dataLength = in.readInt();
-      byte[] value = new byte[dataLength];
-      in.read(value);
-      targetMap.put(key, value);
+  public static void deserialize(InputStream in, Map<String, byte[]> targetMap)
+      throws IOException {
+    try (DataInputStream dataIn = new DataInputStream(in)) {
+      int size = dataIn.readInt();
+      for (int cnt = 1; cnt <= size; cnt++) {
+        String key = dataIn.readUTF();
+        int dataLength = dataIn.readInt();
+        byte[] value = new byte[dataLength];
+        in.read(value);
+        targetMap.put(key, value);
+      }
     }
   }
 
   public static SimulationDataStore deserialize(byte[] data) throws IOException {
+    return deserialize(new ByteArrayInputStream(data));
+  }
+
+  public static SimulationDataStore deserialize(InputStream in) throws IOException {
     SimulationDataStore dataStore = new SimulationDataStore();
-    deserialize(data, dataStore.dataStore);
+    deserialize(in, dataStore.dataStore);
     return dataStore;
   }
 
@@ -54,16 +61,20 @@ public final class SimulationDataStore {
 
   public byte[] serialize() throws IOException {
     ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-    DataOutputStream out = new DataOutputStream(byteOut);
-
-    out.writeInt(dataStore.size());
-    for (Entry<String, byte[]> entry : dataStore.entrySet()) {
-      out.writeUTF(entry.getKey());
-      out.writeInt(entry.getValue().length);
-      out.write(entry.getValue());
-    }
-
+    serialize(byteOut);
+    byteOut.close();
     return byteOut.toByteArray();
+  }
+
+  public void serialize(OutputStream out) throws IOException {
+    try (DataOutputStream dataOut = new DataOutputStream(out)) {
+      dataOut.writeInt(dataStore.size());
+      for (Entry<String, byte[]> entry : dataStore.entrySet()) {
+        dataOut.writeUTF(entry.getKey());
+        dataOut.writeInt(entry.getValue().length);
+        dataOut.write(entry.getValue());
+      }
+    }
   }
 
   public int size() {
