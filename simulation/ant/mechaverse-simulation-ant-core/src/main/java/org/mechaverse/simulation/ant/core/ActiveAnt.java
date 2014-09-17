@@ -1,6 +1,7 @@
 package org.mechaverse.simulation.ant.core;
 
 import org.apache.commons.math3.random.RandomGenerator;
+import org.mechaverse.simulation.ant.api.AntSimulationConfig;
 import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.api.model.Direction;
 import org.mechaverse.simulation.ant.api.model.Entity;
@@ -34,9 +35,6 @@ public final class ActiveAnt implements ActiveEntity {
 
   private static final EntityType[] CARRIABLE_ENTITY_TYPES =
       {EntityType.DIRT, EntityType.FOOD,EntityType.ROCK};
-
-  // TODO(thorntonv): Make these values configurable.
-  private final int pheromoneInitialEnergy = 2 * 60 * 60;
 
   private final Ant entity;
   private final AntBehavior behavior;
@@ -141,8 +139,8 @@ public final class ActiveAnt implements ActiveEntity {
   }
 
   @Override
-  public void performAction(
-      CellEnvironment env, EntityManager entityManager, RandomGenerator random) {
+  public void performAction(CellEnvironment env, AntSimulationConfig config,
+      EntityManager entityManager, RandomGenerator random) {
     AntOutput output = behavior.getOutput(random);
 
     Cell cell = env.getCell(entity);
@@ -200,7 +198,7 @@ public final class ActiveAnt implements ActiveEntity {
     // Leave pheromone action.
     int pheromoneType = output.shouldLeavePheromone();
     if (pheromoneType > 0) {
-      leavePheromone(cell, pheromoneType, entityManager);
+      leavePheromone(cell, pheromoneType, config, entityManager);
       return;
     }
 
@@ -289,11 +287,12 @@ public final class ActiveAnt implements ActiveEntity {
     return false;
   }
 
-  private void leavePheromone(Cell cell, int type, EntityManager entityManager) {
+  private void leavePheromone(Cell cell, int type, AntSimulationConfig config,
+      EntityManager entityManager) {
     Pheromone pheromone = new Pheromone();
     pheromone.setValue(type);
-    pheromone.setMaxEnergy(pheromoneInitialEnergy);
-    pheromone.setEnergy(pheromoneInitialEnergy);
+    pheromone.setMaxEnergy(config.getPheromoneInitialEnergy());
+    pheromone.setEnergy(config.getPheromoneInitialEnergy());
 
     Entity existingPheromone = cell.getEntity(EntityType.PHEROMONE);
     if (existingPheromone != null) {

@@ -51,15 +51,15 @@ public class EnvironmentSimulator implements EntityManager {
     for (EnvironmentSimulationModule module : modules) {
       module.update(state, environment, this, random);
     }
-    
+
     // Create a copy of the active entities because they may add or remove other entities.
     List<ActiveEntity> activeEntityList = new ArrayList<>(activeEntities.values());
-    
+
     for (ActiveEntity activeEntity : activeEntityList) {
       activeEntity.updateInput(environment, random);
     }
     for (ActiveEntity activeEntity : activeEntityList) {
-      activeEntity.performAction(environment, this, random);
+      activeEntity.performAction(environment, state.getConfig(), this, random);
     }
   }
 

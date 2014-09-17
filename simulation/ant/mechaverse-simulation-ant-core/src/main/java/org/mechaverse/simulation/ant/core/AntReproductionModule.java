@@ -59,10 +59,6 @@ public class AntReproductionModule implements EnvironmentSimulationModule {
 
   // TODO(thorntonv): Support multiple nests and nests of different types.
 
-  // TODO(thorntonv): Make these values configurable.
-  private final int targetAntCount = 500;
-  private final int initialAntEnergy = 1000;
-
   private final Set<Ant> ants = new LinkedHashSet<>();
   private Nest nest;
   private final CutAndSplitCrossoverGeneticRecombinator geneticRecombinator =
@@ -71,29 +67,29 @@ public class AntReproductionModule implements EnvironmentSimulationModule {
 
   @Override
   public void update(AntSimulationState state, CellEnvironment env, EntityManager entityManager, RandomGenerator random) {
-    if (ants.size() < targetAntCount && nest != null) {
+    if (ants.size() < state.getConfig().getTargetAntCount() && nest != null) {
       Cell cell = env.getCell(nest);
       if (cell.getEntity(EntityType.ANT) == null) {
-        Ant ant = generateRandomAnt(random);
+        Ant ant = generateRandomAnt(state, random);
         cell.setEntity(ant, EntityType.ANT);
         entityManager.addEntity(ant);
       }
     }
   }
 
-  public Ant generateRandomAnt(RandomGenerator random) {
+  public Ant generateRandomAnt(AntSimulationState state, RandomGenerator random) {
     Ant ant = new Ant();
     ant.setId(new UUID(random.nextLong(), random.nextLong()).toString());
     ant.setDirection(AntSimulationUtil.randomDirection(random));
-    ant.setMaxEnergy(initialAntEnergy);
+    ant.setMaxEnergy(state.getConfig().getAntInitialEnergy());
     ant.setEnergy(ant.getMaxEnergy());
     return ant;
   }
 
-  public Ant generateAnt(RandomGenerator random) {
+  public Ant generateAnt(AntSimulationState state, RandomGenerator random) {
     Ant ant = new Ant();
     ant.setDirection(AntSimulationUtil.randomDirection(random));
-    ant.setMaxEnergy(initialAntEnergy);
+    ant.setMaxEnergy(state.getConfig().getAntInitialEnergy());
     ant.setEnergy(ant.getMaxEnergy());
 
     EnumeratedDistribution<Ant> antFitnessDistribution =

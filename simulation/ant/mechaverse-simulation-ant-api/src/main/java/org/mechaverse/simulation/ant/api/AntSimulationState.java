@@ -17,9 +17,15 @@ import org.mechaverse.simulation.ant.api.model.SimulationModel;
 import org.mechaverse.simulation.common.SimulationDataStore;
 import org.mechaverse.simulation.common.SimulationState;
 
-public class AntSimulationState extends SimulationState<SimulationModel> {
+/**
+ * The ant simulation state.
+ */
+public final class AntSimulationState extends SimulationState<SimulationModel> {
 
   public static final String MODEL_KEY = "model";
+  public static final String CONFIG_KEY = "config";
+
+  private AntSimulationConfig config = new AntSimulationConfig();
 
   public static AntSimulationState deserialize(byte[] data) throws IOException {
     return deserialize(new ByteArrayInputStream(data));
@@ -37,6 +43,7 @@ public class AntSimulationState extends SimulationState<SimulationModel> {
   public AntSimulationState(SimulationDataStore dataStore) throws IOException {
     super(deserializeModel(new GZIPInputStream(
         new ByteArrayInputStream(dataStore.get(MODEL_KEY)))));
+    this.config = AntSimulationConfig.deserialize(dataStore.get(CONFIG_KEY));
   }
 
   @Override
@@ -54,11 +61,19 @@ public class AntSimulationState extends SimulationState<SimulationModel> {
     return model.getIteration();
   }
 
+  public AntSimulationConfig getConfig() {
+    return config;
+  }
+
   @Override
   public byte[] getData(String key) {
     if(key.equals(MODEL_KEY)) {
       try {
         setData(MODEL_KEY, serializeModel());
+      } catch (IOException e) {}
+    } else if(key.equals(CONFIG_KEY)) {
+      try {
+        setData(CONFIG_KEY, config.serialize());
       } catch (IOException e) {}
     }
     return super.getData(key);
@@ -72,6 +87,7 @@ public class AntSimulationState extends SimulationState<SimulationModel> {
 
   public void serialize(OutputStream out) throws IOException {
     setData(MODEL_KEY, serializeModel());
+    setData(CONFIG_KEY, config.serialize());
     dataStore.serialize(out);
   }
 

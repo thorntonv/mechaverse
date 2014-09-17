@@ -12,6 +12,7 @@ import org.mechaverse.simulation.ant.api.model.Nest;
 import org.mechaverse.simulation.ant.api.util.EntityUtil;
 import org.mechaverse.simulation.common.cellautomata.AbstractProbabilisticEnvironmentGenerator;
 
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableTable;
 
@@ -38,14 +39,27 @@ public class AntSimulationEnvironmentGenerator
               .build());
 
   private final EntityManager entityManager;
+  private final Function<EntityType, Entity> entityFactory;
 
   public AntSimulationEnvironmentGenerator() {
     this(null);
   }
 
   public AntSimulationEnvironmentGenerator(EntityManager entityManager) {
+    this(new Function<EntityType, Entity>() {
+
+      @Override
+      public Entity apply(EntityType entityType) {
+        return EntityUtil.newEntity(entityType);
+      }
+    }, entityManager);
+  }
+
+  public AntSimulationEnvironmentGenerator(Function<EntityType, Entity> entityFactory,
+      EntityManager entityManager) {
     super(ImmutableList.of(ROCK_GENERATOR));
 
+    this.entityFactory = entityFactory;
     this.entityManager = entityManager;
   }
 
@@ -73,7 +87,7 @@ public class AntSimulationEnvironmentGenerator
       Cell cell = env.getCell(row, column);
 
       if (cell.isEmpty()) {
-        Entity entity = EntityUtil.newEntity(entityType);
+        Entity entity = entityFactory.apply(entityType);
         env.addEntity(entity, cell);
         if (entityManager != null) {
           entityManager.addEntity(entity);

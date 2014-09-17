@@ -5,11 +5,13 @@ import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Food;
+import org.mechaverse.simulation.ant.api.util.EntityUtil;
 import org.mechaverse.simulation.common.cellautomata.AbstractProbabilisticEnvironmentGenerator.EntityDistribution;
 import org.mechaverse.simulation.common.cellautomata.AbstractProbabilisticEnvironmentGenerator.ProbabilisticLocalGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Table;
 
@@ -51,36 +53,37 @@ public class FoodGenerator implements EnvironmentSimulationModule {
 
   private static Logger logger = LoggerFactory.getLogger(FoodGenerator.class);
 
-  // TODO(thorntonv): Make these values configurable.
-  private int minFoodCount = 1000;
-  private int foodClusterRadius = 15;
-  private int foodEnergy = 300;
-
   private int foodCount = 0;
 
-  private final FoodLocalGenerator foodLocalGenerator;
-
-  public FoodGenerator() {
-    this.foodLocalGenerator = FoodLocalGenerator.newInstance(1, foodClusterRadius);
-  }
-
   @Override
-  public void update(AntSimulationState state, CellEnvironment env, EntityManager entityManager,
-      RandomGenerator random) {
-    if (foodCount < minFoodCount) {
+  public void update(final AntSimulationState state, CellEnvironment env,
+      EntityManager entityManager, RandomGenerator random) {
+    if (foodCount < state.getConfig().getMinFoodCount()) {
       int row = random.nextInt(env.getRowCount());
       int col = random.nextInt(env.getColumnCount());
 
       logger.debug("Generating food at ({}, {})", row, col);
-      new AntSimulationEnvironmentGenerator(entityManager)
-          .apply(foodLocalGenerator, env, row, col, random);
+
+      Function<EntityType, Entity> entityFactory = new Function<EntityType, Entity>() {
+        @Override
+        public Entity apply(EntityType entityType) {
+          Entity entity = EntityUtil.newEntity(entityType);
+          if (entityType == EntityType.FOOD) {
+            entity.setEnergy(state.getConfig().getFoodInitialEnergy());
+            entity.setMaxEnergy(entity.getEnergy());
+          }
+          return entity;
+        }
+      };
+      new AntSimulationEnvironmentGenerator(entityFactory, entityManager)
+          .apply(FoodLocalGenerator.newInstance(1, state.getConfig().getFoodClusterRadius()),
+              env, row, col, random);
     }
   }
 
   @Override
   public void onAddEntity(Entity entity) {
     if (entity instanceof Food) {
-      entity.setEnergy(foodEnergy);
       foodCount++;
     }
   }
