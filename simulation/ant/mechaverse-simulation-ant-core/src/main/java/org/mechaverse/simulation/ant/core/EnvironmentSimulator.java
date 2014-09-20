@@ -13,6 +13,7 @@ import org.mechaverse.simulation.ant.api.model.Environment;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
 /**
@@ -64,9 +65,6 @@ public class EnvironmentSimulator implements EntityManager {
   }
 
   public void updateModel() {
-    for (ActiveEntity activeEntity : activeEntities.values()) {
-      activeEntity.updateModel();
-    }
     environment.updateModel();
   }
 
@@ -97,6 +95,10 @@ public class EnvironmentSimulator implements EntityManager {
     for (EntityManager.Observer observer : observers) {
       observer.onRemoveEntity(activeEntity.getEntity());
     }
+  }
+
+  public Iterable<ActiveEntity> getActiveEntities() {
+    return Iterables.unmodifiableIterable(activeEntities.values());
   }
 
   @Override

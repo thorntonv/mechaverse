@@ -169,4 +169,24 @@ public class CellEnvironment {
   private boolean isValidCellCoordinate(int row, int column) {
     return row >= 0 && row < rowCount && column >= 0 && column < colCount;
   }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    for (int row = 0; row < cells.length; row++) {
+      for (int col = 0; col < cells[row].length; col++) {
+        for (EntityType type : EntityType.values()) {
+          if (cells[row][col].hasEntity(type)) {
+            sb.append(type.name().charAt(0));
+          } else {
+            sb.append("-");
+          }
+        }
+
+        sb.append(" ");
+      }
+      sb.append("\n");
+    }
+    return sb.toString();
+  }
 }

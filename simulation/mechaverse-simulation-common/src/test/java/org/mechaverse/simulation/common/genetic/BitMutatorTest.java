@@ -7,9 +7,9 @@ import static org.junit.Assert.assertFalse;
 import java.util.Arrays;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.apache.commons.math3.random.Well19937c;
 import org.junit.Before;
 import org.junit.Test;
+import org.mechaverse.simulation.common.util.RandomUtil;
 
 /**
  * Unit test for {@link BitMutator}.
@@ -20,7 +20,7 @@ public class BitMutatorTest {
 
   @Before
   public void setUp() {
-    random = new Well19937c(BitMutatorTest.class.getName().hashCode());
+    random = RandomUtil.newGenerator(BitMutatorTest.class.getName().hashCode());
   }
 
   @Test

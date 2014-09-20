@@ -33,7 +33,7 @@ public abstract class AbstractProbabilisticEnvironmentGenerator<E, T>
 
     private EnumeratedDistribution<Optional<T>> distribution;
 
-    public EntityDistribution(List<Pair<T, Double>> entityProbabilities) {
+    public EntityDistribution(List<Pair<T, Double>> entityProbabilities, RandomGenerator random) {
       List<Pair<Optional<T>, Double>> pmf = new ArrayList<>();
       double absentProbability = 1.0;
       for (Pair<T, Double> entityProbability : entityProbabilities) {
@@ -41,15 +41,16 @@ public abstract class AbstractProbabilisticEnvironmentGenerator<E, T>
         pmf.add(new Pair<>(Optional.of(entityProbability.getKey()), entityProbability.getValue()));
       }
       pmf.add(new Pair<>(Optional.<T>absent(), absentProbability));
-      this.distribution = new EnumeratedDistribution<>(pmf);
+      this.distribution = new EnumeratedDistribution<>(random, pmf);
     }
 
     public Optional<T> sample() {
       return distribution.sample();
     }
 
-    public static <T> EntityDistribution<T> of(T entity, double probability) {
-      return new EntityDistribution<T>(ImmutableList.of(new Pair<>(entity, probability)));
+    public static <T> EntityDistribution<T> of(
+          T entity, double probability, RandomGenerator random) {
+      return new EntityDistribution<T>(ImmutableList.of(new Pair<>(entity, probability)), random);
     }
   }
 

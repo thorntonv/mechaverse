@@ -6,6 +6,7 @@ import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.core.ActiveAnt.AntBehavior;
 import org.mechaverse.simulation.api.model.MoveDirection;
 import org.mechaverse.simulation.api.model.TurnDirection;
+import org.mechaverse.simulation.common.SimulationDataStore;
 import org.mechaverse.simulation.common.util.RandomUtil;
 
 /**
@@ -118,7 +119,15 @@ public class SimpleAntBehavior implements AntBehavior {
   }
 
   @Override
-  public void updateModel() {}
+  public void onRemoveEntity() {}
+
+  @Override
+  public void setState(SimulationDataStore state) {}
+
+  @Override
+  public SimulationDataStore getState() {
+    return new SimulationDataStore();
+  }
 
   private TurnDirection getTurnDirection(Direction currentDirection, Direction targetDirection) {
     if (currentDirection == targetDirection) {

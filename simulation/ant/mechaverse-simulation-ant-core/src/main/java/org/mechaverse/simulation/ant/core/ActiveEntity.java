@@ -4,6 +4,7 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.api.AntSimulationConfig;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.EntityType;
+import org.mechaverse.simulation.common.SimulationDataStore;
 
 /**
  * An entity that is active in the environment.
@@ -16,5 +17,7 @@ public interface ActiveEntity {
 
   Entity getEntity();
   EntityType getType();
-  void updateModel();
+
+  void setState(SimulationDataStore state);
+  SimulationDataStore getState();
 }

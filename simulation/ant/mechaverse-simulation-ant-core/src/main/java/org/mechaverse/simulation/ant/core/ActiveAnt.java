@@ -8,6 +8,7 @@ import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Pheromone;
 import org.mechaverse.simulation.ant.api.util.EntityUtil;
+import org.mechaverse.simulation.common.SimulationDataStore;
 
 /**
  * An ant that active in the simulation. An active ant receives sensory information about itself and
@@ -30,7 +31,10 @@ public final class ActiveAnt implements ActiveEntity {
      */
     AntOutput getOutput(RandomGenerator random);
 
-    void updateModel();
+    void onRemoveEntity();
+
+    void setState(SimulationDataStore state);
+    SimulationDataStore getState();
   }
 
   private static final EntityType[] CARRIABLE_ENTITY_TYPES =
@@ -150,6 +154,7 @@ public final class ActiveAnt implements ActiveEntity {
 
     entity.setEnergy(entity.getEnergy() - 1);
     if (entity.getEnergy() <= 0) {
+      behavior.onRemoveEntity();
       entityManager.removeEntity(this);
 
       // Attempt to drop the carried entity.
@@ -239,8 +244,13 @@ public final class ActiveAnt implements ActiveEntity {
   }
 
   @Override
-  public void updateModel() {
-    behavior.updateModel();
+  public void setState(SimulationDataStore state) {
+    behavior.setState(state);
+  }
+
+  @Override
+  public SimulationDataStore getState() {
+    return behavior.getState();
   }
 
   private boolean moveForward(Cell cell, Cell frontCell, CellEnvironment env) {

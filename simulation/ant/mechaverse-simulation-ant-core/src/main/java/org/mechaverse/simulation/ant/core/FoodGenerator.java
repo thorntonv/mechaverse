@@ -30,12 +30,13 @@ public class FoodGenerator implements EnvironmentSimulationModule {
       super(probability, entityDistributions);
     }
 
-    public static FoodLocalGenerator newInstance(double probability, int radius) {
-      return new FoodLocalGenerator(probability, createDistributionMatrix(radius));
+    public static FoodLocalGenerator newInstance(
+        double probability, int radius, RandomGenerator random) {
+      return new FoodLocalGenerator(probability, createDistributionMatrix(radius, random));
     }
 
     private static ImmutableTable<Integer, Integer, EntityDistribution<EntityType>>
-        createDistributionMatrix(int radius) {
+        createDistributionMatrix(int radius, RandomGenerator random) {
       ImmutableTable.Builder<Integer, Integer, EntityDistribution<EntityType>> builder =
           ImmutableTable.builder();
 
@@ -44,7 +45,7 @@ public class FoodGenerator implements EnvironmentSimulationModule {
           double x = col - radius;
           double y = row - radius;
           double p = (radius - Math.sqrt(x * x + y * y)) / radius;
-          builder.put(row, col, EntityDistribution.of(EntityType.FOOD, p > 0 ? p : 0));
+          builder.put(row, col, EntityDistribution.of(EntityType.FOOD, p > 0 ? p : 0, random));
         }
       }
       return builder.build();
@@ -75,8 +76,8 @@ public class FoodGenerator implements EnvironmentSimulationModule {
           return entity;
         }
       };
-      new AntSimulationEnvironmentGenerator(entityFactory, entityManager)
-          .apply(FoodLocalGenerator.newInstance(1, state.getConfig().getFoodClusterRadius()),
+      new AntSimulationEnvironmentGenerator(entityFactory, entityManager, random).apply(
+          FoodLocalGenerator.newInstance(1, state.getConfig().getFoodClusterRadius(), random),
               env, row, col, random);
     }
   }

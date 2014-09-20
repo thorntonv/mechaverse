@@ -5,6 +5,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -13,6 +15,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.SimulationModel;
 import org.mechaverse.simulation.common.SimulationDataStore;
 import org.mechaverse.simulation.common.SimulationState;
@@ -24,6 +27,8 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
 
   public static final String MODEL_KEY = "model";
   public static final String CONFIG_KEY = "config";
+
+  private static final String ENTITY_KEY_PREFIX = "entity.";
 
   private AntSimulationConfig config = new AntSimulationConfig();
 
@@ -38,12 +43,22 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
 
   public AntSimulationState() {
     super(new SimulationModel());
+
+    // Add placeholders for the model and config. These will be serialized from objects when
+    // requested.
+    dataStore.put(MODEL_KEY, new byte[0]);
+    dataStore.put(CONFIG_KEY, new byte[0]);
   }
 
   public AntSimulationState(SimulationDataStore dataStore) throws IOException {
     super(deserializeModel(new GZIPInputStream(
-        new ByteArrayInputStream(dataStore.get(MODEL_KEY)))));
+        new ByteArrayInputStream(dataStore.get(MODEL_KEY)))), dataStore);
     this.config = AntSimulationConfig.deserialize(dataStore.get(CONFIG_KEY));
+
+    // Add placeholders for the model and config. These will be serialized from objects when
+    // requested.
+    this.dataStore.put(MODEL_KEY, new byte[0]);
+    this.dataStore.put(CONFIG_KEY, new byte[0]);
   }
 
   @Override
@@ -85,18 +100,46 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
     return byteOut.toByteArray();
   }
 
+  public byte[] getEntityValue(Entity entity, String key) {
+    return dataStore.get(getEntityKey(entity, key));
+  }
+
+  public void removeAllEntityValues() {
+    Set<String> keys = new HashSet<>(keySet());
+    for (String key : keys) {
+      if (key.startsWith(ENTITY_KEY_PREFIX)) {
+        dataStore.remove(key);
+      }
+    }
+  }
+
+  public SimulationDataStore getEntityValues(Entity entity) {
+    SimulationDataStore entityDataStore = new SimulationDataStore();
+    String entityKeyPrefix = getEntityKeyPrefix(entity) + ".";
+    for (String key : keySet()) {
+      if (key.startsWith(entityKeyPrefix)) {
+        byte[] value = getData(key);
+        String entityKey = key.substring(entityKeyPrefix.length());
+        entityDataStore.put(entityKey, value);
+      }
+    }
+    return entityDataStore;
+  }
+
+  public void putEntityValue(Entity entity, String key, byte[] value) {
+    dataStore.put(getEntityKey(entity, key), value);
+  }
+
+  public void putEntityValues(Entity entity, SimulationDataStore entityDataStore) {
+    for (String key : entityDataStore.keySet()) {
+      putEntityValue(entity, key, entityDataStore.get(key));
+    }
+  }
+
   public void serialize(OutputStream out) throws IOException {
     setData(MODEL_KEY, serializeModel());
     setData(CONFIG_KEY, config.serialize());
     dataStore.serialize(out);
-  }
-
-  private byte[] serializeModel() throws IOException {
-    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-    try (OutputStream out = new GZIPOutputStream(byteOut)) {
-      serializeModel(model, out);
-    }
-    return byteOut.toByteArray();
   }
 
   public static void serializeModel(SimulationModel model, OutputStream out) throws IOException {
@@ -120,5 +163,21 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
     } catch (JAXBException e) {
       throw new IOException(e);
     }
+  }
+
+  private byte[] serializeModel() throws IOException {
+    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+    try (OutputStream out = new GZIPOutputStream(byteOut)) {
+      serializeModel(model, out);
+    }
+    return byteOut.toByteArray();
+  }
+
+  private String getEntityKeyPrefix(Entity entity) {
+    return ENTITY_KEY_PREFIX + entity.getId();
+  }
+
+  private String getEntityKey(Entity entity, String key) {
+    return getEntityKeyPrefix(entity) + "." + key;
   }
 }

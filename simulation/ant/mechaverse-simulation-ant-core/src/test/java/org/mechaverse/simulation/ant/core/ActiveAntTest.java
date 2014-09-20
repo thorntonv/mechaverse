@@ -8,7 +8,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.apache.commons.math3.random.Well19937c;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,6 +24,7 @@ import org.mechaverse.simulation.ant.core.ActiveAnt.AntBehavior;
 import org.mechaverse.simulation.ant.core.AntInput.SensorInfo;
 import org.mechaverse.simulation.api.model.MoveDirection;
 import org.mechaverse.simulation.api.model.TurnDirection;
+import org.mechaverse.simulation.common.util.RandomUtil;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -58,7 +58,7 @@ public class ActiveAntTest {
   @Before
   public void setUp() {
     activeAnt = new ActiveAnt(mockAntEntity, mockAntBehavior);
-    random = new Well19937c(ActiveAntTest.class.getName().hashCode());
+    random = RandomUtil.newGenerator(ActiveAntTest.class.getName().hashCode());
 
     when(mockAntEntity.getEnergy()).thenReturn(10);
     when(mockAntEntity.getDirection()).thenReturn(Direction.EAST);

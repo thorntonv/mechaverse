@@ -7,9 +7,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.apache.commons.math3.random.Well19937c;
 import org.junit.Before;
 import org.junit.Test;
+import org.mechaverse.simulation.common.util.RandomUtil;
 
 /**
  * A unit test for {@link CutAndSplitCrossoverGeneticRecombinator}.
@@ -20,7 +20,7 @@ public class CutAndSplitCrossoverGeneticRecombinatorTest {
 
   @Before
   public void setUp() {
-    random = new Well19937c(BitMutatorTest.class.getName().hashCode());
+    random = RandomUtil.newGenerator(BitMutatorTest.class.getName().hashCode());
   }
 
   @Test
