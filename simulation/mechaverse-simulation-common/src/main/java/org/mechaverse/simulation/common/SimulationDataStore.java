@@ -51,6 +51,10 @@ public final class SimulationDataStore {
     dataStore.put(key, value);
   }
 
+  public void remove(String key) {
+    dataStore.remove(key);
+  }
+
   public boolean containsKey(String key) {
     return dataStore.containsKey(key);
   }

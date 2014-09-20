@@ -55,4 +55,8 @@ public abstract class SimulationState<M> {
   public void setData(String key, byte[] value) {
     dataStore.put(key, value);
   }
+
+  public void removeData(String key) {
+    dataStore.remove(key);
+  }
 }

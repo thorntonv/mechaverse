@@ -2,6 +2,7 @@ package org.mechaverse.simulation.common;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.io.IOException;
 import java.util.Random;
@@ -27,6 +28,15 @@ public class SimulationDataStoreTest {
   public void testPutGet() {
     dataStore.put("testKey", "testValue".getBytes());
     assertArrayEquals("testValue".getBytes(), dataStore.get("testKey"));
+  }
+
+  @Test
+  public void testRemove() {
+    dataStore.put("testKey", "testValue".getBytes());
+    dataStore.remove("testKey");
+    assertFalse(dataStore.containsKey("testKey"));
+    assertEquals(0, dataStore.keySet().size());
+    assertEquals(null, dataStore.get("testKey"));
   }
 
   @Test
