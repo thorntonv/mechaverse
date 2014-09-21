@@ -30,9 +30,9 @@ import com.google.common.collect.Iterables;
 import com.google.common.io.ByteStreams;
 
 /**
- * Unit test for {@link AntSimulationImpl}.
+ * Unit test for {@link AntSimulation}.
  */
-public class AntSimulationImplTest {
+public class AntSimulationTest {
 
   private static final int TEST_ITERATION_COUNT = 2500;
 
@@ -84,18 +84,18 @@ public class AntSimulationImplTest {
     }
   }
 
-  private static final Logger logger = LoggerFactory.getLogger(AntSimulationImplTest.class);
+  private static final Logger logger = LoggerFactory.getLogger(AntSimulationTest.class);
 
   private RandomGenerator random;
 
   @Before
   public void setUp() {
-    this.random = RandomUtil.newGenerator(AntSimulationImplTest.class.getName().hashCode());
+    this.random = RandomUtil.newGenerator(AntSimulationTest.class.getName().hashCode());
   }
 
   @Test
   public void simulate() {
-    AntSimulationImpl simulation = new AntSimulationImpl();
+    AntSimulation simulation = new AntSimulation();
 
     EntityTypeCountObserver entityCountObserver = new EntityTypeCountObserver();
     simulation.addObserver(entityCountObserver);
@@ -119,10 +119,10 @@ public class AntSimulationImplTest {
 
   @Test
   public void simulate_verifyDeterministic() throws IOException {
-    byte[] initialState = AntSimulationImpl.randomState(
+    byte[] initialState = AntSimulation.randomState(
         new AntSimulationEnvironmentGenerator(), random).serialize();
-    AntSimulationImpl simulation1 = new AntSimulationImpl();
-    AntSimulationImpl simulation2 = new AntSimulationImpl();
+    AntSimulation simulation1 = new AntSimulation();
+    AntSimulation simulation2 = new AntSimulation();
     simulation1.setState(AntSimulationState.deserialize(initialState));
     simulation2.setState(AntSimulationState.deserialize(initialState));
 
@@ -134,9 +134,9 @@ public class AntSimulationImplTest {
     }
 
     byte[] state = simulation1.getState().serialize();
-    simulation1 = new AntSimulationImpl();
+    simulation1 = new AntSimulation();
     simulation1.setState(AntSimulationState.deserialize(state));
-    simulation2 = new AntSimulationImpl();
+    simulation2 = new AntSimulation();
     simulation2.setState(AntSimulationState.deserialize(state));
 
     for (int cnt = 0; cnt < 100; cnt++) {
@@ -149,7 +149,7 @@ public class AntSimulationImplTest {
 
   @Test
   public void simulate_random() {
-    AntSimulationImpl simulation = new AntSimulationImpl(new RandomActiveEntityProvider(), random);
+    AntSimulation simulation = new AntSimulation(new RandomActiveEntityProvider(), random);
     for (int cnt = 0; cnt < TEST_ITERATION_COUNT; cnt++) {
       simulation.step();
     }
@@ -193,7 +193,7 @@ public class AntSimulationImplTest {
       }
     };
 
-    AntSimulationImpl simulation = new AntSimulationImpl(provider, random);
+    AntSimulation simulation = new AntSimulation(provider, random);
 
     for (int cnt = 1; cnt <= 100; cnt++) {
       simulation.step();
@@ -215,7 +215,7 @@ public class AntSimulationImplTest {
     }
 
     AntSimulationState state = simulation.getState();
-    simulation = new AntSimulationImpl(provider, random);
+    simulation = new AntSimulation(provider, random);
     simulation.setState(state);
     simulation.step();
 
@@ -264,7 +264,7 @@ public class AntSimulationImplTest {
       }
     };
 
-    AntSimulationImpl simulation = new AntSimulationImpl(provider, random);
+    AntSimulation simulation = new AntSimulation(provider, random);
     int targetAntCount = simulation.getState().getConfig().getTargetAntCount();
     for(int cnt = 1; cnt <= targetAntCount; cnt++) {
       availableIds.add(cnt);

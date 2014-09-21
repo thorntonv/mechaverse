@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 
-public final class AntSimulationImpl {
+public final class AntSimulation {
 
   private static final int DEFAULT_ENVIRONMENT_WIDTH = 200;
   private static final int DEFAULT_ENVIRONMENT_HEIGHT = 200;
@@ -53,11 +53,11 @@ public final class AntSimulationImpl {
     return state;
   }
 
-  public AntSimulationImpl() {
+  public AntSimulation() {
     this(new SimpleActiveEntityProvider(), RandomUtil.newGenerator());
   }
 
-  public AntSimulationImpl(ActiveEntityProvider activeEntityProvider, RandomGenerator random) {
+  public AntSimulation(ActiveEntityProvider activeEntityProvider, RandomGenerator random) {
     this.activeEntityProvider = activeEntityProvider;
     this.random = random;
 

@@ -1,7 +1,6 @@
 package org.mechaverse.simulation.ant.core;
 
 import org.mechaverse.simulation.ant.api.AntSimulationState;
-import org.mechaverse.simulation.ant.core.AntSimulationImpl;
 import org.mechaverse.simulation.api.SimulationService;
 import org.mechaverse.simulation.common.opencl.DeviceUtil;
 import org.springframework.stereotype.Service;
@@ -12,11 +11,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class AntSimulationServiceImpl implements SimulationService {
 
-  private final AntSimulationImpl[] instances = {new AntSimulationImpl()};
+  private AntSimulationPool instancePool = new FixedAntSimulationPool(1);
 
   @Override
   public int getInstanceCount() throws Exception {
-    return instances.length;
+    return instancePool.size();
   }
 
   @Override
@@ -41,7 +40,7 @@ public class AntSimulationServiceImpl implements SimulationService {
 
   @Override
   public byte[] generateRandomState() throws Exception {
-    return AntSimulationImpl.randomState().serialize();
+    return AntSimulation.randomState().serialize();
   }
 
   @Override
@@ -56,7 +55,7 @@ public class AntSimulationServiceImpl implements SimulationService {
     return DeviceUtil.getDeviceInfo();
   }
 
-  private AntSimulationImpl getInstance(int idx) {
-    return instances[idx];
+  private AntSimulation getInstance(int idx) {
+    return instancePool.getInstance(idx);
   }
 }
