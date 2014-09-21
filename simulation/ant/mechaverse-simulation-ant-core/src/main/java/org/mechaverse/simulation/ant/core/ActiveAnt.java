@@ -24,7 +24,7 @@ public final class ActiveAnt implements ActiveEntity {
     /**
      * Sets the current input.
      */
-    void setInput(AntInput input);
+    void setInput(AntInput input, RandomGenerator random);
 
     /**
      * Returns output values based on the current input.
@@ -139,7 +139,7 @@ public final class ActiveAnt implements ActiveEntity {
       Pheromone pheromone = (Pheromone) pheromoneEntity;
       input.setPheromoneType(pheromone.getValue());
     }
-    behavior.setInput(input);
+    behavior.setInput(input, random);
   }
 
   @Override

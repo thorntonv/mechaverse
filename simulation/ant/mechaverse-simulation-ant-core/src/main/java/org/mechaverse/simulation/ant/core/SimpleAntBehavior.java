@@ -21,7 +21,7 @@ public class SimpleAntBehavior implements AntBehavior {
   private boolean leavePheromone = false;
 
   @Override
-  public void setInput(AntInput input) {
+  public void setInput(AntInput input, RandomGenerator random) {
     this.input = input;
   }
 
