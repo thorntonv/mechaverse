@@ -57,7 +57,15 @@ public class FoodGenerator implements EnvironmentSimulationModule {
   private int foodCount = 0;
 
   @Override
-  public void update(final AntSimulationState state, CellEnvironment env,
+  public void beforeUpdate(AntSimulationState state, CellEnvironment env,
+      EntityManager entityManager, RandomGenerator random) {}
+
+  @Override
+  public void beforePerformAction(AntSimulationState state, CellEnvironment env,
+      EntityManager entityManager, RandomGenerator random) {}
+
+  @Override
+  public void afterUpdate(final AntSimulationState state, CellEnvironment env,
       EntityManager entityManager, RandomGenerator random) {
     if (foodCount < state.getConfig().getMinFoodCount()) {
       int row = random.nextInt(env.getRowCount());

@@ -66,7 +66,8 @@ public class AntReproductionModule implements EnvironmentSimulationModule {
   private final AntFitnessCalculator fitnessCalculator = new SimpleAntFitnessCalculator();
 
   @Override
-  public void update(AntSimulationState state, CellEnvironment env, EntityManager entityManager, RandomGenerator random) {
+  public void beforeUpdate(AntSimulationState state, CellEnvironment env,
+      EntityManager entityManager, RandomGenerator random) {
     if (ants.size() < state.getConfig().getTargetAntCount() && nest != null) {
       Cell cell = env.getCell(nest);
       if (cell.getEntity(EntityType.ANT) == null) {
@@ -76,6 +77,14 @@ public class AntReproductionModule implements EnvironmentSimulationModule {
       }
     }
   }
+
+  @Override
+  public void beforePerformAction(AntSimulationState state, CellEnvironment env,
+      EntityManager entityManager, RandomGenerator random) {}
+
+  @Override
+  public void afterUpdate(AntSimulationState state, CellEnvironment env,
+      EntityManager entityManager, RandomGenerator random) {}
 
   public Ant generateRandomAnt(AntSimulationState state, RandomGenerator random) {
     Ant ant = new Ant();

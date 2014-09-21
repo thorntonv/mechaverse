@@ -20,9 +20,16 @@ public class PheromoneDecayModule implements EnvironmentSimulationModule {
   public void onRemoveEntity(Entity entity) {}
 
   @Override
-  public void update(AntSimulationState state, CellEnvironment env, EntityManager entityManager,
-      RandomGenerator random) {
+  public void beforeUpdate(AntSimulationState state, CellEnvironment env,
+      EntityManager entityManager, RandomGenerator random) {}
 
+  @Override
+  public void beforePerformAction(AntSimulationState state, CellEnvironment env,
+      EntityManager entityManager, RandomGenerator random) {}
+
+  @Override
+  public void afterUpdate(AntSimulationState state, CellEnvironment env,
+      EntityManager entityManager, RandomGenerator random) {
     if (state.getModel().getIteration() % decayInterval == 0) {
       decayPheromones(decayInterval, env, entityManager);
     }
