@@ -6,6 +6,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.math3.random.RandomGenerator;
@@ -24,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.io.ByteStreams;
 
 /**
@@ -225,6 +228,60 @@ public class AntSimulationImplTest {
         assertEquals(((Ant) entity).getAge(),
             Integer.parseInt(new String(entityDataStore.get("age"))));
       }
+    }
+  }
+
+  @Test
+  public void antBehaviorOnRemoveEntity() {
+    final Set<Integer> availableIds = new HashSet<Integer>();
+    ActiveEntityProvider provider = new SimpleActiveEntityProvider() {
+      @Override
+      public Optional<ActiveEntity> getActiveEntity(final Entity entity) {
+        if (entity instanceof Ant) {
+          final Ant ant = (Ant) entity;
+          return Optional.<ActiveEntity>of(new ActiveAnt(ant, new SimpleAntBehavior() {
+            private Integer id;
+
+            @Override
+            public AntOutput getOutput(RandomGenerator random) {
+              if(id == null) {
+                id = Iterables.getFirst(availableIds, null);
+                availableIds.remove(id);
+              }
+              assertTrue(id != null);
+              return super.getOutput(random);
+            }
+
+            @Override
+            public void onRemoveEntity() {
+              availableIds.add(id);
+              id = null;
+              super.onRemoveEntity();
+            }
+          }));
+        }
+        return super.getActiveEntity(entity);
+      }
+    };
+
+    AntSimulationImpl simulation = new AntSimulationImpl(provider, random);
+    int targetAntCount = simulation.getState().getConfig().getTargetAntCount();
+    for(int cnt = 1; cnt <= targetAntCount; cnt++) {
+      availableIds.add(cnt);
+    }
+
+    for (int cnt = 1; cnt <= TEST_ITERATION_COUNT; cnt++) {
+      simulation.step();
+
+      int expectedAvailableIdCount = targetAntCount;
+      for(Entity entity : simulation.getState().getModel().getEnvironment().getEntities()) {
+        if(entity instanceof Ant) {
+          expectedAvailableIdCount--;
+        }
+      }
+
+      logger.debug("{} available ids", availableIds.size());
+      assertEquals(expectedAvailableIdCount, availableIds.size());
     }
   }
 
