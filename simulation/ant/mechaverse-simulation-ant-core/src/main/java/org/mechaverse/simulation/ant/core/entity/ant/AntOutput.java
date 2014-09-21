@@ -1,4 +1,4 @@
-package org.mechaverse.simulation.ant.core;
+package org.mechaverse.simulation.ant.core.entity.ant;
 
 import org.mechaverse.simulation.api.model.MoveDirection;
 import org.mechaverse.simulation.api.model.TurnDirection;

@@ -1,4 +1,4 @@
-package org.mechaverse.simulation.ant.core;
+package org.mechaverse.simulation.ant.core.entity.ant;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -20,8 +20,14 @@ import org.mechaverse.simulation.ant.api.model.Food;
 import org.mechaverse.simulation.ant.api.model.Nest;
 import org.mechaverse.simulation.ant.api.model.Pheromone;
 import org.mechaverse.simulation.ant.api.model.Rock;
-import org.mechaverse.simulation.ant.core.ActiveAnt.AntBehavior;
-import org.mechaverse.simulation.ant.core.AntInput.SensorInfo;
+import org.mechaverse.simulation.ant.core.Cell;
+import org.mechaverse.simulation.ant.core.CellEnvironment;
+import org.mechaverse.simulation.ant.core.EntityManager;
+import org.mechaverse.simulation.ant.core.entity.ant.ActiveAnt;
+import org.mechaverse.simulation.ant.core.entity.ant.AntInput;
+import org.mechaverse.simulation.ant.core.entity.ant.AntOutput;
+import org.mechaverse.simulation.ant.core.entity.ant.ActiveAnt.AntBehavior;
+import org.mechaverse.simulation.ant.core.entity.ant.AntInput.SensorInfo;
 import org.mechaverse.simulation.api.model.MoveDirection;
 import org.mechaverse.simulation.api.model.TurnDirection;
 import org.mechaverse.simulation.common.util.RandomUtil;

@@ -2,6 +2,8 @@ package org.mechaverse.simulation.ant.core;
 
 import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.api.model.Entity;
+import org.mechaverse.simulation.ant.core.entity.ant.ActiveAnt;
+import org.mechaverse.simulation.ant.core.entity.ant.SimpleAntBehavior;
 
 import com.google.common.base.Optional;
 

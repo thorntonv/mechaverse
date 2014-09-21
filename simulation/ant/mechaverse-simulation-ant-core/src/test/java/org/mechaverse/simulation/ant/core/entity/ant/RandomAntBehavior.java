@@ -1,7 +1,9 @@
-package org.mechaverse.simulation.ant.core;
+package org.mechaverse.simulation.ant.core.entity.ant;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.mechaverse.simulation.ant.core.ActiveAnt.AntBehavior;
+import org.mechaverse.simulation.ant.core.entity.ant.ActiveAnt.AntBehavior;
+import org.mechaverse.simulation.ant.core.entity.ant.AntOutput;
+import org.mechaverse.simulation.ant.core.entity.ant.SimpleAntBehavior;
 import org.mechaverse.simulation.common.util.RandomUtil;
 
 /**

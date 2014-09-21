@@ -1,4 +1,4 @@
-package org.mechaverse.simulation.ant.core;
+package org.mechaverse.simulation.ant.core.entity.ant;
 
 import static org.junit.Assert.assertEquals;
 
@@ -6,6 +6,7 @@ import java.util.Random;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mechaverse.simulation.ant.core.entity.ant.AntOutput;
 import org.mechaverse.simulation.api.model.MoveDirection;
 import org.mechaverse.simulation.api.model.TurnDirection;
 

@@ -1,9 +1,10 @@
-package org.mechaverse.simulation.ant.core;
+package org.mechaverse.simulation.ant.core.entity.ant;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.api.model.Direction;
 import org.mechaverse.simulation.ant.api.model.EntityType;
-import org.mechaverse.simulation.ant.core.ActiveAnt.AntBehavior;
+import org.mechaverse.simulation.ant.core.AntSimulationUtil;
+import org.mechaverse.simulation.ant.core.entity.ant.ActiveAnt.AntBehavior;
 import org.mechaverse.simulation.api.model.MoveDirection;
 import org.mechaverse.simulation.api.model.TurnDirection;
 import org.mechaverse.simulation.common.SimulationDataStore;

@@ -1,4 +1,4 @@
-package org.mechaverse.simulation.ant.core;
+package org.mechaverse.simulation.ant.core.entity.ant;
 
 import static org.junit.Assert.assertEquals;
 
@@ -8,7 +8,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mechaverse.simulation.ant.api.model.Direction;
 import org.mechaverse.simulation.ant.api.model.EntityType;
-import org.mechaverse.simulation.ant.core.AntInput.SensorInfo;
+import org.mechaverse.simulation.ant.core.entity.ant.AntInput;
+import org.mechaverse.simulation.ant.core.entity.ant.AntInput.SensorInfo;
 
 /**
  * Unit test for {@link AntInput}.
