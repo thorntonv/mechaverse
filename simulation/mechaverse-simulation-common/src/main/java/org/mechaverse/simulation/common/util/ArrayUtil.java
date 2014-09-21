@@ -1,6 +1,7 @@
 package org.mechaverse.simulation.common.util;
 
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 
 /**
  * Utility methods for working with arrays.
@@ -8,14 +9,17 @@ import java.nio.ByteBuffer;
 public class ArrayUtil {
 
   /**
-   * Returns the given byte array as an integer array.
+   * Returns a new integer array using data from the given byte array.
    */
   public static int[] toIntArray(byte[] byteArray) {
-    return ByteBuffer.wrap(byteArray).asIntBuffer().array();
+    IntBuffer intBuffer = ByteBuffer.wrap(byteArray).asIntBuffer();
+    int[] intArray = new int[intBuffer.limit()];
+    intBuffer.get(intArray);
+    return intArray;
   }
 
   /**
-   * Returns the given integer array as a byte array.
+   * Returns a new byte array using data from the given integer array.
    */
   public static byte[] toByteArray(int[] intArray) {
     ByteBuffer byteBuffer = ByteBuffer.allocate(intArray.length * 4);
