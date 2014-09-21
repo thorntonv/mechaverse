@@ -1,7 +1,6 @@
 package org.mechaverse.simulation.ant.core;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.core.ActiveAnt.AntBehavior;
 import org.mechaverse.simulation.common.SimulationDataStore;
 import org.mechaverse.simulation.common.circuit.CircuitSimulator;
@@ -21,10 +20,10 @@ public class CircuitAntBehavior implements AntBehavior {
   private final int[] outputData;
   private final AntOutput output = new AntOutput();
   private final int[] circuitState;
-  private SimulationDataStore state;
+  private SimulationDataStore state = new SimulationDataStore();
   private boolean stateSet = false;
 
-  public CircuitAntBehavior(Ant ant, CircuitSimulator circuitSimulator) {
+  public CircuitAntBehavior(CircuitSimulator circuitSimulator) {
     this.circuitSimulator = circuitSimulator;
     this.outputData = new int[AntOutput.DATA_SIZE];
     this.circuitIndex = circuitSimulator.getAllocator().allocateCircuit();
