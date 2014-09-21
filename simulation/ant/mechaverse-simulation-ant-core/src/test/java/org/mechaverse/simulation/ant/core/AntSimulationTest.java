@@ -114,7 +114,7 @@ public class AntSimulationTest {
 
   @Test
   public void randomGeneratorIsDeterministic() {
-    assertEquals(-9140335696372787636L, random.nextLong());
+    assertEquals(2280233513574350514L, random.nextLong());
   }
 
   @Test
