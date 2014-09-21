@@ -2,6 +2,10 @@ package org.mechaverse.simulation.common.circuit;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -224,5 +228,29 @@ public abstract class AbstractCircuitSimulatorTest {
     circuitSimulator2.getCircuitState(0, state2);
 
     assertArrayEquals(state1, state2);
+  }
+
+  @Test
+  public void circuitAllocationAndDeallocation() throws Exception {
+    Circuit circuit1 = CircuitBuilder.newCircuit(
+        3, 3, Routing3In3OutElementType.newInstance(), 4, 4);
+    CircuitSimulator circuitSimulator = newCircuitSimulator(circuit1, 10);
+    assertEquals(10, circuitSimulator.getAllocator().getAvailableCircuitCount());
+
+    Set<Integer> allocatedCircuits = new HashSet<Integer>();
+    for (int cnt = 1; cnt <= 10; cnt++) {
+      allocatedCircuits.add(circuitSimulator.getAllocator().allocateCircuit());
+    }
+    assertEquals(10, allocatedCircuits.size());
+
+    try {
+      circuitSimulator.getAllocator().allocateCircuit();
+      fail("Expected exception was not thrown.");
+    } catch (IllegalStateException ex) {
+      // Expected.
+    }
+
+    circuitSimulator.getAllocator().deallocateCircuit(4);
+    assertEquals(4, circuitSimulator.getAllocator().allocateCircuit());
   }
 }

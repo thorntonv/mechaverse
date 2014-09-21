@@ -7,6 +7,7 @@ package org.mechaverse.simulation.common.circuit;
  */
 public interface CircuitSimulator extends AutoCloseable {
 
+  public CircuitAllocator getAllocator();
   public int getCircuitCount();
   public int getCircuitInputSize();
   public int getCircuitStateSize();

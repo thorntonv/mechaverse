@@ -5,6 +5,7 @@ import java.io.StringWriter;
 import java.nio.IntBuffer;
 
 import org.mechaverse.circuit.model.Circuit;
+import org.mechaverse.simulation.common.circuit.CircuitAllocator;
 import org.mechaverse.simulation.common.circuit.CircuitSimulator;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModelBuilder;
@@ -32,6 +33,7 @@ public final class OpenClCircuitSimulator implements CircuitSimulator {
   private final int circuitOutputSize;
   private final long globalWorkSize;
   private final long localWorkSize;
+  private final CircuitAllocator allocator;
 
   private final CLContext context;
   private final CLCommandQueue queue;
@@ -63,6 +65,7 @@ public final class OpenClCircuitSimulator implements CircuitSimulator {
     this.circuitOutputSize = circuitOutputSize;
     this.globalWorkSize = globalWorkSize;
     this.localWorkSize = localWorkSize;
+    this.allocator = new CircuitAllocator(numCircuits);
 
     this.context = CLContext.create(device);
     CLProgram program = context.createProgram(kernelSource).build();
@@ -77,6 +80,11 @@ public final class OpenClCircuitSimulator implements CircuitSimulator {
     kernel.setArg(0, inputBuffer);
     kernel.setArg(1, stateBuffer);
     kernel.setArg(2, outputBuffer);
+  }
+
+  @Override
+  public CircuitAllocator getAllocator() {
+    return allocator;
   }
 
   @Override
