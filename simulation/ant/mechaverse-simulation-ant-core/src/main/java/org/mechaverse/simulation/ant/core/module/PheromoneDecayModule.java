@@ -1,15 +1,19 @@
-package org.mechaverse.simulation.ant.core;
+package org.mechaverse.simulation.ant.core.module;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.EntityType;
+import org.mechaverse.simulation.ant.core.AntSimulationModule;
+import org.mechaverse.simulation.ant.core.Cell;
+import org.mechaverse.simulation.ant.core.CellEnvironment;
+import org.mechaverse.simulation.ant.core.EntityManager;
 
 /**
  * A module that periodically decays pheromones. The granularity of this implementation is more
  * coarse than decaying each pheromone every update, but its performance is significantly better.
  */
-public class PheromoneDecayModule implements EnvironmentSimulationModule {
+public class PheromoneDecayModule implements AntSimulationModule {
 
   private int decayInterval = 60 * 60;
 

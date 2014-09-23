@@ -12,7 +12,7 @@
     <constructor-arg value="org.mechaverse.service.storage.api.MechaverseStorageService" /> 
   </bean>
 
-  <bean id="simulationService" class="org.mockito.Mockito" factory-method="mock"> 
-    <constructor-arg value="org.mechaverse.simulation.api.SimulationService" /> 
+  <bean id="simulation" class="org.mockito.Mockito" factory-method="mock"> 
+    <constructor-arg value="org.mechaverse.simulation.api.Simulation" /> 
   </bean>
 </beans>

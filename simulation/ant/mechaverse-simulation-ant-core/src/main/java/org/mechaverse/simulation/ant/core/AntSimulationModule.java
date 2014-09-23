@@ -4,9 +4,9 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
 
 /**
- * A module that can be added to an environment simulation.
+ * A module that can be added to an ant simulation.
  */
-public interface EnvironmentSimulationModule extends EntityManager.Observer {
+public interface AntSimulationModule extends EntityManager.Observer {
 
   /**
    * Performs any actions that are appropriate on before each update of the environment.

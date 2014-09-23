@@ -1,4 +1,4 @@
-package org.mechaverse.simulation.ant.core;
+package org.mechaverse.simulation.ant.core.module;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -14,12 +14,17 @@ import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Nest;
+import org.mechaverse.simulation.ant.core.AntSimulationModule;
+import org.mechaverse.simulation.ant.core.AntSimulationUtil;
+import org.mechaverse.simulation.ant.core.Cell;
+import org.mechaverse.simulation.ant.core.CellEnvironment;
+import org.mechaverse.simulation.ant.core.EntityManager;
 import org.mechaverse.simulation.common.genetic.CutAndSplitCrossoverGeneticRecombinator;
 
 /**
  * An environment simulation module that maintains a target ant population size.
  */
-public class AntReproductionModule implements EnvironmentSimulationModule {
+public class AntReproductionModule implements AntSimulationModule {
 
   /**
    * Calculates the fitness of a set of ants.

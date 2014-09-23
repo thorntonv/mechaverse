@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
@@ -11,26 +13,31 @@ import org.mechaverse.simulation.ant.api.SimulationModelUtil;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Environment;
 import org.mechaverse.simulation.ant.api.model.SimulationModel;
+import org.mechaverse.simulation.ant.api.util.EntityUtil;
+import org.mechaverse.simulation.api.Simulation;
+import org.mechaverse.simulation.common.SimulationDataStore;
 import org.mechaverse.simulation.common.cellautomata.EnvironmentGenerator;
+import org.mechaverse.simulation.common.opencl.DeviceUtil;
 import org.mechaverse.simulation.common.util.RandomUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 
-public final class AntSimulation {
+public final class AntSimulationImpl implements Simulation {
 
   private static final int DEFAULT_ENVIRONMENT_WIDTH = 200;
   private static final int DEFAULT_ENVIRONMENT_HEIGHT = 200;
 
-  private static final Logger logger = LoggerFactory.getLogger(AntSimulationServiceImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(AntSimulationImpl.class);
 
   private AntSimulationState state;
   private final List<EnvironmentSimulator> environmentSimulations = new ArrayList<>();
-  private final ActiveEntityProvider activeEntityProvider;
+  private final ActiveEntityProvider[] activeEntityProviders =
+      new ActiveEntityProvider[EntityUtil.ENTITY_TYPES.length];
   private final RandomGenerator random;
 
-  public static AntSimulationState randomState() throws IOException {
+  public static AntSimulationState randomState() {
     return randomState(new AntSimulationEnvironmentGenerator(), RandomUtil.newGenerator());
   }
 
@@ -53,18 +60,19 @@ public final class AntSimulation {
     return state;
   }
 
-  public AntSimulation() {
-    this(new SimpleActiveEntityProvider(), RandomUtil.newGenerator());
+  public AntSimulationImpl(Map<EntityType, ActiveEntityProvider> activeEntityProviders) {
+    this(activeEntityProviders, RandomUtil.newGenerator());
   }
 
-  public AntSimulation(ActiveEntityProvider activeEntityProvider, RandomGenerator random) {
-    this.activeEntityProvider = activeEntityProvider;
+  public AntSimulationImpl(Map<EntityType, ActiveEntityProvider> activeEntityProviderMap,
+      RandomGenerator random) {
     this.random = random;
-
-    state = randomState(new AntSimulationEnvironmentGenerator(), random);
-    setState(state);
+    for (Entry<EntityType, ActiveEntityProvider> entry : activeEntityProviderMap.entrySet()) {
+      activeEntityProviders[entry.getKey().ordinal()] = entry.getValue();
+    }
   }
 
+  @Override
   public AntSimulationState getState() {
     state.removeAllEntityValues();
     for (EnvironmentSimulator environmentSimulation : environmentSimulations) {
@@ -77,13 +85,18 @@ public final class AntSimulation {
     return state;
   }
 
+  @Override
+  public void setState(SimulationDataStore stateDataStore) throws IOException {
+    setState(new AntSimulationState(stateDataStore));
+  }
+
   public void setState(AntSimulationState state) {
     this.state = state;
     SimulationModel simulationModel = state.getModel();
 
     environmentSimulations.clear();
     for (Environment environment : SimulationModelUtil.getEnvironments(simulationModel)) {
-      environmentSimulations.add(new EnvironmentSimulator(environment, activeEntityProvider));
+      environmentSimulations.add(new EnvironmentSimulator(environment, activeEntityProviders));
     }
 
     for (EnvironmentSimulator environmentSimulation : environmentSimulations) {
@@ -119,10 +132,32 @@ public final class AntSimulation {
     simulationModel.setIteration(simulationModel.getIteration()+1);
   }
 
+  public void setActiveEntityProvider(EntityType entityType,
+      ActiveEntityProvider activeEntityProvider) {
+    activeEntityProviders[entityType.ordinal()] = activeEntityProvider;
+  }
+
   @VisibleForTesting
   void addObserver(EntityManager.Observer observer) {
     for (EnvironmentSimulator environmentSimulator : environmentSimulations) {
       environmentSimulator.addObserver(observer);
     }
+  }
+
+  @Override
+  public SimulationDataStore generateRandomState() {
+    return AntSimulationImpl.randomState();
+  }
+
+  @Override
+  public void step(int stepCount) {
+    for(int cnt = 1; cnt <= stepCount; cnt++) {
+      step();
+    }
+  }
+
+  @Override
+  public String getDeviceInfo() {
+    return DeviceUtil.getDeviceInfo();
   }
 }

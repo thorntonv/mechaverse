@@ -1,6 +1,7 @@
 package org.mechaverse.client;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
@@ -19,7 +20,8 @@ import org.junit.runner.RunWith;
 import org.mechaverse.service.manager.api.MechaverseManager;
 import org.mechaverse.service.manager.api.model.Task;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
-import org.mechaverse.simulation.api.SimulationService;
+import org.mechaverse.simulation.api.Simulation;
+import org.mechaverse.simulation.common.SimulationDataStore;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -35,7 +37,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class MechaverseClientTest {
 
   @Autowired private MechaverseManager mockManager;
-  @Autowired private SimulationService mockSimulationService;
+  @Autowired private Simulation mockSimulation;
   @Autowired private MechaverseStorageService mockStorageService;
 
   private MechaverseClient client;
@@ -43,9 +45,14 @@ public class MechaverseClientTest {
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    Mockito.reset(mockManager, mockSimulationService, mockStorageService);
+    Mockito.reset(mockManager, mockSimulation, mockStorageService);
 
-    client = new MechaverseClient(mockSimulationService, mockManager, mockStorageService, 0);
+    client = new MechaverseClient(mockManager, mockStorageService, 0) {
+      @Override
+      protected Simulation createSimulation() {
+        return mockSimulation;
+      }
+    };
   }
 
   @Test
@@ -57,21 +64,27 @@ public class MechaverseClientTest {
     task.setIteration(300);
     task.setIterationCount(20);
 
-    byte[] state = "state".getBytes();
-    byte[] newState = "newState".getBytes();
+    SimulationDataStore state = new SimulationDataStore();
+    state.put("test", "state".getBytes());
+    SimulationDataStore newState = new SimulationDataStore();
+    newState.put("test2", "newState".getBytes());
     when(mockStorageService.getState(
         task.getSimulationId(), task.getInstanceId(), task.getIteration()))
-            .thenReturn(new ByteArrayInputStream(state));
+            .thenReturn(new ByteArrayInputStream(state.serialize()));
 
-    when(mockSimulationService.getState(0)).thenReturn(newState);
+    when(mockSimulation.getState()).thenReturn(newState);
 
     client.executeTask(task);
 
-    verify(mockSimulationService).setState(0, state);
-    verify(mockSimulationService).step(0, 20);
+    ArgumentCaptor<SimulationDataStore> stateCaptor = ArgumentCaptor.forClass(SimulationDataStore.class);
+    verify(mockSimulation).setState(stateCaptor.capture());
+    assertEquals(state.keySet(), stateCaptor.getValue().keySet());
+    assertArrayEquals("state".getBytes(), state.get("test"));
+
+    verify(mockSimulation).step(20);
     ArgumentCaptor<InputStream> stateIn = ArgumentCaptor.forClass(InputStream.class);
     verify(mockManager).submitResult(eq(task.getId()), stateIn.capture());
-    assertArrayEquals(newState, IOUtils.toByteArray(stateIn.getValue()));
+    assertArrayEquals(newState.serialize(), IOUtils.toByteArray(stateIn.getValue()));
   }
 
   @Test
@@ -83,15 +96,16 @@ public class MechaverseClientTest {
     task.setIteration(-1);
     task.setIterationCount(0);
 
-    byte[] state = "state".getBytes();
-    when(mockSimulationService.generateRandomState()).thenReturn(state);
+    SimulationDataStore state = new SimulationDataStore();
+    state.put("test", "state".getBytes());
+    when(mockSimulation.generateRandomState()).thenReturn(state);
 
     client.executeTask(task);
 
-    verify(mockSimulationService, never()).setState(anyInt(), any(byte[].class));
-    verify(mockSimulationService, never()).step(anyInt(), anyInt());
+    verify(mockSimulation, never()).setState(any(SimulationDataStore.class));
+    verify(mockSimulation, never()).step(anyInt());
     ArgumentCaptor<InputStream> stateIn = ArgumentCaptor.forClass(InputStream.class);
     verify(mockManager).submitResult(eq(task.getId()), stateIn.capture());
-    assertArrayEquals(state, IOUtils.toByteArray(stateIn.getValue()));
+    assertArrayEquals(state.serialize(), IOUtils.toByteArray(stateIn.getValue()));
   }
 }

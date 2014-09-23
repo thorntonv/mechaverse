@@ -20,8 +20,8 @@ import org.mechaverse.service.storage.api.MechaverseStorageService;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.api.model.Entity;
-import org.mechaverse.simulation.ant.core.AntSimulationServiceImpl;
-import org.mechaverse.simulation.api.SimulationService;
+import org.mechaverse.simulation.ant.core.AntSimulationImpl;
+import org.mechaverse.simulation.common.SimulationDataStore;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -37,7 +37,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class AntSimulationMechaverseClientTest {
 
   @Autowired private MechaverseManager mockManager;
-  private SimulationService antSimulationService = new AntSimulationServiceImpl();
   @Autowired private MechaverseStorageService mockStorageService;
 
   private MechaverseClient client;
@@ -47,7 +46,7 @@ public class AntSimulationMechaverseClientTest {
     MockitoAnnotations.initMocks(this);
     Mockito.reset(mockManager, mockStorageService);
 
-    client = new MechaverseClient(antSimulationService, mockManager, mockStorageService, 0);
+    client = new MechaverseClient(mockManager, mockStorageService, 0);
   }
 
   @Test
@@ -59,10 +58,10 @@ public class AntSimulationMechaverseClientTest {
     task.setIteration(300);
     task.setIterationCount(100);
 
-    byte[] state = antSimulationService.generateRandomState();
+    SimulationDataStore state = AntSimulationImpl.randomState();
     when(mockStorageService.getState(
         task.getSimulationId(), task.getInstanceId(), task.getIteration()))
-            .thenReturn(new ByteArrayInputStream(state));
+            .thenReturn(new ByteArrayInputStream(state.serialize()));
 
     client.executeTask(task);
 

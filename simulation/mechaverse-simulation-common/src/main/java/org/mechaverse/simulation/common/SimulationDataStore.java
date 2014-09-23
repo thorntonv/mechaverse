@@ -15,9 +15,9 @@ import java.util.Set;
 /**
  * A data store for simulation key/value data.
  */
-public final class SimulationDataStore {
+public class SimulationDataStore {
 
-  private final Map<String, byte[]> dataStore = new LinkedHashMap<>();
+  private final Map<String, byte[]> dataStore;
 
   public static void deserialize(InputStream in, Map<String, byte[]> targetMap)
       throws IOException {
@@ -41,6 +41,14 @@ public final class SimulationDataStore {
     SimulationDataStore dataStore = new SimulationDataStore();
     deserialize(in, dataStore.dataStore);
     return dataStore;
+  }
+
+  public SimulationDataStore() {
+    this.dataStore = new LinkedHashMap<>();
+  }
+
+  protected SimulationDataStore(SimulationDataStore dataStore) {
+    this.dataStore = dataStore.dataStore;
   }
 
   public byte[] get(String key) {

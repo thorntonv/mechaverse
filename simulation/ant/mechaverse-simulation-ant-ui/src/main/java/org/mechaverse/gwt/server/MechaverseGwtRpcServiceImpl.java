@@ -12,8 +12,9 @@ import org.mechaverse.gwt.shared.MechaverseGwtRpcService;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.model.SimulationModel;
-import org.mechaverse.simulation.ant.core.AntSimulationServiceImpl;
-import org.mechaverse.simulation.api.SimulationService;
+import org.mechaverse.simulation.api.Simulation;
+import org.mechaverse.simulation.common.SimulationDataStore;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.google.common.collect.ImmutableList;
@@ -33,12 +34,16 @@ public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
   @Override
   public SimulationModel loadState(String simulationId, String instanceId, long iteration)
       throws Exception {
-    SimulationService service = getSimulationService();
-    synchronized (service) {
-      InputStream stateIn = getStorageService().getState(simulationId, instanceId, iteration);
-      byte[] state = IOUtils.readBytesFromStream(stateIn);
-      getSimulationService().setState(0, state);
-      return getModel();
+    try {
+      Simulation service = getSimulation();
+      synchronized (service) {
+        InputStream stateIn = getStorageService().getState(simulationId, instanceId, iteration);
+        service.setState(SimulationDataStore.deserialize(IOUtils.readBytesFromStream(stateIn)));
+        return getModel();
+      }
+    } catch (Throwable t) {
+      t.printStackTrace();
+      throw t;
     }
   }
 
@@ -49,9 +54,9 @@ public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
 
   @Override
   public SimulationModel getModel() throws Exception {
-    SimulationService service = getSimulationService();
+    Simulation service = getSimulation();
     synchronized (service) {
-      byte[] modelData = service.getStateValue(0, AntSimulationState.MODEL_KEY);
+      byte[] modelData = service.getState().get(AntSimulationState.MODEL_KEY);
       return AntSimulationState.deserializeModel(new GZIPInputStream(
           new ByteArrayInputStream(modelData)));
     }
@@ -64,18 +69,21 @@ public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
 
   @Override
   public void step() throws Exception {
-    SimulationService service = getSimulationService();
+    Simulation service = getSimulation();
     synchronized (service) {
-      service.step(0, 1);
+      service.step(1);
     }
   }
 
-  private SimulationService getSimulationService() {
+  private Simulation getSimulation() {
     HttpServletRequest request = this.getThreadLocalRequest();
-    SimulationService service = (SimulationService) request.getSession(true)
+    Simulation service = (Simulation) request.getSession(true)
         .getAttribute(SIMULATION_SERVICE_KEY);
     if (service == null) {
-      service = new AntSimulationServiceImpl();
+      try (ClassPathXmlApplicationContext ctx =
+          new ClassPathXmlApplicationContext("simulation-context.xml")) {
+        service = ctx.getBean(Simulation.class);
+      }
       request.getSession().setAttribute(SIMULATION_SERVICE_KEY, service);
     }
     return service;
@@ -86,7 +94,7 @@ public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
     MechaverseStorageService service = (MechaverseStorageService) request.getSession(true)
         .getAttribute(STORAGE_SERVICE_KEY);
     if (service == null) {
-      service =JAXRSClientFactory.create(
+      service = JAXRSClientFactory.create(
         "http://mechaverse.org:8080/mechaverse-storage-service", MechaverseStorageService.class,
         ImmutableList.of(new JacksonJaxbJsonProvider()));
       request.getSession().setAttribute(STORAGE_SERVICE_KEY, service);

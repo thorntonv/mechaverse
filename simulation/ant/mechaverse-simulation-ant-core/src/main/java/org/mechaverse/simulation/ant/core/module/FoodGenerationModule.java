@@ -1,4 +1,4 @@
-package org.mechaverse.simulation.ant.core;
+package org.mechaverse.simulation.ant.core.module;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
@@ -6,6 +6,10 @@ import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Food;
 import org.mechaverse.simulation.ant.api.util.EntityUtil;
+import org.mechaverse.simulation.ant.core.AntSimulationEnvironmentGenerator;
+import org.mechaverse.simulation.ant.core.AntSimulationModule;
+import org.mechaverse.simulation.ant.core.CellEnvironment;
+import org.mechaverse.simulation.ant.core.EntityManager;
 import org.mechaverse.simulation.common.cellautomata.AbstractProbabilisticEnvironmentGenerator.EntityDistribution;
 import org.mechaverse.simulation.common.cellautomata.AbstractProbabilisticEnvironmentGenerator.ProbabilisticLocalGenerator;
 import org.slf4j.Logger;
@@ -18,7 +22,7 @@ import com.google.common.collect.Table;
 /**
  * Generates clusters of food to maintain a minimum quantity of food.
  */
-public class FoodGenerator implements EnvironmentSimulationModule {
+public class FoodGenerationModule implements AntSimulationModule {
 
   /**
    * {@link ProbabilisticLocalGenerator} that generates a cluster of food.
@@ -52,7 +56,7 @@ public class FoodGenerator implements EnvironmentSimulationModule {
     }
   }
 
-  private static Logger logger = LoggerFactory.getLogger(FoodGenerator.class);
+  private static Logger logger = LoggerFactory.getLogger(FoodGenerationModule.class);
 
   private int foodCount = 0;
 

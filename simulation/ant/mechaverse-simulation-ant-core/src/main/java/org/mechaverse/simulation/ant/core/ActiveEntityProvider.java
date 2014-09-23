@@ -2,12 +2,10 @@ package org.mechaverse.simulation.ant.core;
 
 import org.mechaverse.simulation.ant.api.model.Entity;
 
-import com.google.common.base.Optional;
-
 /**
- * Provides an {@link ActiveEntity} instance for the given entity (if appropriate).
+ * Provides an {@link ActiveEntity} instance for the given entity.
  */
 public interface ActiveEntityProvider {
 
-  Optional<ActiveEntity> getActiveEntity(Entity entity);
+  ActiveEntity getActiveEntity(Entity entity);
 }

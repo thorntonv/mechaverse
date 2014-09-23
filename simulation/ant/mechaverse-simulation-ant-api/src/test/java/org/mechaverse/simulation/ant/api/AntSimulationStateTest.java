@@ -34,7 +34,7 @@ public class AntSimulationStateTest {
     String entityKey = "entity.001." + KEY1;
     assertTrue(state.containsKey(entityKey));
     assertEquals(keySetWithEntityKeys(entityKey), state.keySet());
-    assertArrayEquals(DATA1, state.getData(entityKey));
+    assertArrayEquals(DATA1, state.get(entityKey));
     assertArrayEquals(DATA1, state.getEntityValue(entity, KEY1));
   }
 
@@ -56,10 +56,10 @@ public class AntSimulationStateTest {
     assertTrue(state.containsKey(entityKey1));
     assertTrue(state.containsKey(entityKey2));
     assertEquals(keySetWithEntityKeys(entityKey1, entityKey2), state.keySet());
-    assertArrayEquals(DATA1, state.getData(entityKey1));
-    assertArrayEquals(DATA2, state.getData(entityKey2));
+    assertArrayEquals(DATA1, state.get(entityKey1));
+    assertArrayEquals(DATA2, state.get(entityKey2));
 
-    state.setData("test", "test".getBytes());
+    state.put("test", "test".getBytes());
 
     entityDataStore = state.getEntityValues(entity);
     assertEquals(ImmutableSet.of(KEY1, KEY2), entityDataStore.keySet());
@@ -81,7 +81,7 @@ public class AntSimulationStateTest {
     entityDataStore.put(KEY1, DATA1);
     state.putEntityValues(entity2, entityDataStore);
 
-    state.setData("test", "test".getBytes());
+    state.put("test", "test".getBytes());
 
     state.removeAllEntityValues();
 

@@ -3,8 +3,6 @@ package org.mechaverse.common;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.mechaverse.service.manager.api.MechaverseManager;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
-import org.mechaverse.simulation.api.SimulationService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,12 +25,6 @@ public class MechaverseConfig {
 
   @Value("${org.mechaverse.storageServiceUrl}")
   private String storageServiceUrl;
-
-  @Autowired(required = false) SimulationService simulationService;
-
-  public SimulationService getSimulationService() {
-    return simulationService;
-  }
 
   @Bean
   public MechaverseManager getManager() {

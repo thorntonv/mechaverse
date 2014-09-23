@@ -42,12 +42,12 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
   }
 
   public AntSimulationState() {
-    super(new SimulationModel());
+    super(new SimulationModel(), new SimulationDataStore());
 
     // Add placeholders for the model and config. These will be serialized from objects when
     // requested.
-    dataStore.put(MODEL_KEY, new byte[0]);
-    dataStore.put(CONFIG_KEY, new byte[0]);
+    put(MODEL_KEY, new byte[0]);
+    put(CONFIG_KEY, new byte[0]);
   }
 
   public AntSimulationState(SimulationDataStore dataStore) throws IOException {
@@ -57,18 +57,13 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
 
     // Add placeholders for the model and config. These will be serialized from objects when
     // requested.
-    this.dataStore.put(MODEL_KEY, new byte[0]);
-    this.dataStore.put(CONFIG_KEY, new byte[0]);
+    put(MODEL_KEY, new byte[0]);
+    put(CONFIG_KEY, new byte[0]);
   }
 
   @Override
   public String getId() {
     return model.getId();
-  }
-
-  @Override
-  public String getInstanceId() {
-    return model.getEnvironment().getId();
   }
 
   @Override
@@ -81,19 +76,20 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
   }
 
   @Override
-  public byte[] getData(String key) {
+  public byte[] get(String key) {
     if(key.equals(MODEL_KEY)) {
       try {
-        setData(MODEL_KEY, serializeModel());
+        put(MODEL_KEY, serializeModel());
       } catch (IOException e) {}
     } else if(key.equals(CONFIG_KEY)) {
       try {
-        setData(CONFIG_KEY, config.serialize());
+        put(CONFIG_KEY, config.serialize());
       } catch (IOException e) {}
     }
-    return super.getData(key);
+    return super.get(key);
   }
 
+  @Override
   public byte[] serialize() throws IOException {
     ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
     serialize(byteOut);
@@ -101,14 +97,14 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
   }
 
   public byte[] getEntityValue(Entity entity, String key) {
-    return dataStore.get(getEntityKey(entity, key));
+    return get(getEntityKey(entity, key));
   }
 
   public void removeAllEntityValues() {
     Set<String> keys = new HashSet<>(keySet());
     for (String key : keys) {
       if (key.startsWith(ENTITY_KEY_PREFIX)) {
-        dataStore.remove(key);
+        remove(key);
       }
     }
   }
@@ -118,7 +114,7 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
     String entityKeyPrefix = getEntityKeyPrefix(entity) + ".";
     for (String key : keySet()) {
       if (key.startsWith(entityKeyPrefix)) {
-        byte[] value = getData(key);
+        byte[] value = get(key);
         String entityKey = key.substring(entityKeyPrefix.length());
         entityDataStore.put(entityKey, value);
       }
@@ -127,7 +123,7 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
   }
 
   public void putEntityValue(Entity entity, String key, byte[] value) {
-    dataStore.put(getEntityKey(entity, key), value);
+    put(getEntityKey(entity, key), value);
   }
 
   public void putEntityValues(Entity entity, SimulationDataStore entityDataStore) {
@@ -136,10 +132,11 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
     }
   }
 
+  @Override
   public void serialize(OutputStream out) throws IOException {
-    setData(MODEL_KEY, serializeModel());
-    setData(CONFIG_KEY, config.serialize());
-    dataStore.serialize(out);
+    put(MODEL_KEY, serializeModel());
+    put(CONFIG_KEY, config.serialize());
+    super.serialize(out);
   }
 
   public static void serializeModel(SimulationModel model, OutputStream out) throws IOException {
