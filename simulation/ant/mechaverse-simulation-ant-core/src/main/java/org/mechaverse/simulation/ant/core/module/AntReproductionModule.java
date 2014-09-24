@@ -14,12 +14,12 @@ import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Nest;
-import org.mechaverse.simulation.ant.core.AntSimulationModule;
 import org.mechaverse.simulation.ant.core.AntSimulationUtil;
 import org.mechaverse.simulation.ant.core.Cell;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
 import org.mechaverse.simulation.ant.core.EntityManager;
 import org.mechaverse.simulation.common.genetic.CutAndSplitCrossoverGeneticRecombinator;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * An environment simulation module that maintains a target ant population size.
@@ -64,6 +64,9 @@ public class AntReproductionModule implements AntSimulationModule {
 
   // TODO(thorntonv): Support multiple nests and nests of different types.
 
+  @Value("#{properties['antMaxCount']}") private int antMaxCount;
+  @Value("#{properties['antInitialEnergy']}") private int antInitialEnergy;
+
   private final Set<Ant> ants = new LinkedHashSet<>();
   private Nest nest;
   private final CutAndSplitCrossoverGeneticRecombinator geneticRecombinator =
@@ -73,7 +76,7 @@ public class AntReproductionModule implements AntSimulationModule {
   @Override
   public void beforeUpdate(AntSimulationState state, CellEnvironment env,
       EntityManager entityManager, RandomGenerator random) {
-    if (ants.size() < state.getConfig().getTargetAntCount() && nest != null) {
+    if (ants.size() < antMaxCount && nest != null) {
       Cell cell = env.getCell(nest);
       if (cell.getEntity(EntityType.ANT) == null) {
         Ant ant = generateRandomAnt(state, random);
@@ -95,16 +98,16 @@ public class AntReproductionModule implements AntSimulationModule {
     Ant ant = new Ant();
     ant.setId(new UUID(random.nextLong(), random.nextLong()).toString());
     ant.setDirection(AntSimulationUtil.randomDirection(random));
-    ant.setMaxEnergy(state.getConfig().getAntInitialEnergy());
-    ant.setEnergy(ant.getMaxEnergy());
+    ant.setEnergy(antInitialEnergy);
+    ant.setMaxEnergy(antInitialEnergy);
     return ant;
   }
 
   public Ant generateAnt(AntSimulationState state, RandomGenerator random) {
     Ant ant = new Ant();
     ant.setDirection(AntSimulationUtil.randomDirection(random));
-    ant.setMaxEnergy(state.getConfig().getAntInitialEnergy());
-    ant.setEnergy(ant.getMaxEnergy());
+    ant.setEnergy(antInitialEnergy);
+    ant.setMaxEnergy(antInitialEnergy);
 
     EnumeratedDistribution<Ant> antFitnessDistribution =
         fitnessCalculator.getAntFitnessDistribution(ants, random);

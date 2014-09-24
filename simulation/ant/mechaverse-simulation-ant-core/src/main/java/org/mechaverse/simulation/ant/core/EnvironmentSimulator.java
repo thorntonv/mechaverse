@@ -6,41 +6,50 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.Environment;
-import org.mechaverse.simulation.ant.api.util.EntityUtil;
-import org.mechaverse.simulation.ant.core.module.AntReproductionModule;
-import org.mechaverse.simulation.ant.core.module.FoodGenerationModule;
-import org.mechaverse.simulation.ant.core.module.PheromoneDecayModule;
+import org.mechaverse.simulation.ant.core.module.AntSimulationModule;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
 /**
  * Simulates an environment.
  */
-public class EnvironmentSimulator implements EntityManager {
+public final class EnvironmentSimulator implements EntityManager {
+
+  public static class Factory {
+
+    @Autowired ApplicationContext context;
+    @Autowired private ActiveEntityProviders activeEntityProviders;
+    @Resource(name="modules") private List<AntSimulationModule> modules;
+
+    public EnvironmentSimulator create(Environment environment) {
+      EnvironmentSimulator environmentSimulator =
+          new EnvironmentSimulator(environment, activeEntityProviders, modules);
+      context.getAutowireCapableBeanFactory().autowireBean(environmentSimulator);
+      return environmentSimulator;
+    }
+  }
+
 
   private final CellEnvironment environment;
   private final Map<Entity, ActiveEntity> activeEntities = new LinkedHashMap<>();
-  private final List<AntSimulationModule> modules = new ArrayList<>();
-  private final ActiveEntityProvider[] activeEntityProviders;
   private final Set<EntityManager.Observer> observers = Sets.newLinkedHashSet();
+  private final ActiveEntityProviders activeEntityProviders;
+  private final List<AntSimulationModule> modules;
 
-  public EnvironmentSimulator(Environment environment,
-      ActiveEntityProvider[] activeEntityProviders) {
-    this(environment, ImmutableList.<AntSimulationModule>of(
-      new FoodGenerationModule(), new AntReproductionModule(), new PheromoneDecayModule()),
-      activeEntityProviders);
-  }
-
-  public EnvironmentSimulator(Environment environment, List<AntSimulationModule> modules,
-      ActiveEntityProvider[] activeEntityProviders) {
+  private EnvironmentSimulator(Environment environment, ActiveEntityProviders activeEntityProviders,
+      List<AntSimulationModule> modules) {
     this.environment = new CellEnvironment(environment);
-    this.activeEntityProviders = activeEntityProviders;
+    this.activeEntityProviders =activeEntityProviders;
+    this.modules = modules;
 
     for (Entity entity : environment.getEntities()) {
       addEntity(entity);
@@ -70,7 +79,7 @@ public class EnvironmentSimulator implements EntityManager {
     }
 
     for (ActiveEntity activeEntity : activeEntityList) {
-      activeEntity.performAction(environment, state.getConfig(), this, random);
+      activeEntity.performAction(environment, this, random);
     }
 
     for (AntSimulationModule module : modules) {
@@ -84,8 +93,7 @@ public class EnvironmentSimulator implements EntityManager {
 
   @Override
   public void addEntity(Entity entity) {
-    ActiveEntityProvider activeEntityProvider =
-        activeEntityProviders[EntityUtil.getType(entity).ordinal()];
+    ActiveEntityProvider activeEntityProvider = activeEntityProviders.get(entity);
     if (activeEntityProvider != null) {
       ActiveEntity activeEntity = activeEntityProvider.getActiveEntity(entity);
       activeEntities.put(activeEntity.getEntity(), activeEntity);

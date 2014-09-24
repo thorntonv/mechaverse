@@ -17,6 +17,8 @@ import org.mechaverse.service.manager.api.model.Task;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
 import org.mechaverse.simulation.api.Simulation;
 import org.mechaverse.simulation.common.SimulationDataStore;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
@@ -106,9 +108,9 @@ public class MechaverseClient {
     System.out.printf("(%d) Executing task [simulation: %s, instance: %s, iteration: %d]\n",
         instanceIdx, task.getSimulationId(), task.getInstanceId(), task.getIteration());
 
-    try {
+    try(AbstractApplicationContext ctx = getApplicationContext()) {
       SimulationDataStore state = null;
-      Simulation simulation = createSimulation();
+      Simulation simulation = createSimulation(ctx);
       if (task.getIteration() >= 0) {
         // Get the state from the storage service.
         logSubOperationStart("Retrieving simulation state");
@@ -141,11 +143,12 @@ public class MechaverseClient {
     }
   }
 
-  protected Simulation createSimulation() {
-    try (ClassPathXmlApplicationContext ctx =
-        new ClassPathXmlApplicationContext("simulation-context.xml")) {
-      return ctx.getBean(Simulation.class);
-    }
+  protected AbstractApplicationContext getApplicationContext() {
+    return new ClassPathXmlApplicationContext("simulation-context.xml");
+  }
+
+  protected Simulation createSimulation(ApplicationContext ctx) {
+    return ctx.getBean(Simulation.class);
   }
 
   private void logOperationStart(String msg) {

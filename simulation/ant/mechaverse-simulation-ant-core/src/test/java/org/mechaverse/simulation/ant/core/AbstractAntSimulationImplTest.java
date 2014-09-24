@@ -7,8 +7,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.math3.random.RandomGenerator;
@@ -20,17 +18,11 @@ import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.SimulationModel;
 import org.mechaverse.simulation.ant.api.util.EntityUtil;
-import org.mechaverse.simulation.ant.core.entity.ant.ActiveAnt;
-import org.mechaverse.simulation.ant.core.entity.ant.AntOutput;
-import org.mechaverse.simulation.ant.core.entity.ant.SimpleAntBehavior;
-import org.mechaverse.simulation.common.SimulationDataStore;
 import org.mechaverse.simulation.common.util.RandomUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 import com.google.common.io.ByteStreams;
 
 /**
@@ -78,6 +70,9 @@ public abstract class AbstractAntSimulationImplTest {
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractAntSimulationImplTest.class);
 
+  @Value("#{properties['antMaxCount']}") private int antMaxCount;
+  @Value("#{properties['foodMinCount']}") private int minFoodCount;
+
   private RandomGenerator random;
 
   protected abstract AntSimulationImpl newSimulationImpl();
@@ -108,8 +103,7 @@ public abstract class AbstractAntSimulationImplTest {
       verifyEntityTypeCounts(simulation.getState().getModel(), entityCountObserver);
     }
 
-    assertTrue(entityCountObserver.getEntityCount(EntityType.FOOD) >= simulation.getState()
-        .getConfig().getMinFoodCount());
+    assertTrue(entityCountObserver.getEntityCount(EntityType.FOOD) >= minFoodCount);
   }
 
   @Test
@@ -144,137 +138,6 @@ public abstract class AbstractAntSimulationImplTest {
       simulation2.step();
 
       verifyStatesEqual(simulation1.getState(), simulation2.getState());
-    }
-  }
-
-  @Test
-  public void getAndSetEntityState() throws IOException {
-    ActiveEntityProvider provider = new ActiveEntityProvider() {
-      @Override
-      public ActiveEntity getActiveEntity(final Entity entity) {
-        final Ant ant = (Ant) entity;
-        return new ActiveAnt(ant, new SimpleAntBehavior() {
-          int age = 0;
-          @Override
-          public AntOutput getOutput(RandomGenerator random) {
-            age++;
-            if(age > 10) {
-             entity.setEnergy(0);
-            }
-            return super.getOutput(random);
-          }
-
-          @Override
-          public void setState(SimulationDataStore state) {
-            age = Integer.parseInt(new String(state.get("age")));
-            assertEquals(entity.getId(), new String(state.get("id")));
-            assertEquals(((Ant) entity).getAge(), age);
-          }
-
-          @Override
-          public SimulationDataStore getState() {
-            SimulationDataStore dataStore = new SimulationDataStore();
-            dataStore.put("id", entity.getId().getBytes());
-            dataStore.put("age", String.valueOf(age).getBytes());
-            return dataStore;
-          }
-        });
-      }
-    };
-
-    AntSimulationImpl simulation = new AntSimulationImpl(
-        ImmutableMap.of(EntityType.ANT, provider), random);
-    simulation.setState(simulation.generateRandomState());
-
-    for (int cnt = 1; cnt <= 100; cnt++) {
-      simulation.step();
-
-      AntSimulationState state = simulation.getState();
-      int antCount = 0;
-      for (Entity entity : state.getModel().getEnvironment().getEntities()) {
-        if (entity instanceof Ant) {
-          SimulationDataStore entityDataStore = state.getEntityValues(entity);
-          assertEquals(ImmutableSet.of("id", "age"), entityDataStore.keySet());
-          assertEquals(entity.getId(), new String(entityDataStore.get("id")));
-          assertEquals(((Ant) entity).getAge(),
-              Integer.parseInt(new String(entityDataStore.get("age"))));
-          antCount++;
-        }
-      }
-      assertEquals("Key set was: " + state.keySet().toString(),
-          antCount*2 + 2, state.keySet().size());
-    }
-
-    AntSimulationState state = simulation.getState();
-    simulation = new AntSimulationImpl(
-        ImmutableMap.of(EntityType.ANT, provider), random);
-
-    simulation.setState(state);
-    simulation.step();
-
-    state = simulation.getState();
-    for (Entity entity : state.getModel().getEnvironment().getEntities()) {
-      if (entity instanceof Ant) {
-        SimulationDataStore entityDataStore = state.getEntityValues(entity);
-        assertEquals(ImmutableSet.of("id", "age"), entityDataStore.keySet());
-        assertEquals(entity.getId(), new String(entityDataStore.get("id")));
-        assertEquals(((Ant) entity).getAge(),
-            Integer.parseInt(new String(entityDataStore.get("age"))));
-      }
-    }
-  }
-
-  @Test
-  public void antBehaviorOnRemoveEntity() throws IOException {
-    final Set<Integer> availableIds = new HashSet<Integer>();
-    ActiveEntityProvider provider = new ActiveEntityProvider() {
-      @Override
-      public ActiveEntity getActiveEntity(final Entity entity) {
-        final Ant ant = (Ant) entity;
-        return new ActiveAnt(ant, new SimpleAntBehavior() {
-          private Integer id;
-
-          @Override
-          public AntOutput getOutput(RandomGenerator random) {
-            if(id == null) {
-              id = Iterables.getFirst(availableIds, null);
-              availableIds.remove(id);
-            }
-            assertTrue(id != null);
-            return super.getOutput(random);
-          }
-
-          @Override
-          public void onRemoveEntity() {
-            availableIds.add(id);
-            id = null;
-            super.onRemoveEntity();
-          }
-        });
-      }
-    };
-
-    AntSimulationImpl simulation = new AntSimulationImpl(
-        ImmutableMap.of(EntityType.ANT, provider), random);
-    simulation.setState(simulation.generateRandomState());
-
-    int targetAntCount = simulation.getState().getConfig().getTargetAntCount();
-    for(int cnt = 1; cnt <= targetAntCount; cnt++) {
-      availableIds.add(cnt);
-    }
-
-    for (int cnt = 1; cnt <= TEST_ITERATION_COUNT; cnt++) {
-      simulation.step();
-
-      int expectedAvailableIdCount = targetAntCount;
-      for(Entity entity : simulation.getState().getModel().getEnvironment().getEntities()) {
-        if(entity instanceof Ant) {
-          expectedAvailableIdCount--;
-        }
-      }
-
-      logger.debug("{} available ids", availableIds.size());
-      assertEquals(expectedAvailableIdCount, availableIds.size());
     }
   }
 

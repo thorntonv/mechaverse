@@ -30,8 +30,6 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
 
   private static final String ENTITY_KEY_PREFIX = "entity.";
 
-  private AntSimulationConfig config = new AntSimulationConfig();
-
   public static AntSimulationState deserialize(byte[] data) throws IOException {
     return deserialize(new ByteArrayInputStream(data));
   }
@@ -53,7 +51,6 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
   public AntSimulationState(SimulationDataStore dataStore) throws IOException {
     super(deserializeModel(new GZIPInputStream(
         new ByteArrayInputStream(dataStore.get(MODEL_KEY)))), dataStore);
-    this.config = AntSimulationConfig.deserialize(dataStore.get(CONFIG_KEY));
 
     // Add placeholders for the model and config. These will be serialized from objects when
     // requested.
@@ -71,19 +68,11 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
     return model.getIteration();
   }
 
-  public AntSimulationConfig getConfig() {
-    return config;
-  }
-
   @Override
   public byte[] get(String key) {
     if(key.equals(MODEL_KEY)) {
       try {
         put(MODEL_KEY, serializeModel());
-      } catch (IOException e) {}
-    } else if(key.equals(CONFIG_KEY)) {
-      try {
-        put(CONFIG_KEY, config.serialize());
       } catch (IOException e) {}
     }
     return super.get(key);
@@ -135,7 +124,6 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
   @Override
   public void serialize(OutputStream out) throws IOException {
     put(MODEL_KEY, serializeModel());
-    put(CONFIG_KEY, config.serialize());
     super.serialize(out);
   }
 

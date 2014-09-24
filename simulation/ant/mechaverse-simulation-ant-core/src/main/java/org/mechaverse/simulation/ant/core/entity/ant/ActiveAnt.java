@@ -1,7 +1,6 @@
 package org.mechaverse.simulation.ant.core.entity.ant;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.mechaverse.simulation.ant.api.AntSimulationConfig;
 import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.api.model.Direction;
 import org.mechaverse.simulation.ant.api.model.Entity;
@@ -14,6 +13,7 @@ import org.mechaverse.simulation.ant.core.Cell;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
 import org.mechaverse.simulation.ant.core.EntityManager;
 import org.mechaverse.simulation.common.SimulationDataStore;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * An ant that active in the simulation. An active ant receives sensory information about itself and
@@ -44,6 +44,9 @@ public final class ActiveAnt implements ActiveEntity {
 
   private static final EntityType[] CARRIABLE_ENTITY_TYPES =
       {EntityType.DIRT, EntityType.FOOD,EntityType.ROCK};
+
+  @Value("#{properties['pheromoneInitialEnergy']}") private int pheromoneInitialEnergy;
+
 
   private final Ant entity;
   private final AntBehavior behavior;
@@ -148,8 +151,8 @@ public final class ActiveAnt implements ActiveEntity {
   }
 
   @Override
-  public void performAction(CellEnvironment env, AntSimulationConfig config,
-      EntityManager entityManager, RandomGenerator random) {
+  public void performAction(CellEnvironment env, EntityManager entityManager,
+      RandomGenerator random) {
     AntOutput output = behavior.getOutput(random);
 
     Cell cell = env.getCell(entity);
@@ -208,7 +211,7 @@ public final class ActiveAnt implements ActiveEntity {
     // Leave pheromone action.
     int pheromoneType = output.shouldLeavePheromone();
     if (pheromoneType > 0) {
-      leavePheromone(cell, pheromoneType, config, entityManager);
+      leavePheromone(cell, pheromoneType, entityManager);
       return;
     }
 
@@ -302,12 +305,11 @@ public final class ActiveAnt implements ActiveEntity {
     return false;
   }
 
-  private void leavePheromone(Cell cell, int type, AntSimulationConfig config,
-      EntityManager entityManager) {
+  private void leavePheromone(Cell cell, int type, EntityManager entityManager) {
     Pheromone pheromone = new Pheromone();
     pheromone.setValue(type);
-    pheromone.setMaxEnergy(config.getPheromoneInitialEnergy());
-    pheromone.setEnergy(config.getPheromoneInitialEnergy());
+    pheromone.setEnergy(pheromoneInitialEnergy);
+    pheromone.setMaxEnergy(pheromoneInitialEnergy);
 
     Entity existingPheromone = cell.getEntity(EntityType.PHEROMONE);
     if (existingPheromone != null) {

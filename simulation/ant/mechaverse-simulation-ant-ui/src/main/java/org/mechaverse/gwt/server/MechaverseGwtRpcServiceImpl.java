@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSessionEvent;
+import javax.servlet.http.HttpSessionListener;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
@@ -14,6 +16,9 @@ import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.model.SimulationModel;
 import org.mechaverse.simulation.api.Simulation;
 import org.mechaverse.simulation.common.SimulationDataStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
@@ -24,12 +29,15 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
  * Implementation of {@link MechaverseGwtRpcService} which forwards requests to the REST service.
  */
 public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
-    implements MechaverseGwtRpcService {
+    implements MechaverseGwtRpcService, HttpSessionListener {
 
   private static final long serialVersionUID = 1349327476429682957L;
 
   private static final String SIMULATION_SERVICE_KEY = "simulation-service";
+  private static final String SIMULATION_CONTEXT_KEY = "simulation-context";
   private static final String STORAGE_SERVICE_KEY = "storage-service";
+
+  private static final Logger logger = LoggerFactory.getLogger(MechaverseGwtRpcServiceImpl.class);
 
   @Override
   public SimulationModel loadState(String simulationId, String instanceId, long iteration)
@@ -80,11 +88,11 @@ public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
     Simulation service = (Simulation) request.getSession(true)
         .getAttribute(SIMULATION_SERVICE_KEY);
     if (service == null) {
-      try (ClassPathXmlApplicationContext ctx =
-          new ClassPathXmlApplicationContext("simulation-context.xml")) {
-        service = ctx.getBean(Simulation.class);
-      }
+      ClassPathXmlApplicationContext ctx =
+          new ClassPathXmlApplicationContext("simulation-context.xml");
+      service = ctx.getBean(Simulation.class);
       request.getSession().setAttribute(SIMULATION_SERVICE_KEY, service);
+      request.getSession().setAttribute(SIMULATION_CONTEXT_KEY, ctx);
     }
     return service;
   }
@@ -100,5 +108,18 @@ public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
       request.getSession().setAttribute(STORAGE_SERVICE_KEY, service);
     }
     return service;
+  }
+
+  @Override
+  public void sessionCreated(HttpSessionEvent arg0) {}
+
+  @Override
+  public void sessionDestroyed(HttpSessionEvent event) {
+    AbstractApplicationContext ctx =
+        (AbstractApplicationContext) event.getSession().getAttribute(SIMULATION_CONTEXT_KEY);
+    if (ctx != null) {
+      logger.debug("sessionDestroyed");
+      ctx.close();
+    }
   }
 }

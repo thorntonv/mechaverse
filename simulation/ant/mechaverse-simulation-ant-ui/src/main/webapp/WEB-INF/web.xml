@@ -5,6 +5,10 @@
 
 <web-app>
 
+  <session-config>
+      <session-timeout>1</session-timeout>
+  </session-config>
+
   <!-- Servlets -->
   <servlet>
     <servlet-name>mechaverseServlet</servlet-name>
@@ -30,6 +34,10 @@
     <servlet-name>mechaverseServlet</servlet-name>
     <url-pattern>/org.mechaverse.gwt.MechaverseClientJUnit/mechaverse</url-pattern>
   </servlet-mapping>
+
+  <listener>
+    <listener-class>org.mechaverse.gwt.server.MechaverseGwtRpcServiceImpl</listener-class>
+  </listener>
 
   <!-- Default page to serve -->
   <welcome-file-list>

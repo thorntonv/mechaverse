@@ -1,7 +1,10 @@
-package org.mechaverse.simulation.ant.core;
+package org.mechaverse.simulation.ant.core.module;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
+import org.mechaverse.simulation.ant.core.ActiveEntity;
+import org.mechaverse.simulation.ant.core.CellEnvironment;
+import org.mechaverse.simulation.ant.core.EntityManager;
 
 /**
  * A module that can be added to an ant simulation.

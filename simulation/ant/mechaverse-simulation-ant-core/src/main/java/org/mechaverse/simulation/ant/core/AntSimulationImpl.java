@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
@@ -13,7 +11,6 @@ import org.mechaverse.simulation.ant.api.SimulationModelUtil;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Environment;
 import org.mechaverse.simulation.ant.api.model.SimulationModel;
-import org.mechaverse.simulation.ant.api.util.EntityUtil;
 import org.mechaverse.simulation.api.Simulation;
 import org.mechaverse.simulation.common.SimulationDataStore;
 import org.mechaverse.simulation.common.cellautomata.EnvironmentGenerator;
@@ -21,6 +18,7 @@ import org.mechaverse.simulation.common.opencl.DeviceUtil;
 import org.mechaverse.simulation.common.util.RandomUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -31,10 +29,10 @@ public final class AntSimulationImpl implements Simulation {
 
   private static final Logger logger = LoggerFactory.getLogger(AntSimulationImpl.class);
 
+  @Autowired private EnvironmentSimulator.Factory environmentSimulatorFactory;
+
   private AntSimulationState state;
   private final List<EnvironmentSimulator> environmentSimulations = new ArrayList<>();
-  private final ActiveEntityProvider[] activeEntityProviders =
-      new ActiveEntityProvider[EntityUtil.ENTITY_TYPES.length];
   private final RandomGenerator random;
 
   public static AntSimulationState randomState() {
@@ -60,16 +58,12 @@ public final class AntSimulationImpl implements Simulation {
     return state;
   }
 
-  public AntSimulationImpl(Map<EntityType, ActiveEntityProvider> activeEntityProviders) {
-    this(activeEntityProviders, RandomUtil.newGenerator());
+  public AntSimulationImpl() {
+    this(RandomUtil.newGenerator());
   }
 
-  public AntSimulationImpl(Map<EntityType, ActiveEntityProvider> activeEntityProviderMap,
-      RandomGenerator random) {
+  public AntSimulationImpl(RandomGenerator random) {
     this.random = random;
-    for (Entry<EntityType, ActiveEntityProvider> entry : activeEntityProviderMap.entrySet()) {
-      activeEntityProviders[entry.getKey().ordinal()] = entry.getValue();
-    }
   }
 
   @Override
@@ -96,7 +90,7 @@ public final class AntSimulationImpl implements Simulation {
 
     environmentSimulations.clear();
     for (Environment environment : SimulationModelUtil.getEnvironments(simulationModel)) {
-      environmentSimulations.add(new EnvironmentSimulator(environment, activeEntityProviders));
+      environmentSimulations.add(environmentSimulatorFactory.create(environment));
     }
 
     for (EnvironmentSimulator environmentSimulation : environmentSimulations) {
@@ -130,11 +124,6 @@ public final class AntSimulationImpl implements Simulation {
     // Set the seed to be used for the next step.
     simulationModel.setSeed(String.valueOf(random.nextLong()));
     simulationModel.setIteration(simulationModel.getIteration()+1);
-  }
-
-  public void setActiveEntityProvider(EntityType entityType,
-      ActiveEntityProvider activeEntityProvider) {
-    activeEntityProviders[entityType.ordinal()] = activeEntityProvider;
   }
 
   @VisibleForTesting

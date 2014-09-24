@@ -3,7 +3,6 @@ package org.mechaverse.simulation.ant.core.module;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.model.Entity;
-import org.mechaverse.simulation.ant.core.AntSimulationModule;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
 import org.mechaverse.simulation.ant.core.EntityManager;
 import org.mechaverse.simulation.common.circuit.CircuitSimulator;
