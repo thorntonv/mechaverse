@@ -16,4 +16,9 @@ public class SimpleAntSimulationImplTest extends AbstractAntSimulationImplTest {
   protected AntSimulationImpl newSimulationImpl() {
     return simulationImplFactory.getObject();
   }
+
+  @Override
+  protected int testIterationCount() {
+    return 2500;
+  }
 }

@@ -20,7 +20,7 @@ import org.junit.runner.RunWith;
 import org.mechaverse.service.manager.api.MechaverseManager;
 import org.mechaverse.service.manager.api.model.Task;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
-import org.mechaverse.simulation.api.Simulation;
+import org.mechaverse.simulation.common.Simulation;
 import org.mechaverse.simulation.common.SimulationDataStore;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;

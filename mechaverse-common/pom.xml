@@ -13,11 +13,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.mechaverse.simulation</groupId>
-      <artifactId>mechaverse-simulation-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.mechaverse.service</groupId>
       <artifactId>mechaverse-manager-api</artifactId>
       <version>${project.version}</version>

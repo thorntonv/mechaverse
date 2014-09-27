@@ -1,5 +1,6 @@
 package org.mechaverse.simulation.common.circuit;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -10,9 +11,16 @@ import javax.xml.bind.Unmarshaller;
 import org.mechaverse.circuit.model.Circuit;
 
 /**
- * Reads a circuit from a given input XML stream.
+ * Reads a circuit from XML.
  */
 public class CircuitReader {
+
+  /**
+   * Reads a circuit from the given input XML.
+   */
+  public static Circuit read(byte[] circuitXmlData) throws IOException {
+    return read(new ByteArrayInputStream(circuitXmlData));
+  }
 
   /**
    * Reads a circuit from the given input XML.

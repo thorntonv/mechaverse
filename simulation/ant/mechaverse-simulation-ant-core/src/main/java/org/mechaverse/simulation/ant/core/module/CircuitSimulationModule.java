@@ -6,6 +6,7 @@ import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
 import org.mechaverse.simulation.ant.core.EntityManager;
 import org.mechaverse.simulation.common.circuit.CircuitSimulator;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -13,7 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class CircuitSimulationModule implements AntSimulationModule {
 
-  @Autowired private CircuitSimulator circuitSimulator;
+  @Autowired private ObjectFactory<CircuitSimulator> circuitSimulatorFactory;
+  private CircuitSimulator circuitSimulator;
 
   @Override
   public void onAddEntity(Entity entity) {}
@@ -28,6 +30,10 @@ public class CircuitSimulationModule implements AntSimulationModule {
   @Override
   public void beforePerformAction(AntSimulationState state, CellEnvironment env,
       EntityManager entityManager, RandomGenerator random) {
+    if (circuitSimulator == null) {
+      // Lazily load the circuit simulator.
+      circuitSimulator = circuitSimulatorFactory.getObject();
+    }
     circuitSimulator.update();
   }
 

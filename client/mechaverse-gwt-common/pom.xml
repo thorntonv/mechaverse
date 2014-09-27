@@ -40,15 +40,8 @@
     </dependency>
     <dependency>
       <groupId>org.mechaverse.simulation</groupId>
-      <artifactId>mechaverse-simulation-api</artifactId>
+      <artifactId>mechaverse-simulation-common</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.mechaverse.simulation</groupId>
-      <artifactId>mechaverse-simulation-api</artifactId>
-      <version>${project.version}</version>
-      <classifier>sources</classifier>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.google.gwt</groupId>

@@ -15,7 +15,7 @@ import org.mechaverse.common.MechaverseConfig;
 import org.mechaverse.service.manager.api.MechaverseManager;
 import org.mechaverse.service.manager.api.model.Task;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
-import org.mechaverse.simulation.api.Simulation;
+import org.mechaverse.simulation.common.Simulation;
 import org.mechaverse.simulation.common.SimulationDataStore;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;

@@ -13,6 +13,6 @@
   </bean>
 
   <bean id="simulation" class="org.mockito.Mockito" factory-method="mock"> 
-    <constructor-arg value="org.mechaverse.simulation.api.Simulation" /> 
+    <constructor-arg value="org.mechaverse.simulation.common.Simulation" /> 
   </bean>
 </beans>

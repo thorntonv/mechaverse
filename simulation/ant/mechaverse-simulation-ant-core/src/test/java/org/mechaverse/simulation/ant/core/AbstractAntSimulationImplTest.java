@@ -2,6 +2,7 @@ package org.mechaverse.simulation.ant.core;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -29,8 +30,6 @@ import com.google.common.io.ByteStreams;
  * Unit test for {@link AntSimulationImpl}.
  */
 public abstract class AbstractAntSimulationImplTest {
-
-  private static final int TEST_ITERATION_COUNT = 2500;
 
   private static class EntityTypeCounter {
 
@@ -76,6 +75,7 @@ public abstract class AbstractAntSimulationImplTest {
   private RandomGenerator random;
 
   protected abstract AntSimulationImpl newSimulationImpl();
+  protected abstract int testIterationCount();
 
   @Before
   public void setUp() {
@@ -97,7 +97,7 @@ public abstract class AbstractAntSimulationImplTest {
 
     verifyEntityTypeCounts(simulation.getState().getModel(), entityCountObserver);
 
-    for (int cnt = 0; cnt < TEST_ITERATION_COUNT; cnt++) {
+    for (int cnt = 0; cnt < testIterationCount(); cnt++) {
       simulation.step();
 
       verifyEntityTypeCounts(simulation.getState().getModel(), entityCountObserver);
@@ -117,6 +117,7 @@ public abstract class AbstractAntSimulationImplTest {
         new AntSimulationEnvironmentGenerator(), random).serialize();
     AntSimulationImpl simulation1 = newSimulationImpl();
     AntSimulationImpl simulation2 = newSimulationImpl();
+    assertNotEquals(simulation1, simulation2);
     simulation1.setState(AntSimulationState.deserialize(initialState));
     simulation2.setState(AntSimulationState.deserialize(initialState));
 
@@ -177,7 +178,8 @@ public abstract class AbstractAntSimulationImplTest {
         data1 = decompress(data1);
         data2 = decompress(data2);
       }
-      assertArrayEquals(data1, data2);
+
+      assertArrayEquals("Data for key " + key + " does not match.", data1, data2);
     }
   }
 

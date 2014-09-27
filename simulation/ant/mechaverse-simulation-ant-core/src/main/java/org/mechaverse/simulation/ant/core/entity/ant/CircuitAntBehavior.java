@@ -5,7 +5,6 @@ import org.mechaverse.simulation.ant.core.entity.ant.ActiveAnt.AntBehavior;
 import org.mechaverse.simulation.common.SimulationDataStore;
 import org.mechaverse.simulation.common.circuit.CircuitSimulator;
 import org.mechaverse.simulation.common.util.ArrayUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.base.Preconditions;
 
@@ -16,17 +15,18 @@ public class CircuitAntBehavior implements AntBehavior {
 
   public static final String CIRCUIT_STATE_KEY = "circuitState";
 
-  @Autowired private CircuitSimulator circuitSimulator;
-
   private final int circuitIndex;
   private final int[] outputData;
   private final AntOutput output = new AntOutput();
   private final int[] circuitState;
   private SimulationDataStore state = new SimulationDataStore();
   private boolean stateSet = false;
+  private final CircuitSimulator circuitSimulator;
 
-  public CircuitAntBehavior() {
-    this.outputData = new int[AntOutput.DATA_SIZE];
+  public CircuitAntBehavior(CircuitSimulator circuitSimulator) {
+    this.circuitSimulator = circuitSimulator;
+
+    this.outputData = new int[circuitSimulator.getCircuitOutputSize()];
     this.circuitIndex = circuitSimulator.getAllocator().allocateCircuit();
     this.circuitState = new int[circuitSimulator.getCircuitStateSize()];
   }
@@ -46,8 +46,9 @@ public class CircuitAntBehavior implements AntBehavior {
 
   @Override
   public AntOutput getOutput(RandomGenerator random) {
-    circuitSimulator.getCircuitOutput(circuitIndex, outputData);
-    output.setData(outputData);
+    // TODO(thorntonv): Implement circuit output.
+    // circuitSimulator.getCircuitOutput(circuitIndex, outputData);
+    // output.setData(outputData);
     return output;
   }
 

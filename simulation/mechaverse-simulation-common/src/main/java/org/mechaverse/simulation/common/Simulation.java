@@ -1,4 +1,4 @@
-package org.mechaverse.simulation.api;
+package org.mechaverse.simulation.common;
 
 import org.mechaverse.simulation.common.SimulationDataStore;
 

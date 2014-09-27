@@ -14,7 +14,7 @@ import org.mechaverse.gwt.shared.MechaverseGwtRpcService;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.model.SimulationModel;
-import org.mechaverse.simulation.api.Simulation;
+import org.mechaverse.simulation.common.Simulation;
 import org.mechaverse.simulation.common.SimulationDataStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

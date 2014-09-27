@@ -6,6 +6,7 @@ import java.nio.IntBuffer;
 
 import org.mechaverse.circuit.model.Circuit;
 import org.mechaverse.simulation.common.circuit.CircuitAllocator;
+import org.mechaverse.simulation.common.circuit.CircuitDataSource;
 import org.mechaverse.simulation.common.circuit.CircuitSimulator;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModelBuilder;
@@ -16,6 +17,7 @@ import com.jogamp.opencl.CLContext;
 import com.jogamp.opencl.CLDevice;
 import com.jogamp.opencl.CLKernel;
 import com.jogamp.opencl.CLMemory.Mem;
+import com.jogamp.opencl.CLPlatform;
 import com.jogamp.opencl.CLProgram;
 
 /**
@@ -42,6 +44,18 @@ public final class OpenClCircuitSimulator implements CircuitSimulator {
   private final CLBuffer<IntBuffer> stateBuffer;
   private final CLBuffer<IntBuffer> outputBuffer;
   private boolean finished = true;
+
+  public OpenClCircuitSimulator(int numCircuits, int circuitInputSize, int circuitOutputSize,
+      CircuitDataSource circuitDataSource) {
+    this(numCircuits, circuitInputSize, circuitOutputSize, circuitDataSource.getCircuit());
+  }
+
+  public OpenClCircuitSimulator(
+      int numCircuits, int circuitInputSize, int circuitOutputSize, Circuit circuit) {
+    this(numCircuits, circuitInputSize, circuitOutputSize,
+        CLPlatform.getDefault().getMaxFlopsDevice(),
+            new CircuitSimulationModelBuilder().buildModel(circuit));
+  }
 
   public OpenClCircuitSimulator(int numCircuits, int circuitInputSize,
       int circuitOutputSize, CLDevice device, Circuit circuit) {

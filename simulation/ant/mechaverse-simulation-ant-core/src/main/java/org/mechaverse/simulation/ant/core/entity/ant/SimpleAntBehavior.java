@@ -5,9 +5,9 @@ import org.mechaverse.simulation.ant.api.model.Direction;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.core.AntSimulationUtil;
 import org.mechaverse.simulation.ant.core.entity.ant.ActiveAnt.AntBehavior;
-import org.mechaverse.simulation.api.model.MoveDirection;
-import org.mechaverse.simulation.api.model.TurnDirection;
 import org.mechaverse.simulation.common.SimulationDataStore;
+import org.mechaverse.simulation.common.model.MoveDirection;
+import org.mechaverse.simulation.common.model.TurnDirection;
 import org.mechaverse.simulation.common.util.RandomUtil;
 
 /**

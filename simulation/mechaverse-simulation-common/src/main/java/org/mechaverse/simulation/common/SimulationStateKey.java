@@ -1,4 +1,4 @@
-package org.mechaverse.simulation.api;
+package org.mechaverse.simulation.common;
 
 /**
  * A key that identifies a simulation state.

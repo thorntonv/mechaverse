@@ -11,7 +11,7 @@ import org.mechaverse.simulation.ant.api.SimulationModelUtil;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Environment;
 import org.mechaverse.simulation.ant.api.model.SimulationModel;
-import org.mechaverse.simulation.api.Simulation;
+import org.mechaverse.simulation.common.Simulation;
 import org.mechaverse.simulation.common.SimulationDataStore;
 import org.mechaverse.simulation.common.cellautomata.EnvironmentGenerator;
 import org.mechaverse.simulation.common.opencl.DeviceUtil;

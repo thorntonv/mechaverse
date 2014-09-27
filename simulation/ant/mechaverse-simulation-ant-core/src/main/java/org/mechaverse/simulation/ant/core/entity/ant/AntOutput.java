@@ -1,7 +1,7 @@
 package org.mechaverse.simulation.ant.core.entity.ant;
 
-import org.mechaverse.simulation.api.model.MoveDirection;
-import org.mechaverse.simulation.api.model.TurnDirection;
+import org.mechaverse.simulation.common.model.MoveDirection;
+import org.mechaverse.simulation.common.model.TurnDirection;
 
 /**
  * Encodes and decodes the output of an ant.

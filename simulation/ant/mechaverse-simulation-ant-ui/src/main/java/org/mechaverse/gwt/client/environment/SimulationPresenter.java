@@ -4,7 +4,6 @@ import org.mechaverse.gwt.client.manager.ManagerClientFactory;
 import org.mechaverse.gwt.common.client.webconsole.NotificationBar;
 import org.mechaverse.gwt.shared.MechaverseGwtRpcServiceAsync;
 import org.mechaverse.simulation.ant.api.model.SimulationModel;
-import org.mechaverse.simulation.api.SimulationStateKey;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.dom.client.ScrollEvent;
@@ -130,8 +129,8 @@ public class SimulationPresenter extends AbstractActivity {
   private SimulationView view;
   private HandlerRegistration scrollHandler;
 
-  public SimulationPresenter(final SimulationStateKey simulationStateKey,
-      ManagerClientFactory clientFactory) {
+  public SimulationPresenter(final String simulationId, final String instanceId,
+      final long iteration, ManagerClientFactory clientFactory) {
     this.notificationBar = clientFactory.getNotificationBar();
     this.view = clientFactory.getSimulationView();
 
@@ -139,7 +138,7 @@ public class SimulationPresenter extends AbstractActivity {
       @Override
       public void onAttachOrDetach(AttachEvent event) {
         if (event.isAttached()) {
-          loadState(simulationStateKey);
+          loadState(simulationId, instanceId, iteration);
           addScrollHandler();
         } else {
           updateTimer.cancel();
@@ -165,22 +164,21 @@ public class SimulationPresenter extends AbstractActivity {
     return view;
   }
 
-  private void loadState(SimulationStateKey simulationStateKey) {
+  private void loadState(String simulationId, String instanceId, long iteration) {
     notificationBar.showLoading();
-    service.loadState(simulationStateKey.getSimulationId(), simulationStateKey.getInstanceId(),
-        simulationStateKey.getIteration(), new AsyncCallback<SimulationModel>() {
-          @Override
-          public void onFailure(Throwable ex) {
-            notificationBar.showError(ex.getMessage());
-          }
+    service.loadState(simulationId, instanceId, iteration, new AsyncCallback<SimulationModel>() {
+      @Override
+      public void onFailure(Throwable ex) {
+        notificationBar.showError(ex.getMessage());
+      }
 
-          @Override
-          public void onSuccess(SimulationModel model) {
-            notificationBar.hide();
-            updateTimer.schedule(UPDATE_INTERVAL);
-            setState(model);
-          }
-        });
+      @Override
+      public void onSuccess(SimulationModel model) {
+        notificationBar.hide();
+        updateTimer.schedule(UPDATE_INTERVAL);
+        setState(model);
+      }
+    });
   }
 
   private void addScrollHandler() {
