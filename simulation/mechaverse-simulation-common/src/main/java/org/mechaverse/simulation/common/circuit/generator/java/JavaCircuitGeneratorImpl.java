@@ -18,7 +18,7 @@ import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel
  */
 public class JavaCircuitGeneratorImpl extends AbstractCStyleCircuitSimulationGenerator {
 
-  // TODO(thorntonv): Generate circuit input/output code.
+  // TODO(thorntonv): Generate circuit output code.
 
   public static final String TYPE = "java";
 
@@ -26,12 +26,15 @@ public class JavaCircuitGeneratorImpl extends AbstractCStyleCircuitSimulationGen
 
   static final String IMPL_CLASS_NAME = "CircuitSimulationImpl";
 
-  public JavaCircuitGeneratorImpl(Circuit circuit) {
-    this(new CircuitSimulationModelBuilder().buildModel(circuit));
+  private final int circuitInputSize;
+
+  public JavaCircuitGeneratorImpl(Circuit circuit, int circuitInputSize) {
+    this(new CircuitSimulationModelBuilder().buildModel(circuit), circuitInputSize);
   }
 
-  public JavaCircuitGeneratorImpl(CircuitSimulationModel model) {
+  public JavaCircuitGeneratorImpl(CircuitSimulationModel model, int circuitInputSize) {
     super(model);
+    this.circuitInputSize = circuitInputSize;
   }
 
   @Override
@@ -55,8 +58,8 @@ public class JavaCircuitGeneratorImpl extends AbstractCStyleCircuitSimulationGen
 
   private void generateConstructor(LogicalUnitInfo logicalUnitInfo, PrintWriter out) {
     out.println("public CircuitSimulationImpl() {");
-    out.printf("super(%d, %d, %d, %d);%n", model.getLogicalUnitCount(), numExternalElements,
-        model.getCircuitStateSize(), model.getIterationsPerUpdate());
+    out.printf("super(%d, %d, %d, %d, %d);%n", model.getLogicalUnitCount(), numExternalElements,
+        model.getCircuitStateSize(), circuitInputSize, model.getIterationsPerUpdate());
     out.println("}");
   }
 
@@ -70,6 +73,8 @@ public class JavaCircuitGeneratorImpl extends AbstractCStyleCircuitSimulationGen
 
     generateCopyStateValuesToExternalInputs("external", logicalUnitInfo, out);
     out.println();
+
+    generateConstants(logicalUnitInfo, out);
 
     // Perform updates.
 

@@ -10,5 +10,6 @@ public interface JavaCircuitSimulation {
   public int getStateSize();
   public void getState(int state[]);
   public void setState(int state[]);
+  public void setInput(int input[]);
   public void update();
 }

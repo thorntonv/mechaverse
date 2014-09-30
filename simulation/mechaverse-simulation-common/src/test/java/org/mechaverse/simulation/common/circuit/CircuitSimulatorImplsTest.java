@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.mechaverse.circuit.model.Circuit;
 import org.mechaverse.simulation.common.circuit.CircuitBuilder.Routing3In3OutElementType;
 import org.mechaverse.simulation.common.circuit.generator.java.JavaCircuitSimulator;
+import org.mechaverse.simulation.common.circuit.generator.java.JavaCircuitSimulatorTest;
 import org.mechaverse.simulation.common.opencl.OpenClCircuitSimulator;
 import org.mechaverse.simulation.common.util.compiler.JavaCompilerUtil.CompileException;
 
@@ -18,8 +19,6 @@ import com.jogamp.opencl.CLPlatform;
 
 /**
  * A test that verifies that all circuit simulation implementations yield consistent results.
- *
- * @author thorntonv@mechaverse.org
  */
 public class CircuitSimulatorImplsTest {
 
@@ -60,7 +59,8 @@ public class CircuitSimulatorImplsTest {
   public List<CircuitSimulator> getSimulators(int numCircuits, Circuit circuit)
       throws CompileException {
     List<CircuitSimulator> simulators = new ArrayList<>();
-    simulators.add(new JavaCircuitSimulator(numCircuits, circuit));
+    simulators.add(new JavaCircuitSimulator(numCircuits,
+        JavaCircuitSimulatorTest.CIRCUIT_INPUT_SIZE, circuit));
     simulators.add(new OpenClCircuitSimulator(
       numCircuits, 16, 16, CLPlatform.getDefault().getMaxFlopsDevice(), circuit));
     return simulators;

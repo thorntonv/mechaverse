@@ -2,6 +2,7 @@ package org.mechaverse.simulation.common.circuit;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.HashSet;
@@ -10,13 +11,15 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mechaverse.circuit.model.Circuit;
+import org.mechaverse.circuit.model.ElementType;
 import org.mechaverse.simulation.common.circuit.CircuitBuilder.CircuitStateBuilder;
+import org.mechaverse.simulation.common.circuit.CircuitBuilder.InputElementType;
 import org.mechaverse.simulation.common.circuit.CircuitBuilder.LogicalUnitStateBuilder;
 import org.mechaverse.simulation.common.circuit.CircuitBuilder.Routing3In3OutElementType;
+
+import com.google.common.collect.ImmutableList;
 /**
  * Abstract base test for {@link CircuitSimulator} implementations.
- *
- * @author thorntonv@mechaverse.org
  */
 public abstract class AbstractCircuitSimulatorTest {
 
@@ -175,6 +178,35 @@ public abstract class AbstractCircuitSimulatorTest {
     circuitSimulator.getCircuitState(0, stateBuilder.getState());
 
     assertEquals(0b101, luStateBuilder.get("e1_out2"));
+  }
+
+  @Test
+  public void inputElement() throws Exception {
+    Circuit circuit = CircuitBuilder.newCircuit(3, 3, ImmutableList.<ElementType>of(
+        InputElementType.newInstance(), Routing3In3OutElementType.newInstance()),
+            new String[][] {{CircuitBuilder.INPUT_TYPE, CircuitBuilder.ROUTING_3IN3OUT_TYPE}});
+    CircuitSimulator circuitSimulator = newCircuitSimulator(circuit, 1);
+
+    int[] input = new int[circuitSimulator.getCircuitInputSize()];
+    assertTrue(input.length > 1);
+    input[1] = 0b101;
+    circuitSimulator.setCircuitInput(0, input);
+
+    CircuitStateBuilder stateBuilder = CircuitStateBuilder.of(circuit, 1);
+    stateBuilder.setAll(0b111);
+
+    LogicalUnitStateBuilder luStateBuilder = stateBuilder.luStateBuilder(0, 1);
+    luStateBuilder.set("e1_out1_idx", 1);
+    luStateBuilder.set("e2_out3", 0b111);
+    luStateBuilder.set("e2_out3_input1Mask", 0b111);
+    luStateBuilder.set("e2_out3_input2Mask", 0b000);
+
+    circuitSimulator.setCircuitState(0, stateBuilder.getState());
+    circuitSimulator.update();
+
+    circuitSimulator.getCircuitState(0, stateBuilder.getState());
+
+    assertEquals(0b101, luStateBuilder.get("e2_out3"));
   }
 
   @Test

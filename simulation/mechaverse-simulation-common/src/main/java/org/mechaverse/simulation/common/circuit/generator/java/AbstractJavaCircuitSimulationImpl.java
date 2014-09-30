@@ -9,13 +9,17 @@ public abstract class AbstractJavaCircuitSimulationImpl implements JavaCircuitSi
 
   protected final int numLogicalUnits;
   protected final int[] circuitState;
+  protected final int[] circuitInput;
   protected final int[] external;
+  protected final int circuitInputLength;
   protected final int iterationsPerUpdate;
 
   public AbstractJavaCircuitSimulationImpl(int numLogicalUnits, int numExternalElements,
-       int stateSize, int iterationsPerUpdate) {
+       int stateSize, int inputSize, int iterationsPerUpdate) {
     this.numLogicalUnits = numLogicalUnits;
     this.circuitState = new int[stateSize];
+    this.circuitInput = new int[inputSize];
+    this.circuitInputLength = inputSize;
     this.external = new int[numExternalElements * numLogicalUnits];
     this.iterationsPerUpdate = iterationsPerUpdate;
   }
@@ -23,6 +27,11 @@ public abstract class AbstractJavaCircuitSimulationImpl implements JavaCircuitSi
   @Override
   public int getStateSize() {
     return circuitState.length;
+  }
+
+  @Override
+  public void setInput(int[] input) {
+    System.arraycopy(input, 0, this.circuitInput, 0, this.circuitInput.length);
   }
 
   @Override

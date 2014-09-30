@@ -22,25 +22,28 @@ import com.google.common.base.Preconditions;
 public final class JavaCircuitSimulator implements CircuitSimulator {
 
   private final CircuitSimulationModel circuitModel;
+  private final int circuitInputSize;
   private final JavaCircuitSimulation[] circuitSimulations;
   private final CircuitAllocator allocator;
 
-  public JavaCircuitSimulator(int numCircuits, CircuitDataSource circuitDataSource)
+  public JavaCircuitSimulator(int numCircuits, int circuitInputSize, CircuitDataSource circuitDataSource)
       throws CompileException {
-    this(numCircuits, circuitDataSource.getCircuit());
+    this(numCircuits, circuitInputSize, circuitDataSource.getCircuit());
   }
 
-  public JavaCircuitSimulator(int numCircuits, Circuit circuit) throws CompileException {
-    this(numCircuits, new CircuitSimulationModelBuilder().buildModel(circuit));
+  public JavaCircuitSimulator(int numCircuits, int circuitInputSize, Circuit circuit)
+      throws CompileException {
+    this(numCircuits, circuitInputSize, new CircuitSimulationModelBuilder().buildModel(circuit));
   }
 
-  private JavaCircuitSimulator(int numCircuits, CircuitSimulationModel circuitModel)
+  private JavaCircuitSimulator(int numCircuits, int circuitInputSize, CircuitSimulationModel circuitModel)
       throws CompileException {
     Preconditions.checkState(numCircuits > 0);
     this.circuitModel = circuitModel;
+    this.circuitInputSize = circuitInputSize;
     this.circuitSimulations = new JavaCircuitSimulation[numCircuits];
     for (int idx = 0; idx < numCircuits; idx++) {
-      circuitSimulations[idx] = compile(circuitModel);
+      circuitSimulations[idx] = compile(circuitModel, circuitInputSize);
     }
     allocator = new CircuitAllocator(numCircuits);
   }
@@ -57,8 +60,7 @@ public final class JavaCircuitSimulator implements CircuitSimulator {
 
   @Override
   public int getCircuitInputSize() {
-    // TODO(thorntonv): Implement method.
-    return 0;
+    return circuitInputSize;
   }
 
   @Override
@@ -84,7 +86,7 @@ public final class JavaCircuitSimulator implements CircuitSimulator {
 
   @Override
   public void setCircuitInput(int circuitIndex, int[] circuitInput) {
-    // TODO(thorntonv): Implement method.
+    circuitSimulations[circuitIndex].setInput(circuitInput);
   }
 
   @Override
@@ -102,24 +104,26 @@ public final class JavaCircuitSimulator implements CircuitSimulator {
   @Override
   public void close() throws Exception {}
 
-  public static JavaCircuitSimulation compile(Circuit circuit) throws CompileException {
+  public static JavaCircuitSimulation compile(Circuit circuit, int circuitInputSize)
+      throws CompileException {
     CircuitSimulationModelBuilder modelBuilder = new CircuitSimulationModelBuilder();
-    return compile(modelBuilder.buildModel(circuit));
+    return compile(modelBuilder.buildModel(circuit), circuitInputSize);
   }
 
-  public static JavaCircuitSimulation compile(CircuitSimulationModel circuitModel)
-      throws CompileException {
-    JavaCircuitGeneratorImpl generator = new JavaCircuitGeneratorImpl(circuitModel);
+  public static JavaCircuitSimulation compile(CircuitSimulationModel circuitModel,
+      int circuitInputSize) throws CompileException {
+    JavaCircuitGeneratorImpl generator =
+        new JavaCircuitGeneratorImpl(circuitModel, circuitInputSize);
     StringWriter out = new StringWriter();
     generator.generate(new PrintWriter(out));
     return JavaCompilerUtil.compile(
-      JavaCircuitGeneratorImpl.IMPL_PACKAGE + "." + JavaCircuitGeneratorImpl.IMPL_CLASS_NAME,
-          out.toString());
+        JavaCircuitGeneratorImpl.IMPL_PACKAGE + "." + JavaCircuitGeneratorImpl.IMPL_CLASS_NAME,
+            out.toString());
   }
 
   @Override
   public String toString() {
-    JavaCircuitGeneratorImpl generator = new JavaCircuitGeneratorImpl(circuitModel);
+    JavaCircuitGeneratorImpl generator = new JavaCircuitGeneratorImpl(circuitModel, 0);
     StringWriter out = new StringWriter();
     generator.generate(new PrintWriter(out));
     return out.toString();

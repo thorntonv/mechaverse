@@ -1,5 +1,7 @@
 package org.mechaverse.simulation.common.circuit;
 
+import java.util.Collection;
+
 import org.mechaverse.circuit.model.Circuit;
 import org.mechaverse.circuit.model.Element;
 import org.mechaverse.circuit.model.ElementType;
@@ -10,6 +12,8 @@ import org.mechaverse.circuit.model.Row;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModelBuilder;
 
+import com.google.common.collect.ImmutableList;
+
 /**
  * Assists with building {@link Cicuit} instances.
  *
@@ -19,10 +23,29 @@ public class CircuitBuilder {
 
   // TODO(thorntonv): Implement unit tests for this class.
 
+  public static final String INPUT_TYPE = "input";
+
+  /**
+   * An input element.
+   */
+  public static class InputElementType extends ElementType {
+
+    private static final long serialVersionUID = 1L;
+
+    public InputElementType() {
+      setId(INPUT_TYPE);
+      getOutputs().add(newOutput("1", "circuitInput[{idx} % circuitInputLength] ", "idx"));
+    }
+
+    public static InputElementType newInstance() {
+      return new InputElementType();
+    }
+  }
+
   public static final String ROUTING_3IN3OUT_TYPE = "routing3in3out";
 
   /**
-   * Creates a routing element with 3 inputs and 3 outputs.
+   * A routing element with 3 inputs and 3 outputs.
    */
   public static class Routing3In3OutElementType extends ElementType {
 
@@ -62,7 +85,7 @@ public class CircuitBuilder {
     }
 
     public LogicalUnitStateBuilder luStateBuilder(int circuitIdx, int logicalUnitIdx) {
-      return new LogicalUnitStateBuilder(state, logicalUnitIdx, 
+      return new LogicalUnitStateBuilder(state, logicalUnitIdx,
           circuitIdx * model.getCircuitStateSize(), model);
     }
 
@@ -115,15 +138,26 @@ public class CircuitBuilder {
    */
   public static Circuit newCircuit(int width, int height, ElementType elementType,
       int unitRowCount, int unitColumnCount) {
+    String[][] elementTypeIds = new String[unitRowCount][unitColumnCount];
+    for (int row = 0; row < elementTypeIds.length; row++) {
+      for (int col = 0; col < elementTypeIds[row].length; col++) {
+        elementTypeIds[row][col] = elementType.getId();
+      }
+    }
+    return newCircuit(width, height, ImmutableList.of(elementType), elementTypeIds);
+  }
+
+  public static Circuit newCircuit(int width, int height, Collection<ElementType> elementTypes,
+      String[][] elementTypeIds) {
     Circuit circuit = new Circuit();
     circuit.setWidth(width);
     circuit.setHeight(height);
-    circuit.getElementTypes().add(elementType);
+    circuit.getElementTypes().addAll(elementTypes);
     circuit.setLogicalUnit(new LogicalUnit());
-    for (int rowCount = 1; rowCount <= unitRowCount; rowCount++) {
+    for (int rowIdx = 0; rowIdx < elementTypeIds.length; rowIdx++) {
       Row row = new Row();
-      for (int colCount = 1; colCount <= unitColumnCount; colCount++) {
-        row.getElements().add(newElement(elementType.getId()));
+      for (int colIdx = 0; colIdx < elementTypeIds[rowIdx].length; colIdx++) {
+        row.getElements().add(newElement(elementTypeIds[rowIdx][colIdx]));
       }
       circuit.getLogicalUnit().getRows().add(row);
     }

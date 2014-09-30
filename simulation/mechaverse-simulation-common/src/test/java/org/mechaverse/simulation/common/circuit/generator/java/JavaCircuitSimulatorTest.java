@@ -6,14 +6,14 @@ import org.mechaverse.simulation.common.circuit.CircuitSimulator;
 
 /**
  * Unit test for {@link JavaCircuitSimulator}.
- *
- * @author thorntonv@mechaverse.org
  */
 public class JavaCircuitSimulatorTest extends AbstractCircuitSimulatorTest {
+
+  public static final int CIRCUIT_INPUT_SIZE = 4;
 
   @Override
   protected CircuitSimulator newCircuitSimulator(Circuit circuit, int circuitCount)
       throws Exception {
-    return new JavaCircuitSimulator(circuitCount, circuit);
+    return new JavaCircuitSimulator(circuitCount, CIRCUIT_INPUT_SIZE, circuit);
   }
 }
