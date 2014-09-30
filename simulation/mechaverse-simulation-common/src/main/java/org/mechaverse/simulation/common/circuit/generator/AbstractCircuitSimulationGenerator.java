@@ -76,6 +76,19 @@ public abstract class AbstractCircuitSimulationGenerator implements CircuitSimul
     return out.toString();
   }
 
+  protected boolean isConstantExpression(ElementInfo element, Output output) {
+    Matcher matcher = EXPRESSION_VAR_PATTERN.matcher(output.getExpression().trim());
+    while (matcher.find()) {
+      String placeholderId = matcher.group();
+      // Remove enclosing curly braces.
+      placeholderId = placeholderId.substring(1, placeholderId.length() - 1);
+      if (placeholderId.startsWith(ELEMENT_INPUT_ID_PREFIX)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   /**
    * Returns the index of the logical unit that is referenced by the given external element relative
    * to the index of the current logical unit.

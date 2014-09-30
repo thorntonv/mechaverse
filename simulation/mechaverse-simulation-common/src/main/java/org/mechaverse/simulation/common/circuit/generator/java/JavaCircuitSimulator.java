@@ -5,6 +5,7 @@ import java.io.StringWriter;
 
 import org.mechaverse.circuit.model.Circuit;
 import org.mechaverse.simulation.common.circuit.CircuitAllocator;
+import org.mechaverse.simulation.common.circuit.CircuitDataSource;
 import org.mechaverse.simulation.common.circuit.CircuitSimulator;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModelBuilder;
@@ -23,6 +24,11 @@ public final class JavaCircuitSimulator implements CircuitSimulator {
   private final CircuitSimulationModel circuitModel;
   private final JavaCircuitSimulation[] circuitSimulations;
   private final CircuitAllocator allocator;
+
+  public JavaCircuitSimulator(int numCircuits, CircuitDataSource circuitDataSource)
+      throws CompileException {
+    this(numCircuits, circuitDataSource.getCircuit());
+  }
 
   public JavaCircuitSimulator(int numCircuits, Circuit circuit) throws CompileException {
     this(numCircuits, new CircuitSimulationModelBuilder().buildModel(circuit));

@@ -18,10 +18,11 @@ import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel
  */
 public class JavaCircuitGeneratorImpl extends AbstractCStyleCircuitSimulationGenerator {
 
+  // TODO(thorntonv): Generate circuit input/output code.
+
   public static final String TYPE = "java";
 
-  static final String IMPL_PACKAGE = "org.mechaverse.simulation.common" +
-      ".circuit.generator.java";
+  static final String IMPL_PACKAGE = "org.mechaverse.simulation.common.circuit.generator.java";
 
   static final String IMPL_CLASS_NAME = "CircuitSimulationImpl";
 
@@ -36,11 +37,6 @@ public class JavaCircuitGeneratorImpl extends AbstractCStyleCircuitSimulationGen
   @Override
   protected String getLogicalUnitIndexExpr() {
     return "luIndex";
-  }
-
-  @Override
-  protected String getThreadStateOffsetExpr() {
-    return getLogicalUnitIndexExpr();
   }
 
   @Override

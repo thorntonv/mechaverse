@@ -91,9 +91,11 @@ public final class OpenClCircuitSimulator implements CircuitSimulator {
     this.stateBuffer = context.createIntBuffer(numCircuits * circuitStateSize, Mem.READ_WRITE);
     this.outputBuffer = context.createIntBuffer(numCircuits * circuitOutputSize, Mem.WRITE_ONLY);
 
-    kernel.setArg(0, inputBuffer);
-    kernel.setArg(1, stateBuffer);
-    kernel.setArg(2, outputBuffer);
+    kernel.putArg(inputBuffer)
+      .putArg(stateBuffer)
+      .putArg(outputBuffer)
+      .putArg(circuitInputSize)
+      .putArg(circuitOutputSize);
   }
 
   @Override

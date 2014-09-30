@@ -19,7 +19,8 @@ public class OpenClCircuitSimulatorTest extends AbstractCircuitSimulatorTest {
 
   private static final String KERNAL_SOURCE =
       "void kernel " + OpenClCircuitSimulator.KERNEL_NAME + "(" +
-      "    global const int* input, global int* state, global int* output) {" +
+      "    global const int* input, global int* state, global int* output, " +
+      "        const unsigned int inputLength, const unsigned int outputLength) {" +
       "  output[get_global_id(0)] = state[get_global_id(0)] + input[get_global_id(0)];" +
       "  state[get_global_id(0)]++;" +
       "}";

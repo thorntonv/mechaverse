@@ -30,7 +30,6 @@ public abstract class AbstractCStyleCircuitSimulationGenerator
   }
 
   protected abstract String getLogicalUnitIndexExpr();
-  protected abstract String getThreadStateOffsetExpr();
 
   protected abstract void printExternalElementDebugInfo(
       String outputVarName, String stateIndexExpr, PrintWriter out);
@@ -67,7 +66,6 @@ public abstract class AbstractCStyleCircuitSimulationGenerator
         }
         out.printf("int %s = %s[%s];%n", outputVarName, stateArrayVarName, stateIndexExpr);
       }
-      out.println();
     }
   }
 
@@ -80,8 +78,8 @@ public abstract class AbstractCStyleCircuitSimulationGenerator
       String stateArrayVarName, LogicalUnitInfo logicalUnitInfo, PrintWriter out) {
     String[] varNames = model.getLogicalUnitInfo().getVarNames();
     for (int idx = 0; idx < logicalUnitInfo.getExternalElements().size(); idx++) {
-      out.printf("%s[%s + %d * %d] = %s;%n",
-          stateArrayVarName, luIndexExpr, idx, numLogicalUnits, varNames[idx]);
+      out.printf("%s[(%d * %d) + %s] = %s;%n",
+          stateArrayVarName, idx, numLogicalUnits, luIndexExpr, varNames[idx]);
     }
   }
 
@@ -97,17 +95,35 @@ public abstract class AbstractCStyleCircuitSimulationGenerator
   }
 
   /**
+   * Generates code to set constants.
+   */
+  protected void generateConstants(LogicalUnitInfo logicalUnitInfo, PrintWriter out) {
+    for (ElementInfo element : logicalUnitInfo.getElements()) {
+      for (Output output : element.getOutputs()) {
+        if (isConstantExpression(element, output)) {
+          String updateExpr = getVarMappedExpression(element, output);
+          if (PRINT_DEBUG_INFO) {
+            printUpdateDebugInfo(element, output, updateExpr, logicalUnitInfo, out);
+          }
+          out.printf("%s = %s;%n", element.getOutputVarName(output), updateExpr);
+        }
+      }
+    }
+  }
+
+  /**
    * Generates code to update state variables.
    */
   protected void generateUpdates(LogicalUnitInfo logicalUnitInfo, PrintWriter out) {
     for (ElementInfo element : logicalUnitInfo.getElements()) {
       for (Output output : element.getOutputs()) {
-        String updateExpr = getVarMappedExpression(element, output);
-
-        if(PRINT_DEBUG_INFO) {
-          printUpdateDebugInfo(element, output, updateExpr, logicalUnitInfo, out);
+        if (!isConstantExpression(element, output)) {
+          String updateExpr = getVarMappedExpression(element, output);
+          if (PRINT_DEBUG_INFO) {
+            printUpdateDebugInfo(element, output, updateExpr, logicalUnitInfo, out);
+          }
+          out.printf("%s = %s;%n", element.getOutputVarName(output), updateExpr);
         }
-        out.printf("%s = %s;%n", element.getOutputVarName(output), updateExpr);
       }
     }
   }
@@ -133,16 +149,16 @@ public abstract class AbstractCStyleCircuitSimulationGenerator
    * @param stateIndex the index of a state value relative to the logical unit.
    */
   private String getStateIndexExpr(String logicalUnitIndexExpr, int stateIndex) {
-    return String.format("%s + (%d * %d)", logicalUnitIndexExpr, stateIndex, numLogicalUnits);
+    return String.format("(%d * %d) + %s", stateIndex, numLogicalUnits, logicalUnitIndexExpr);
   }
 
   private String loadStateToVarStatement(String varName, int stateIndex) {
-    return String.format("int %s = state[%s];", varName,
-        getStateIndexExpr(getThreadStateOffsetExpr(), stateIndex));
+    return String.format("int %s = circuitState[%s];", varName,
+        getStateIndexExpr(getLogicalUnitIndexExpr(), stateIndex));
   }
 
   private String saveVarToStateStatement(String varName, int stateIndex) {
-    return String.format("state[%s] = %s;",
-        getStateIndexExpr(getThreadStateOffsetExpr(), stateIndex), varName);
+    return String.format("circuitState[%s] = %s;",
+        getStateIndexExpr(getLogicalUnitIndexExpr(), stateIndex), varName);
   }
 }

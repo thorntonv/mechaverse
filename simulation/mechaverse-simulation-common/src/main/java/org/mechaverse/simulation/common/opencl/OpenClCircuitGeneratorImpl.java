@@ -19,8 +19,6 @@ public class OpenClCircuitGeneratorImpl extends AbstractCStyleCircuitSimulationG
 
   public static final String TYPE = "opencl";
 
-  private static final String CIRCUIT_THREAD_OFFSET_VAR_NAME = "circuitStateOffset";
-
   public OpenClCircuitGeneratorImpl(Circuit circuit) {
     this(new CircuitSimulationModelBuilder().buildModel(circuit));
   }
@@ -35,20 +33,22 @@ public class OpenClCircuitGeneratorImpl extends AbstractCStyleCircuitSimulationG
   }
 
   @Override
-  protected String getThreadStateOffsetExpr() {
-    return CIRCUIT_THREAD_OFFSET_VAR_NAME;
-  }
-
-  @Override
   public void generate(PrintWriter out) {
     LogicalUnitInfo logicalUnitInfo = model.getLogicalUnitInfo();
     int numExternalElements = logicalUnitInfo.getExternalElements().size();
 
     out.println("void kernel " + OpenClCircuitSimulator.KERNEL_NAME + "(");
-    out.println("global const int* input, global int* state, global int* output) {");
+    out.println("global const int* circuitInputs, global int* circuitStates, "
+        + "global int* circuitOutputs, const unsigned int circuitInputLength, "
+        + "const unsigned int circuitOutputLength) {");
 
-    out.printf("int %s = get_global_id(0) / get_local_size(0) * %d + get_local_id(0);%n",
-      CIRCUIT_THREAD_OFFSET_VAR_NAME, model.getCircuitStateSize());
+    // State is arranged as an array of circuit states. The state of each circuit is arranged as
+    // an array of logical unit states. The circuit index is get_global_id(0) / get_local_size(0)
+    out.printf("__global int* circuitState = &circuitStates[%s * %d];%n",
+        "get_global_id(0) / get_local_size(0)", model.getCircuitStateSize());
+
+    out.printf("__global int* circuitInput = &circuitInputs[%s * circuitInputLength];%n",
+        "get_global_id(0) / get_local_size(0)");
 
     // Copy state values into the appropriate variables.
     generateCopyStateValuesToVariables(logicalUnitInfo, out);
@@ -59,6 +59,11 @@ public class OpenClCircuitGeneratorImpl extends AbstractCStyleCircuitSimulationG
     // Copy external elements to shared memory.
     generateCopyExternalInputsToState("external", logicalUnitInfo, out);
     generateBarrier(out);
+    out.println();
+
+    // Generate constants.
+    generateConstants(logicalUnitInfo, out);
+    out.println();
 
     // Perform updates.
 
