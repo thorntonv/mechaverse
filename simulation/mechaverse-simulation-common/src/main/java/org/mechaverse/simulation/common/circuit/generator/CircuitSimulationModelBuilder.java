@@ -111,6 +111,13 @@ public class CircuitSimulationModelBuilder {
     }
   }
 
+  /**
+   * Builds the simulation model for the given circuit.
+   */
+  public static CircuitSimulationModel build(Circuit circuit) {
+    return new CircuitSimulationModelBuilder().buildModel(circuit);
+  }
+
   public CircuitSimulationModel buildModel(Circuit circuit) {
     Map<String, ElementType> elementTypeMap = buildElementTypeMap(circuit);
     LogicalUnitInfo logicalUnitInfo =

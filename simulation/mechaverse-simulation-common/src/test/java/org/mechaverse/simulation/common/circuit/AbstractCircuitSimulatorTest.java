@@ -210,6 +210,29 @@ public abstract class AbstractCircuitSimulatorTest {
   }
 
   @Test
+  public void outputMap() throws Exception {
+    CircuitStateBuilder stateBuilder = CircuitStateBuilder.of(routingCircuit, 1);
+    stateBuilder.setAll(0b111);
+
+    LogicalUnitStateBuilder luStateBuilder = stateBuilder.luStateBuilder(0, 0);
+    luStateBuilder.set("e3_out1", 0b010);
+    luStateBuilder.set("e2_out1_input2Mask", 0b000);
+    luStateBuilder.set("e2_out1_input3Mask", 0b111);
+
+    CircuitSimulator circuitSimulator = newCircuitSimulator(routingCircuit, 1);
+    circuitSimulator.setCircuitState(0, stateBuilder.getState());
+    int[] circuitOutputMap = new int[circuitSimulator.getCircuitOutputSize()];
+    circuitOutputMap[0] = luStateBuilder.getStateIndex("e2_out1");
+    circuitSimulator.setCircuitOutputMap(0, circuitOutputMap);
+    circuitSimulator.update();
+    circuitSimulator.getCircuitState(0, stateBuilder.getState());
+    int[] circuitOutput = new int[circuitSimulator.getCircuitOutputSize()];
+    circuitSimulator.getCircuitOutput(0, circuitOutput);
+    assertEquals(0b010, luStateBuilder.get("e2_out1"));
+    assertEquals(0b010, circuitOutput[0]);
+  }
+
+  @Test
   public void update_multipleCircuits() throws Exception {
     int numCircuits = 50;
     CircuitSimulator circuitSimulator = newCircuitSimulator(routingCircuit, numCircuits);

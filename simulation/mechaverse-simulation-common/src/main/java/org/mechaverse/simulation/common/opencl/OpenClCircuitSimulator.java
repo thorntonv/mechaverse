@@ -42,6 +42,7 @@ public final class OpenClCircuitSimulator implements CircuitSimulator {
   private final CLKernel kernel;
   private final CLBuffer<IntBuffer> inputBuffer;
   private final CLBuffer<IntBuffer> stateBuffer;
+  private final CLBuffer<IntBuffer> outputMapBuffer;
   private final CLBuffer<IntBuffer> outputBuffer;
   private boolean finished = true;
 
@@ -89,10 +90,12 @@ public final class OpenClCircuitSimulator implements CircuitSimulator {
     // Allocate buffers.
     this.inputBuffer = context.createIntBuffer(numCircuits * circuitInputSize, Mem.READ_ONLY);
     this.stateBuffer = context.createIntBuffer(numCircuits * circuitStateSize, Mem.READ_WRITE);
+    this.outputMapBuffer = context.createIntBuffer(numCircuits * circuitOutputSize, Mem.READ_WRITE);
     this.outputBuffer = context.createIntBuffer(numCircuits * circuitOutputSize, Mem.WRITE_ONLY);
 
     kernel.putArg(inputBuffer)
       .putArg(stateBuffer)
+      .putArg(outputMapBuffer)
       .putArg(outputBuffer)
       .putArg(circuitInputSize)
       .putArg(circuitOutputSize);
@@ -155,6 +158,19 @@ public final class OpenClCircuitSimulator implements CircuitSimulator {
     }
     inputBuffer.getBuffer().position(circuitIndex * circuitInputSize);
     inputBuffer.getBuffer().put(circuitInput);
+    inputBuffer.getBuffer().rewind();
+  }
+
+  @Override
+  public void setCircuitOutputMap(int circuitIndex, int[] outputMap) {
+    if (!finished) {
+      queue.finish();
+      finished = true;
+    }
+    outputMapBuffer.getBuffer().position(circuitIndex * circuitOutputSize);
+    outputMapBuffer.getBuffer().put(outputMap);
+    outputMapBuffer.getBuffer().rewind();
+    queue.putWriteBuffer(outputMapBuffer, true);
   }
 
   @Override

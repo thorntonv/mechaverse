@@ -18,8 +18,6 @@ import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel
  */
 public class JavaCircuitGeneratorImpl extends AbstractCStyleCircuitSimulationGenerator {
 
-  // TODO(thorntonv): Generate circuit output code.
-
   public static final String TYPE = "java";
 
   static final String IMPL_PACKAGE = "org.mechaverse.simulation.common.circuit.generator.java";
@@ -27,14 +25,18 @@ public class JavaCircuitGeneratorImpl extends AbstractCStyleCircuitSimulationGen
   static final String IMPL_CLASS_NAME = "CircuitSimulationImpl";
 
   private final int circuitInputSize;
+  private final int circuitOutputSize;
 
-  public JavaCircuitGeneratorImpl(Circuit circuit, int circuitInputSize) {
-    this(new CircuitSimulationModelBuilder().buildModel(circuit), circuitInputSize);
+  public JavaCircuitGeneratorImpl(Circuit circuit, int circuitInputSize, int circuitOutputSize) {
+    this(new CircuitSimulationModelBuilder().buildModel(circuit), circuitInputSize,
+        circuitOutputSize);
   }
 
-  public JavaCircuitGeneratorImpl(CircuitSimulationModel model, int circuitInputSize) {
+  public JavaCircuitGeneratorImpl(CircuitSimulationModel model, int circuitInputSize,
+      int circuitOutputSize) {
     super(model);
     this.circuitInputSize = circuitInputSize;
+    this.circuitOutputSize = circuitOutputSize;
   }
 
   @Override
@@ -58,8 +60,9 @@ public class JavaCircuitGeneratorImpl extends AbstractCStyleCircuitSimulationGen
 
   private void generateConstructor(LogicalUnitInfo logicalUnitInfo, PrintWriter out) {
     out.println("public CircuitSimulationImpl() {");
-    out.printf("super(%d, %d, %d, %d, %d);%n", model.getLogicalUnitCount(), numExternalElements,
-        model.getCircuitStateSize(), circuitInputSize, model.getIterationsPerUpdate());
+    out.printf("super(%d, %d, %d, %d, %d, %d);%n", model.getLogicalUnitCount(), numExternalElements,
+        model.getCircuitStateSize(), circuitInputSize, circuitOutputSize,
+            model.getIterationsPerUpdate());
     out.println("}");
   }
 

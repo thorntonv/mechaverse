@@ -60,7 +60,8 @@ public class CircuitSimulatorImplsTest {
       throws CompileException {
     List<CircuitSimulator> simulators = new ArrayList<>();
     simulators.add(new JavaCircuitSimulator(numCircuits,
-        JavaCircuitSimulatorTest.CIRCUIT_INPUT_SIZE, circuit));
+        JavaCircuitSimulatorTest.CIRCUIT_INPUT_SIZE, JavaCircuitSimulatorTest.CIRCUIT_INPUT_SIZE,
+            circuit));
     simulators.add(new OpenClCircuitSimulator(
       numCircuits, 16, 16, CLPlatform.getDefault().getMaxFlopsDevice(), circuit));
     return simulators;

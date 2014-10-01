@@ -39,16 +39,24 @@ public class OpenClCircuitGeneratorImpl extends AbstractCStyleCircuitSimulationG
 
     out.println("void kernel " + OpenClCircuitSimulator.KERNEL_NAME + "(");
     out.println("global const int* circuitInputs, global int* circuitStates, "
-        + "global int* circuitOutputs, const unsigned int circuitInputLength, "
-        + "const unsigned int circuitOutputLength) {");
+        + "global int* circuitOutputMaps, global int* circuitOutputs, "
+        + "const unsigned int circuitInputLength, const unsigned int circuitOutputLength) {");
+
+    String circuitIdxExpr = "get_global_id(0) / get_local_size(0)";
 
     // State is arranged as an array of circuit states. The state of each circuit is arranged as
     // an array of logical unit states. The circuit index is get_global_id(0) / get_local_size(0)
     out.printf("__global int* circuitState = &circuitStates[%s * %d];%n",
-        "get_global_id(0) / get_local_size(0)", model.getCircuitStateSize());
+        circuitIdxExpr, model.getCircuitStateSize());
 
     out.printf("__global int* circuitInput = &circuitInputs[%s * circuitInputLength];%n",
-        "get_global_id(0) / get_local_size(0)");
+        circuitIdxExpr);
+
+    out.printf("__global int* circuitOutputMap = &circuitOutputMaps[%s * circuitOutputLength];%n",
+        circuitIdxExpr);
+
+    out.printf("__global int* circuitOutput = &circuitOutputs[%s * circuitOutputLength];%n",
+        circuitIdxExpr);
 
     // Copy state values into the appropriate variables.
     generateCopyStateValuesToVariables(logicalUnitInfo, out);
@@ -87,12 +95,23 @@ public class OpenClCircuitGeneratorImpl extends AbstractCStyleCircuitSimulationG
 
     // Copy output values from variables back to state array.
     generateCopyVariablesToState(logicalUnitInfo, out);
+    out.println();
+
+    generateCopyStateValuesToOutput(out);
 
     out.println("}");
   }
 
   protected void generateBarrier(PrintWriter out) {
     out.println("barrier(CLK_LOCAL_MEM_FENCE);");
+  }
+
+  protected void generateCopyStateValuesToOutput(PrintWriter out) {
+    // Each local thread is responsible for copying the indices associated with its id.
+    out.println("for(int idx = get_local_id(0); idx < circuitOutputLength; "
+        + "idx += get_local_size(0)) {");
+    out.println("circuitOutput[idx] = circuitState[circuitOutputMap[idx]];");
+    out.println("}");
   }
 
   @Override

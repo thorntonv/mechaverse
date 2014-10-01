@@ -10,10 +10,11 @@ import org.mechaverse.simulation.common.circuit.CircuitSimulator;
 public class JavaCircuitSimulatorTest extends AbstractCircuitSimulatorTest {
 
   public static final int CIRCUIT_INPUT_SIZE = 4;
+  public static final int CIRCUIT_OUTPUT_SIZE = 4;
 
   @Override
   protected CircuitSimulator newCircuitSimulator(Circuit circuit, int circuitCount)
       throws Exception {
-    return new JavaCircuitSimulator(circuitCount, CIRCUIT_INPUT_SIZE, circuit);
+    return new JavaCircuitSimulator(circuitCount, CIRCUIT_INPUT_SIZE, CIRCUIT_OUTPUT_SIZE, circuit);
   }
 }

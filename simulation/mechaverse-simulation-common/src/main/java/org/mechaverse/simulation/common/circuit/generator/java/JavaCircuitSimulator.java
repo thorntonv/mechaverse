@@ -23,27 +23,30 @@ public final class JavaCircuitSimulator implements CircuitSimulator {
 
   private final CircuitSimulationModel circuitModel;
   private final int circuitInputSize;
+  private final int circuitOutputSize;
   private final JavaCircuitSimulation[] circuitSimulations;
   private final CircuitAllocator allocator;
 
-  public JavaCircuitSimulator(int numCircuits, int circuitInputSize, CircuitDataSource circuitDataSource)
-      throws CompileException {
-    this(numCircuits, circuitInputSize, circuitDataSource.getCircuit());
+  public JavaCircuitSimulator(int numCircuits, int circuitInputSize, int circuitOutputSize,
+      CircuitDataSource circuitDataSource) throws CompileException {
+    this(numCircuits, circuitInputSize, circuitOutputSize, circuitDataSource.getCircuit());
   }
 
-  public JavaCircuitSimulator(int numCircuits, int circuitInputSize, Circuit circuit)
-      throws CompileException {
-    this(numCircuits, circuitInputSize, new CircuitSimulationModelBuilder().buildModel(circuit));
+  public JavaCircuitSimulator(int numCircuits, int circuitInputSize, int circuitOutputSize,
+      Circuit circuit) throws CompileException {
+    this(numCircuits, circuitInputSize, circuitOutputSize,
+        new CircuitSimulationModelBuilder().buildModel(circuit));
   }
 
-  private JavaCircuitSimulator(int numCircuits, int circuitInputSize, CircuitSimulationModel circuitModel)
-      throws CompileException {
+  private JavaCircuitSimulator(int numCircuits, int circuitInputSize, int circuitOutputSize,
+      CircuitSimulationModel circuitModel) throws CompileException {
     Preconditions.checkState(numCircuits > 0);
     this.circuitModel = circuitModel;
     this.circuitInputSize = circuitInputSize;
+    this.circuitOutputSize = circuitOutputSize;
     this.circuitSimulations = new JavaCircuitSimulation[numCircuits];
     for (int idx = 0; idx < numCircuits; idx++) {
-      circuitSimulations[idx] = compile(circuitModel, circuitInputSize);
+      circuitSimulations[idx] = compile(circuitModel, circuitInputSize, circuitOutputSize);
     }
     allocator = new CircuitAllocator(numCircuits);
   }
@@ -70,8 +73,7 @@ public final class JavaCircuitSimulator implements CircuitSimulator {
 
   @Override
   public int getCircuitOutputSize() {
-    // TODO(thorntonv): Implement method.
-    return 0;
+    return circuitOutputSize;
   }
 
   @Override
@@ -91,7 +93,12 @@ public final class JavaCircuitSimulator implements CircuitSimulator {
 
   @Override
   public void getCircuitOutput(int circuitIndex, int[] circuitOutput) {
-    // TODO(thorntonv): Implement method.
+    circuitSimulations[circuitIndex].getOutput(circuitOutput);
+  }
+
+  @Override
+  public void setCircuitOutputMap(int circuitIndex, int[] outputMap) {
+    circuitSimulations[circuitIndex].setOutputMap(outputMap);
   }
 
   @Override
@@ -104,16 +111,16 @@ public final class JavaCircuitSimulator implements CircuitSimulator {
   @Override
   public void close() throws Exception {}
 
-  public static JavaCircuitSimulation compile(Circuit circuit, int circuitInputSize)
-      throws CompileException {
+  public static JavaCircuitSimulation compile(Circuit circuit,
+      int circuitInputSize, int circuitOutputSize) throws CompileException {
     CircuitSimulationModelBuilder modelBuilder = new CircuitSimulationModelBuilder();
-    return compile(modelBuilder.buildModel(circuit), circuitInputSize);
+    return compile(modelBuilder.buildModel(circuit), circuitInputSize, circuitOutputSize);
   }
 
   public static JavaCircuitSimulation compile(CircuitSimulationModel circuitModel,
-      int circuitInputSize) throws CompileException {
+      int circuitInputSize, int circuitOutputSize) throws CompileException {
     JavaCircuitGeneratorImpl generator =
-        new JavaCircuitGeneratorImpl(circuitModel, circuitInputSize);
+        new JavaCircuitGeneratorImpl(circuitModel, circuitInputSize, circuitOutputSize);
     StringWriter out = new StringWriter();
     generator.generate(new PrintWriter(out));
     return JavaCompilerUtil.compile(
@@ -123,7 +130,7 @@ public final class JavaCircuitSimulator implements CircuitSimulator {
 
   @Override
   public String toString() {
-    JavaCircuitGeneratorImpl generator = new JavaCircuitGeneratorImpl(circuitModel, 0);
+    JavaCircuitGeneratorImpl generator = new JavaCircuitGeneratorImpl(circuitModel, 0, 0);
     StringWriter out = new StringWriter();
     generator.generate(new PrintWriter(out));
     return out.toString();

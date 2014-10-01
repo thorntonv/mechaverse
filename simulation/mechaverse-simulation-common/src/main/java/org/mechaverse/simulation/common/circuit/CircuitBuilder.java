@@ -15,7 +15,7 @@ import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel
 import com.google.common.collect.ImmutableList;
 
 /**
- * Assists with building {@link Cicuit} instances.
+ * Assists with building {@link Circuit} instances.
  *
  * @author thorntonv@mechaverse.org
  */
@@ -116,8 +116,15 @@ public class CircuitBuilder {
     }
 
     public int get(String varName) {
+      return state[getStateIndex(varName)];
+    }
+
+    /**
+     * Returns the circuit state index of the given variable name for this logical unit.
+     */
+    public int getStateIndex(String varName) {
       int stateIndex = model.getLogicalUnitInfo().getStateIndex(varName);
-      return state[offset + logicalUnitIndex + stateIndex * model.getLogicalUnitCount()];
+      return offset + logicalUnitIndex + stateIndex * model.getLogicalUnitCount();
     }
 
     public LogicalUnitStateBuilder set(String varName, int value) {

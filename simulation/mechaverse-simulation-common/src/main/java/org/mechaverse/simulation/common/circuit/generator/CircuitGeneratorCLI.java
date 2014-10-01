@@ -68,7 +68,7 @@ public class CircuitGeneratorCLI {
 
   private static CircuitSimulationGenerator createGenerator(String type, Circuit circuit) {
     if (type.equalsIgnoreCase(JavaCircuitGeneratorImpl.TYPE)) {
-      return new JavaCircuitGeneratorImpl(circuit, 0);
+      return new JavaCircuitGeneratorImpl(circuit, 0, 0);
     } else if (type.equalsIgnoreCase(OpenClCircuitGeneratorImpl.TYPE)) {
       return new OpenClCircuitGeneratorImpl(circuit);
     }
