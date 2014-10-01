@@ -66,6 +66,27 @@ public class CircuitBuilder {
     }
   }
 
+  public static final String TOGGLE_TYPE = "toggle";
+
+  /**
+   * An element that toggles between 1 and 0.
+   */
+  public static class ToggleElementType extends ElementType {
+
+    private static final long serialVersionUID = 1L;
+
+    public ToggleElementType() {
+      setId(TOGGLE_TYPE);
+      getOutputs().add(newOutput("1", "~{output1}"));
+      getOutputs().add(newOutput("2", "~{output2}"));
+      getOutputs().add(newOutput("3", "~{output3}"));
+    }
+
+    public static ToggleElementType newInstance() {
+      return new ToggleElementType();
+    }
+  }
+
   /**
    * Sets and gets circuit state values.
    */

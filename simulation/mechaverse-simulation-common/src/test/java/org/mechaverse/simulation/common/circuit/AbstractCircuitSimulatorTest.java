@@ -16,6 +16,7 @@ import org.mechaverse.simulation.common.circuit.CircuitBuilder.CircuitStateBuild
 import org.mechaverse.simulation.common.circuit.CircuitBuilder.InputElementType;
 import org.mechaverse.simulation.common.circuit.CircuitBuilder.LogicalUnitStateBuilder;
 import org.mechaverse.simulation.common.circuit.CircuitBuilder.Routing3In3OutElementType;
+import org.mechaverse.simulation.common.circuit.CircuitBuilder.ToggleElementType;
 
 import com.google.common.collect.ImmutableList;
 /**
@@ -230,6 +231,34 @@ public abstract class AbstractCircuitSimulatorTest {
     circuitSimulator.getCircuitOutput(0, circuitOutput);
     assertEquals(0b010, luStateBuilder.get("e2_out1"));
     assertEquals(0b010, circuitOutput[0]);
+  }
+
+  @Test
+  public void memoryElement() throws Exception {
+    Circuit circuit = CircuitBuilder.newCircuit(3, 3, ToggleElementType.newInstance(), 3, 3);
+    CircuitSimulator circuitSimulator = newCircuitSimulator(circuit, 1);
+
+    CircuitStateBuilder stateBuilder = CircuitStateBuilder.of(circuit, 1);
+    stateBuilder.setAll(0b111);
+
+    LogicalUnitStateBuilder luStateBuilder = stateBuilder.luStateBuilder(0, 0);
+    luStateBuilder.set("e2_out1", 0b001);
+    luStateBuilder.set("e2_out2", 0b101);
+    luStateBuilder.set("e2_out3", 0b100);
+
+    circuitSimulator.setCircuitState(0, stateBuilder.getState());
+    circuitSimulator.update();
+
+    circuitSimulator.getCircuitState(0, stateBuilder.getState());
+    assertEquals(0b110, luStateBuilder.get("e2_out1") & 0b111);
+    assertEquals(0b010, luStateBuilder.get("e2_out2") & 0b111);
+    assertEquals(0b011, luStateBuilder.get("e2_out3") & 0b111);
+
+    circuitSimulator.update();
+    circuitSimulator.getCircuitState(0, stateBuilder.getState());
+    assertEquals(0b001, luStateBuilder.get("e2_out1"));
+    assertEquals(0b101, luStateBuilder.get("e2_out2"));
+    assertEquals(0b100, luStateBuilder.get("e2_out3"));
   }
 
   @Test

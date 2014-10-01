@@ -20,6 +20,7 @@ public abstract class AbstractCircuitSimulationGenerator implements CircuitSimul
   protected static final Pattern EXPRESSION_VAR_PATTERN = Pattern.compile("\\{[^}]+\\}");
 
   private static final String ELEMENT_INPUT_ID_PREFIX = "input";
+  private static final String ELEMENT_OUTPUT_ID_PREFIX = "output";
 
   protected final CircuitSimulationModel model;
 
@@ -55,6 +56,14 @@ public abstract class AbstractCircuitSimulationGenerator implements CircuitSimul
             ElementInfo inputElement =
                 model.getLogicalUnitInfo().getElementInfo(input.getElement().getId());
             varName = inputElement.getOutputVarName(input.getOutput());
+          }
+        }
+      }
+      if (varName == null && placeholderId.startsWith(ELEMENT_OUTPUT_ID_PREFIX)) {
+        // Attempt to map the id to an element output.
+        for (int idx = 0; idx < element.getOutputs().size() && varName == null; idx++) {
+          if (placeholderId.equalsIgnoreCase(ELEMENT_OUTPUT_ID_PREFIX + (idx + 1))) {
+            varName = element.getOutputVarName(element.getOutputs().get(idx));
           }
         }
       }
