@@ -3,18 +3,26 @@
 
   <element-type id="register">
     <output id="1">
-      <expression>{input1} ? {input2} : {output1}</expression>
+      <expression><![CDATA[({output1} & ~{input1}) | ({input2} & {input1})]]></expression>
     </output>
   </element-type>
 
-  <!-- An element for routing data from one part of the circuit to another.  -->
+  <!-- An element that outputs a circuit input. -->
+  <element-type id="input">
+    <output id="1">
+      <param id="idx" />
+      <expression><![CDATA[circuitInput[{idx} % circuitInputLength]]]></expression>
+    </output>
+  </element-type>
+
+  <!-- An element for routing data from one part of the circuit to another. -->
   <element-type id="interplaneRouting">
     <output id="1">
       <expression><![CDATA[({input1} << 1)]]></expression>
     </output>
   </element-type>
 
-  <!-- An element for routing data from one part of the circuit to another.  -->
+  <!-- An element for routing data from one part of the circuit to another. -->
   <element-type id="routing3in3out">
     <output id="1">
       <param id="input2Mask" />
@@ -82,13 +90,13 @@
     <row>
       <element type="interplaneRouting" />
       <element type="boolean3in3out" />
-      <element type="interplaneRouting" />
+      <element type="register" />
       <element type="boolean3in3out" outputs="{1}" />
     </row>
     <row>
       <element type="interplaneRouting" />
       <element type="boolean3in3out" />
-      <element type="interplaneRouting" />
+      <element type="register" />
       <element type="boolean3in3out" outputs="{1}" />
     </row>
     <row>
