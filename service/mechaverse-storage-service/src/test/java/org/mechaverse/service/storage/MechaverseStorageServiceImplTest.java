@@ -15,7 +15,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import org.mechaverse.service.storage.api.MechaverseStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -27,14 +26,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration("/test-context.xml")
 public class MechaverseStorageServiceImplTest {
 
-  @Autowired StorageServiceConfig config;
-  @Autowired MechaverseStorageService service;
+  @Autowired MechaverseStorageServiceImpl service;
   @Rule public TemporaryFolder folder = new TemporaryFolder();
 
   @Test
   public void persistState() throws Exception {
     File basePath = folder.newFolder();
-    config.setBasePath(basePath.getAbsolutePath());
+    service.setBasePath(basePath.getAbsolutePath());
     service.setState("1", "1", 0, new ByteArrayInputStream("This is a test.".getBytes()));
     InputStream stateIn = service.getState("1", "1", 0);
 
@@ -47,7 +45,7 @@ public class MechaverseStorageServiceImplTest {
   @Test
   public void removeSimulation() throws Exception {
     File basePath = folder.newFolder();
-    config.setBasePath(basePath.getAbsolutePath());
+    service.setBasePath(basePath.getAbsolutePath());
     service.setState("1", "1", 0, new ByteArrayInputStream("This is a test.".getBytes()));
 
     assertEquals(5, FileUtils
@@ -68,7 +66,7 @@ public class MechaverseStorageServiceImplTest {
   @Test
   public void removeInstance() throws Exception {
     File basePath = folder.newFolder();
-    config.setBasePath(basePath.getAbsolutePath());
+    service.setBasePath(basePath.getAbsolutePath());
     service.setState("1", "1", 0, new ByteArrayInputStream("This is a test.".getBytes()));
 
     assertEquals(5, FileUtils

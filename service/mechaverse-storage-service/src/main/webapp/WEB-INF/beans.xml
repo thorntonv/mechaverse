@@ -14,6 +14,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
 
   <context:annotation-config />
 
+  <context:property-placeholder location="classpath:mechaverse-storage-service.properties" />
   <context:component-scan base-package="org.mechaverse.service.storage" />
 
   <jaxrs:server id="services" address="/">
