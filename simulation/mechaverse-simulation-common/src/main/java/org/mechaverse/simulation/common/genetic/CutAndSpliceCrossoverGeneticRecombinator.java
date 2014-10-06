@@ -10,17 +10,17 @@ import org.mechaverse.simulation.common.util.RandomUtil;
 import com.google.common.base.Preconditions;
 
 /**
- * Performs genetic recombination using cut and split crossover.
+ * Performs genetic recombination using cut and splice crossover.
  */
-public class CutAndSplitCrossoverGeneticRecombinator
-    implements GeneticRecombinator<CrossoverGeneticData> {
+public class CutAndSpliceCrossoverGeneticRecombinator
+    implements GeneticRecombinator<GeneticData> {
 
-  private static class RecombinationState extends CrossoverGeneticData {
+  private static class RecombinationState extends GeneticData {
 
     private int position;
     private int nextCrossoverPointIdx;
 
-    public RecombinationState(CrossoverGeneticData data) {
+    public RecombinationState(GeneticData data) {
       super(data.getData(), data.getCrossoverPoints());
     }
 
@@ -48,8 +48,8 @@ public class CutAndSplitCrossoverGeneticRecombinator
   }
 
   @Override
-  public CrossoverGeneticData recombine(
-      CrossoverGeneticData parent1Data, CrossoverGeneticData parent2Data, RandomGenerator random) {
+  public GeneticData recombine(
+      GeneticData parent1Data, GeneticData parent2Data, RandomGenerator random) {
     Preconditions.checkNotNull(parent1Data);
     Preconditions.checkNotNull(parent2Data);
     Preconditions.checkNotNull(random);
@@ -72,6 +72,6 @@ public class CutAndSplitCrossoverGeneticRecombinator
       otherParent.nextCrossoverPoint();
       childCrossoverPoints.add(childData.size());
     }
-    return new CrossoverGeneticData(childData.toByteArray(), childCrossoverPoints.toArray());
+    return new GeneticData(childData.toByteArray(), childCrossoverPoints.toArray());
   }
 }

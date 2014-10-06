@@ -12,9 +12,9 @@ import org.junit.Test;
 import org.mechaverse.simulation.common.util.RandomUtil;
 
 /**
- * A unit test for {@link CutAndSplitCrossoverGeneticRecombinator}.
+ * A unit test for {@link CutAndSpliceCrossoverGeneticRecombinator}.
  */
-public class CutAndSplitCrossoverGeneticRecombinatorTest {
+public class CutAndSpliceCrossoverGeneticRecombinatorTest {
 
   private RandomGenerator random;
 
@@ -25,8 +25,7 @@ public class CutAndSplitCrossoverGeneticRecombinatorTest {
 
   @Test
   public void recombine() {
-    GeneticRecombinator<CrossoverGeneticData> recombinator =
-        new CutAndSplitCrossoverGeneticRecombinator();
+    GeneticRecombinator<GeneticData> recombinator = new CutAndSpliceCrossoverGeneticRecombinator();
 
     ByteArrayOutputStream parent1Out = new ByteArrayOutputStream();
     ByteArrayOutputStream parent2Out = new ByteArrayOutputStream();
@@ -46,12 +45,12 @@ public class CutAndSplitCrossoverGeneticRecombinatorTest {
       selectParentCrossoverPoints.add(selectedParent.size());
     }
 
-    CrossoverGeneticData parent1Data =
-        new CrossoverGeneticData(parent1Out.toByteArray(), parent1CrossoverPoints.toArray());
-    CrossoverGeneticData parent2Data =
-        new CrossoverGeneticData(parent2Out.toByteArray(), parent2CrossoverPoints.toArray());
+    GeneticData parent1Data =
+        new GeneticData(parent1Out.toByteArray(), parent1CrossoverPoints.toArray());
+    GeneticData parent2Data =
+        new GeneticData(parent2Out.toByteArray(), parent2CrossoverPoints.toArray());
 
-    CrossoverGeneticData childData = recombinator.recombine(parent1Data, parent2Data, random);
+    GeneticData childData = recombinator.recombine(parent1Data, parent2Data, random);
 
     ByteArrayInputStream childIn = new ByteArrayInputStream(childData.getData());
 

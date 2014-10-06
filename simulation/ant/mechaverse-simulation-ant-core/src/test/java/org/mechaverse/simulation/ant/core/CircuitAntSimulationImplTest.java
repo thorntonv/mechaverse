@@ -58,10 +58,16 @@ public class CircuitAntSimulationImplTest extends AbstractAntSimulationImplTest 
           SimulationDataStore entityDataStore = state.getEntityValues(entity);
           assertTrue(entityDataStore.containsKey(CircuitAntBehavior.CIRCUIT_STATE_KEY));
           assertTrue(entityDataStore.get(CircuitAntBehavior.CIRCUIT_STATE_KEY).length > 0);
+          assertTrue(entityDataStore.containsKey(CircuitAntBehavior.CIRCUIT_OUTPUT_MAP_KEY));
+          assertTrue(entityDataStore.get(CircuitAntBehavior.CIRCUIT_OUTPUT_MAP_KEY).length > 0);
+          assertTrue(entityDataStore.containsKey(CircuitAntBehavior.CIRCUIT_BIT_OUTPUT_MAP_KEY));
+          assertTrue(entityDataStore.get(CircuitAntBehavior.CIRCUIT_BIT_OUTPUT_MAP_KEY).length > 0);
           antCount++;
         }
       }
-      assertEquals(antCount + 2, state.keySet().size());
+      // State should have model and config values.
+      // Each ant should have genetic data, circuit state, output map, and bit output map values.
+      assertEquals("Key set: " + state.keySet(), antCount * 4 + 2, state.keySet().size());
     }
   }
 }

@@ -62,4 +62,13 @@ public final class RandomUtil {
       return random.nextFloat() <= p;
     }
   }
+
+  /**
+   * Returns a new random byte array with the given length.
+   */
+  public static byte[] randomBytes(int length, RandomGenerator random) {
+    byte[] data = new byte[length];
+    random.nextBytes(data);
+    return data;
+  }
 }

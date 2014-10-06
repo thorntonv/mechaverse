@@ -18,7 +18,7 @@ import org.mechaverse.simulation.ant.core.AntSimulationUtil;
 import org.mechaverse.simulation.ant.core.Cell;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
 import org.mechaverse.simulation.ant.core.EntityManager;
-import org.mechaverse.simulation.common.genetic.CutAndSplitCrossoverGeneticRecombinator;
+import org.mechaverse.simulation.common.genetic.CutAndSpliceCrossoverGeneticRecombinator;
 import org.springframework.beans.factory.annotation.Value;
 
 /**
@@ -69,8 +69,8 @@ public class AntReproductionModule implements AntSimulationModule {
 
   private final Set<Ant> ants = new LinkedHashSet<>();
   private Nest nest;
-  private final CutAndSplitCrossoverGeneticRecombinator geneticRecombinator =
-      new CutAndSplitCrossoverGeneticRecombinator();
+  private final CutAndSpliceCrossoverGeneticRecombinator geneticRecombinator =
+      new CutAndSpliceCrossoverGeneticRecombinator();
   private final AntFitnessCalculator fitnessCalculator = new SimpleAntFitnessCalculator();
 
   @Override

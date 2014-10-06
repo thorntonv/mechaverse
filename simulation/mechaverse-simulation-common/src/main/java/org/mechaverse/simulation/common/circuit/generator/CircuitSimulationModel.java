@@ -305,8 +305,18 @@ public class CircuitSimulationModel {
     return circuit.getIterationsPerUpdate() != null ? circuit.getIterationsPerUpdate() : 1;
   }
 
+  /**
+   * Returns the number of state values.
+   */
   public int getCircuitStateSize() {
     return logicalUnitInfo.getStateSize() * getLogicalUnitCount();
+  }
+
+  /**
+   * Returns the size of the circuit state in bytes.
+   */
+  public int getCircuitStateSizeBytes() {
+    return getCircuitStateSize() * 4;
   }
 
   public int getLogicalUnitCount() {
