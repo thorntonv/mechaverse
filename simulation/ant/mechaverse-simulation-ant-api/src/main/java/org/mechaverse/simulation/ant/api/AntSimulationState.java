@@ -85,6 +85,10 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
     return byteOut.toByteArray();
   }
 
+  public boolean containsEntityKey(Entity entity, String key) {
+    return containsKey(getEntityKey(entity, key));
+  }
+
   public byte[] getEntityValue(Entity entity, String key) {
     return get(getEntityKey(entity, key));
   }

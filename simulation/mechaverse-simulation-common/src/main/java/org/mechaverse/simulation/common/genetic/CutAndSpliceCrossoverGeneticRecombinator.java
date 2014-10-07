@@ -12,8 +12,7 @@ import com.google.common.base.Preconditions;
 /**
  * Performs genetic recombination using cut and splice crossover.
  */
-public class CutAndSpliceCrossoverGeneticRecombinator
-    implements GeneticRecombinator<GeneticData> {
+public class CutAndSpliceCrossoverGeneticRecombinator implements GeneticRecombinator {
 
   private static class RecombinationState extends GeneticData {
 

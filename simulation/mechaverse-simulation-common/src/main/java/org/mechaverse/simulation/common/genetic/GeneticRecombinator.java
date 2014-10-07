@@ -5,13 +5,12 @@ import org.apache.commons.math3.random.RandomGenerator;
 /**
  * An interface for classes that perform genetic recombination.
  *
- * @param <T> the genetic data type
+ * @author Vance Thornton
  */
-public interface GeneticRecombinator<T extends GeneticData> {
+public interface GeneticRecombinator {
 
   /**
    * Performs genetic recombination with the given parent data to form the resultant child data.
    */
-  T recombine(T parent1Data, T parent2Data, RandomGenerator random);
-
+  GeneticData recombine(GeneticData parent1Data, GeneticData parent2Data, RandomGenerator random);
 }
