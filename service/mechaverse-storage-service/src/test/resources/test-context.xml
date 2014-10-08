@@ -13,4 +13,5 @@
   <context:component-scan base-package="org.mechaverse.service.storage" />
 
   <bean class="org.mechaverse.service.storage.MechaverseStorageServiceImpl" />
+  <bean class="org.mechaverse.service.storage.MongoDBMechaverseStorageService" />
 </beans> 
