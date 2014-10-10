@@ -18,14 +18,18 @@ import org.mechaverse.simulation.common.SimulationDataStore;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.mongodb.MongoClient;
-
-// TODO(dhendrickson): move some of this to an interface test
-// TODO(dhendrickson): add javadoc
-// TODO(dhendrickson): look into embedded database to eliminate test dependency
+/**
+ * 
+ * Unit tests for {@link MongoDBMechaverseStorageService}.
+ * 
+ * @author Dusty Hendrickson <dusty@obsidiannight.com>
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/test-context.xml")
+// TODO(dhendrickson): look into embedded database to eliminate test dependency
+@Ignore
 public class MongoDBMechaverseStorageServiceTest {
+  // TODO(dhendrickson): move some of this to an interface test
 
   private MongoDBMechaverseStorageService service;
 
@@ -44,24 +48,21 @@ public class MongoDBMechaverseStorageServiceTest {
     return true;
   }
 
-  // TODO(dhendrickson): figure out how to configure this better
-  private void removeDatabase() throws IOException {
-    MongoClient mongoClient = new MongoClient("localhost", 27017);
-    mongoClient.getDB("mechaverse-storage-test").dropDatabase();
-    mongoClient.close();
-  }
-
   @Before
   public void before() throws IOException {
-    removeDatabase();
     this.service = new MongoDBMechaverseStorageService();
+    this.service.setMongoDatabaseName("mechaverse-storage-test");
+    this.service.clear();
   }
 
   @After
   public void after() throws IOException {
-    removeDatabase();
+    this.service.clear();
   }
 
+  /**
+   * Test setter/getter for MongoDB host.
+   */
   @Test
   public void testMongoHost() {
     String setHost = "fake-host";
@@ -71,6 +72,9 @@ public class MongoDBMechaverseStorageServiceTest {
     assertEquals(setHost, getHost);
   }
 
+  /**
+   * Test setter/getter for MongoDB port.
+   */
   @Test
   public void testMongoPort() {
     int setPort = 1337;
@@ -80,6 +84,9 @@ public class MongoDBMechaverseStorageServiceTest {
     assertEquals(setPort, getPort);
   }
 
+  /**
+   * Test setter/getter for MongoDB database name.
+   */
   @Test
   public void testMongoDatabaseName() {
     String setDatabaseName = "fake-database";
@@ -89,15 +96,19 @@ public class MongoDBMechaverseStorageServiceTest {
     assertEquals(setDatabaseName, getDatabaseName);
   }
 
-  @Ignore
+  /**
+   * Test setter/getter for state.
+   * 
+   * 1) Database is empty 2) Set state 3) Get state 4) Confirm equality of set and get
+   */
   @Test
-  public void testState() throws IOException {
+  public void testStateA() throws IOException {
     SimulationDataStore setStore = new SimulationDataStore();
     setStore.put("key1", "value1".getBytes());
     setStore.put("key2", "value2".getBytes());
     setStore.put("key3", "value3".getBytes());
-    InputStream setStream = new ByteArrayInputStream(setStore.serialize());
 
+    InputStream setStream = new ByteArrayInputStream(setStore.serialize());
     this.service.setState("simulation-id", "instance-id", 0, setStream);
 
     InputStream getStream;
@@ -107,9 +118,120 @@ public class MongoDBMechaverseStorageServiceTest {
     assertTrue(compareSimulationDataStore(setStore, getStore));
   }
 
-  @Ignore
+  /**
+   * Test setter/getter for state.
+   * 
+   * 1) Database is empty 2) Set state 3) Update state with same key set 4) Get state 5) Confirm
+   * equality of update and get
+   */
   @Test
-  public void testDeleteSimulation() throws IOException {
+  public void testStateB() throws IOException {
+    SimulationDataStore setStore = new SimulationDataStore();
+    setStore.put("key1", "value1".getBytes());
+    setStore.put("key2", "value2".getBytes());
+    setStore.put("key3", "value3".getBytes());
+
+    InputStream setStream = new ByteArrayInputStream(setStore.serialize());
+    this.service.setState("simulation-id", "instance-id", 0, setStream);
+
+    SimulationDataStore updateStore = new SimulationDataStore();
+    setStore.put("key1", "value4".getBytes());
+    setStore.put("key2", "value5".getBytes());
+    setStore.put("key3", "value6".getBytes());
+
+    InputStream updateStream = new ByteArrayInputStream(updateStore.serialize());
+    this.service.setState("simulation-id", "instance-id", 0, updateStream);
+
+    InputStream getStream;
+    getStream = this.service.getState("simulation-id", "instance-id", 0);
+    SimulationDataStore getStore = SimulationDataStore.deserialize(getStream);
+
+    assertTrue(compareSimulationDataStore(updateStore, getStore));
+  }
+
+  /**
+   * Test setter/getter for state.
+   * 
+   * 1) Database is empty 2) Set state 3) Update state with different key set 4) Get state 5)
+   * Confirm equality of update and get
+   */
+  @Test
+  public void testStateC() throws IOException {
+    SimulationDataStore setStore = new SimulationDataStore();
+    setStore.put("key1", "value1".getBytes());
+    setStore.put("key2", "value2".getBytes());
+    setStore.put("key3", "value3".getBytes());
+
+    InputStream setStream = new ByteArrayInputStream(setStore.serialize());
+    this.service.setState("simulation-id", "instance-id", 0, setStream);
+
+    SimulationDataStore updateStore = new SimulationDataStore();
+    setStore.put("key4", "value4".getBytes());
+    setStore.put("key5", "value5".getBytes());
+    setStore.put("key6", "value6".getBytes());
+
+    InputStream updateStream = new ByteArrayInputStream(updateStore.serialize());
+    this.service.setState("simulation-id", "instance-id", 0, updateStream);
+
+    InputStream getStream;
+    getStream = this.service.getState("simulation-id", "instance-id", 0);
+    SimulationDataStore getStore = SimulationDataStore.deserialize(getStream);
+
+    assertTrue(compareSimulationDataStore(updateStore, getStore));
+  }
+
+  /**
+   * Test setter/getter for state.
+   * 
+   * 1) Database is empty 2) Set state 3) Update state with empty key set 4) Get state 5) Confirm
+   * equality of update and get
+   */
+  @Test
+  public void testStateD() throws IOException {
+    SimulationDataStore setStore = new SimulationDataStore();
+    setStore.put("key1", "value1".getBytes());
+    setStore.put("key2", "value2".getBytes());
+    setStore.put("key3", "value3".getBytes());
+
+    InputStream setStream = new ByteArrayInputStream(setStore.serialize());
+    this.service.setState("simulation-id", "instance-id", 0, setStream);
+
+    SimulationDataStore updateStore = new SimulationDataStore();
+
+    InputStream updateStream = new ByteArrayInputStream(updateStore.serialize());
+    this.service.setState("simulation-id", "instance-id", 0, updateStream);
+
+    InputStream getStream;
+    getStream = this.service.getState("simulation-id", "instance-id", 0);
+    SimulationDataStore getStore = SimulationDataStore.deserialize(getStream);
+
+    assertTrue(compareSimulationDataStore(updateStore, getStore));
+  }
+
+  /**
+   * Test setter/getter for state.
+   * 
+   * 1) Database is empty 2) Set state with invalid stream 3) Confirm expected exception
+   */
+  @Test
+  public void testStateE() {
+    InputStream stream = new ByteArrayInputStream(new byte[0]);
+    try {
+      this.service.setState("simulation-id", "instance-id", 0, stream);
+      fail("set state succeeded when should have failed");
+    } catch (IOException ex) {
+      // Expected condition
+    }
+  }
+
+  /**
+   * Test deleting a simulation.
+   * 
+   * 1) Database is empty 2) Set state for two simulation/instance/iteration 3) Delete one
+   * simulation 4) Confirm only records for one simulation removed
+   */
+  @Test
+  public void testDeleteSimulationA() throws IOException {
     SimulationDataStore store = new SimulationDataStore();
     store.put("key1", "value1".getBytes());
     store.put("key2", "value2".getBytes());
@@ -168,7 +290,24 @@ public class MongoDBMechaverseStorageServiceTest {
     }
   }
 
-  @Ignore
+  /**
+   * Test deleting a simulation.
+   * 
+   * 1) Database is empty 2) Set state for two simulation/instance/iteration 3) Delete one
+   * simulation 4) Confirm only records for one simulation removed
+   */
+  @Test
+  public void testDeleteSimulationB() {
+    try {
+      this.service.deleteSimulation("fake-simulation");
+    } catch (IOException e) {
+      fail("delete simulation threw an unexpected exception");
+    }
+  }
+
+  /**
+   * Test deleting an instance simulation.
+   */
   @Test
   public void testDeleteInstance() throws IOException {
     SimulationDataStore store = new SimulationDataStore();
@@ -215,5 +354,29 @@ public class MongoDBMechaverseStorageServiceTest {
     } catch (IOException ex) {
       // Expected condition
     }
+  }
+
+  /**
+   * Test getter for state value.
+   * 
+   * 1) Database is empty 2) Set state 3) Get state value 4) Confirm state only contains requested
+   * key
+   */
+  @Test
+  public void testGetStateValue() throws IOException {
+    SimulationDataStore store = new SimulationDataStore();
+    store.put("key1", "value1".getBytes());
+    store.put("key2", "value2".getBytes());
+    store.put("key3", "value3".getBytes());
+
+    this.service.setState("simulation1", "instance1", 0,
+        new ByteArrayInputStream(store.serialize()));
+
+    InputStream stream = this.service.getStateValue("simulation1", "instance1", 0, "key2");
+    SimulationDataStore getStore = SimulationDataStore.deserialize(stream);
+
+    assertEquals(1, getStore.size());
+    assertTrue(getStore.containsKey("key2"));
+    assertTrue(Arrays.equals(getStore.get("key2"), "value2".getBytes()));
   }
 }

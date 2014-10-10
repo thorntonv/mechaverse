@@ -12,17 +12,21 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoException;
 
-// TODO(dhendrickson): add javadoc
-//
+/**
+ * A storage service implementation that utilizes a MongoDB database.
+ * 
+ * @author Dusty Hendrickson <dusty@obsidiannight.com>
+ */
 public class MongoDBMechaverseStorageService implements MechaverseStorageService {
 
   // Constants
-  private final String mongoCollectionName = "simulationDataStores";
-  private final String simulationIdKey = "simulationId";
-  private final String instanceIdKey = "instanceId";
-  private final String iterationKey = "iteration";
-  private final String dataStoreKey = "dataStoreEntries";
+  private static final String mongoCollectionName = "simulationDataStores";
+  private static final String simulationIdKey = "simulationId";
+  private static final String instanceIdKey = "instanceId";
+  private static final String iterationKey = "iteration";
+  private static final String dataStoreKey = "dataStoreEntries";
 
   // Configuration
   @Value("${org.mechaverse.service.storage.mongoHost}")
@@ -34,39 +38,98 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
   @Value("${org.mechaverse.service.storage.mongoDatabaseName}")
   private String mongoDatabaseName = "mechaverse-storage-service";
 
+  // Singleton client and database
   private static MongoClient mongoClient;
   private static DB mongoDatabase;
 
+  /**
+   * Returns a singleton instance of a MongoDB database.
+   * 
+   * @param mongoHost hostname or IP address of the MongoDB server
+   * @param mongoPort port of the MongoDB server
+   * @param mongoDatabaseName database name on the MongoDB server
+   * @return MongoDB database
+   * @throws IOException
+   */
   private static DB getDatabase(String mongoHost, int mongoPort, String mongoDatabaseName)
       throws IOException {
-    if (mongoClient == null) {
+    if (mongoDatabase == null) {
       mongoClient = new MongoClient(mongoHost, mongoPort);
       mongoDatabase = mongoClient.getDB(mongoDatabaseName);
+
+      // Create a unique index using the simulation, instance, and iteration as the key
+      // Note: this is safe to run multiple times, as subsequent creations are ignored
+      DBObject indexKeys = new BasicDBObject();
+      indexKeys.put(simulationIdKey, 1);
+      indexKeys.put(instanceIdKey, 1);
+      indexKeys.put(iterationKey, 1);
+      mongoDatabase.getCollection(mongoCollectionName).createIndex(indexKeys,
+          new BasicDBObject("unique", true));
     }
 
     return mongoDatabase;
   }
 
+  /**
+   * Removes the MongoDB database. Used primarily for testing purposes.
+   * 
+   * @throws IOException
+   */
+  protected void clear() throws IOException {
+    DB database = getDatabase(this.mongoHost, this.mongoPort, this.mongoDatabaseName);
+    database.dropDatabase();
+  }
+
+  /**
+   * Return the hostname or IP address of the MongoDB server.
+   * 
+   * @return MongoDB hostname or IP address of the MongoDB server
+   */
   public String getMongoHost() {
     return mongoHost;
   }
 
+  /**
+   * Set the hostname or IP address of the MongoDB server.
+   * 
+   * @param mongoHost hostname or IP address of the MongoDB server
+   */
   public void setMongoHost(String mongoHost) {
     this.mongoHost = mongoHost;
   }
 
+  /**
+   * Return the port of the MongoDB server.
+   * 
+   * @return port of the MongoDB server
+   */
   public int getMongoPort() {
     return mongoPort;
   }
 
+  /**
+   * Set the port of the MongoDB server.
+   * 
+   * @param mongoPort port of the MongoDB server
+   */
   public void setMongoPort(int mongoPort) {
     this.mongoPort = mongoPort;
   }
 
+  /**
+   * Return the database name on the MongoDB server.
+   * 
+   * @return database name on the MongoDB server
+   */
   public String getMongoDatabaseName() {
     return mongoDatabaseName;
   }
 
+  /**
+   * Set the database name on the MongoDB server.
+   * 
+   * @param mongoDatabaseName database name on the MongoDB server
+   */
   public void setMongoDatabaseName(String mongoDatabaseName) {
     this.mongoDatabaseName = mongoDatabaseName;
   }
@@ -74,37 +137,43 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
   @Override
   public InputStream getState(String simulationId, String instanceId, long iteration)
       throws IOException {
-    // Setup database connection
-    DB database = getDatabase(this.mongoHost, this.mongoPort, this.mongoDatabaseName);
-
-    // Construct database query
-    BasicDBObject searchQuery = new BasicDBObject();
-    searchQuery.put(this.simulationIdKey, simulationId);
-    searchQuery.put(this.instanceIdKey, instanceId);
-    searchQuery.put(this.iterationKey, iteration);
-
-    // Retrieve individual record from database
-    DBObject record = database.getCollection(this.mongoCollectionName).findOne(searchQuery);
-    if (record == null) {
-      throw new IOException(String.format("unable to get state for %s:%s:%s", simulationId,
-          instanceId, iteration));
-    }
-
-    // Reconstruct data
-    SimulationDataStore store = new SimulationDataStore();
-    DBObject keys = (DBObject) record.get(this.dataStoreKey);
-    for (String key : keys.keySet()) {
-      store.put(key, (byte[]) keys.get(key));
-    }
-
-    return new ByteArrayInputStream(store.serialize());
+    return this.getStateValue(simulationId, instanceId, iteration, null);
   }
 
   @Override
   public InputStream getStateValue(String simulationId, String instanceId, long iteration,
       String key) throws IOException {
-    throw new UnsupportedOperationException();
-    // TODO(dhendrickson): implement
+    // Setup database connection
+    DB database = getDatabase(this.mongoHost, this.mongoPort, this.mongoDatabaseName);
+
+    // Build query to find existing document
+    DBObject query = new BasicDBObject();
+    query.put(simulationIdKey, simulationId);
+    query.put(instanceIdKey, instanceId);
+    query.put(iterationKey, iteration);
+
+    // Filter fields by key if necessary
+    DBObject fields = new BasicDBObject();
+    if (key != null) {
+      fields.put(String.format("%s.%s", dataStoreKey, key), 1);
+    }
+
+    // Retrieve individual document from collection
+    DBObject record = database.getCollection(mongoCollectionName).findOne(query, fields);
+    if (record == null) {
+      throw new IOException(String.format("unable to get state for %s:%s:%s", simulationId,
+          instanceId, iteration));
+    }
+
+    // Reconstruct state from document
+    SimulationDataStore store = new SimulationDataStore();
+    DBObject dataStoreEntries = (DBObject) record.get(dataStoreKey);
+    for (String storeKey : dataStoreEntries.keySet()) {
+      store.put(storeKey, (byte[]) dataStoreEntries.get(storeKey));
+    }
+    InputStream state = new ByteArrayInputStream(store.serialize());
+
+    return state;
   }
 
   @Override
@@ -113,19 +182,33 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
     // Setup database connection
     DB database = getDatabase(this.mongoHost, this.mongoPort, this.mongoDatabaseName);
 
-    // Encode state into database
-    // TODO(dhendrickson): deal with existing record
+    // Build basic document
+    DBObject document = new BasicDBObject();
+    document.put(simulationIdKey, simulationId);
+    document.put(instanceIdKey, instanceId);
+    document.put(iterationKey, iteration);
+
+    // Decode state and add to document
+    DBObject keys = new BasicDBObject();
     SimulationDataStore store = SimulationDataStore.deserialize(stateInput);
-    BasicDBObject entry = new BasicDBObject();
-    BasicDBObject keys = new BasicDBObject();
-    for (String key : store.keySet()) {
-      keys.put(key, store.get(key));
+    for (String storeKey : store.keySet()) {
+      keys.put(storeKey, store.get(storeKey));
     }
-    entry.put(this.simulationIdKey, simulationId);
-    entry.put(this.instanceIdKey, instanceId);
-    entry.put(this.iterationKey, iteration);
-    entry.put(this.dataStoreKey, keys);
-    database.getCollection(this.mongoCollectionName).insert(entry);
+    document.put(dataStoreKey, keys);
+
+    // Build query to check for existing state document
+    DBObject query = new BasicDBObject();
+    query.put(simulationIdKey, simulationId);
+    query.put(instanceIdKey, instanceId);
+    query.put(iterationKey, iteration);
+
+    // Attempt to update an existing document with matching query, otherwise insert a new document
+    try {
+      database.getCollection(mongoCollectionName).update(query, document, true, false);
+    } catch (MongoException ex) {
+      throw new IOException(String.format("unable to set state for %s:%s:%s", simulationId,
+          instanceId, iteration), ex);
+    }
   }
 
   @Override
@@ -140,11 +223,16 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
     // Setup database connection
     DB database = getDatabase(this.mongoHost, this.mongoPort, this.mongoDatabaseName);
 
-    // Remove all documents with given simulation ID
-    BasicDBObject query = new BasicDBObject();
-    query.append(this.simulationIdKey, simulationId);
-    database.getCollection(this.mongoCollectionName).remove(query);
-    // TODO(dhendrickson): check error conditions
+    // Build query to find all documents for the given simulation
+    DBObject query = new BasicDBObject();
+    query.put(simulationIdKey, simulationId);
+
+    // Remove all documents that match query
+    try {
+      database.getCollection(mongoCollectionName).remove(query);
+    } catch (MongoException ex) {
+      throw new IOException(String.format("unable to delete simulation %s", simulationId), ex);
+    }
   }
 
   @Override
@@ -152,11 +240,17 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
     // Setup database connection
     DB database = getDatabase(this.mongoHost, this.mongoPort, this.mongoDatabaseName);
 
-    // Remove all documents with given simulation ID
-    BasicDBObject query = new BasicDBObject();
-    query.append(this.simulationIdKey, simulationId);
-    query.append(this.instanceIdKey, instanceId);
-    database.getCollection(this.mongoCollectionName).remove(query);
-    // TODO(dhendrickson): check error conditions
+    // Build query to find all documents for the given simulation and instance
+    DBObject query = new BasicDBObject();
+    query.put(simulationIdKey, simulationId);
+    query.put(instanceIdKey, instanceId);
+
+    // Remove all documents that match query
+    try {
+      database.getCollection(mongoCollectionName).remove(query);
+    } catch (MongoException ex) {
+      throw new IOException(String.format("unable to delete instance %s:%s", simulationId,
+          instanceId), ex);
+    }
   }
 }
