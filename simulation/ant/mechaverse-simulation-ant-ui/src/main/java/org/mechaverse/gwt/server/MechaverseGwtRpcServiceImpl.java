@@ -4,12 +4,13 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.mechaverse.gwt.shared.MechaverseGwtRpcService;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
@@ -18,11 +19,13 @@ import org.mechaverse.simulation.common.Simulation;
 import org.mechaverse.simulation.common.SimulationDataStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
-import com.google.common.collect.ImmutableList;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
@@ -38,6 +41,16 @@ public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
   private static final String STORAGE_SERVICE_KEY = "storage-service";
 
   private static final Logger logger = LoggerFactory.getLogger(MechaverseGwtRpcServiceImpl.class);
+
+  @Autowired private ObjectFactory<MechaverseStorageService> storageServiceClientFactory;
+
+  @Override
+  public void init(ServletConfig config) throws ServletException {
+    super.init(config);
+    WebApplicationContext context =
+        WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+    context.getAutowireCapableBeanFactory().autowireBean(this);
+  }
 
   @Override
   public SimulationModel loadState(String simulationId, String instanceId, long iteration)
@@ -102,16 +115,14 @@ public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
     MechaverseStorageService service = (MechaverseStorageService) request.getSession(true)
         .getAttribute(STORAGE_SERVICE_KEY);
     if (service == null) {
-      service = JAXRSClientFactory.create(
-        "http://mechaverse.org:8080/mechaverse-storage-service", MechaverseStorageService.class,
-        ImmutableList.of(new JacksonJaxbJsonProvider()));
+      service = storageServiceClientFactory.getObject();
       request.getSession().setAttribute(STORAGE_SERVICE_KEY, service);
     }
     return service;
   }
 
   @Override
-  public void sessionCreated(HttpSessionEvent arg0) {}
+  public void sessionCreated(HttpSessionEvent event) {}
 
   @Override
   public void sessionDestroyed(HttpSessionEvent event) {

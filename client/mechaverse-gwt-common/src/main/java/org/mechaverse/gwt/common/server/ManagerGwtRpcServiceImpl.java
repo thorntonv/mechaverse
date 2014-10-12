@@ -2,29 +2,37 @@ package org.mechaverse.gwt.common.server;
 
 import java.util.List;
 
-import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+
 import org.mechaverse.gwt.common.shared.ManagerGwtRpcService;
 import org.mechaverse.service.manager.api.MechaverseManager;
 import org.mechaverse.service.manager.api.model.SimulationConfig;
 import org.mechaverse.service.manager.api.model.SimulationInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
-import com.google.common.collect.ImmutableList;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
  * Implementation of the {@link ManagerGwtRpcService}.
  *
- * @author Vance Thornton
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class ManagerGwtRpcServiceImpl extends RemoteServiceServlet implements ManagerGwtRpcService {
 
   private static final long serialVersionUID = -1273742074908104295L;
 
-  // TODO(thorntonv): Inject this service.
-  private final MechaverseManager manager = JAXRSClientFactory.create(
-      "http://mechaverse.org:8080/mechaverse-manager", MechaverseManager.class,
-      ImmutableList.of(new JacksonJaxbJsonProvider()));
+  @Autowired private MechaverseManager manager;
+
+  @Override
+  public void init(ServletConfig config) throws ServletException {
+    super.init(config);
+    WebApplicationContext context =
+        WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+    context.getAutowireCapableBeanFactory().autowireBean(this);
+  }
 
   @Override
   public List<SimulationInfo> getSimulationInfo() throws Exception {
