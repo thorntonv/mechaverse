@@ -8,7 +8,7 @@ import com.google.gwt.user.client.ui.ValueListBox;
 /**
  * A dropdown for selecting an environment.
  *
- * @author thorntonv@mechaverse.org
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class EnvironmentDropDown extends ValueListBox<Environment> {
 

@@ -167,7 +167,7 @@ public class CircuitSimulationModel {
   /**
    * Element connection information.
    *
-   * @author thorntonv@mechaverse.org
+   * @author Vance Thornton (thorntonv@mechaverse.org)
    */
   public static class ConnectionInfo {
 

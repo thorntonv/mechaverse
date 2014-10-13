@@ -5,7 +5,7 @@ import org.apache.commons.math3.random.RandomGenerator;
 /**
  * An interface for classes that perform genetic recombination.
  *
- * @author Vance Thornton
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public interface GeneticRecombinator {
 

@@ -5,7 +5,7 @@ import com.google.gwt.user.client.ui.Button;
 /**
  * A button for performing an action.
  *
- * @author Vance Thornton
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class ActionButton extends Button {
 

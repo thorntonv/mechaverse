@@ -12,8 +12,6 @@ import com.jogamp.opencl.CLPlatform;
 
 /**
  * Unit test for {@link OpenClCircuitSimulator}.
- *
- * @author thorntonv@mechaverse.org
  */
 public class OpenClCircuitSimulatorTest extends AbstractCircuitSimulatorTest {
 

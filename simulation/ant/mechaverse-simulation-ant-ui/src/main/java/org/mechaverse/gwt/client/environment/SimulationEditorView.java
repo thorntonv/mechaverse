@@ -19,7 +19,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * A view for editing a simulation.
  *
- * @author thorntonv@mechaverse.org
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class SimulationEditorView extends ResizeComposite {
 

@@ -12,7 +12,7 @@ import com.google.common.base.Optional;
  * @param <E> the environment type
  * @param <T> the entity type
  *
- * @author thorntonv
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public interface EnvironmentGenerator<E, T> {
 

@@ -11,7 +11,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 /**
  * A GWT RPC service for accessing the manager interface.
  *
- * @author Vance Thornton
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 @RemoteServiceRelativePath("manager")
 public interface ManagerGwtRpcService extends RemoteService {

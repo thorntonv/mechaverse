@@ -3,7 +3,7 @@ package org.mechaverse.simulation.common.circuit.generator.java;
 /**
  * Base class extended by the generated Java circuit simulation code.
  *
- * @author thorntonv@mechaverse.org
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public abstract class AbstractJavaCircuitSimulationImpl implements JavaCircuitSimulation {
 

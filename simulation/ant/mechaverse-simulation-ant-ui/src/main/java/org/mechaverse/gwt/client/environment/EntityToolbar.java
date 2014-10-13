@@ -15,7 +15,7 @@ import com.google.gwt.user.client.ui.Image;
 /**
  * A toolbar for selecting an entity.
  *
- * @author thorntonv@mechaverse.org
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class EntityToolbar extends HorizontalPanel {
 

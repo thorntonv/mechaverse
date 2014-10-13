@@ -7,7 +7,7 @@ import com.google.gwt.user.client.ui.Image;
 /**
  * Image utility methods.
  *
- * @author Vance Thornton
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class ImageUtil {
 

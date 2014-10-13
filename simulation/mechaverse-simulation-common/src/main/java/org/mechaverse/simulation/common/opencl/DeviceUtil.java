@@ -6,7 +6,7 @@ import com.jogamp.opencl.CLPlatform;
 /**
  * Utility methods for working with OpenCL devices.
  *
- * @author thorntonv@mechaverse.org
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public final class DeviceUtil {
 

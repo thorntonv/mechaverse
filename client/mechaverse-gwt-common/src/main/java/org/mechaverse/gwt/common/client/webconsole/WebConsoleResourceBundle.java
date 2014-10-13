@@ -9,7 +9,7 @@ import com.google.gwt.user.cellview.client.CellTable;
 /**
  * A bundle which contains web console resources.
  *
- * @author Vance Thornton
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public interface WebConsoleResourceBundle extends ClientBundle {
 

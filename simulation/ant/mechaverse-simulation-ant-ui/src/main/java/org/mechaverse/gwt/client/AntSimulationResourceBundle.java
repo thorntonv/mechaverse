@@ -14,7 +14,7 @@ import com.google.gwt.resources.client.ImageResource;
 /**
  * A bundle which contains common resources.
  *
- * @author thorntonv@mechaverse.org
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public interface AntSimulationResourceBundle extends ClientBundle {
 

@@ -24,7 +24,7 @@ import javax.tools.ToolProvider;
 /**
  * Utility methods for compiling Java source code.
  *
- * @author thorntonv@mechaverse.org
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public final class JavaCompilerUtil {
 

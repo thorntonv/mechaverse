@@ -17,7 +17,7 @@ import com.google.common.base.Preconditions;
 /**
  * Java based circuit simulator implementation.
  *
- * @author thorntonv@mechaverse.org
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public final class JavaCircuitSimulator implements CircuitSimulator {
 

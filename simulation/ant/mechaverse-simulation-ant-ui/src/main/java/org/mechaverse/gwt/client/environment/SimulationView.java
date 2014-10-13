@@ -9,9 +9,9 @@ import com.google.gwt.place.shared.PlaceHistoryMapper;
 import com.google.gwt.user.client.ui.ScrollPanel;
 
 /**
- * A view which displays a simulation.
+ * A view that displays a simulation.
  *
- * @author thorntonv@mechaverse.org
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class SimulationView extends ScrollPanel {
 

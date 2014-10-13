@@ -14,7 +14,7 @@ import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel
 /**
  * A generator that creates Java source code for executing a circuit simulation.
  *
- * @author thorntonv@mechaverse.org
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class JavaCircuitGeneratorImpl extends AbstractCStyleCircuitSimulationGenerator {
 

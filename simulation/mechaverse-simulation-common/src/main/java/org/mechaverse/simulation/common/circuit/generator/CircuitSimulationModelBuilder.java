@@ -26,7 +26,7 @@ import com.google.common.collect.ImmutableBiMap;
 /**
  * Builds a {@link CircuitSimulationModel} for a {@link Circuit}.
  *
- * @author thorntonv@mechaverse.org
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class CircuitSimulationModelBuilder {
 

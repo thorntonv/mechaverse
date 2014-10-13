@@ -5,7 +5,7 @@ import com.google.gwt.text.shared.AbstractRenderer;
 /**
  * A renderer that renders a string.
  *
- * @author Vance Thornton
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class StringRenderer extends AbstractRenderer<String> {
 

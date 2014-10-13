@@ -3,7 +3,7 @@ package org.mechaverse.gwt.common.client.util;
 /**
  * A coordinate which consists of a row and column.
  *
- * @author Vance Thornton
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class Coordinate {
 

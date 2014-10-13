@@ -7,7 +7,7 @@ import com.google.gwt.user.client.ui.Image;
 /**
  * A button for performing a refresh.
  *
- * @author Vance Thornton
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class RefreshButton extends Button {
 

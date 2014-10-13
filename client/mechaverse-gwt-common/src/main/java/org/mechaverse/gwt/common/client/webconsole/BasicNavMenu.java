@@ -11,7 +11,7 @@ import com.google.gwt.user.client.ui.Hyperlink;
 /**
  * A basic navigation menu that consists of a list of links.
  *
- * @author Vance Thornton
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class BasicNavMenu extends FlowPanel {
 

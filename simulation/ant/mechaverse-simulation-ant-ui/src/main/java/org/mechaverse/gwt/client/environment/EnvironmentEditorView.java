@@ -11,7 +11,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * A view for editing an environment.
  *
- * @author thorntonv@mechaverse.org
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class EnvironmentEditorView extends ResizeComposite {
 

@@ -14,8 +14,6 @@ import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel
 
 /**
  * Unit test {@link CircuitSimulationModelBuilder}.
- *
- * @author thorntonv@mechaverse.org
  */
 public class CircuitModelBuilderTest {
 

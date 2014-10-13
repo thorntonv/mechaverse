@@ -7,7 +7,7 @@ import com.google.gwt.text.shared.AbstractRenderer;
 /**
  * A renderer which renders an environment ID.
  *
- * @author thorntonv@mechaverse.org
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class EnvironmentRenderer extends AbstractRenderer<Environment> {
 

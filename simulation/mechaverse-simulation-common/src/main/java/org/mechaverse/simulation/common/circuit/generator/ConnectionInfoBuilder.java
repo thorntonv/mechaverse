@@ -5,7 +5,7 @@ import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel
 /**
  * Builder for {@link ConnectionInfo}.
  *
- * @author thorntonv@mechaverse.org
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public interface ConnectionInfoBuilder {
 

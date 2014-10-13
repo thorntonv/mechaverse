@@ -3,7 +3,7 @@ package org.mechaverse.simulation.common.circuit.generator.java;
 /**
  * An interface for Java circuit simulations.
  *
- * @author thorntonv@mechaverse.org
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public interface JavaCircuitSimulation {
 

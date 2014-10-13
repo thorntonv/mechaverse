@@ -17,7 +17,7 @@ import com.google.common.collect.ImmutableList;
 /**
  * Assists with building {@link Circuit} instances.
  *
- * @author thorntonv@mechaverse.org
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class CircuitBuilder {
 

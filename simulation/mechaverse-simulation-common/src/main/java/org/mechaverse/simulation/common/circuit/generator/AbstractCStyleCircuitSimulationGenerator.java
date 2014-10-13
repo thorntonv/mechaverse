@@ -10,7 +10,7 @@ import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel
 /**
  * An implementation of {@link CircuitSimulationGenerator} for C style languages.
  *
- * @author thorntonv@mechaverse.org
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public abstract class AbstractCStyleCircuitSimulationGenerator
     extends AbstractCircuitSimulationGenerator {

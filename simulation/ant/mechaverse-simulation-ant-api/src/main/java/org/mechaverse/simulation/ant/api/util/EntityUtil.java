@@ -15,7 +15,7 @@ import org.mechaverse.simulation.ant.api.model.Rock;
 /**
  * Entity utility methods.
  *
- * @author thorntonv@mechaverse.org
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class EntityUtil {
 

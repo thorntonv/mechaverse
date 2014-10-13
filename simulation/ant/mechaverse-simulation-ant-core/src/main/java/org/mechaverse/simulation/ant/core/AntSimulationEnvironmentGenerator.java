@@ -20,7 +20,7 @@ import com.google.common.collect.ImmutableTable;
 /**
  * Generator for ant simulation environments.
  *
- * @author thorntonv@mechaverse.org
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class AntSimulationEnvironmentGenerator
     extends AbstractProbabilisticEnvironmentGenerator<CellEnvironment, EntityType> {

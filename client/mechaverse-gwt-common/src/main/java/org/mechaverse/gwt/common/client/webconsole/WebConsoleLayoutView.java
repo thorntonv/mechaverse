@@ -14,7 +14,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * The web console layout UI.
  *
- * @author Vance Thornton
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class WebConsoleLayoutView extends ResizeComposite implements AcceptsOneWidget {
 

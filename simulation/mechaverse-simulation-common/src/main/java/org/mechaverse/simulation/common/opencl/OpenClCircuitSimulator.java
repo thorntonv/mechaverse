@@ -23,7 +23,7 @@ import com.jogamp.opencl.CLProgram;
 /**
  * Simulates circuits using an OpenCL device.
  *
- * @author thorntonv@mechaverse.org
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public final class OpenClCircuitSimulator implements CircuitSimulator {
 

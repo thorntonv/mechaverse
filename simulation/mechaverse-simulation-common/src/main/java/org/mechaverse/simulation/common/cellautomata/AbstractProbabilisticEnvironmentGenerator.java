@@ -18,7 +18,7 @@ import com.google.common.collect.Table;
  * @param <E> the environment type
  * @param <T> the entity type
  *
- * @author thorntonv@mechaverse.org
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public abstract class AbstractProbabilisticEnvironmentGenerator<E, T>
     implements EnvironmentGenerator<E, T> {

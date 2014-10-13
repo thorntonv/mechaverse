@@ -13,7 +13,7 @@ import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel
 /**
  * Generates a circuit simulation kernel that can be executed using OpenCL devices.
  *
- * @author thorntonv@mechaverse.org
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class OpenClCircuitGeneratorImpl extends AbstractCStyleCircuitSimulationGenerator {
 

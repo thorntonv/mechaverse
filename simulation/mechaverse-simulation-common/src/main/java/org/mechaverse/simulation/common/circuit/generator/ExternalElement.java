@@ -7,7 +7,7 @@ import org.mechaverse.circuit.model.Output;
 /**
  * An element that is external to the logical unit.
  *
- * @author thorntonv@mechaverse.org
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class ExternalElement extends Element {
 

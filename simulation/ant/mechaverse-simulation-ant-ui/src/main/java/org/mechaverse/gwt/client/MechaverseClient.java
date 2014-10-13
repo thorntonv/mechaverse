@@ -21,7 +21,7 @@ import com.google.web.bindery.event.shared.EventBus;
 /**
  * The main entry point.
  *
- * @author thorntonv@mechaverse.org
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class MechaverseClient implements EntryPoint {
 

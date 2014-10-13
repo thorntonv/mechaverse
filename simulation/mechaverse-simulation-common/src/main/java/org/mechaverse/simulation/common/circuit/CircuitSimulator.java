@@ -3,7 +3,7 @@ package org.mechaverse.simulation.common.circuit;
 /**
  * An interface for circuit simulators.
  *
- * @author thorntonv@mechaverse.org
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public interface CircuitSimulator extends AutoCloseable {
 

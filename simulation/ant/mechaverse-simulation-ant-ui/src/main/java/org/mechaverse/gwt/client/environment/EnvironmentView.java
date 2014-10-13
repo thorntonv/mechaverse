@@ -27,7 +27,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 /**
  * A view which displays an environment.
  *
- * @author thorntonv@mechaverse.org
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class EnvironmentView extends SimplePanel {
 

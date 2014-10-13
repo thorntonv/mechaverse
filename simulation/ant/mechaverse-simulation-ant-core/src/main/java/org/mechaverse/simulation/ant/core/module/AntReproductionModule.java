@@ -33,7 +33,7 @@ import com.google.common.base.Preconditions;
 /**
  * An environment simulation module that maintains a target ant population size.
  *
- * @author Vance Thornton
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class AntReproductionModule implements AntSimulationModule {
 

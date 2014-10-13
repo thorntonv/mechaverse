@@ -17,7 +17,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * A presenter for {@link EnvironmentEditorView}.
  *
- * @author thorntonv@mechaverse.org
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class EnvironmentEditorPresenter implements EnvironmentView.Observer, IsWidget {
 
