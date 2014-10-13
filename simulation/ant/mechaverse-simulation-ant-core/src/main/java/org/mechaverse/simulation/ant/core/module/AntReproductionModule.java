@@ -2,6 +2,7 @@ package org.mechaverse.simulation.ant.core.module;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -42,7 +43,8 @@ public class AntReproductionModule implements AntSimulationModule {
    */
   public static interface AntFitnessCalculator {
 
-    EnumeratedDistribution<Ant> getAntFitnessDistribution(Set<Ant> ants, RandomGenerator random);
+    EnumeratedDistribution<Ant> getAntFitnessDistribution(
+        Collection<Ant> ants, RandomGenerator random);
   }
 
   /**
@@ -57,7 +59,7 @@ public class AntReproductionModule implements AntSimulationModule {
 
     @Override
     public EnumeratedDistribution<Ant> getAntFitnessDistribution(
-        Set<Ant> ants, RandomGenerator random) {
+        Collection<Ant> ants, RandomGenerator random) {
       Preconditions.checkState(ants.size() > 0);
 
       double ageSum = 0;
@@ -87,6 +89,10 @@ public class AntReproductionModule implements AntSimulationModule {
 
   @Value("#{properties['antMaxCount']}") private int antMaxCount;
   @Value("#{properties['antInitialEnergy']}") private int antInitialEnergy;
+  @Value("#{properties['antMinReproductiveAge']}") private int antMinReproductiveAge;
+
+  // TODO(thorntonv): Determine if this should be a simulation property.
+  private int maxGeneratedAntNestDistance = 15;
 
   private final Set<Ant> ants = new LinkedHashSet<>();
   private Nest nest;
@@ -105,12 +111,19 @@ public class AntReproductionModule implements AntSimulationModule {
   public void beforeUpdate(AntSimulationState state, CellEnvironment env,
       EntityManager entityManager, RandomGenerator random) {
     if (ants.size() < antMaxCount && nest != null) {
-      Cell cell = env.getCell(nest);
-      if (cell.getEntity(EntityType.ANT) == null) {
-        Ant ant = ants.size() >= 2 ?
-            generateAnt(state, random) : generateRandomAnt(state, random);
-        cell.setEntity(ant, EntityType.ANT);
-        entityManager.addEntity(ant);
+      Cell nestCell = env.getCell(nest);
+      int row = random.nextInt(maxGeneratedAntNestDistance * 2) - maxGeneratedAntNestDistance
+          + nestCell.getRow();
+      int col = random.nextInt(maxGeneratedAntNestDistance * 2) - maxGeneratedAntNestDistance
+          + nestCell.getColumn();
+
+      if(env.hasCell(row, col)) {
+        Cell cell = env.getCell(row, col);
+        if (cell.getEntity(EntityType.ANT) == null) {
+          Ant ant = generateAnt(state, random);
+          cell.setEntity(ant, EntityType.ANT);
+          entityManager.addEntity(ant);
+        }
       }
     }
   }
@@ -135,8 +148,13 @@ public class AntReproductionModule implements AntSimulationModule {
   public Ant generateAnt(AntSimulationState state, RandomGenerator random) {
     Ant ant = generateRandomAnt(state, random);
 
+    Collection<Ant> reproductiveAnts = getReproductiveAnts();
+    if (reproductiveAnts.size() < 2) {
+      return ant;
+    }
+
     EnumeratedDistribution<Ant> antFitnessDistribution =
-        fitnessCalculator.getAntFitnessDistribution(ants, random);
+        fitnessCalculator.getAntFitnessDistribution(reproductiveAnts, random);
 
     Ant parent1 = antFitnessDistribution.sample();
     Ant parent2 = antFitnessDistribution.sample();
@@ -197,5 +215,15 @@ public class AntReproductionModule implements AntSimulationModule {
   @VisibleForTesting
   void setAntMaxCount(int antMaxCount) {
     this.antMaxCount = antMaxCount;
+  }
+
+  private Collection<Ant> getReproductiveAnts() {
+    List<Ant> reproductiveAnts = new ArrayList<>();
+    for (Ant ant : ants) {
+      if (ant.getAge() >= antMinReproductiveAge) {
+        reproductiveAnts.add(ant);
+      }
+    }
+    return reproductiveAnts;
   }
 }

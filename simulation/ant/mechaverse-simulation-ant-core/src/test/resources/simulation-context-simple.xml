@@ -13,6 +13,7 @@
   <util:properties id="properties">
     <prop key="antMaxCount">500</prop>
     <prop key="antInitialEnergy">1000</prop>
+    <prop key="antMinReproductiveAge">200</prop>
     <prop key="foodMinCount">1000</prop>
     <prop key="foodClusterRadius">15</prop>
     <prop key="foodInitialEnergy">300</prop>

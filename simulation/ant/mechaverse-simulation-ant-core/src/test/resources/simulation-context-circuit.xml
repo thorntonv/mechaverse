@@ -11,11 +11,12 @@
   <context:annotation-config />
 
   <util:properties id="properties">
-    <prop key="antMaxCount">500</prop>
-    <prop key="antInitialEnergy">1000</prop>
-    <prop key="foodMinCount">1000</prop>
+    <prop key="antMaxCount">5</prop>
+    <prop key="antInitialEnergy">36000</prop>
+    <prop key="antMinReproductiveAge">6000</prop>
+    <prop key="foodMinCount">1500</prop>
     <prop key="foodClusterRadius">15</prop>
-    <prop key="foodInitialEnergy">300</prop>
+    <prop key="foodInitialEnergy">18000</prop>
     <prop key="pheromoneInitialEnergy">3600</prop>
   </util:properties>
 

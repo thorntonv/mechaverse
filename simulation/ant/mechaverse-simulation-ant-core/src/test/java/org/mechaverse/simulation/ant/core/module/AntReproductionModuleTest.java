@@ -36,6 +36,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class AntReproductionModuleTest {
 
+  // TODO(thorntonv): Add test to ensure that only ants of reproductive age reproduce.
+
   private static final String TEST_GENETIC_DATA_KEY = "testKey";
 
   @Mock private EntityManager mockEntityManager;
@@ -129,11 +131,11 @@ public class AntReproductionModuleTest {
 
   private CellEnvironment newEnvironment() {
     Environment env = new Environment();
-    env.setWidth(3);
-    env.setHeight(3);
+    env.setWidth(40);
+    env.setHeight(40);
     Nest nest = new Nest();
-    nest.setX(1);
-    nest.setY(1);
+    nest.setX(20);
+    nest.setY(20);
     env.getEntities().add(nest);
     module.onAddEntity(nest);
     return new CellEnvironment(env);
