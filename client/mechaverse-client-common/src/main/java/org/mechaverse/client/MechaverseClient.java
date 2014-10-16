@@ -128,9 +128,12 @@ public class MechaverseClient {
       if (task.getIterationCount() > 0) {
         logSubOperationStart("Performing " + task.getIterationCount() + " iterations");
         simulation.setState(state);
+        long startTime = System.nanoTime();
         simulation.step(task.getIterationCount());
+        long runTime =
+            TimeUnit.MILLISECONDS.convert(System.nanoTime() - startTime, TimeUnit.NANOSECONDS);
         state = simulation.getState();
-        logOperationDone();
+        logOperationDone(runTime);
       }
 
       // Submit result.
@@ -161,6 +164,14 @@ public class MechaverseClient {
 
   private void logOperationDone() {
     System.out.println(DONE_MSG);
+  }
+
+  private void logOperationDone(long runTimeMillis) {
+    if(runTimeMillis < 1000) {
+      System.out.println(DONE_MSG + " Completed in " + runTimeMillis + " ms.");
+    } else {
+      System.out.printf(DONE_MSG + " Completed in %.2f sec.%n", runTimeMillis / 1000.0f);
+    }
   }
 
   private void sleep() {
