@@ -99,6 +99,12 @@ public final class OpenClCircuitSimulator implements CircuitSimulator {
       .putArg(outputBuffer)
       .putArg(circuitInputSize)
       .putArg(circuitOutputSize);
+
+    // Initialize the circuit output maps.
+    int[] outputMap = new int[circuitOutputSize];
+    for (int circuitIdx = 0; circuitIdx < numCircuits; circuitIdx++) {
+      setCircuitOutputMap(circuitIdx, outputMap);
+    }
   }
 
   @Override
