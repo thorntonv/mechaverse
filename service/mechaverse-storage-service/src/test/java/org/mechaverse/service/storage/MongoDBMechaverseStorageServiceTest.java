@@ -10,29 +10,36 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mechaverse.simulation.common.SimulationDataStore;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import de.flapdoodle.embed.mongo.MongodExecutable;
+import de.flapdoodle.embed.mongo.MongodProcess;
+import de.flapdoodle.embed.mongo.MongodStarter;
+import de.flapdoodle.embed.mongo.config.IMongodConfig;
+import de.flapdoodle.embed.mongo.config.MongodConfigBuilder;
+import de.flapdoodle.embed.mongo.config.Net;
+import de.flapdoodle.embed.mongo.distribution.Version;
 
 /**
  * 
  * Unit tests for {@link MongoDBMechaverseStorageService}.
  * 
- * @author Dusty Hendrickson <dusty@obsidiannight.com>
+ * @author Dusty Hendrickson <dhendrickson@mechaverse.org>
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("/test-context.xml")
-// TODO(dhendrickson): look into embedded database to eliminate test dependency
-@Ignore
 public class MongoDBMechaverseStorageServiceTest {
   // TODO(dhendrickson): move some of this to an interface test
 
   private MongoDBMechaverseStorageService service;
-
+  private static MongodExecutable mongodExecutable;
+  private static MongodProcess mongodProcess;
+  private static int mongoPort = 37017;
+  private static String mongoHost = "127.0.0.1";
+  private static String mongoDatabaseName = "mechaverse-storage-test";
+  
   // TODO(dhendrickson): relocate this to SimulationDataStore and provide new hashCode()
   boolean compareSimulationDataStore(SimulationDataStore storeA, SimulationDataStore storeB) {
     if (storeA.size() != storeB.size()) {
@@ -48,10 +55,33 @@ public class MongoDBMechaverseStorageServiceTest {
     return true;
   }
 
+  @BeforeClass
+  public static void beforeClass() throws IOException
+  {
+    int port = 37017;
+    IMongodConfig mongodConfig = new MongodConfigBuilder()
+        .version(Version.Main.PRODUCTION)
+        .net(new Net(port, false))
+        .build();
+    
+    MongodStarter starter = MongodStarter.getDefaultInstance();
+    mongodExecutable = starter.prepare(mongodConfig);
+    mongodProcess = mongodExecutable.start();
+  }
+  
+  @AfterClass
+  public static void afterClass()
+  {
+    mongodProcess.stop();
+    mongodExecutable.stop();
+  }
+  
   @Before
   public void before() throws IOException {
     this.service = new MongoDBMechaverseStorageService();
-    this.service.setMongoDatabaseName("mechaverse-storage-test");
+    this.service.setMongoPort(mongoPort);
+    this.service.setMongoHost(mongoHost);
+    this.service.setMongoDatabaseName(mongoDatabaseName);
     this.service.clear();
   }
 

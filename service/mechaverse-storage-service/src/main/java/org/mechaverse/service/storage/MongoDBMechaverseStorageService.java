@@ -17,7 +17,7 @@ import com.mongodb.MongoException;
 /**
  * A storage service implementation that utilizes a MongoDB database.
  * 
- * @author Dusty Hendrickson <dusty@obsidiannight.com>
+ * @author Dusty Hendrickson <dhendrickson@mechaverse.org>
  */
 public class MongoDBMechaverseStorageService implements MechaverseStorageService {
 
