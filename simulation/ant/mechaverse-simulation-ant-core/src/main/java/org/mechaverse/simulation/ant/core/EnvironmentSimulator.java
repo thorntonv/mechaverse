@@ -6,13 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.Environment;
 import org.mechaverse.simulation.ant.core.module.AntSimulationModule;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
@@ -28,11 +27,11 @@ public final class EnvironmentSimulator implements EntityManager {
 
     @Autowired ApplicationContext context;
     @Autowired private ActiveEntityProviders activeEntityProviders;
-    @Resource(name="modules") private List<AntSimulationModule> modules;
+    @Autowired private ObjectFactory<List<AntSimulationModule>> modulesFactory;
 
     public EnvironmentSimulator create(Environment environment) {
       EnvironmentSimulator environmentSimulator =
-          new EnvironmentSimulator(environment, activeEntityProviders, modules);
+          new EnvironmentSimulator(environment, activeEntityProviders, modulesFactory.getObject());
       context.getAutowireCapableBeanFactory().autowireBean(environmentSimulator);
       return environmentSimulator;
     }
@@ -55,7 +54,6 @@ public final class EnvironmentSimulator implements EntityManager {
       addEntity(entity);
     }
 
-    this.modules.addAll(modules);
     for(AntSimulationModule module : modules) {
       addObserver(module);
     }

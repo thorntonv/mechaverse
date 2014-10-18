@@ -53,7 +53,7 @@
   <bean id="foodGenerationModule" class="org.mechaverse.simulation.ant.core.module.FoodGenerationModule" scope="prototype" />
   <bean id="pheromoneDecayModule" class="org.mechaverse.simulation.ant.core.module.PheromoneDecayModule" scope="prototype" />
   <bean id="circuitModule" class="org.mechaverse.simulation.ant.core.module.CircuitSimulationModule" lazy-init="true" />
-  
+
   <util:list id="modules" value-type="org.mechaverse.simulation.ant.core.module.AntSimulationModule" scope="prototype">
     <ref bean="antReproductionModule" />
     <ref bean="foodGenerationModule" />
