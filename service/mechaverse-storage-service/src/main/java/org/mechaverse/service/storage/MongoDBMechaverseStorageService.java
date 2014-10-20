@@ -17,16 +17,25 @@ import com.mongodb.MongoException;
 /**
  * A storage service implementation that utilizes a MongoDB database.
  * 
+ * A collection named simulationDataStores will be created in the desired database. Each document in
+ * the collection will be structured as follows:
+ * 
+ * {"simulationId": "b271815a-d81b-4398-8192-b15258bace42", "instanceId":
+ * "e58e1866-ebf5-421b-a925-d70a09f0513a", "iteration": 0, "dataStoreEntries": {...} }
+ * 
+ * A unique index will created for the collection that ensures that there is only one document for a
+ * given simulationId, instanceId, and iteration combinations.
+ * 
  * @author Dusty Hendrickson <dhendrickson@mechaverse.org>
  */
 public class MongoDBMechaverseStorageService implements MechaverseStorageService {
 
   // Constants
-  private static final String mongoCollectionName = "simulationDataStores";
-  private static final String simulationIdKey = "simulationId";
-  private static final String instanceIdKey = "instanceId";
-  private static final String iterationKey = "iteration";
-  private static final String dataStoreKey = "dataStoreEntries";
+  private final String mongoCollectionName = "simulationDataStores";
+  private final String simulationIdKey = "simulationId";
+  private final String instanceIdKey = "instanceId";
+  private final String iterationKey = "iteration";
+  private final String dataStoreKey = "dataStoreEntries";
 
   // Configuration
   @Value("${org.mechaverse.service.storage.mongoHost}")
@@ -38,12 +47,12 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
   @Value("${org.mechaverse.service.storage.mongoDatabaseName}")
   private String mongoDatabaseName = "mechaverse-storage-service";
 
-  // Singleton client and database
-  private static MongoClient mongoClient;
-  private static DB mongoDatabase;
+  // MongoDB client and database
+  private MongoClient mongoClient;
+  private DB mongoDatabase;
 
   /**
-   * Returns a singleton instance of a MongoDB database.
+   * Returns an instance of a MongoDB database.
    * 
    * @param mongoHost hostname or IP address of the MongoDB server
    * @param mongoPort port of the MongoDB server
@@ -51,23 +60,24 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
    * @return MongoDB database
    * @throws IOException
    */
-  private static DB getDatabase(String mongoHost, int mongoPort, String mongoDatabaseName)
+  private DB getDatabase(String mongoHost, int mongoPort, String mongoDatabaseName)
       throws IOException {
-    if (mongoDatabase == null) {
-      mongoClient = new MongoClient(mongoHost, mongoPort);
-      mongoDatabase = mongoClient.getDB(mongoDatabaseName);
+    // TODO(dhendrickson): look into thread safety issues of MongoDB driver
+    if (this.mongoDatabase == null) {
+      this.mongoClient = new MongoClient(mongoHost, mongoPort);
+      this.mongoDatabase = this.mongoClient.getDB(mongoDatabaseName);
 
       // Create a unique index using the simulation, instance, and iteration as the key
       // Note: this is safe to run multiple times, as subsequent creations are ignored
       DBObject indexKeys = new BasicDBObject();
-      indexKeys.put(simulationIdKey, 1);
-      indexKeys.put(instanceIdKey, 1);
-      indexKeys.put(iterationKey, 1);
-      mongoDatabase.getCollection(mongoCollectionName).createIndex(indexKeys,
+      indexKeys.put(this.simulationIdKey, 1);
+      indexKeys.put(this.instanceIdKey, 1);
+      indexKeys.put(this.iterationKey, 1);
+      mongoDatabase.getCollection(this.mongoCollectionName).createIndex(indexKeys,
           new BasicDBObject("unique", true));
     }
 
-    return mongoDatabase;
+    return this.mongoDatabase;
   }
 
   /**
@@ -137,12 +147,6 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
   @Override
   public InputStream getState(String simulationId, String instanceId, long iteration)
       throws IOException {
-    return this.getStateValue(simulationId, instanceId, iteration, null);
-  }
-
-  @Override
-  public InputStream getStateValue(String simulationId, String instanceId, long iteration,
-      String key) throws IOException {
     // Setup database connection
     DB database = getDatabase(this.mongoHost, this.mongoPort, this.mongoDatabaseName);
 
@@ -152,14 +156,8 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
     query.put(instanceIdKey, instanceId);
     query.put(iterationKey, iteration);
 
-    // Filter fields by key if necessary
-    DBObject fields = new BasicDBObject();
-    if (key != null) {
-      fields.put(String.format("%s.%s", dataStoreKey, key), 1);
-    }
-
     // Retrieve individual document from collection
-    DBObject record = database.getCollection(mongoCollectionName).findOne(query, fields);
+    DBObject record = database.getCollection(mongoCollectionName).findOne(query);
     if (record == null) {
       throw new IOException(String.format("unable to get state for %s:%s:%s", simulationId,
           instanceId, iteration));
@@ -174,6 +172,12 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
     InputStream state = new ByteArrayInputStream(store.serialize());
 
     return state;
+  }
+
+  @Override
+  public InputStream getStateValue(String simulationId, String instanceId, long iteration,
+      String key) throws IOException {
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -215,7 +219,6 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
   public void setStateValue(String simulationId, String instanceId, long iteration, String key,
       InputStream valueInput) throws IOException {
     throw new UnsupportedOperationException();
-    // TODO(dhendrickson): implement
   }
 
   @Override

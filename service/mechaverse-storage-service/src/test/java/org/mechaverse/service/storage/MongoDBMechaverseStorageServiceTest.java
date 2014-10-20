@@ -39,7 +39,7 @@ public class MongoDBMechaverseStorageServiceTest {
   private static int mongoPort = 37017;
   private static String mongoHost = "127.0.0.1";
   private static String mongoDatabaseName = "mechaverse-storage-test";
-  
+
   // TODO(dhendrickson): relocate this to SimulationDataStore and provide new hashCode()
   boolean compareSimulationDataStore(SimulationDataStore storeA, SimulationDataStore storeB) {
     if (storeA.size() != storeB.size()) {
@@ -56,26 +56,23 @@ public class MongoDBMechaverseStorageServiceTest {
   }
 
   @BeforeClass
-  public static void beforeClass() throws IOException
-  {
+  public static void beforeClass() throws IOException {
     int port = 37017;
-    IMongodConfig mongodConfig = new MongodConfigBuilder()
-        .version(Version.Main.PRODUCTION)
-        .net(new Net(port, false))
-        .build();
-    
+    IMongodConfig mongodConfig =
+        new MongodConfigBuilder().version(Version.Main.PRODUCTION).net(new Net(port, false))
+            .build();
+
     MongodStarter starter = MongodStarter.getDefaultInstance();
     mongodExecutable = starter.prepare(mongodConfig);
     mongodProcess = mongodExecutable.start();
   }
-  
+
   @AfterClass
-  public static void afterClass()
-  {
+  public static void afterClass() {
     mongodProcess.stop();
     mongodExecutable.stop();
   }
-  
+
   @Before
   public void before() throws IOException {
     this.service = new MongoDBMechaverseStorageService();
@@ -165,9 +162,9 @@ public class MongoDBMechaverseStorageServiceTest {
     this.service.setState("simulation-id", "instance-id", 0, setStream);
 
     SimulationDataStore updateStore = new SimulationDataStore();
-    setStore.put("key1", "value4".getBytes());
-    setStore.put("key2", "value5".getBytes());
-    setStore.put("key3", "value6".getBytes());
+    updateStore.put("key1", "value4".getBytes());
+    updateStore.put("key2", "value5".getBytes());
+    updateStore.put("key3", "value6".getBytes());
 
     InputStream updateStream = new ByteArrayInputStream(updateStore.serialize());
     this.service.setState("simulation-id", "instance-id", 0, updateStream);
@@ -196,9 +193,9 @@ public class MongoDBMechaverseStorageServiceTest {
     this.service.setState("simulation-id", "instance-id", 0, setStream);
 
     SimulationDataStore updateStore = new SimulationDataStore();
-    setStore.put("key4", "value4".getBytes());
-    setStore.put("key5", "value5".getBytes());
-    setStore.put("key6", "value6".getBytes());
+    updateStore.put("key4", "value4".getBytes());
+    updateStore.put("key5", "value5".getBytes());
+    updateStore.put("key6", "value6".getBytes());
 
     InputStream updateStream = new ByteArrayInputStream(updateStore.serialize());
     this.service.setState("simulation-id", "instance-id", 0, updateStream);
@@ -384,29 +381,5 @@ public class MongoDBMechaverseStorageServiceTest {
     } catch (IOException ex) {
       // Expected condition
     }
-  }
-
-  /**
-   * Test getter for state value.
-   * 
-   * 1) Database is empty 2) Set state 3) Get state value 4) Confirm state only contains requested
-   * key
-   */
-  @Test
-  public void testGetStateValue() throws IOException {
-    SimulationDataStore store = new SimulationDataStore();
-    store.put("key1", "value1".getBytes());
-    store.put("key2", "value2".getBytes());
-    store.put("key3", "value3".getBytes());
-
-    this.service.setState("simulation1", "instance1", 0,
-        new ByteArrayInputStream(store.serialize()));
-
-    InputStream stream = this.service.getStateValue("simulation1", "instance1", 0, "key2");
-    SimulationDataStore getStore = SimulationDataStore.deserialize(stream);
-
-    assertEquals(1, getStore.size());
-    assertTrue(getStore.containsKey("key2"));
-    assertTrue(Arrays.equals(getStore.get("key2"), "value2".getBytes()));
   }
 }
