@@ -6,6 +6,8 @@ import java.io.InputStream;
 
 import org.mechaverse.service.storage.api.MechaverseStorageService;
 import org.mechaverse.simulation.common.SimulationDataStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.mongodb.BasicDBObject;
@@ -29,6 +31,7 @@ import com.mongodb.MongoException;
  * @author Dusty Hendrickson <dhendrickson@mechaverse.org>
  */
 public class MongoDBMechaverseStorageService implements MechaverseStorageService {
+  private Logger logger = LoggerFactory.getLogger(MongoDBMechaverseStorageService.class);
 
   // Constants
   private final String mongoCollectionName = "simulationDataStores";
@@ -60,10 +63,12 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
    * @return MongoDB database
    * @throws IOException
    */
-  private DB getDatabase(String mongoHost, int mongoPort, String mongoDatabaseName)
-      throws IOException {
+  private DB getDatabase() throws IOException {
     // TODO(dhendrickson): look into thread safety issues of MongoDB driver
     if (this.mongoDatabase == null) {
+      this.logger.debug("Creating MongoDB database connection to {}:{}/{}", mongoHost, mongoPort,
+          mongoDatabaseName);
+
       this.mongoClient = new MongoClient(mongoHost, mongoPort);
       this.mongoDatabase = this.mongoClient.getDB(mongoDatabaseName);
 
@@ -86,7 +91,7 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
    * @throws IOException
    */
   protected void clear() throws IOException {
-    DB database = getDatabase(this.mongoHost, this.mongoPort, this.mongoDatabaseName);
+    DB database = getDatabase();
     database.dropDatabase();
   }
 
@@ -147,8 +152,10 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
   @Override
   public InputStream getState(String simulationId, String instanceId, long iteration)
       throws IOException {
+    this.logger.debug("Get state for {}:{}:{}", simulationId, instanceId, iteration);
+
     // Setup database connection
-    DB database = getDatabase(this.mongoHost, this.mongoPort, this.mongoDatabaseName);
+    DB database = getDatabase();
 
     // Build query to find existing document
     DBObject query = new BasicDBObject();
@@ -177,14 +184,17 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
   @Override
   public InputStream getStateValue(String simulationId, String instanceId, long iteration,
       String key) throws IOException {
+    this.logger.debug("Get state value for {}:{}:{}:{}", simulationId, instanceId, iteration, key);
     throw new UnsupportedOperationException();
   }
 
   @Override
   public void setState(String simulationId, String instanceId, long iteration,
       InputStream stateInput) throws IOException {
+    this.logger.debug("Set state for {}:{}:{}", simulationId, instanceId, iteration);
+
     // Setup database connection
-    DB database = getDatabase(this.mongoHost, this.mongoPort, this.mongoDatabaseName);
+    DB database = getDatabase();
 
     // Build basic document
     DBObject document = new BasicDBObject();
@@ -218,13 +228,14 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
   @Override
   public void setStateValue(String simulationId, String instanceId, long iteration, String key,
       InputStream valueInput) throws IOException {
+    this.logger.debug("Get state value for {}:{}:{}:{}", simulationId, instanceId, iteration, key);
     throw new UnsupportedOperationException();
   }
 
   @Override
   public void deleteSimulation(String simulationId) throws IOException {
     // Setup database connection
-    DB database = getDatabase(this.mongoHost, this.mongoPort, this.mongoDatabaseName);
+    DB database = getDatabase();
 
     // Build query to find all documents for the given simulation
     DBObject query = new BasicDBObject();
@@ -241,7 +252,7 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
   @Override
   public void deleteInstance(String simulationId, String instanceId) throws IOException {
     // Setup database connection
-    DB database = getDatabase(this.mongoHost, this.mongoPort, this.mongoDatabaseName);
+    DB database = getDatabase();
 
     // Build query to find all documents for the given simulation and instance
     DBObject query = new BasicDBObject();
