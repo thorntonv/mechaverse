@@ -9,6 +9,9 @@ import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel.ExternalElementInfo;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel.Input;
 import org.mechaverse.simulation.common.circuit.generator.ExternalElement;
+import org.mockito.ArgumentCaptor;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 public class CircuitTestUtil {
 
@@ -141,5 +144,19 @@ public class CircuitTestUtil {
     for (int idx = 0; idx < state.length; idx++) {
       state[idx] = random.nextInt();
     }
+  }
+
+  /**
+   * Returns an {@link Answer} that copies the given data to the passed argument.
+   */
+  public static Answer<Void> mockIntArrayAnswer(
+      final int[] data, final ArgumentCaptor<int[]> argCaptor) {
+    return new Answer<Void>() {
+      @Override
+      public Void answer(InvocationOnMock invocation) throws Throwable {
+        System.arraycopy(data, 0, argCaptor.getValue(), 0, data.length);
+        return null;
+      }
+    };
   }
 }

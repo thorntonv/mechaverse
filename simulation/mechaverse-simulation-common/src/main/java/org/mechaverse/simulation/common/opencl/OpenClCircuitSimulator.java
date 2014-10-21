@@ -10,6 +10,8 @@ import org.mechaverse.simulation.common.circuit.CircuitDataSource;
 import org.mechaverse.simulation.common.circuit.CircuitSimulator;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModelBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jogamp.opencl.CLBuffer;
 import com.jogamp.opencl.CLCommandQueue;
@@ -29,6 +31,8 @@ public final class OpenClCircuitSimulator implements CircuitSimulator {
 
   public static final String KERNEL_NAME = "circuit_simulation";
 
+  private static final Logger logger = LoggerFactory.getLogger(OpenClCircuitSimulator.class);
+
   private final int numCircuits;
   private final int circuitInputSize;
   private final int circuitStateSize;
@@ -45,6 +49,8 @@ public final class OpenClCircuitSimulator implements CircuitSimulator {
   private final CLBuffer<IntBuffer> outputMapBuffer;
   private final CLBuffer<IntBuffer> outputBuffer;
   private boolean finished = true;
+  private boolean circuitStateUpdated = false;
+  private boolean outputMapUpdated = false;
 
   public OpenClCircuitSimulator(int numCircuits, int circuitInputSize, int circuitOutputSize,
       CircuitDataSource circuitDataSource) {
@@ -74,6 +80,10 @@ public final class OpenClCircuitSimulator implements CircuitSimulator {
   public OpenClCircuitSimulator(int numCircuits, int circuitInputSize, int circuitStateSize,
       int circuitOutputSize, long globalWorkSize, long localWorkSize, CLDevice device,
       String kernelSource) {
+    logger.debug("{}(numCircuits = {}, circuitInputSize = {}, "
+        + "circuitStateSize = {}, circuitOutputSize = {})", getClass().getSimpleName(),
+        numCircuits, circuitInputSize, circuitStateSize, circuitOutputSize);
+
     this.numCircuits = numCircuits;
     this.circuitInputSize = circuitInputSize;
     this.circuitStateSize = circuitStateSize;
@@ -153,7 +163,7 @@ public final class OpenClCircuitSimulator implements CircuitSimulator {
     stateBuffer.getBuffer().position(circuitIndex * circuitStateSize);
     stateBuffer.getBuffer().put(circuitState);
     stateBuffer.getBuffer().rewind();
-    queue.putWriteBuffer(stateBuffer, true);
+    circuitStateUpdated = true;
   }
 
   @Override
@@ -176,7 +186,7 @@ public final class OpenClCircuitSimulator implements CircuitSimulator {
     outputMapBuffer.getBuffer().position(circuitIndex * circuitOutputSize);
     outputMapBuffer.getBuffer().put(outputMap);
     outputMapBuffer.getBuffer().rewind();
-    queue.putWriteBuffer(outputMapBuffer, true);
+    outputMapUpdated = true;
   }
 
   @Override
@@ -192,7 +202,14 @@ public final class OpenClCircuitSimulator implements CircuitSimulator {
 
   @Override
   public void update() {
-    inputBuffer.getBuffer().rewind();
+    if (circuitStateUpdated) {
+      queue.putWriteBuffer(stateBuffer, false);
+      circuitStateUpdated = false;
+    }
+    if (outputMapUpdated) {
+      queue.putWriteBuffer(outputMapBuffer, false);
+      outputMapUpdated = false;
+    }
     queue.putWriteBuffer(inputBuffer, false)
         .put1DRangeKernel(kernel, 0, globalWorkSize, localWorkSize)
         .putReadBuffer(outputBuffer, false);
@@ -208,6 +225,8 @@ public final class OpenClCircuitSimulator implements CircuitSimulator {
     queue.release();
     kernel.release();
     context.release();
+
+    logger.debug("close()");
   }
 
   private static String getKernelSource(CircuitSimulationModel circuitModel) {

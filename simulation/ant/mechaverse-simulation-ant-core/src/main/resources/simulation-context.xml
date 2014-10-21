@@ -20,10 +20,31 @@
     <prop key="pheromoneInitialEnergy">3600</prop>
   </util:properties>
 
-  <bean id="activeAntProvider" class="org.mechaverse.simulation.ant.core.entity.ant.ActiveAntProvider" scope="prototype" />
-  <bean id="antBehavior" class="org.mechaverse.simulation.ant.core.entity.ant.SimpleAntBehavior" scope="prototype" />
+  <bean class="org.mechaverse.simulation.ant.core.AntSimulationImpl" lazy-init="true" />
 
-  <bean class="org.mechaverse.simulation.ant.core.AntSimulationImpl" scope="prototype" />
+  <bean id="circuitDataSource" class="org.mechaverse.simulation.common.SimulationStateCircuitDataSource" lazy-init="true" />
+
+  <bean class="org.mechaverse.simulation.common.opencl.CompositeOpenClCircuitSimulatorFactory" 
+      name="CompositeCircuitSimulatorFactory">
+    <constructor-arg index="0" value="4" />
+    <constructor-arg index="1" value="125" />
+    <constructor-arg index="2" >
+      <util:constant static-field="org.mechaverse.simulation.ant.core.entity.ant.AntInput.DATA_SIZE" />
+    </constructor-arg>
+    <constructor-arg index="3" >
+      <util:constant static-field="org.mechaverse.simulation.ant.core.entity.ant.AntOutput.DATA_SIZE" />
+    </constructor-arg>
+    <constructor-arg index="4"><ref bean="circuitDataSource" /></constructor-arg>
+  </bean>
+  
+  <bean id="circuitSimulator" class="org.mechaverse.simulation.common.circuit.CircuitSimulator" 
+      factory-bean="CompositeCircuitSimulatorFactory" factory-method="getObject" lazy-init="true" />
+
+  <bean id="activeAntProvider" class="org.mechaverse.simulation.ant.core.entity.ant.ActiveAntProvider" scope="prototype" />
+  <bean id="antBehavior" class="org.mechaverse.simulation.ant.core.entity.ant.CircuitAntBehavior" scope="prototype" >
+      <constructor-arg><ref bean="circuitSimulator" /></constructor-arg>
+  </bean>
+
   <bean class="org.mechaverse.simulation.ant.core.EnvironmentSimulator.Factory" scope="prototype" />
   <bean class="org.mechaverse.simulation.ant.core.ActiveEntityProviders" scope="prototype">
     <constructor-arg>
@@ -36,10 +57,12 @@
   <bean id="antReproductionModule" class="org.mechaverse.simulation.ant.core.module.AntReproductionModule" scope="prototype" />
   <bean id="foodGenerationModule" class="org.mechaverse.simulation.ant.core.module.FoodGenerationModule" scope="prototype" />
   <bean id="pheromoneDecayModule" class="org.mechaverse.simulation.ant.core.module.PheromoneDecayModule" scope="prototype" />
+  <bean id="circuitModule" class="org.mechaverse.simulation.ant.core.module.CircuitSimulationModule" lazy-init="true" />
 
   <util:list id="modules" value-type="org.mechaverse.simulation.ant.core.module.AntSimulationModule" scope="prototype">
     <ref bean="antReproductionModule" />
     <ref bean="foodGenerationModule" />
     <ref bean="pheromoneDecayModule" />
+    <ref bean="circuitModule" />
   </util:list>
 </beans>
