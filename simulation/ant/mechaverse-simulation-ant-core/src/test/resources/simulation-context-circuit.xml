@@ -11,7 +11,7 @@
   <context:annotation-config />
 
   <util:properties id="properties">
-    <prop key="antMaxCount">5</prop>
+    <prop key="antMaxCount">4</prop>
     <prop key="antInitialEnergy">36000</prop>
     <prop key="antMinReproductiveAge">6000</prop>
     <prop key="foodMinCount">1500</prop>
@@ -24,16 +24,21 @@
 
   <bean id="circuitDataSource" class="org.mechaverse.simulation.common.SimulationStateCircuitDataSource" lazy-init="true" />
 
-  <bean id="circuitSimulator" class="org.mechaverse.simulation.common.opencl.OpenClCircuitSimulator" lazy-init="true">
-    <constructor-arg index="0" value="#{properties['antMaxCount']}" />
-    <constructor-arg index="1" >
+  <bean class="org.mechaverse.simulation.common.opencl.CompositeOpenClCircuitSimulatorFactory" 
+      name="CompositeCircuitSimulatorFactory">
+    <constructor-arg index="0" value="4" />
+    <constructor-arg index="1" value="1" />
+    <constructor-arg index="2" >
       <util:constant static-field="org.mechaverse.simulation.ant.core.entity.ant.AntInput.DATA_SIZE" />
     </constructor-arg>
-    <constructor-arg index="2" >
+    <constructor-arg index="3" >
       <util:constant static-field="org.mechaverse.simulation.ant.core.entity.ant.AntOutput.DATA_SIZE" />
     </constructor-arg>
-    <constructor-arg index="3"><ref bean="circuitDataSource" /></constructor-arg>
+    <constructor-arg index="4"><ref bean="circuitDataSource" /></constructor-arg>
   </bean>
+  
+  <bean id="circuitSimulator" class="org.mechaverse.simulation.common.circuit.CircuitSimulator" 
+      factory-bean="CompositeCircuitSimulatorFactory" factory-method="getObject" lazy-init="true" />
 
   <bean id="activeAntProvider" class="org.mechaverse.simulation.ant.core.entity.ant.ActiveAntProvider" scope="prototype" />
   <bean id="antBehavior" class="org.mechaverse.simulation.ant.core.entity.ant.CircuitAntBehavior" scope="prototype" >
@@ -53,7 +58,7 @@
   <bean id="foodGenerationModule" class="org.mechaverse.simulation.ant.core.module.FoodGenerationModule" scope="prototype" />
   <bean id="pheromoneDecayModule" class="org.mechaverse.simulation.ant.core.module.PheromoneDecayModule" scope="prototype" />
   <bean id="circuitModule" class="org.mechaverse.simulation.ant.core.module.CircuitSimulationModule" lazy-init="true" />
-  
+
   <util:list id="modules" value-type="org.mechaverse.simulation.ant.core.module.AntSimulationModule" scope="prototype">
     <ref bean="antReproductionModule" />
     <ref bean="foodGenerationModule" />
