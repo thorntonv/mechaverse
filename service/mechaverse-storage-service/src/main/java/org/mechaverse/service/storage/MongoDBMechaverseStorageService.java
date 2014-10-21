@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.cxf.helpers.IOUtils;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
 import org.mechaverse.simulation.common.SimulationDataStore;
 import org.slf4j.Logger;
@@ -18,16 +19,16 @@ import com.mongodb.MongoException;
 
 /**
  * A storage service implementation that utilizes a MongoDB database.
- * 
+ *
  * A collection named simulationDataStores will be created in the desired database. Each document in
  * the collection will be structured as follows:
- * 
+ *
  * {"simulationId": "b271815a-d81b-4398-8192-b15258bace42", "instanceId":
  * "e58e1866-ebf5-421b-a925-d70a09f0513a", "iteration": 0, "dataStoreEntries": {...} }
- * 
+ *
  * A unique index will created for the collection that ensures that there is only one document for a
  * given simulationId, instanceId, and iteration combinations.
- * 
+ *
  * @author Dusty Hendrickson <dhendrickson@mechaverse.org>
  */
 public class MongoDBMechaverseStorageService implements MechaverseStorageService {
@@ -56,7 +57,7 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
 
   /**
    * Returns an instance of a MongoDB database.
-   * 
+   *
    * @param mongoHost hostname or IP address of the MongoDB server
    * @param mongoPort port of the MongoDB server
    * @param mongoDatabaseName database name on the MongoDB server
@@ -87,7 +88,7 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
 
   /**
    * Removes the MongoDB database. Used primarily for testing purposes.
-   * 
+   *
    * @throws IOException
    */
   protected void clear() throws IOException {
@@ -97,7 +98,7 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
 
   /**
    * Return the hostname or IP address of the MongoDB server.
-   * 
+   *
    * @return MongoDB hostname or IP address of the MongoDB server
    */
   public String getMongoHost() {
@@ -106,7 +107,7 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
 
   /**
    * Set the hostname or IP address of the MongoDB server.
-   * 
+   *
    * @param mongoHost hostname or IP address of the MongoDB server
    */
   public void setMongoHost(String mongoHost) {
@@ -115,7 +116,7 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
 
   /**
    * Return the port of the MongoDB server.
-   * 
+   *
    * @return port of the MongoDB server
    */
   public int getMongoPort() {
@@ -124,7 +125,7 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
 
   /**
    * Set the port of the MongoDB server.
-   * 
+   *
    * @param mongoPort port of the MongoDB server
    */
   public void setMongoPort(int mongoPort) {
@@ -133,7 +134,7 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
 
   /**
    * Return the database name on the MongoDB server.
-   * 
+   *
    * @return database name on the MongoDB server
    */
   public String getMongoDatabaseName() {
@@ -142,7 +143,7 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
 
   /**
    * Set the database name on the MongoDB server.
-   * 
+   *
    * @param mongoDatabaseName database name on the MongoDB server
    */
   public void setMongoDatabaseName(String mongoDatabaseName) {
@@ -204,7 +205,8 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
 
     // Decode state and add to document
     DBObject keys = new BasicDBObject();
-    SimulationDataStore store = SimulationDataStore.deserialize(stateInput);
+    SimulationDataStore store =
+        SimulationDataStore.deserialize(IOUtils.readBytesFromStream(stateInput));
     for (String storeKey : store.keySet()) {
       keys.put(storeKey, store.get(storeKey));
     }

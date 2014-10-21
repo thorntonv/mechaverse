@@ -19,7 +19,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
 
   <jaxrs:server id="services" address="/">
     <jaxrs:serviceBeans>
-      <bean class="org.mechaverse.service.storage.MechaverseStorageServiceImpl" />
+      <bean class="org.mechaverse.service.storage.MongoDBMechaverseStorageService" />
     </jaxrs:serviceBeans>
     <jaxrs:providers>
       <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider" />
