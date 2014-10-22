@@ -27,7 +27,7 @@ public class SimulationDataStore {
         String key = dataIn.readUTF();
         int dataLength = dataIn.readInt();
         byte[] value = new byte[dataLength];
-        in.read(value);
+        dataIn.readFully(value);
         targetMap.put(key, value);
       }
     }
