@@ -7,6 +7,7 @@ import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.core.Cell;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
 import org.mechaverse.simulation.ant.core.EntityManager;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * A module that periodically decays pheromones. The granularity of this implementation is more
@@ -14,7 +15,7 @@ import org.mechaverse.simulation.ant.core.EntityManager;
  */
 public class PheromoneDecayModule implements AntSimulationModule {
 
-  private int decayInterval = 60 * 60;
+  @Value("#{properties['pheromoneDecayInterval']}") private int decayInterval;
 
   @Override
   public void onAddEntity(Entity entity) {}

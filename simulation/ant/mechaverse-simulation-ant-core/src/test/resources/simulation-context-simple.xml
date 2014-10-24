@@ -18,6 +18,7 @@
     <prop key="foodClusterRadius">15</prop>
     <prop key="foodInitialEnergy">300</prop>
     <prop key="pheromoneInitialEnergy">3600</prop>
+    <prop key="pheromoneDecayInterval">3600</prop>
   </util:properties>
 
   <bean id="activeAntProvider" class="org.mechaverse.simulation.ant.core.entity.ant.ActiveAntProvider" scope="prototype" />
