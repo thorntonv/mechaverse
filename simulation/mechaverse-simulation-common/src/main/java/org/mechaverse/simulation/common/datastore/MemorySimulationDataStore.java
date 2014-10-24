@@ -1,4 +1,4 @@
-package org.mechaverse.simulation.common;
+package org.mechaverse.simulation.common.datastore;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -13,9 +13,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /**
- * A data store for simulation key/value data.
+ * A {@link SimulationDataStore} implementation that stores data in memory.
+ *
+ * @author Vance Thornton (thorntonv@mechaverse.org)
  */
-public class SimulationDataStore {
+public class MemorySimulationDataStore implements SimulationDataStore {
+
+  // TODO(thorntonv): Move the serialize/deserialize methods to separate classes.
 
   private final Map<String, byte[]> dataStore;
 
@@ -33,40 +37,45 @@ public class SimulationDataStore {
     }
   }
 
-  public static SimulationDataStore deserialize(byte[] data) throws IOException {
+  public static MemorySimulationDataStore deserialize(byte[] data) throws IOException {
     return deserialize(new ByteArrayInputStream(data));
   }
 
-  public static SimulationDataStore deserialize(InputStream in) throws IOException {
-    SimulationDataStore dataStore = new SimulationDataStore();
+  public static MemorySimulationDataStore deserialize(InputStream in) throws IOException {
+    MemorySimulationDataStore dataStore = new MemorySimulationDataStore();
     deserialize(in, dataStore.dataStore);
     return dataStore;
   }
 
-  public SimulationDataStore() {
+  public MemorySimulationDataStore() {
     this.dataStore = new LinkedHashMap<>();
   }
 
-  protected SimulationDataStore(SimulationDataStore dataStore) {
+  protected MemorySimulationDataStore(MemorySimulationDataStore dataStore) {
     this.dataStore = dataStore.dataStore;
   }
 
+  @Override
   public byte[] get(String key) {
     return dataStore.get(key);
   }
 
+  @Override
   public void put(String key, byte[] value) {
     dataStore.put(key, value);
   }
 
+  @Override
   public void remove(String key) {
     dataStore.remove(key);
   }
 
+  @Override
   public boolean containsKey(String key) {
     return dataStore.containsKey(key);
   }
 
+  @Override
   public Set<String> keySet() {
     return dataStore.keySet();
   }
@@ -89,6 +98,7 @@ public class SimulationDataStore {
     }
   }
 
+  @Override
   public int size() {
     return dataStore.size();
   }
