@@ -29,7 +29,7 @@ import com.mongodb.MongoException;
  * A unique index will created for the collection that ensures that there is only one document for a
  * given simulationId, instanceId, and iteration combinations.
  *
- * @author Dusty Hendrickson <dhendrickson@mechaverse.org>
+ * @author Dusty Hendrickson (dhendrickson@mechaverse.org)
  */
 public class MongoDBMechaverseStorageService implements MechaverseStorageService {
   private Logger logger = LoggerFactory.getLogger(MongoDBMechaverseStorageService.class);
@@ -62,34 +62,31 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
    * @param mongoPort port of the MongoDB server
    * @param mongoDatabaseName database name on the MongoDB server
    * @return MongoDB database
-   * @throws IOException
    */
   private DB getDatabase() throws IOException {
     // TODO(dhendrickson): look into thread safety issues of MongoDB driver
-    if (this.mongoDatabase == null) {
-      this.logger.debug("Creating MongoDB database connection to {}:{}/{}", mongoHost, mongoPort,
+    if (mongoDatabase == null) {
+      logger.debug("Creating MongoDB database connection to {}:{}/{}", mongoHost, mongoPort,
           mongoDatabaseName);
 
-      this.mongoClient = new MongoClient(mongoHost, mongoPort);
-      this.mongoDatabase = this.mongoClient.getDB(mongoDatabaseName);
+      mongoClient = new MongoClient(mongoHost, mongoPort);
+      mongoDatabase = mongoClient.getDB(mongoDatabaseName);
 
       // Create a unique index using the simulation, instance, and iteration as the key
       // Note: this is safe to run multiple times, as subsequent creations are ignored
       DBObject indexKeys = new BasicDBObject();
-      indexKeys.put(this.simulationIdKey, 1);
-      indexKeys.put(this.instanceIdKey, 1);
-      indexKeys.put(this.iterationKey, 1);
-      mongoDatabase.getCollection(this.mongoCollectionName).createIndex(indexKeys,
+      indexKeys.put(simulationIdKey, 1);
+      indexKeys.put(instanceIdKey, 1);
+      indexKeys.put(iterationKey, 1);
+      mongoDatabase.getCollection(mongoCollectionName).createIndex(indexKeys,
           new BasicDBObject("unique", true));
     }
 
-    return this.mongoDatabase;
+    return mongoDatabase;
   }
 
   /**
    * Removes the MongoDB database. Used primarily for testing purposes.
-   *
-   * @throws IOException
    */
   protected void clear() throws IOException {
     DB database = getDatabase();
@@ -153,7 +150,7 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
   @Override
   public InputStream getState(String simulationId, String instanceId, long iteration)
       throws IOException {
-    this.logger.debug("Get state for {}:{}:{}", simulationId, instanceId, iteration);
+    logger.debug("Get state for {}:{}:{}", simulationId, instanceId, iteration);
 
     // Setup database connection
     DB database = getDatabase();
@@ -185,14 +182,14 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
   @Override
   public InputStream getStateValue(String simulationId, String instanceId, long iteration,
       String key) throws IOException {
-    this.logger.debug("Get state value for {}:{}:{}:{}", simulationId, instanceId, iteration, key);
+    logger.debug("Get state value for {}:{}:{}:{}", simulationId, instanceId, iteration, key);
     throw new UnsupportedOperationException();
   }
 
   @Override
   public void setState(String simulationId, String instanceId, long iteration,
       InputStream stateInput) throws IOException {
-    this.logger.debug("Set state for {}:{}:{}", simulationId, instanceId, iteration);
+    logger.debug("Set state for {}:{}:{}", simulationId, instanceId, iteration);
 
     // Setup database connection
     DB database = getDatabase();
@@ -230,7 +227,7 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
   @Override
   public void setStateValue(String simulationId, String instanceId, long iteration, String key,
       InputStream valueInput) throws IOException {
-    this.logger.debug("Get state value for {}:{}:{}:{}", simulationId, instanceId, iteration, key);
+    logger.debug("Get state value for {}:{}:{}:{}", simulationId, instanceId, iteration, key);
     throw new UnsupportedOperationException();
   }
 

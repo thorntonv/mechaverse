@@ -28,7 +28,7 @@ import de.flapdoodle.embed.mongo.distribution.Version;
  * 
  * Unit tests for {@link MongoDBMechaverseStorageService}.
  * 
- * @author Dusty Hendrickson <dhendrickson@mechaverse.org>
+ * @author Dusty Hendrickson (dhendrickson@mechaverse.org)
  */
 public class MongoDBMechaverseStorageServiceTest {
   // TODO(dhendrickson): move some of this to an interface test
@@ -320,8 +320,7 @@ public class MongoDBMechaverseStorageServiceTest {
   /**
    * Test deleting a simulation.
    * 
-   * 1) Database is empty 2) Set state for two simulation/instance/iteration 3) Delete one
-   * simulation 4) Confirm only records for one simulation removed
+   * 1) Database is empty 2) Delete non-existent simulation 3) No exceptions are thrown
    */
   @Test
   public void testDeleteSimulationB() {
