@@ -26,7 +26,6 @@ import org.mechaverse.simulation.common.SimulationState;
 public final class AntSimulationState extends SimulationState<SimulationModel> {
 
   public static final String MODEL_KEY = "model";
-  public static final String CONFIG_KEY = "config";
 
   private static final String ENTITY_KEY_PREFIX = "entity.";
 
@@ -42,20 +41,16 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
   public AntSimulationState() {
     super(new SimulationModel(), new SimulationDataStore());
 
-    // Add placeholders for the model and config. These will be serialized from objects when
-    // requested.
+    // Add placeholder for the model. This will be serialized when requested.
     put(MODEL_KEY, new byte[0]);
-    put(CONFIG_KEY, new byte[0]);
   }
 
   public AntSimulationState(SimulationDataStore dataStore) throws IOException {
     super(deserializeModel(new GZIPInputStream(
         new ByteArrayInputStream(dataStore.get(MODEL_KEY)))), dataStore);
 
-    // Add placeholders for the model and config. These will be serialized from objects when
-    // requested.
+    // Add placeholder for the model. This will be serialized when requested.
     put(MODEL_KEY, new byte[0]);
-    put(CONFIG_KEY, new byte[0]);
   }
 
   @Override

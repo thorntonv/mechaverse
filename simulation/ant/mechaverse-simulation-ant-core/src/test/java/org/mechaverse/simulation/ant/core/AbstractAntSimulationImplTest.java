@@ -169,7 +169,6 @@ public abstract class AbstractAntSimulationImplTest {
         state2.getModel().getEnvironment().getEntities().size());
 
     assertTrue(state1.keySet().toString(), state1.keySet().contains(AntSimulationState.MODEL_KEY));
-    assertTrue(state1.keySet().contains(AntSimulationState.CONFIG_KEY));
     assertEquals(state1.keySet(), state2.keySet());
     for (String key : state1.keySet()) {
       byte[] data1 = state1.get(key);

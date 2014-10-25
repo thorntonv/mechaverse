@@ -65,9 +65,9 @@ public class CircuitAntSimulationImplTest extends AbstractAntSimulationImplTest 
           antCount++;
         }
       }
-      // State should have model and config values.
+      // State should have a model value.
       // Each ant should have genetic data, circuit state, output map, and bit output map values.
-      assertEquals("Key set: " + state.keySet(), antCount * 4 + 2, state.keySet().size());
+      assertEquals("Key set: " + state.keySet(), antCount * 4 + 1, state.keySet().size());
     }
   }
 }
