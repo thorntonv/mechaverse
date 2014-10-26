@@ -1,6 +1,5 @@
 package org.mechaverse.simulation.ant.core.module;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -164,30 +163,21 @@ public class AntReproductionModule implements AntSimulationModule {
       parent2 = antFitnessDistribution.sample();
     }
 
-    if(state.containsEntityKey(parent1, GeneticDataStore.KEY)
-        && state.containsEntityKey(parent2, GeneticDataStore.KEY)) {
-      try {
-      // Get the parents genetic information.
-      GeneticDataStore parent1GeneticDataStore =
-          GeneticDataStore.deserialize(state.getEntityValue(parent1, GeneticDataStore.KEY));
-      GeneticDataStore parent2GeneticDataStore =
-          GeneticDataStore.deserialize(state.getEntityValue(parent2, GeneticDataStore.KEY));
+    // Get the parents genetic information.
+    GeneticDataStore parent1GeneticDataStore = state.getEntityGeneticDataStore(parent1);
+    GeneticDataStore parent2GeneticDataStore = state.getEntityGeneticDataStore(parent2);
 
-      GeneticDataStore childGeneticDataStore = new GeneticDataStore();
-      for (String key : parent1GeneticDataStore.keySet()) {
-        GeneticData parent1Data = parent1GeneticDataStore.get(key);
-        GeneticData parent2Data = parent2GeneticDataStore.get(key);
-        GeneticData childData = geneticRecombinator.recombine(parent1Data, parent2Data, random);
-        childGeneticDataStore.put(key, childData);
-      }
-      state.putEntityValue(ant, GeneticDataStore.KEY, childGeneticDataStore.serialize());
-
-      logger.debug("Generated child ant {} with parents {} and {}",
-          ant.getId(), parent1.getId(), parent2.getId());
-      } catch(IOException ex) {
-        logger.warn("Error generating ant", ex);
-      }
+    GeneticDataStore childGeneticDataStore = state.getEntityGeneticDataStore(ant);
+    for (String key : parent1GeneticDataStore.keySet()) {
+      GeneticData parent1GeneticData = parent1GeneticDataStore.get(key);
+      GeneticData parent2GeneticData = parent2GeneticDataStore.get(key);
+      GeneticData childData = geneticRecombinator.recombine(
+          parent1GeneticData, parent2GeneticData, random);
+      childGeneticDataStore.put(key, childData);
     }
+
+    logger.debug("Generated child ant {} with parents {} and {}",
+        ant.getId(), parent1.getId(), parent2.getId());
 
     return ant;
   }

@@ -16,12 +16,10 @@ public class CircuitGeneticDataGenerator {
   public static final String CIRCUIT_STATE_KEY = "circuitState";
   public static final String OUTPUT_MAP_KEY = "outputMap";
 
-  public GeneticDataStore generateGeneticData(int stateSize, int outputSize,
+  public void generateGeneticData(GeneticDataStore dataStore, int stateSize, int outputSize,
       RandomGenerator random) {
-    GeneticDataStore dataStore = new GeneticDataStore();
     dataStore.put(CIRCUIT_STATE_KEY, generateStateGeneticData(stateSize, random));
     dataStore.put(OUTPUT_MAP_KEY, generateOutputMapGeneticData(outputSize, stateSize, random));
-    return dataStore;
   }
 
   public GeneticData generateStateGeneticData(int stateSize, RandomGenerator random) {

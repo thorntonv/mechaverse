@@ -1,54 +1,62 @@
 package org.mechaverse.simulation.common.datastore;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+
+import com.google.common.base.Supplier;
 
 /**
  * A {@link SimulationDataStore} implementation that stores data in memory.
  *
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
-public class MemorySimulationDataStore implements SimulationDataStore {
+public class MemorySimulationDataStore extends AbstractSimulationDataStore {
 
-  // TODO(thorntonv): Move the serialize/deserialize methods to separate classes.
+  private static final Supplier<SimulationDataStore> SUPPLIER =
+      new Supplier<SimulationDataStore>() {
+    @Override
+    public SimulationDataStore get() {
+      return new MemorySimulationDataStore();
+    }
+  };
 
-  private final Map<String, byte[]> dataStore;
+  /**
+   * A {@link SimulationDataStoreInputStream} for reading a {@link MemorySimulationDataStore} from
+   * an {@link InputStream}.
+   */
+  public static final class MemorySimulationDataStoreInputStream
+      extends SimulationDataStoreInputStream {
 
-  public static void deserialize(InputStream in, Map<String, byte[]> targetMap)
-      throws IOException {
-    try (DataInputStream dataIn = new DataInputStream(in)) {
-      int size = dataIn.readInt();
-      for (int cnt = 1; cnt <= size; cnt++) {
-        String key = dataIn.readUTF();
-        int dataLength = dataIn.readInt();
-        byte[] value = new byte[dataLength];
-        dataIn.readFully(value);
-        targetMap.put(key, value);
-      }
+    public MemorySimulationDataStoreInputStream(InputStream in) {
+      super(in, SUPPLIER);
     }
   }
 
-  public static MemorySimulationDataStore deserialize(byte[] data) throws IOException {
-    return deserialize(new ByteArrayInputStream(data));
+  /**
+   * Deserializes a {@link MemorySimulationDataStore} from the data in the given byte array.
+   */
+  public static SimulationDataStore fromByteArray(byte[] data) throws IOException {
+    ByteArrayInputStream byteIn = new ByteArrayInputStream(data);
+    try (MemorySimulationDataStoreInputStream in =
+        new MemorySimulationDataStoreInputStream(byteIn)) {
+      return in.readDataStore();
+    }
   }
 
-  public static MemorySimulationDataStore deserialize(InputStream in) throws IOException {
-    MemorySimulationDataStore dataStore = new MemorySimulationDataStore();
-    deserialize(in, dataStore.dataStore);
-    return dataStore;
-  }
+  private final Map<String, byte[]> dataStore;
+
 
   public MemorySimulationDataStore() {
     this.dataStore = new LinkedHashMap<>();
+  }
+
+  public MemorySimulationDataStore(SimulationDataStore dataStore) {
+    this.dataStore = new LinkedHashMap<>();
+    merge(dataStore);
   }
 
   protected MemorySimulationDataStore(MemorySimulationDataStore dataStore) {
@@ -71,6 +79,11 @@ public class MemorySimulationDataStore implements SimulationDataStore {
   }
 
   @Override
+  public void clear() {
+    dataStore.clear();
+  }
+
+  @Override
   public boolean containsKey(String key) {
     return dataStore.containsKey(key);
   }
@@ -78,24 +91,6 @@ public class MemorySimulationDataStore implements SimulationDataStore {
   @Override
   public Set<String> keySet() {
     return dataStore.keySet();
-  }
-
-  public byte[] serialize() throws IOException {
-    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-    serialize(byteOut);
-    byteOut.close();
-    return byteOut.toByteArray();
-  }
-
-  public void serialize(OutputStream out) throws IOException {
-    try (DataOutputStream dataOut = new DataOutputStream(out)) {
-      dataOut.writeInt(dataStore.size());
-      for (Entry<String, byte[]> entry : dataStore.entrySet()) {
-        dataOut.writeUTF(entry.getKey());
-        dataOut.writeInt(entry.getValue().length);
-        dataOut.write(entry.getValue());
-      }
-    }
   }
 
   @Override

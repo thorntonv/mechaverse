@@ -1,6 +1,5 @@
 package org.mechaverse.simulation.common.datastore;
 
-import java.io.IOException;
 import java.util.Set;
 
 import com.google.common.base.Predicate;
@@ -54,39 +53,51 @@ public final class SimulationDataStoreView implements SimulationDataStore {
   }
 
   @Override
-  public byte[] get(String key) throws IOException {
+  public byte[] get(String key) {
     String absoluteKey = rootKeyPrefix + key;
     return visibleKeyPredicate.apply(absoluteKey) ? dataStore.get(absoluteKey) : null;
   }
 
   @Override
-  public void put(String key, byte[] value) throws IOException {
+  public void put(String key, byte[] value) {
     String absoluteKey = rootKeyPrefix + key;
     if (visibleKeyPredicate.apply(absoluteKey)) {
       dataStore.put(absoluteKey, value);
     } else {
-      throw new IOException("The key " + key + " is not visible in this view.");
+      throw new IllegalArgumentException("The key " + key + " is not visible in this view.");
     }
   }
 
   @Override
-  public void remove(String key) throws IOException {
+  public void merge(SimulationDataStore fromDataStore) {
+    dataStore.merge(fromDataStore);
+  }
+
+  @Override
+  public void remove(String key) {
     String absoluteKey = rootKeyPrefix + key;
     if (visibleKeyPredicate.apply(absoluteKey)) {
       dataStore.remove(absoluteKey);
     } else {
-      throw new IOException("The key " + key + " is not visible in this view.");
+      throw new IllegalArgumentException("The key " + key + " is not visible in this view.");
     }
   }
 
   @Override
-  public boolean containsKey(String key) throws IOException {
+  public void clear() {
+    for (String key : keySet()) {
+      remove(key);
+    }
+  }
+
+  @Override
+  public boolean containsKey(String key) {
     String absoluteKey = rootKeyPrefix + key;
     return visibleKeyPredicate.apply(absoluteKey) ? dataStore.containsKey(absoluteKey) : false;
   }
 
   @Override
-  public Set<String> keySet() throws IOException {
+  public Set<String> keySet() {
     ImmutableSet.Builder<String> keySetBuilder = ImmutableSet.builder();
     for (String absoluteKey : dataStore.keySet()) {
       if (absoluteKey.startsWith(rootKeyPrefix) && visibleKeyPredicate.apply(absoluteKey)) {
@@ -98,7 +109,17 @@ public final class SimulationDataStoreView implements SimulationDataStore {
   }
 
   @Override
-  public int size() throws IOException {
+  public int size() {
     return keySet().size();
+  }
+
+  @Override
+  public boolean equals(Object otherObject) {
+    return dataStore.equals(otherObject);
+  }
+
+  @Override
+  public int hashCode() {
+    return dataStore.hashCode();
   }
 }

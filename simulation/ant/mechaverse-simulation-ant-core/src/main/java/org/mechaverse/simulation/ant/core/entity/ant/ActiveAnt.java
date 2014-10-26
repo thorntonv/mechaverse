@@ -1,6 +1,7 @@
 package org.mechaverse.simulation.ant.core.entity.ant;
 
 import org.apache.commons.math3.random.RandomGenerator;
+import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.api.model.Direction;
 import org.mechaverse.simulation.ant.api.model.Entity;
@@ -12,7 +13,6 @@ import org.mechaverse.simulation.ant.core.AntSimulationUtil;
 import org.mechaverse.simulation.ant.core.Cell;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
 import org.mechaverse.simulation.ant.core.EntityManager;
-import org.mechaverse.simulation.common.SimulationDataStore;
 import org.springframework.beans.factory.annotation.Value;
 
 /**
@@ -26,6 +26,8 @@ public final class ActiveAnt implements ActiveEntity {
    */
   public static interface AntBehavior {
 
+    void setEntity(Ant entity);
+
     /**
      * Sets the current input.
      */
@@ -38,8 +40,8 @@ public final class ActiveAnt implements ActiveEntity {
 
     void onRemoveEntity();
 
-    void setState(SimulationDataStore state);
-    SimulationDataStore getState();
+    void setState(AntSimulationState state);
+    void updateState(AntSimulationState state);
   }
 
   private static final EntityType[] CARRIABLE_ENTITY_TYPES =
@@ -56,6 +58,7 @@ public final class ActiveAnt implements ActiveEntity {
   public ActiveAnt(Ant entity, AntBehavior behavior) {
     this.entity = entity;
     this.behavior = behavior;
+    behavior.setEntity(entity);
     if (entity.getCarriedEntity() != null) {
       this.carriedEntityType = EntityUtil.getType(entity.getCarriedEntity());
     }
@@ -252,13 +255,13 @@ public final class ActiveAnt implements ActiveEntity {
   }
 
   @Override
-  public void setState(SimulationDataStore state) {
+  public void setState(AntSimulationState state) {
     behavior.setState(state);
   }
 
   @Override
-  public SimulationDataStore getState() {
-    return behavior.getState();
+  public void updateState(AntSimulationState state) {
+    behavior.updateState(state);
   }
 
   private boolean moveForward(Cell cell, Cell frontCell, CellEnvironment env) {

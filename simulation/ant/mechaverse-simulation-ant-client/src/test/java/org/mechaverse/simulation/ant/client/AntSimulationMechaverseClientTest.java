@@ -1,6 +1,7 @@
 package org.mechaverse.simulation.ant.client;
 
 import static org.junit.Assert.assertTrue;
+import static org.mechaverse.simulation.common.datastore.SimulationDataStoreOutputStream.toByteArray;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -21,7 +22,8 @@ import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.core.AntSimulationImpl;
-import org.mechaverse.simulation.common.SimulationDataStore;
+import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore;
+import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -61,7 +63,7 @@ public class AntSimulationMechaverseClientTest {
     SimulationDataStore state = AntSimulationImpl.randomState();
     when(mockStorageService.getState(
         task.getSimulationId(), task.getInstanceId(), task.getIteration()))
-            .thenReturn(new ByteArrayInputStream(state.serialize()));
+            .thenReturn(new ByteArrayInputStream(toByteArray(state)));
 
     client.executeTask(task);
 
@@ -71,7 +73,8 @@ public class AntSimulationMechaverseClientTest {
     byte[] newState = IOUtils.toByteArray(stateIn.getValue());
     assertTrue(newState.length > 0);
 
-    AntSimulationState stateData = AntSimulationState.deserialize(newState);
+    AntSimulationState stateData =
+        new AntSimulationState(MemorySimulationDataStore.fromByteArray(newState));
     assertTrue(getAntCount(stateData.getModel().getEnvironment().getEntities()) > 0);
   }
 

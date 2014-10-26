@@ -10,7 +10,7 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.mechaverse.simulation.ant.api.model.Entity;
-import org.mechaverse.simulation.common.SimulationDataStore;
+import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -30,12 +30,13 @@ public class AntSimulationStateTest {
     AntSimulationState state = new AntSimulationState();
     Entity entity = new Entity();
     entity.setId("001");
-    state.putEntityValue(entity, KEY1, DATA1);
+    SimulationDataStore entityDataStore = state.getEntityDataStore(entity);
+    entityDataStore.put(KEY1, DATA1);
     String entityKey = "entity.001." + KEY1;
     assertTrue(state.containsKey(entityKey));
     assertEquals(keySetWithEntityKeys(entityKey), state.keySet());
     assertArrayEquals(DATA1, state.get(entityKey));
-    assertArrayEquals(DATA1, state.getEntityValue(entity, KEY1));
+    assertArrayEquals(DATA1, entityDataStore.get(KEY1));
   }
 
   @Test
@@ -44,11 +45,9 @@ public class AntSimulationStateTest {
     Entity entity = new Entity();
     entity.setId("001");
 
-    SimulationDataStore entityDataStore = new SimulationDataStore();
+    SimulationDataStore entityDataStore = state.getEntityDataStore(entity);
     entityDataStore.put(KEY1, DATA1);
     entityDataStore.put(KEY2, DATA2);
-
-    state.putEntityValues(entity, entityDataStore);
 
     String entityKey1 = "entity.001." + KEY1;
     String entityKey2 = "entity.001." + KEY2;
@@ -61,29 +60,28 @@ public class AntSimulationStateTest {
 
     state.put("test", "test".getBytes());
 
-    entityDataStore = state.getEntityValues(entity);
+    entityDataStore = state.getEntityDataStore(entity);
     assertEquals(ImmutableSet.of(KEY1, KEY2), entityDataStore.keySet());
   }
 
   @Test
-  public void removeAllEntityValues() {
+  public void clearEntityDataStores() {
     AntSimulationState state = new AntSimulationState();
     Entity entity1 = new Entity();
     entity1.setId("001");
-    SimulationDataStore entityDataStore = new SimulationDataStore();
-    entityDataStore.put(KEY1, DATA1);
-    entityDataStore.put(KEY2, DATA2);
-    state.putEntityValues(entity1, entityDataStore);
+    SimulationDataStore entityDataStore1 = state.getEntityDataStore(entity1);
+    entityDataStore1.put(KEY1, DATA1);
+    entityDataStore1.put(KEY2, DATA2);
 
     Entity entity2 = new Entity();
     entity2.setId("002");
-    entityDataStore = new SimulationDataStore();
-    entityDataStore.put(KEY1, DATA1);
-    state.putEntityValues(entity2, entityDataStore);
+    SimulationDataStore entityDataStore2 = state.getEntityDataStore(entity2);
+    entityDataStore2.put(KEY1, DATA1);
 
     state.put("test", "test".getBytes());
 
-    state.removeAllEntityValues();
+    entityDataStore1.clear();
+    entityDataStore2.clear();
 
     assertEquals(keySetWithEntityKeys("test"), state.keySet());
   }

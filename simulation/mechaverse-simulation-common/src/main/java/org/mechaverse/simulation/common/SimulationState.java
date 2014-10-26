@@ -1,12 +1,14 @@
 package org.mechaverse.simulation.common;
 
+import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore;
+import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 
 /**
  * Represents a simulation state.
  *
  * @param <M> The simulation model type
  */
-public abstract class SimulationState<M> extends SimulationDataStore {
+public abstract class SimulationState<M> extends MemorySimulationDataStore {
 
   protected final M model;
 

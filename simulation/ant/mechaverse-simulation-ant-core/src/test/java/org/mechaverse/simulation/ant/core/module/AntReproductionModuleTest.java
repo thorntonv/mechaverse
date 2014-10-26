@@ -1,6 +1,7 @@
 package org.mechaverse.simulation.ant.core.module;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -85,16 +86,17 @@ public class AntReproductionModuleTest {
     module.setAntMaxCount(5);
 
     Ant parent1 = module.generateRandomAnt(state, random);
-    GeneticDataStore parent1GeneticData = randomGeneticDataStore();
-    state.putEntityValue(parent1, GeneticDataStore.KEY, parent1GeneticData.serialize());
+    GeneticDataStore parent1GeneticData =
+        randomGeneticDataStore(state.getEntityGeneticDataStore(parent1));
+
     module.onAddEntity(parent1);
 
     Ant parent2 = module.generateRandomAnt(state, random);
-    GeneticDataStore parent2GeneticData = randomGeneticDataStore();
-    state.putEntityValue(parent2, GeneticDataStore.KEY, parent2GeneticData.serialize());
+    GeneticDataStore parent2GeneticData =
+        randomGeneticDataStore(state.getEntityGeneticDataStore(parent2));
     module.onAddEntity(parent2);
 
-    GeneticDataStore childGeneticData = randomGeneticDataStore();
+    GeneticDataStore childGeneticData = randomGeneticDataStore(new GeneticDataStore());
 
     when(mockGeneticRecombinator.recombine(
         any(GeneticData.class), any(GeneticData.class), eq(random)))
@@ -109,8 +111,8 @@ public class AntReproductionModuleTest {
     assertNotNull(child);
 
     // Verify that the child genetic data was added to the state.
-    assertArrayEquals(state.getEntityValue(child, GeneticDataStore.KEY),
-        childGeneticData.serialize());
+    assertEquals(state.getEntityGeneticDataStore(child).get(TEST_GENETIC_DATA_KEY),
+        childGeneticData.get(TEST_GENETIC_DATA_KEY));
 
     // Verify that recombine was called with the genetic data of the parent ants.
     ArgumentCaptor<GeneticData> geneticDataCaptor1 = ArgumentCaptor.forClass(GeneticData.class);
@@ -141,8 +143,7 @@ public class AntReproductionModuleTest {
     return new CellEnvironment(env);
   }
 
-  private GeneticDataStore randomGeneticDataStore() {
-    GeneticDataStore geneticData = new GeneticDataStore();
+  private GeneticDataStore randomGeneticDataStore(GeneticDataStore geneticData) throws IOException {
     geneticData.put(TEST_GENETIC_DATA_KEY, new GeneticData(RandomUtil.randomBytes(100, random),
         ArrayUtil.toIntArray(RandomUtil.randomBytes(25, random))));
     return geneticData;

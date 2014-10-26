@@ -1,11 +1,12 @@
 package org.mechaverse.simulation.ant.core.entity.ant;
 
 import org.apache.commons.math3.random.RandomGenerator;
+import org.mechaverse.simulation.ant.api.AntSimulationState;
+import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.api.model.Direction;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.core.AntSimulationUtil;
 import org.mechaverse.simulation.ant.core.entity.ant.ActiveAnt.AntBehavior;
-import org.mechaverse.simulation.common.SimulationDataStore;
 import org.mechaverse.simulation.common.model.MoveDirection;
 import org.mechaverse.simulation.common.model.TurnDirection;
 import org.mechaverse.simulation.common.util.RandomUtil;
@@ -20,6 +21,9 @@ public class SimpleAntBehavior implements AntBehavior {
 
   private TurnDirection turnDirection = TurnDirection.NONE;
   private boolean leavePheromone = false;
+
+  @Override
+  public void setEntity(Ant entity) {}
 
   @Override
   public void setInput(AntInput input, RandomGenerator random) {
@@ -123,12 +127,10 @@ public class SimpleAntBehavior implements AntBehavior {
   public void onRemoveEntity() {}
 
   @Override
-  public void setState(SimulationDataStore state) {}
+  public void setState(AntSimulationState state) {}
 
   @Override
-  public SimulationDataStore getState() {
-    return new SimulationDataStore();
-  }
+  public void updateState(AntSimulationState state) {}
 
   private TurnDirection getTurnDirection(Direction currentDirection, Direction targetDirection) {
     if (currentDirection == targetDirection) {

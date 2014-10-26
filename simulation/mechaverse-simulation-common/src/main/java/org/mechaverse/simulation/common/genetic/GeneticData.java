@@ -5,6 +5,7 @@ import gnu.trove.list.array.TIntArrayList;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Base class for genetic data.
@@ -14,7 +15,7 @@ import java.io.IOException;
 public class GeneticData {
 
   // TODO(thorntonv): Implement unit test for this class.
-  
+
   public static class Builder {
 
     private final ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -78,5 +79,25 @@ public class GeneticData {
 
   public int[] getCrossoverPoints() {
     return crossoverPoints;
+  }
+
+  @Override
+  public boolean equals(Object otherObject) {
+    if (otherObject == null) {
+      return false;
+    } else if (otherObject == this) {
+      return true;
+    } else if(!(otherObject instanceof GeneticData)) {
+      return false;
+    }
+
+    GeneticData otherData = (GeneticData) otherObject;
+    return Arrays.equals(data, otherData.data)
+        && Arrays.equals(crossoverPoints, otherData.crossoverPoints);
+  }
+
+  @Override
+  public int hashCode() {
+    return Arrays.hashCode(data) + Arrays.hashCode(crossoverPoints);
   }
 }

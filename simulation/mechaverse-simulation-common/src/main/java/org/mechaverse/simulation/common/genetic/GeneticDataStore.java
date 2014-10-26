@@ -1,10 +1,10 @@
 package org.mechaverse.simulation.common.genetic;
 
-import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.mechaverse.simulation.common.SimulationDataStore;
+import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore;
+import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 import org.mechaverse.simulation.common.util.ArrayUtil;
 
 /**
@@ -15,7 +15,7 @@ import org.mechaverse.simulation.common.util.ArrayUtil;
 public class GeneticDataStore {
 
   // TODO(thorntonv): Implement unit test for this class.
-  
+
   public static final String KEY = "geneticData";
 
   private static final String DATA_KEY = "data";
@@ -23,12 +23,8 @@ public class GeneticDataStore {
 
   private final SimulationDataStore dataStore;
 
-  public static GeneticDataStore deserialize(byte[] data) throws IOException {
-    return new GeneticDataStore(SimulationDataStore.deserialize(data));
-  }
-
   public GeneticDataStore() {
-    this(new SimulationDataStore());
+    this(new MemorySimulationDataStore());
   }
 
   public GeneticDataStore(SimulationDataStore dataStore) {
@@ -53,7 +49,7 @@ public class GeneticDataStore {
 
   public Set<String> keySet() {
     Set<String> keySet = new LinkedHashSet<>();
-    String suffix = "." + DATA_KEY;
+    String suffix = SimulationDataStore.KEY_SEPARATOR + DATA_KEY;
     for (String key : dataStore.keySet()) {
       if (key.endsWith(suffix)) {
         keySet.add(key.substring(0, key.length() - suffix.length()));
@@ -62,30 +58,19 @@ public class GeneticDataStore {
     return keySet;
   }
 
-  public GeneticData getCompositeData() {
-    GeneticData.Builder geneticDataBuilder = GeneticData.newBuilder();
-    int basePosition = 0;
-    for (String key : keySet()) {
-      GeneticData componentData = get(key);
-      geneticDataBuilder.write(componentData.getData());
-
-      for (int crossoverPoint : componentData.getCrossoverPoints()) {
-        geneticDataBuilder.addCrossoverPoint(basePosition + crossoverPoint);
-      }
-      basePosition += componentData.getData().length;
-    }
-    return geneticDataBuilder.build();
+  public void clear() {
+    dataStore.clear();
   }
 
-  public byte[] serialize() throws IOException {
-    return dataStore.serialize();
+  public int size() {
+    return keySet().size();
   }
 
   private String geneticDataKey(String key) {
-    return key + "." + DATA_KEY;
+    return key + SimulationDataStore.KEY_SEPARATOR + DATA_KEY;
   }
 
   private String crossoverDataKey(String key) {
-    return key + "." + CROSSOVER_DATA_KEY;
+    return key + SimulationDataStore.KEY_SEPARATOR + CROSSOVER_DATA_KEY;
   }
 }

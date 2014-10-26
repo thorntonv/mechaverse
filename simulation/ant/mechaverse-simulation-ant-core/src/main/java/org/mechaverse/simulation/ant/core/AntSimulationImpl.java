@@ -12,8 +12,8 @@ import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Environment;
 import org.mechaverse.simulation.ant.api.model.SimulationModel;
 import org.mechaverse.simulation.common.Simulation;
-import org.mechaverse.simulation.common.SimulationDataStore;
 import org.mechaverse.simulation.common.cellautomata.EnvironmentGenerator;
+import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 import org.mechaverse.simulation.common.opencl.DeviceUtil;
 import org.mechaverse.simulation.common.util.RandomUtil;
 import org.slf4j.Logger;
@@ -68,12 +68,11 @@ public final class AntSimulationImpl implements Simulation {
 
   @Override
   public AntSimulationState getState() {
-    state.removeAllEntityValues();
     for (EnvironmentSimulator environmentSimulation : environmentSimulations) {
       environmentSimulation.updateModel();
 
       for (ActiveEntity activeEntity : environmentSimulation.getActiveEntities()) {
-        state.putEntityValues(activeEntity.getEntity(), activeEntity.getState());
+        activeEntity.updateState(state);
       }
     }
     return state;
@@ -95,7 +94,7 @@ public final class AntSimulationImpl implements Simulation {
 
     for (EnvironmentSimulator environmentSimulation : environmentSimulations) {
       for (ActiveEntity activeEntity : environmentSimulation.getActiveEntities()) {
-        activeEntity.setState(state.getEntityValues(activeEntity.getEntity()));
+        activeEntity.setState(state);
       }
     }
   }

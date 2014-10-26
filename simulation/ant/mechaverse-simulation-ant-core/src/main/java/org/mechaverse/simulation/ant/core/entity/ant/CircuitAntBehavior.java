@@ -1,11 +1,11 @@
 package org.mechaverse.simulation.ant.core.entity.ant;
 
-import java.io.IOException;
-
 import org.apache.commons.math3.random.RandomGenerator;
+import org.mechaverse.simulation.ant.api.AntSimulationState;
+import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.core.entity.ant.ActiveAnt.AntBehavior;
-import org.mechaverse.simulation.common.SimulationDataStore;
 import org.mechaverse.simulation.common.circuit.CircuitSimulator;
+import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 import org.mechaverse.simulation.common.genetic.CircuitGeneticDataGenerator;
 import org.mechaverse.simulation.common.genetic.GeneticData;
 import org.mechaverse.simulation.common.genetic.GeneticDataStore;
@@ -22,13 +22,15 @@ public class CircuitAntBehavior implements AntBehavior {
   public static final String CIRCUIT_OUTPUT_MAP_KEY = "circuitOutputMap";
   public static final String CIRCUIT_BIT_OUTPUT_MAP_KEY = "circuitBitOutputMap";
 
+  private Ant entity;
   private final int circuitIndex;
   private final int[] antOutputData;
   private final int[] circuitOutputData;
   private int[] bitOutputMap;
   private final AntOutput output = new AntOutput();
   private final int[] circuitState;
-  private SimulationDataStore state = new SimulationDataStore();
+  private SimulationDataStore dataStore;
+  private GeneticDataStore geneticDataStore;
   private boolean stateSet = false;
   private final CircuitSimulator circuitSimulator;
   private CircuitGeneticDataGenerator geneticDataGenerator = new CircuitGeneticDataGenerator();
@@ -44,16 +46,18 @@ public class CircuitAntBehavior implements AntBehavior {
   }
 
   @Override
+  public void setEntity(Ant entity) {
+    this.entity = entity;
+  }
+
+  @Override
   public void setInput(AntInput input, RandomGenerator random) {
     if (!stateSet) {
-      GeneticDataStore geneticData;
-      if (state.containsKey(GeneticDataStore.KEY)) {
-        geneticData = loadGeneticData();
-      } else {
-        geneticData = generateGeneticData(random);
+      if (geneticDataStore.size() == 0) {
+        generateGeneticData(random);
       }
 
-      initializeCircuit(geneticData);
+      initializeCircuit();
       stateSet = true;
     }
 
@@ -71,78 +75,70 @@ public class CircuitAntBehavior implements AntBehavior {
   public void onRemoveEntity() {
     circuitSimulator.getAllocator().deallocateCircuit(circuitIndex);
     stateSet = false;
+
+    // Remove entity state.
+    if (dataStore != null) {
+      dataStore.clear();
+    }
+    if (geneticDataStore != null) {
+      geneticDataStore.clear();
+    }
   }
 
   @Override
-  public void setState(SimulationDataStore state) {
-    this.state = state;
+  public void setState(AntSimulationState state) {
+    this.dataStore = state.getEntityDataStore(entity);
+    this.geneticDataStore = state.getEntityGeneticDataStore(entity);
 
     // If the ant has an existing circuit state then load it.
-    byte[] circuitStateBytes = state.get(CIRCUIT_STATE_KEY);
+    byte[] circuitStateBytes = dataStore.get(CIRCUIT_STATE_KEY);
     if (circuitStateBytes != null) {
       circuitSimulator.setCircuitState(circuitIndex, ArrayUtil.toIntArray(circuitStateBytes));
       stateSet = true;
     }
 
-    byte[] outputMapBytes = state.get(CIRCUIT_OUTPUT_MAP_KEY);
+    byte[] outputMapBytes = dataStore.get(CIRCUIT_OUTPUT_MAP_KEY);
     if (outputMapBytes != null) {
       circuitSimulator.setCircuitOutputMap(circuitIndex, ArrayUtil.toIntArray(outputMapBytes));
     }
 
-    byte[] bitOutputMapBytes = state.get(CIRCUIT_BIT_OUTPUT_MAP_KEY);
+    byte[] bitOutputMapBytes = dataStore.get(CIRCUIT_BIT_OUTPUT_MAP_KEY);
     if (bitOutputMapBytes != null) {
       this.bitOutputMap = ArrayUtil.toIntArray(bitOutputMapBytes);
     }
   }
 
   @Override
-  public SimulationDataStore getState() {
+  public void updateState(AntSimulationState state) {
     Preconditions.checkState(stateSet, "State is not set");
 
     circuitSimulator.getCircuitState(circuitIndex, circuitState);
-    state.put(CIRCUIT_STATE_KEY, ArrayUtil.toByteArray(circuitState));
-    return state;
+    state.getEntityDataStore(entity).put(CIRCUIT_STATE_KEY, ArrayUtil.toByteArray(circuitState));
   }
 
-  private GeneticDataStore generateGeneticData(RandomGenerator random) {
-    try {
-      GeneticDataStore geneticData = geneticDataGenerator.generateGeneticData(
-          circuitSimulator.getCircuitStateSize(), circuitSimulator.getCircuitOutputSize(), random);
-      GeneticData bitOutputMapData = geneticDataGenerator.generateOutputMapGeneticData(
-          circuitSimulator.getCircuitOutputSize(), 32, random);
-      geneticData.put(CIRCUIT_BIT_OUTPUT_MAP_KEY, bitOutputMapData);
-
-      state.put(GeneticDataStore.KEY, geneticData.serialize());
-
-      return geneticData;
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+  private void generateGeneticData(RandomGenerator random) {
+    geneticDataGenerator.generateGeneticData(geneticDataStore,
+        circuitSimulator.getCircuitStateSize(), circuitSimulator.getCircuitOutputSize(), random);
+    GeneticData bitOutputMapData = geneticDataGenerator.generateOutputMapGeneticData(
+        circuitSimulator.getCircuitOutputSize(), 32, random);
+    geneticDataStore.put(CIRCUIT_BIT_OUTPUT_MAP_KEY, bitOutputMapData);
   }
 
-  private GeneticDataStore loadGeneticData() {
-    try {
-      return GeneticDataStore.deserialize(state.get(GeneticDataStore.KEY));
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  private void initializeCircuit(GeneticDataStore geneticData) {
+  private void initializeCircuit() {
     // Circuit state.
-    int[] circuitState = geneticDataGenerator.getCircuitState(geneticData);
+    int[] circuitState = geneticDataGenerator.getCircuitState(geneticDataStore);
     circuitSimulator.setCircuitState(circuitIndex, circuitState);
-    state.put(CIRCUIT_STATE_KEY, ArrayUtil.toByteArray(circuitState));
+    dataStore.put(CIRCUIT_STATE_KEY, ArrayUtil.toByteArray(circuitState));
 
     // Circuit output map.
-    int[] outputMap = geneticDataGenerator.getOutputMap(geneticData);
+    int[] outputMap = geneticDataGenerator.getOutputMap(geneticDataStore);
     circuitSimulator.setCircuitOutputMap(circuitIndex, outputMap);
-    state.put(CIRCUIT_OUTPUT_MAP_KEY, ArrayUtil.toByteArray(outputMap));
+    dataStore.put(CIRCUIT_OUTPUT_MAP_KEY, ArrayUtil.toByteArray(outputMap));
 
     // Bit output map.
-    byte[] bitOutputMapBytes = geneticData.get(CIRCUIT_BIT_OUTPUT_MAP_KEY).getData();
+    byte[] bitOutputMapBytes = geneticDataStore.get(CIRCUIT_BIT_OUTPUT_MAP_KEY).getData();
     this.bitOutputMap = ArrayUtil.toIntArray(bitOutputMapBytes);
-    state.put(CIRCUIT_BIT_OUTPUT_MAP_KEY, bitOutputMapBytes);
+    dataStore.put(CIRCUIT_BIT_OUTPUT_MAP_KEY, bitOutputMapBytes);
   }
 
   private void updateAntOutputData() {

@@ -1,6 +1,6 @@
 package org.mechaverse.simulation.common;
 
-import org.mechaverse.simulation.common.SimulationDataStore;
+import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 
 /**
  * Interface for a mechaverse simulation.

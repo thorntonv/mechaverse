@@ -14,7 +14,7 @@ import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.core.entity.ant.CircuitAntBehavior;
 import org.mechaverse.simulation.common.Simulation;
-import org.mechaverse.simulation.common.SimulationDataStore;
+import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -55,7 +55,7 @@ public class CircuitAntSimulationImplTest extends AbstractAntSimulationImplTest 
       int antCount = 0;
       for (Entity entity : state.getModel().getEnvironment().getEntities()) {
         if (entity instanceof Ant) {
-          SimulationDataStore entityDataStore = state.getEntityValues(entity);
+          SimulationDataStore entityDataStore = state.getEntityDataStore(entity);
           assertTrue(entityDataStore.containsKey(CircuitAntBehavior.CIRCUIT_STATE_KEY));
           assertTrue(entityDataStore.get(CircuitAntBehavior.CIRCUIT_STATE_KEY).length > 0);
           assertTrue(entityDataStore.containsKey(CircuitAntBehavior.CIRCUIT_OUTPUT_MAP_KEY));
@@ -66,8 +66,9 @@ public class CircuitAntSimulationImplTest extends AbstractAntSimulationImplTest 
         }
       }
       // State should have a model value.
-      // Each ant should have genetic data, circuit state, output map, and bit output map values.
-      assertEquals("Key set: " + state.keySet(), antCount * 4 + 1, state.keySet().size());
+      // Each ant should have circuit state genetic data, output map genetic data,
+      // bit output map genetic data, circuit state, output map, and bit output map values.
+      assertEquals("Key set: " + state.keySet(), antCount * 9 + 1, state.keySet().size());
     }
   }
 }

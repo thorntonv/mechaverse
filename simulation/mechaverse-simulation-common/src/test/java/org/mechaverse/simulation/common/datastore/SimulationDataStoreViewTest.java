@@ -6,7 +6,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -74,7 +76,7 @@ public class SimulationDataStoreViewTest {
     try {
       dataStoreView.put("newKey", "newData".getBytes());
       fail("Expected exception was not thrown.");
-    } catch (IOException e) {
+    } catch (IllegalArgumentException e) {
       // Expected.
     }
     verifyZeroInteractions(mockDataStore);
@@ -93,10 +95,23 @@ public class SimulationDataStoreViewTest {
     try {
       dataStoreView.remove("existingKey");
       fail("Expected exception was not thrown.");
-    } catch (IOException e) {
+    } catch (IllegalArgumentException e) {
       // Expected.
     }
     verifyZeroInteractions(mockDataStore);
+  }
+
+  @Test
+  public void clear() {
+    when(mockDataStore.keySet()).thenReturn(
+        ImmutableSet.of("key1", "key2", "key3", getAbsoluteKey("key1"), getAbsoluteKey("key2")));
+    when(mockVisibleKeyPredicate.apply(getAbsoluteKey("key1"))).thenReturn(true);
+    when(mockVisibleKeyPredicate.apply(getAbsoluteKey("key2"))).thenReturn(true);
+
+    dataStoreView.clear();
+    verify(mockDataStore, times(2)).remove(any(String.class));
+    verify(mockDataStore).remove(getAbsoluteKey("key1"));
+    verify(mockDataStore).remove(getAbsoluteKey("key2"));
   }
 
   @Test

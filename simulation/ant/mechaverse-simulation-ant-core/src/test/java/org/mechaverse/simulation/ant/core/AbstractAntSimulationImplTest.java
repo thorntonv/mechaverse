@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mechaverse.simulation.common.datastore.SimulationDataStoreOutputStream.toByteArray;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -19,6 +20,7 @@ import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.SimulationModel;
 import org.mechaverse.simulation.ant.api.util.EntityUtil;
+import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore;
 import org.mechaverse.simulation.common.util.RandomUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,13 +115,13 @@ public abstract class AbstractAntSimulationImplTest {
 
   @Test
   public void simulate_verifyDeterministic() throws IOException {
-    byte[] initialState = AntSimulationImpl.randomState(
-        new AntSimulationEnvironmentGenerator(), random).serialize();
+    byte[] initialState = toByteArray(AntSimulationImpl.randomState(
+        new AntSimulationEnvironmentGenerator(), random));
     AntSimulationImpl simulation1 = newSimulationImpl();
     AntSimulationImpl simulation2 = newSimulationImpl();
     assertNotEquals(simulation1, simulation2);
-    simulation1.setState(AntSimulationState.deserialize(initialState));
-    simulation2.setState(AntSimulationState.deserialize(initialState));
+    simulation1.setState(MemorySimulationDataStore.fromByteArray(initialState));
+    simulation2.setState(MemorySimulationDataStore.fromByteArray(initialState));
 
     for (int cnt = 0; cnt < 50; cnt++) {
       simulation1.step();
@@ -128,11 +130,11 @@ public abstract class AbstractAntSimulationImplTest {
       verifyStatesEqual(simulation1.getState(), simulation2.getState());
     }
 
-    byte[] state = simulation1.getState().serialize();
+    byte[] state = toByteArray(simulation1.getState());
     simulation1 = newSimulationImpl();
-    simulation1.setState(AntSimulationState.deserialize(state));
+    simulation1.setState(MemorySimulationDataStore.fromByteArray(state));
     simulation2 = newSimulationImpl();
-    simulation2.setState(AntSimulationState.deserialize(state));
+    simulation2.setState(MemorySimulationDataStore.fromByteArray(state));
 
     for (int cnt = 0; cnt < 100; cnt++) {
       simulation1.step();

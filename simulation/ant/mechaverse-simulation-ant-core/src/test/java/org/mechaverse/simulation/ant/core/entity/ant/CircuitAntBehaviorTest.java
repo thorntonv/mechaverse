@@ -9,15 +9,20 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mechaverse.simulation.common.SimulationDataStore;
+import org.mechaverse.simulation.ant.api.AntSimulationState;
+import org.mechaverse.simulation.ant.api.model.Ant;
+import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.common.circuit.CircuitAllocator;
 import org.mechaverse.simulation.common.circuit.CircuitSimulator;
 import org.mechaverse.simulation.common.circuit.CircuitUtil;
+import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 import org.mechaverse.simulation.common.genetic.CircuitGeneticDataGenerator;
 import org.mechaverse.simulation.common.genetic.GeneticData;
 import org.mechaverse.simulation.common.genetic.GeneticDataStore;
@@ -46,11 +51,12 @@ public class CircuitAntBehaviorTest {
 
   @Mock private CircuitSimulator mockCircuitSimulator;
   @Mock private CircuitAllocator mockCircuitAllocator;
-  @Mock private SimulationDataStore mockState;
 
+  private Ant ant;
   private CircuitAntBehavior behavior;
   private AntInput input;
   private RandomGenerator random;
+  private AntSimulationState state;
 
   @Before
   public void setUp() {
@@ -61,32 +67,32 @@ public class CircuitAntBehaviorTest {
     input = new AntInput();
     random = RandomUtil.newGenerator(CircuitAntBehavior.class.getName().hashCode());
     behavior = new CircuitAntBehavior(mockCircuitSimulator);
+    state = new AntSimulationState();
+
+    ant = new Ant();
+    ant.setId("001");
+    behavior.setEntity(ant);
   }
 
   @Test
   public void generateGeneticData() throws IOException {
-    behavior.setState(mockState);
+    behavior.setState(state);
     behavior.setInput(input, random);
 
     // Verify that the circuit state was initialized.
 
-    ArgumentCaptor<byte[]> circuitStateCaptor = ArgumentCaptor.forClass(byte[].class);
-    verify(mockState).put(eq(CircuitAntBehavior.CIRCUIT_STATE_KEY), circuitStateCaptor.capture());
-    assertEquals(TEST_CIRCUIT_STATE_SIZE_BYTES, circuitStateCaptor.getValue().length);
+    SimulationDataStore entityDataStore = state.getEntityDataStore(ant);
 
-    ArgumentCaptor<byte[]> outputMapCaptor = ArgumentCaptor.forClass(byte[].class);
-    verify(mockState).put(eq(CircuitAntBehavior.CIRCUIT_OUTPUT_MAP_KEY), outputMapCaptor.capture());
-    assertEquals(TEST_CIRCUIT_OUTPUT_SIZE_BYTES, outputMapCaptor.getValue().length);
+    byte[] circuitState = entityDataStore.get(CircuitAntBehavior.CIRCUIT_STATE_KEY);
+    byte[] outputMap = entityDataStore.get(CircuitAntBehavior.CIRCUIT_OUTPUT_MAP_KEY);
+    byte[] bitOutputMap = entityDataStore.get(CircuitAntBehavior.CIRCUIT_BIT_OUTPUT_MAP_KEY);
 
-    ArgumentCaptor<byte[]> bitOutputMapCaptor = ArgumentCaptor.forClass(byte[].class);
-    verify(mockState).put(eq(CircuitAntBehavior.CIRCUIT_BIT_OUTPUT_MAP_KEY),
-        bitOutputMapCaptor.capture());
-    assertEquals(TEST_CIRCUIT_OUTPUT_SIZE_BYTES, bitOutputMapCaptor.getValue().length);
+    assertEquals(TEST_CIRCUIT_STATE_SIZE_BYTES, circuitState.length);
+    assertEquals(TEST_CIRCUIT_OUTPUT_SIZE_BYTES, outputMap.length);
+    assertEquals(TEST_CIRCUIT_OUTPUT_SIZE_BYTES, bitOutputMap.length);
 
     // Verify that the genetic data was stored.
-    ArgumentCaptor<byte[]> geneticDataCaptor = ArgumentCaptor.forClass(byte[].class);
-    verify(mockState).put(eq(GeneticDataStore.KEY), geneticDataCaptor.capture());
-    GeneticDataStore geneticData = GeneticDataStore.deserialize(geneticDataCaptor.getValue());
+    GeneticDataStore geneticData = state.getEntityGeneticDataStore(ant);
     assertEquals(ImmutableSet.of(CircuitGeneticDataGenerator.CIRCUIT_STATE_KEY,
         CircuitGeneticDataGenerator.OUTPUT_MAP_KEY, CircuitAntBehavior.CIRCUIT_BIT_OUTPUT_MAP_KEY),
             geneticData.keySet());
@@ -94,65 +100,62 @@ public class CircuitAntBehaviorTest {
     // Verify that the stored genetic data matches the initial circuit state.
 
     GeneticData circuitStateData = geneticData.get(CircuitGeneticDataGenerator.CIRCUIT_STATE_KEY);
-    assertArrayEquals(circuitStateCaptor.getValue(), circuitStateData.getData());
+    assertArrayEquals(circuitState, circuitStateData.getData());
     assertNotNull(circuitStateData.getCrossoverPoints());
 
     GeneticData outputMapData = geneticData.get(CircuitGeneticDataGenerator.OUTPUT_MAP_KEY);
-    assertArrayEquals(outputMapCaptor.getValue(), outputMapData.getData());
+    assertArrayEquals(outputMap, outputMapData.getData());
     assertNotNull(outputMapData.getCrossoverPoints());
 
     GeneticData bitOutputMapData = geneticData.get(CircuitAntBehavior.CIRCUIT_BIT_OUTPUT_MAP_KEY);
-    assertArrayEquals(bitOutputMapCaptor.getValue(), bitOutputMapData.getData());
+    assertArrayEquals(bitOutputMap, bitOutputMapData.getData());
     assertNotNull(bitOutputMapData.getCrossoverPoints());
   }
 
   @Test
   public void loadGeneticData() throws IOException {
-    GeneticDataStore geneticData = createGeneticDataStore();
-    when(mockState.containsKey(GeneticDataStore.KEY)).thenReturn(true);
-    when(mockState.get(GeneticDataStore.KEY)).thenReturn(geneticData.serialize());
-    behavior.setState(mockState);
+    createGeneticDataStore(state.getEntityGeneticDataStore(ant));
+    behavior.setState(state);
     behavior.setInput(input, random);
 
     // Verify that the initial state was stored.
+    SimulationDataStore entityDataStore = state.getEntityDataStore(ant);
+    GeneticDataStore entityGeneticDataStore = state.getEntityGeneticDataStore(ant);
 
-    ArgumentCaptor<byte[]> circuitStateCaptor = ArgumentCaptor.forClass(byte[].class);
-    verify(mockState).put(eq(CircuitAntBehavior.CIRCUIT_STATE_KEY), circuitStateCaptor.capture());
-    assertArrayEquals(geneticData.get(CircuitGeneticDataGenerator.CIRCUIT_STATE_KEY).getData(),
-        circuitStateCaptor.getValue());
+    byte[] expectedCircuitState = entityGeneticDataStore
+        .get(CircuitGeneticDataGenerator.CIRCUIT_STATE_KEY).getData();
+    byte[] expectedOutputMap = entityGeneticDataStore
+        .get(CircuitGeneticDataGenerator.OUTPUT_MAP_KEY).getData();
 
-    ArgumentCaptor<byte[]> outputMapCaptor = ArgumentCaptor.forClass(byte[].class);
-    verify(mockState).put(eq(CircuitAntBehavior.CIRCUIT_OUTPUT_MAP_KEY), outputMapCaptor.capture());
-    assertArrayEquals(geneticData.get(CircuitGeneticDataGenerator.OUTPUT_MAP_KEY).getData(),
-        outputMapCaptor.getValue());
-
-    ArgumentCaptor<byte[]> bitOutputMapCaptor = ArgumentCaptor.forClass(byte[].class);
-    verify(mockState).put(eq(CircuitAntBehavior.CIRCUIT_BIT_OUTPUT_MAP_KEY),
-        bitOutputMapCaptor.capture());
-    assertArrayEquals(geneticData.get(CircuitAntBehavior.CIRCUIT_BIT_OUTPUT_MAP_KEY).getData(),
-      bitOutputMapCaptor.getValue());
+    assertArrayEquals(
+        expectedCircuitState, entityDataStore.get(CircuitAntBehavior.CIRCUIT_STATE_KEY));
+    assertArrayEquals(
+        expectedOutputMap, entityDataStore.get(CircuitAntBehavior.CIRCUIT_OUTPUT_MAP_KEY));
+    assertArrayEquals(
+        entityGeneticDataStore.get(CircuitAntBehavior.CIRCUIT_BIT_OUTPUT_MAP_KEY).getData(),
+        entityDataStore.get(CircuitAntBehavior.CIRCUIT_BIT_OUTPUT_MAP_KEY));
 
     // Verify that the circuit simulator was initialized.
 
     verify(mockCircuitSimulator).setCircuitState(eq(0),
-        eq(ArrayUtil.toIntArray(circuitStateCaptor.getValue())));
+        eq(ArrayUtil.toIntArray(expectedCircuitState)));
     verify(mockCircuitSimulator).setCircuitOutputMap(eq(0),
-        eq(ArrayUtil.toIntArray(outputMapCaptor.getValue())));
+        eq(ArrayUtil.toIntArray(expectedOutputMap)));
   }
 
   @Test
   public void setInput() {
     input = new AntInput(
         ArrayUtil.toIntArray(RandomUtil.randomBytes(AntInput.DATA_SIZE * 4, random)));
+    behavior.setState(state);
     behavior.setInput(input, random);
     verify(mockCircuitSimulator).setCircuitInput(0, input.getData());
   }
 
   @Test
   public void getOutput() throws IOException {
-    GeneticDataStore geneticData = createGeneticDataStore();
-    when(mockState.containsKey(GeneticDataStore.KEY)).thenReturn(true);
-    when(mockState.get(GeneticDataStore.KEY)).thenReturn(geneticData.serialize());
+    GeneticDataStore geneticData = state.getEntityGeneticDataStore(ant);
+    createGeneticDataStore(geneticData);
 
     final int[] circuitOutput = ArrayUtil.toIntArray(
         RandomUtil.randomBytes(TEST_CIRCUIT_OUTPUT_SIZE_BYTES, random));
@@ -166,7 +169,7 @@ public class CircuitAntBehaviorTest {
         return null;
       }
     }).when(mockCircuitSimulator).getCircuitOutput(eq(0), circuitOutputCaptor.capture());
-    behavior.setState(mockState);
+    behavior.setState(state);
     behavior.setInput(input, random);
     int[] antOutputData = behavior.getOutput(random).getData();
     assertEquals(AntOutput.DATA_SIZE, antOutputData.length);
@@ -181,19 +184,34 @@ public class CircuitAntBehaviorTest {
 
   @Test
   public void onRemoveEntity() {
+    Entity otherEntity = new Entity();
+    otherEntity.setId("100");
+    createGeneticDataStore(state.getEntityGeneticDataStore(otherEntity));
+
+    Set<String> expectedKeySet = new HashSet<String>(state.keySet());
+
+    GeneticDataStore geneticData = state.getEntityGeneticDataStore(ant);
+    createGeneticDataStore(geneticData);
+
+    behavior.setState(state);
+    behavior.setInput(input, random);
+
     behavior.onRemoveEntity();
 
     verify(mockCircuitAllocator).deallocateCircuit(0);
+    assertEquals(expectedKeySet, state.keySet());
   }
 
   @Test
-  public void setState() {
+  public void setState() throws IOException {
     byte[] circuitStateBytes = RandomUtil.randomBytes(TEST_CIRCUIT_STATE_SIZE_BYTES, random);
     byte[] outputMapBytes = RandomUtil.randomBytes(TEST_CIRCUIT_OUTPUT_SIZE_BYTES, random);
-    when(mockState.get(CircuitAntBehavior.CIRCUIT_STATE_KEY)).thenReturn(circuitStateBytes);
-    when(mockState.get(CircuitAntBehavior.CIRCUIT_OUTPUT_MAP_KEY)).thenReturn(outputMapBytes);
 
-    behavior.setState(mockState);
+    SimulationDataStore dataStore = state.getEntityDataStore(ant);
+    dataStore.put(CircuitAntBehavior.CIRCUIT_STATE_KEY, circuitStateBytes);
+    dataStore.put(CircuitAntBehavior.CIRCUIT_OUTPUT_MAP_KEY, outputMapBytes);
+
+    behavior.setState(state);
 
     verify(mockCircuitSimulator)
         .setCircuitState(eq(0), eq(ArrayUtil.toIntArray(circuitStateBytes)));
@@ -202,9 +220,11 @@ public class CircuitAntBehaviorTest {
   }
 
   @Test
-  public void getState() {
+  public void updateState() throws IOException {
     final byte[] circuitStateBytes = RandomUtil.randomBytes(TEST_CIRCUIT_STATE_SIZE_BYTES, random);
-    when(mockState.get(CircuitAntBehavior.CIRCUIT_STATE_KEY)).thenReturn(circuitStateBytes);
+    SimulationDataStore entityDataStore = state.getEntityDataStore(ant);
+    entityDataStore.put(CircuitAntBehavior.CIRCUIT_STATE_KEY, new byte[0]);
+
     final ArgumentCaptor<int[]> circuitStateCaptor = ArgumentCaptor.forClass(int[].class);
     doAnswer(new Answer<Void>() {
       @Override
@@ -217,30 +237,25 @@ public class CircuitAntBehaviorTest {
       }
     }).when(mockCircuitSimulator).getCircuitState(eq(0), circuitStateCaptor.capture());
 
-    behavior.setState(mockState);
-    SimulationDataStore state = behavior.getState();
-    assertEquals(mockState, state);
-    verify(mockState).put(eq(CircuitAntBehavior.CIRCUIT_STATE_KEY), eq(circuitStateBytes));
+    behavior.setState(state);
+    behavior.updateState(state);
+    assertArrayEquals(circuitStateBytes, entityDataStore.get(CircuitAntBehavior.CIRCUIT_STATE_KEY));
   }
 
-  private GeneticDataStore createGeneticDataStore() {
-    GeneticDataStore dataStore = new GeneticDataStore();
-
+  private void createGeneticDataStore(GeneticDataStore geneticDataStore) {
     GeneticData circuitStateData = new GeneticData(RandomUtil.randomBytes(
         TEST_CIRCUIT_STATE_SIZE_BYTES, random), new int[0]);
-    dataStore.put(CircuitGeneticDataGenerator.CIRCUIT_STATE_KEY, circuitStateData);
+    geneticDataStore.put(CircuitGeneticDataGenerator.CIRCUIT_STATE_KEY, circuitStateData);
 
     GeneticData outputMapData = new GeneticData(RandomUtil.randomBytes(
         TEST_CIRCUIT_OUTPUT_SIZE_BYTES, random), new int[0]);
-    dataStore.put(CircuitGeneticDataGenerator.OUTPUT_MAP_KEY, outputMapData);
+    geneticDataStore.put(CircuitGeneticDataGenerator.OUTPUT_MAP_KEY, outputMapData);
 
     int[] bitOutputMap = new int[TEST_CIRCUIT_OUTPUT_SIZE];
     for (int idx = 0; idx < bitOutputMap.length; idx++) {
       bitOutputMap[idx] = random.nextInt(Integer.SIZE);
     }
     GeneticData bitOutputMapData = new GeneticData(ArrayUtil.toByteArray(bitOutputMap), new int[0]);
-    dataStore.put(CircuitAntBehavior.CIRCUIT_BIT_OUTPUT_MAP_KEY, bitOutputMapData);
-
-    return dataStore;
+    geneticDataStore.put(CircuitAntBehavior.CIRCUIT_BIT_OUTPUT_MAP_KEY, bitOutputMapData);
   }
 }

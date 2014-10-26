@@ -44,6 +44,8 @@ public final class EnvironmentSimulator implements EntityManager {
   private final ActiveEntityProviders activeEntityProviders;
   private final List<AntSimulationModule> modules;
 
+  private AntSimulationState state;
+
   private EnvironmentSimulator(Environment environment, ActiveEntityProviders activeEntityProviders,
       List<AntSimulationModule> modules) {
     this.environment = new CellEnvironment(environment);
@@ -60,6 +62,8 @@ public final class EnvironmentSimulator implements EntityManager {
   }
 
   public void update(AntSimulationState state, RandomGenerator random) {
+    this.state = state;
+
     for (AntSimulationModule module : modules) {
       module.beforeUpdate(state, environment, this, random);
     }
@@ -94,6 +98,9 @@ public final class EnvironmentSimulator implements EntityManager {
     ActiveEntityProvider activeEntityProvider = activeEntityProviders.get(entity);
     if (activeEntityProvider != null) {
       ActiveEntity activeEntity = activeEntityProvider.getActiveEntity(entity);
+      if (state != null) {
+        activeEntity.setState(state);
+      }
       activeEntities.put(activeEntity.getEntity(), activeEntity);
     }
     for (EntityManager.Observer observer : observers) {

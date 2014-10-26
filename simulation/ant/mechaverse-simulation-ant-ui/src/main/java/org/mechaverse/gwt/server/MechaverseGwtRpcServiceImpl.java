@@ -10,13 +10,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
-import org.apache.cxf.helpers.IOUtils;
 import org.mechaverse.gwt.shared.MechaverseGwtRpcService;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.model.SimulationModel;
 import org.mechaverse.simulation.common.Simulation;
-import org.mechaverse.simulation.common.SimulationDataStore;
+import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore.MemorySimulationDataStoreInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
@@ -58,9 +57,15 @@ public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
     try {
       Simulation service = getSimulation();
       synchronized (service) {
-        InputStream stateIn = getStorageService().getState(simulationId, instanceId, iteration);
-        service.setState(SimulationDataStore.deserialize(IOUtils.readBytesFromStream(stateIn)));
-        return getModel();
+        InputStream in = getStorageService().getState(simulationId, instanceId, iteration);
+        MemorySimulationDataStoreInputStream stateIn = new MemorySimulationDataStoreInputStream(in);
+        try {
+          service.setState(stateIn.readDataStore());
+          return getModel();
+        } finally {
+          in.close();
+          stateIn.close();
+        }
       }
     } catch (Throwable t) {
       t.printStackTrace();

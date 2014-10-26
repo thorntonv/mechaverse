@@ -5,8 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -17,8 +15,11 @@ import javax.xml.bind.Unmarshaller;
 
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.SimulationModel;
-import org.mechaverse.simulation.common.SimulationDataStore;
 import org.mechaverse.simulation.common.SimulationState;
+import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore;
+import org.mechaverse.simulation.common.datastore.SimulationDataStore;
+import org.mechaverse.simulation.common.datastore.SimulationDataStoreView;
+import org.mechaverse.simulation.common.genetic.GeneticDataStore;
 
 /**
  * The ant simulation state.
@@ -26,20 +27,10 @@ import org.mechaverse.simulation.common.SimulationState;
 public final class AntSimulationState extends SimulationState<SimulationModel> {
 
   public static final String MODEL_KEY = "model";
-
-  private static final String ENTITY_KEY_PREFIX = "entity.";
-
-  public static AntSimulationState deserialize(byte[] data) throws IOException {
-    return deserialize(new ByteArrayInputStream(data));
-  }
-
-  public static AntSimulationState deserialize(InputStream in) throws IOException {
-    SimulationDataStore dataStore = SimulationDataStore.deserialize(in);
-    return new AntSimulationState(dataStore);
-  }
+  public static final String ENTITY_DATA_ROOT_KEY = "entity";
 
   public AntSimulationState() {
-    super(new SimulationModel(), new SimulationDataStore());
+    super(new SimulationModel(), new MemorySimulationDataStore());
 
     // Add placeholder for the model. This will be serialized when requested.
     put(MODEL_KEY, new byte[0]);
@@ -73,57 +64,13 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
     return super.get(key);
   }
 
-  @Override
-  public byte[] serialize() throws IOException {
-    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-    serialize(byteOut);
-    return byteOut.toByteArray();
+  public SimulationDataStore getEntityDataStore(Entity entity) {
+    return new SimulationDataStoreView(getEntityRootKey(entity), this);
   }
 
-  public boolean containsEntityKey(Entity entity, String key) {
-    return containsKey(getEntityKey(entity, key));
-  }
-
-  public byte[] getEntityValue(Entity entity, String key) {
-    return get(getEntityKey(entity, key));
-  }
-
-  public void removeAllEntityValues() {
-    Set<String> keys = new HashSet<>(keySet());
-    for (String key : keys) {
-      if (key.startsWith(ENTITY_KEY_PREFIX)) {
-        remove(key);
-      }
-    }
-  }
-
-  public SimulationDataStore getEntityValues(Entity entity) {
-    SimulationDataStore entityDataStore = new SimulationDataStore();
-    String entityKeyPrefix = getEntityKeyPrefix(entity) + ".";
-    for (String key : keySet()) {
-      if (key.startsWith(entityKeyPrefix)) {
-        byte[] value = get(key);
-        String entityKey = key.substring(entityKeyPrefix.length());
-        entityDataStore.put(entityKey, value);
-      }
-    }
-    return entityDataStore;
-  }
-
-  public void putEntityValue(Entity entity, String key, byte[] value) {
-    put(getEntityKey(entity, key), value);
-  }
-
-  public void putEntityValues(Entity entity, SimulationDataStore entityDataStore) {
-    for (String key : entityDataStore.keySet()) {
-      putEntityValue(entity, key, entityDataStore.get(key));
-    }
-  }
-
-  @Override
-  public void serialize(OutputStream out) throws IOException {
-    put(MODEL_KEY, serializeModel());
-    super.serialize(out);
+  public GeneticDataStore getEntityGeneticDataStore(Entity entity) {
+    return new GeneticDataStore(
+        new SimulationDataStoreView(GeneticDataStore.KEY, getEntityDataStore(entity)));
   }
 
   public static void serializeModel(SimulationModel model, OutputStream out) throws IOException {
@@ -149,19 +96,15 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
     }
   }
 
+  private String getEntityRootKey(Entity entity) {
+    return ENTITY_DATA_ROOT_KEY + SimulationDataStore.KEY_SEPARATOR + entity.getId();
+  }
+
   private byte[] serializeModel() throws IOException {
     ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
     try (OutputStream out = new GZIPOutputStream(byteOut)) {
       serializeModel(model, out);
     }
     return byteOut.toByteArray();
-  }
-
-  private String getEntityKeyPrefix(Entity entity) {
-    return ENTITY_KEY_PREFIX + entity.getId();
-  }
-
-  private String getEntityKey(Entity entity, String key) {
-    return getEntityKeyPrefix(entity) + "." + key;
   }
 }

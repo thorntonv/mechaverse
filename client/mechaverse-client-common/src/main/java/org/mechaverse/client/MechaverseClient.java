@@ -1,6 +1,5 @@
 package org.mechaverse.client;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.ConnectException;
 import java.util.ArrayList;
@@ -10,13 +9,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.cxf.helpers.IOUtils;
 import org.mechaverse.common.MechaverseConfig;
 import org.mechaverse.service.manager.api.MechaverseManager;
 import org.mechaverse.service.manager.api.model.Task;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
 import org.mechaverse.simulation.common.Simulation;
-import org.mechaverse.simulation.common.SimulationDataStore;
+import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore.MemorySimulationDataStoreInputStream;
+import org.mechaverse.simulation.common.datastore.SimulationDataStore;
+import org.mechaverse.simulation.common.datastore.SimulationDataStoreInputStream;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -114,9 +114,17 @@ public class MechaverseClient {
       if (task.getIteration() >= 0) {
         // Get the state from the storage service.
         logSubOperationStart("Retrieving simulation state");
-        InputStream stateIn = storageService.getState(
+        InputStream in = storageService.getState(
             task.getSimulationId(), task.getInstanceId(), task.getIteration());
-        state = SimulationDataStore.deserialize(IOUtils.readBytesFromStream(stateIn));
+        MemorySimulationDataStoreInputStream stateIn = new MemorySimulationDataStoreInputStream(in);
+
+        try {
+          state = stateIn.readDataStore();
+        } finally {
+          stateIn.close();
+          in.close();
+        }
+
         logOperationDone();
       } else {
         // Generate a new state.
@@ -138,7 +146,8 @@ public class MechaverseClient {
 
       // Submit result.
       logSubOperationStart("Submitting result");
-      manager.submitResult(task.getId(), new ByteArrayInputStream(state.serialize()));
+
+      manager.submitResult(task.getId(), SimulationDataStoreInputStream.newInputStream(state));
       logOperationDone();
     } catch (Throwable ex) {
       printErrorMessage(ex);
