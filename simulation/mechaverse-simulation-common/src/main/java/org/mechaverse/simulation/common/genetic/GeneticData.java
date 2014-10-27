@@ -18,9 +18,9 @@ public class GeneticData {
 
   public static class Builder {
 
-    private final ByteArrayOutputStream out = new ByteArrayOutputStream();
+    private final ByteArrayOutputStream out = new ByteArrayOutputStream(512*1024);
     private final DataOutputStream dataOut = new DataOutputStream(out);
-    private final TIntArrayList crossoverPoints = new TIntArrayList();
+    private final TIntArrayList crossoverPoints = new TIntArrayList(128*1024);
 
     public Builder write(byte[] data) {
       try {

@@ -136,7 +136,7 @@ public abstract class AbstractAntSimulationImplTest {
     simulation2 = newSimulationImpl();
     simulation2.setState(MemorySimulationDataStore.fromByteArray(state));
 
-    for (int cnt = 0; cnt < 100; cnt++) {
+    for (int cnt = 0; cnt < 50; cnt++) {
       simulation1.step();
       simulation2.step();
 

@@ -12,6 +12,7 @@ public final class AntOutput {
   public static final TurnDirection[] TURN_DIRECTIONS = TurnDirection.values();
 
   public static final int DATA_SIZE = 1;
+  public static final int DATA_SIZE_BYTES = DATA_SIZE * 4;
 
   // TODO(thorntonv) Implement general output.
   // TODO(thorntonv) Implement attack output.

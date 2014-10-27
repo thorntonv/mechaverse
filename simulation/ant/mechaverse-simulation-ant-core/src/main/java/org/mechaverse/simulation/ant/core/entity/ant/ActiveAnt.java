@@ -1,5 +1,7 @@
 package org.mechaverse.simulation.ant.core.entity.ant;
 
+import java.io.IOException;
+
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.model.Ant;
@@ -20,6 +22,8 @@ import org.springframework.beans.factory.annotation.Value;
  * the environment and is able to perform actions.
  */
 public final class ActiveAnt implements ActiveEntity {
+
+  public static final String OUTPUT_REPLAY_DATA_KEY = "outputReplayData";
 
   /**
    * Determines the action an ant should take based on the input.
@@ -54,6 +58,7 @@ public final class ActiveAnt implements ActiveEntity {
   private final AntBehavior behavior;
   private EntityType carriedEntityType = EntityType.NONE;
   private final AntInput input = new AntInput();
+  private AntOutputDataOutputStream outputReplayDataOutputStream = new AntOutputDataOutputStream();
 
   public ActiveAnt(Ant entity, AntBehavior behavior) {
     this.entity = entity;
@@ -158,6 +163,10 @@ public final class ActiveAnt implements ActiveEntity {
       RandomGenerator random) {
     AntOutput output = behavior.getOutput(random);
 
+    try {
+      outputReplayDataOutputStream.writeAntOutput(output);
+    } catch (IOException e) {}
+
     Cell cell = env.getCell(entity);
     Cell frontCell = env.getCellInDirection(cell, entity.getDirection());
 
@@ -257,11 +266,15 @@ public final class ActiveAnt implements ActiveEntity {
   @Override
   public void setState(AntSimulationState state) {
     behavior.setState(state);
+    // Output replay data will contain all outputs since the state was last set.
+    outputReplayDataOutputStream = new AntOutputDataOutputStream();
   }
 
   @Override
   public void updateState(AntSimulationState state) {
     behavior.updateState(state);
+    state.getEntityReplayDataStore(entity).put(
+        OUTPUT_REPLAY_DATA_KEY, outputReplayDataOutputStream.toByteArray());
   }
 
   private boolean moveForward(Cell cell, Cell frontCell, CellEnvironment env) {

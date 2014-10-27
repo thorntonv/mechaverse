@@ -40,7 +40,7 @@ public class CircuitAntSimulationImplTest extends AbstractAntSimulationImplTest 
 
   @Override
   protected int testIterationCount() {
-    return 100;
+    return 500;
   }
 
   @Test
@@ -67,8 +67,9 @@ public class CircuitAntSimulationImplTest extends AbstractAntSimulationImplTest 
       }
       // State should have a model value.
       // Each ant should have circuit state genetic data, output map genetic data,
-      // bit output map genetic data, circuit state, output map, and bit output map values.
-      assertEquals("Key set: " + state.keySet(), antCount * 9 + 1, state.keySet().size());
+      // bit output map genetic data, circuit state, output map, bit output map values, and
+      // output replay data.
+      assertEquals("Key set: " + state.keySet(), antCount * 10 + 1, state.keySet().size());
     }
   }
 }

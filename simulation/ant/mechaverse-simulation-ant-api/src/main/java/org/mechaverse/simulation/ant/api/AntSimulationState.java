@@ -28,6 +28,7 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
 
   public static final String MODEL_KEY = "model";
   public static final String ENTITY_DATA_ROOT_KEY = "entity";
+  public static final String REPLAY_DATA_ROOT_KEY = "replay";
 
   public AntSimulationState() {
     super(new SimulationModel(), new MemorySimulationDataStore());
@@ -71,6 +72,11 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
   public GeneticDataStore getEntityGeneticDataStore(Entity entity) {
     return new GeneticDataStore(
         new SimulationDataStoreView(GeneticDataStore.KEY, getEntityDataStore(entity)));
+  }
+
+  public SimulationDataStore getEntityReplayDataStore(Entity entity) {
+    return new SimulationDataStoreView(
+        REPLAY_DATA_ROOT_KEY + SimulationDataStore.KEY_SEPARATOR + getEntityRootKey(entity), this);
   }
 
   public static void serializeModel(SimulationModel model, OutputStream out) throws IOException {
