@@ -48,6 +48,19 @@ public abstract class AbstractCircuitSimulatorTest {
   }
 
   @Test
+  public void getAndSetState() throws Exception {
+    CircuitSimulator circuitSimulator = newCircuitSimulator(routingCircuit, 1);
+
+    int[] expectedCircuitState = new int[circuitSimulator.getCircuitStateSize()];
+    CircuitTestUtil.setRandomState(expectedCircuitState);
+    circuitSimulator.setCircuitState(0, expectedCircuitState);
+    int[] actualCircuitState = new int[circuitSimulator.getCircuitStateSize()];
+    circuitSimulator.getCircuitState(0, actualCircuitState);
+
+    assertArrayEquals(expectedCircuitState, actualCircuitState);
+  }
+
+  @Test
   public void routingCircuit_stateSize() throws Exception {
     CircuitSimulator circuitSimulator = newCircuitSimulator(routingCircuit, 1);
 

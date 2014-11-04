@@ -148,6 +148,11 @@ public final class OpenClCircuitSimulator implements CircuitSimulator {
       queue.finish();
       finished = true;
     }
+    if (circuitStateUpdated) {
+      // Finish the write before starting the read.
+      queue.putWriteBuffer(stateBuffer, true);
+      circuitStateUpdated = false;
+    }
     queue.putReadBuffer(stateBuffer, true);
     stateBuffer.getBuffer().position(circuitIndex * circuitStateSize);
     stateBuffer.getBuffer().get(circuitState);
