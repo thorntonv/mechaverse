@@ -18,14 +18,26 @@ public class PheromoneDecayModule implements AntSimulationModule {
   @Value("#{properties['pheromoneDecayInterval']}") private int decayInterval;
 
   @Override
-  public void onAddEntity(Entity entity) {}
+  public void setState(AntSimulationState state, CellEnvironment env, EntityManager entityManager) {
+  }
 
   @Override
-  public void onRemoveEntity(Entity entity) {}
+  public void updateState(AntSimulationState state, CellEnvironment env,
+      EntityManager entityManager) {}
+
+  @Override
+  public void onAddEntity(Entity entity, AntSimulationState state) {}
+
+  @Override
+  public void onRemoveEntity(Entity entity, AntSimulationState state) {}
 
   @Override
   public void beforeUpdate(AntSimulationState state, CellEnvironment env,
-      EntityManager entityManager, RandomGenerator random) {}
+      EntityManager entityManager, RandomGenerator random) {
+    if (state.getModel().getIteration() % decayInterval == 0) {
+      decayPheromones(decayInterval, env, entityManager);
+    }
+  }
 
   @Override
   public void beforePerformAction(AntSimulationState state, CellEnvironment env,
@@ -33,11 +45,7 @@ public class PheromoneDecayModule implements AntSimulationModule {
 
   @Override
   public void afterUpdate(AntSimulationState state, CellEnvironment env,
-      EntityManager entityManager, RandomGenerator random) {
-    if (state.getModel().getIteration() % decayInterval == 0) {
-      decayPheromones(decayInterval, env, entityManager);
-    }
-  }
+      EntityManager entityManager, RandomGenerator random) {}
 
   /**
    * Decays all pheromones by the specified amount. Pheromones that are fully decayed will be

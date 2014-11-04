@@ -69,11 +69,7 @@ public final class AntSimulationImpl implements Simulation {
   @Override
   public AntSimulationState getState() {
     for (EnvironmentSimulator environmentSimulation : environmentSimulations) {
-      environmentSimulation.updateModel();
-
-      for (ActiveEntity activeEntity : environmentSimulation.getActiveEntities()) {
-        activeEntity.updateState(state);
-      }
+      environmentSimulation.updateState(state);
     }
     return state;
   }
@@ -87,15 +83,18 @@ public final class AntSimulationImpl implements Simulation {
     this.state = state;
     SimulationModel simulationModel = state.getModel();
 
+    // Close the existing environment simulations.
+    for (EnvironmentSimulator environmentSimulation : environmentSimulations) {
+      environmentSimulation.close();
+    }
+
     environmentSimulations.clear();
     for (Environment environment : SimulationModelUtil.getEnvironments(simulationModel)) {
-      environmentSimulations.add(environmentSimulatorFactory.create(environment));
+      environmentSimulations.add(environmentSimulatorFactory.create(environment.getId()));
     }
 
     for (EnvironmentSimulator environmentSimulation : environmentSimulations) {
-      for (ActiveEntity activeEntity : environmentSimulation.getActiveEntities()) {
-        activeEntity.setState(state);
-      }
+      environmentSimulation.setState(state);
     }
   }
 
@@ -112,12 +111,13 @@ public final class AntSimulationImpl implements Simulation {
 
     random.setSeed(Long.valueOf(simulationModel.getSeed()));
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("seed = {}", simulationModel.getSeed());
-    }
-
     for (EnvironmentSimulator environmentSimulation : environmentSimulations) {
       environmentSimulation.update(state, random);
+    }
+
+    if (logger.isDebugEnabled()) {
+      // Print seed after updating environments in case seed is changed.
+      logger.debug("seed = {}", simulationModel.getSeed());
     }
 
     // Set the seed to be used for the next step.

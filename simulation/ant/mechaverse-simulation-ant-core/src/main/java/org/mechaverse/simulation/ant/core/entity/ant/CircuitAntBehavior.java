@@ -1,5 +1,7 @@
 package org.mechaverse.simulation.ant.core.entity.ant;
 
+import java.util.Arrays;
+
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.model.Ant;
@@ -10,8 +12,8 @@ import org.mechaverse.simulation.common.genetic.CircuitGeneticDataGenerator;
 import org.mechaverse.simulation.common.genetic.GeneticData;
 import org.mechaverse.simulation.common.genetic.GeneticDataStore;
 import org.mechaverse.simulation.common.util.ArrayUtil;
-
-import com.google.common.base.Preconditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link AntBehavior} implementation that is based on a simulated circuit.
@@ -21,6 +23,8 @@ public class CircuitAntBehavior implements AntBehavior {
   public static final String CIRCUIT_STATE_KEY = "circuitState";
   public static final String CIRCUIT_OUTPUT_MAP_KEY = "circuitOutputMap";
   public static final String CIRCUIT_BIT_OUTPUT_MAP_KEY = "circuitBitOutputMap";
+
+  private static final Logger logger = LoggerFactory.getLogger(CircuitAntBehavior.class);
 
   private Ant entity;
   private final int circuitIndex;
@@ -93,8 +97,11 @@ public class CircuitAntBehavior implements AntBehavior {
     // If the ant has an existing circuit state then load it.
     byte[] circuitStateBytes = dataStore.get(CIRCUIT_STATE_KEY);
     if (circuitStateBytes != null) {
-      circuitSimulator.setCircuitState(circuitIndex, ArrayUtil.toIntArray(circuitStateBytes));
+      int[] circuitState = ArrayUtil.toIntArray(circuitStateBytes);
+      circuitSimulator.setCircuitState(circuitIndex, circuitState);
       stateSet = true;
+      logger.trace("setState {} circuitState = {}", entity.getId(),
+          Arrays.hashCode(circuitState));
     }
 
     byte[] outputMapBytes = dataStore.get(CIRCUIT_OUTPUT_MAP_KEY);
@@ -110,10 +117,12 @@ public class CircuitAntBehavior implements AntBehavior {
 
   @Override
   public void updateState(AntSimulationState state) {
-    Preconditions.checkState(stateSet, "State is not set");
-
-    circuitSimulator.getCircuitState(circuitIndex, circuitState);
-    state.getEntityDataStore(entity).put(CIRCUIT_STATE_KEY, ArrayUtil.toByteArray(circuitState));
+    if(stateSet) {
+      circuitSimulator.getCircuitState(circuitIndex, circuitState);
+      state.getEntityDataStore(entity).put(CIRCUIT_STATE_KEY, ArrayUtil.toByteArray(circuitState));
+      logger.trace("updateState {} circuitState = {}", entity.getId(),
+          Arrays.hashCode(circuitState));
+    }
   }
 
   private void generateGeneticData(RandomGenerator random) {
@@ -129,6 +138,8 @@ public class CircuitAntBehavior implements AntBehavior {
     int[] circuitState = geneticDataGenerator.getCircuitState(geneticDataStore);
     circuitSimulator.setCircuitState(circuitIndex, circuitState);
     dataStore.put(CIRCUIT_STATE_KEY, ArrayUtil.toByteArray(circuitState));
+    logger.trace("initializeCircuit {} circuitState = {}", entity.getId(),
+        Arrays.hashCode(circuitState));
 
     // Circuit output map.
     int[] outputMap = geneticDataGenerator.getOutputMap(geneticDataStore);

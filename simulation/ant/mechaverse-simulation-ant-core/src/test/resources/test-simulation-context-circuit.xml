@@ -11,14 +11,14 @@
   <context:annotation-config />
 
   <util:properties id="properties">
-    <prop key="antMaxCount">500</prop>
-    <prop key="antInitialEnergy">36000</prop>
-    <prop key="antMinReproductiveAge">6000</prop>
-    <prop key="foodMinCount">1500</prop>
+    <prop key="antMaxCount">4</prop>
+    <prop key="antInitialEnergy">100</prop>
+    <prop key="antMinReproductiveAge">25</prop>
+    <prop key="foodMinCount">1000</prop>
     <prop key="foodClusterRadius">15</prop>
-    <prop key="foodInitialEnergy">18000</prop>
-    <prop key="pheromoneInitialEnergy">3600</prop>
-    <prop key="pheromoneDecayInterval">3600</prop>
+    <prop key="foodInitialEnergy">10</prop>
+    <prop key="pheromoneInitialEnergy">100</prop>
+    <prop key="pheromoneDecayInterval">100</prop>
   </util:properties>
 
   <bean class="org.mechaverse.simulation.ant.core.AntSimulationImpl" lazy-init="true" />
@@ -28,13 +28,11 @@
   <bean class="org.mechaverse.simulation.common.opencl.CompositeOpenClCircuitSimulatorFactory" 
       name="CompositeCircuitSimulatorFactory">
     <constructor-arg index="0" value="4" />
-    <constructor-arg index="1" value="125" />
+    <constructor-arg index="1" value="1" />
     <constructor-arg index="2" >
       <util:constant static-field="org.mechaverse.simulation.ant.core.entity.ant.AntInput.DATA_SIZE" />
     </constructor-arg>
-    <constructor-arg index="3" >
-      <util:constant static-field="org.mechaverse.simulation.ant.core.entity.ant.AntOutput.DATA_SIZE" />
-    </constructor-arg>
+    <constructor-arg index="3" value="32" />
     <constructor-arg index="4"><ref bean="circuitDataSource" /></constructor-arg>
   </bean>
   

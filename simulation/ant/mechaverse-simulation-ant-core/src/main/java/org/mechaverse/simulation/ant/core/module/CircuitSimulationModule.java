@@ -18,10 +18,18 @@ public class CircuitSimulationModule implements AntSimulationModule {
   private CircuitSimulator circuitSimulator;
 
   @Override
-  public void onAddEntity(Entity entity) {}
+  public void setState(AntSimulationState state, CellEnvironment env, EntityManager entityManager) {
+  }
 
   @Override
-  public void onRemoveEntity(Entity entity) {}
+  public void updateState(AntSimulationState state, CellEnvironment env,
+      EntityManager entityManager) {}
+
+  @Override
+  public void onAddEntity(Entity entity, AntSimulationState state) {}
+
+  @Override
+  public void onRemoveEntity(Entity entity, AntSimulationState state) {}
 
   @Override
   public void beforeUpdate(AntSimulationState state, CellEnvironment env,

@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
+import org.mechaverse.simulation.ant.api.SimulationModelUtil;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.Environment;
 import org.mechaverse.simulation.ant.core.module.AntSimulationModule;
@@ -21,7 +22,7 @@ import com.google.common.collect.Sets;
 /**
  * Simulates an environment.
  */
-public final class EnvironmentSimulator implements EntityManager {
+public final class EnvironmentSimulator implements EntityManager, AutoCloseable {
 
   public static class Factory {
 
@@ -29,16 +30,17 @@ public final class EnvironmentSimulator implements EntityManager {
     @Autowired private ActiveEntityProviders activeEntityProviders;
     @Autowired private ObjectFactory<List<AntSimulationModule>> modulesFactory;
 
-    public EnvironmentSimulator create(Environment environment) {
+    public EnvironmentSimulator create(String environmentId) {
       EnvironmentSimulator environmentSimulator =
-          new EnvironmentSimulator(environment, activeEntityProviders, modulesFactory.getObject());
+          new EnvironmentSimulator(environmentId, activeEntityProviders, modulesFactory.getObject());
       context.getAutowireCapableBeanFactory().autowireBean(environmentSimulator);
       return environmentSimulator;
     }
   }
 
 
-  private final CellEnvironment environment;
+  private final String environmentId;
+  private CellEnvironment environment;
   private final Map<Entity, ActiveEntity> activeEntities = new LinkedHashMap<>();
   private final Set<EntityManager.Observer> observers = Sets.newLinkedHashSet();
   private final ActiveEntityProviders activeEntityProviders;
@@ -46,19 +48,11 @@ public final class EnvironmentSimulator implements EntityManager {
 
   private AntSimulationState state;
 
-  private EnvironmentSimulator(Environment environment, ActiveEntityProviders activeEntityProviders,
+  private EnvironmentSimulator(String environmentId, ActiveEntityProviders activeEntityProviders,
       List<AntSimulationModule> modules) {
-    this.environment = new CellEnvironment(environment);
-    this.activeEntityProviders =activeEntityProviders;
+    this.environmentId = environmentId;
+    this.activeEntityProviders = activeEntityProviders;
     this.modules = modules;
-
-    for (Entity entity : environment.getEntities()) {
-      addEntity(entity);
-    }
-
-    for(AntSimulationModule module : modules) {
-      addObserver(module);
-    }
   }
 
   public void update(AntSimulationState state, RandomGenerator random) {
@@ -89,7 +83,39 @@ public final class EnvironmentSimulator implements EntityManager {
     }
   }
 
-  public void updateModel() {
+  public void setState(AntSimulationState state) {
+    cleanUp();
+
+    this.state = state;
+
+    for (AntSimulationModule module : modules) {
+      module.setState(state, environment, this);
+    }
+
+    Environment environmentModel = SimulationModelUtil.getEnvironment(
+        state.getModel(), environmentId);
+    this.environment = new CellEnvironment(environmentModel);
+    List<Entity> entities = new ArrayList<>(environmentModel.getEntities());
+    for (Entity entity : entities) {
+      addEntity(entity);
+    }
+
+    for (ActiveEntity activeEntity : getActiveEntities()) {
+      activeEntity.setState(state);
+    }
+
+    for(AntSimulationModule module : modules) {
+      addObserver(module);
+    }
+  }
+
+  public void updateState(AntSimulationState state) {
+    for (AntSimulationModule module : modules) {
+      module.updateState(state, environment, this);
+    }
+    for (ActiveEntity activeEntity : getActiveEntities()) {
+      activeEntity.updateState(state);
+    }
     environment.updateModel();
   }
 
@@ -104,7 +130,7 @@ public final class EnvironmentSimulator implements EntityManager {
       activeEntities.put(activeEntity.getEntity(), activeEntity);
     }
     for (EntityManager.Observer observer : observers) {
-      observer.onAddEntity(entity);
+      observer.onAddEntity(entity, state);
     }
   }
 
@@ -113,7 +139,7 @@ public final class EnvironmentSimulator implements EntityManager {
     activeEntities.remove(entity);
     environment.getCell(entity).removeEntity(entity);
     for (EntityManager.Observer observer : observers) {
-      observer.onRemoveEntity(entity);
+      observer.onRemoveEntity(entity, state);
     }
   }
 
@@ -121,8 +147,9 @@ public final class EnvironmentSimulator implements EntityManager {
   public void removeEntity(ActiveEntity activeEntity) {
     activeEntities.remove(activeEntity.getEntity());
     environment.getCell(activeEntity.getEntity()).removeEntity(activeEntity.getType());
+    activeEntity.updateState(state);
     for (EntityManager.Observer observer : observers) {
-      observer.onRemoveEntity(activeEntity.getEntity());
+      observer.onRemoveEntity(activeEntity.getEntity(), state);
     }
   }
 
@@ -135,12 +162,27 @@ public final class EnvironmentSimulator implements EntityManager {
     observers.add(observer);
 
     for (Entity entity : environment.getEnvironment().getEntities()) {
-      observer.onAddEntity(entity);
+      observer.onAddEntity(entity, state);
     }
   }
 
   @Override
   public void removeObserver(Observer observer) {
     observers.remove(observer);
+  }
+
+  @Override
+  public void close() {
+    cleanUp();
+  }
+
+  private void cleanUp() {
+    observers.removeAll(modules);
+
+    // Clean up the active entities.
+    for (ActiveEntity entity : activeEntities.values()) {
+      entity.onRemoveEntity();
+    }
+    activeEntities.clear();
   }
 }

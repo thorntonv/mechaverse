@@ -1,5 +1,7 @@
 package org.mechaverse.simulation.ant.core.module;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -19,6 +21,7 @@ import org.mechaverse.simulation.ant.core.AntSimulationUtil;
 import org.mechaverse.simulation.ant.core.Cell;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
 import org.mechaverse.simulation.ant.core.EntityManager;
+import org.mechaverse.simulation.ant.core.entity.EntityDataOutputStream;
 import org.mechaverse.simulation.common.genetic.CutAndSpliceCrossoverGeneticRecombinator;
 import org.mechaverse.simulation.common.genetic.GeneticData;
 import org.mechaverse.simulation.common.genetic.GeneticDataStore;
@@ -29,6 +32,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 
 /**
  * An environment simulation module that maintains a target ant population size.
@@ -98,12 +102,30 @@ public class AntReproductionModule implements AntSimulationModule {
   private final GeneticRecombinator geneticRecombinator;
   private final AntFitnessCalculator fitnessCalculator = new SimpleAntFitnessCalculator();
 
+  private ByteArrayOutputStream antGenerationReplayDataByteOut;
+  private EntityDataOutputStream antGenerationReplayDataOut;
+
+
   public AntReproductionModule() {
     this(new CutAndSpliceCrossoverGeneticRecombinator());
   }
 
   public AntReproductionModule(GeneticRecombinator geneticRecombinator) {
     this.geneticRecombinator = geneticRecombinator;
+  }
+
+  @Override
+  public void setState(AntSimulationState state, CellEnvironment env, EntityManager entityManager) {
+    antGenerationReplayDataByteOut = new ByteArrayOutputStream(64 * 1024);
+    antGenerationReplayDataOut = new EntityDataOutputStream(antGenerationReplayDataByteOut);
+  }
+
+  @Override
+  public void updateState(AntSimulationState state, CellEnvironment env,
+      EntityManager entityManager) {
+    // Store the ant generation data.
+    state.getReplayDataStore().put(AntReproductionReplayModule.ANT_GENERATION_DATA_KEY,
+        antGenerationReplayDataByteOut.toByteArray());
   }
 
   @Override
@@ -122,6 +144,7 @@ public class AntReproductionModule implements AntSimulationModule {
           Ant ant = generateAnt(state, random);
           cell.setEntity(ant, EntityType.ANT);
           entityManager.addEntity(ant);
+          writeAntGenerationReplayData(ImmutableList.of(ant), state);
         }
       }
     }
@@ -149,6 +172,7 @@ public class AntReproductionModule implements AntSimulationModule {
 
     Collection<Ant> reproductiveAnts = getReproductiveAnts();
     if (reproductiveAnts.size() < 2) {
+      logger.debug("Generated ant {}", ant.getId());
       return ant;
     }
 
@@ -183,7 +207,7 @@ public class AntReproductionModule implements AntSimulationModule {
   }
 
   @Override
-  public void onAddEntity(Entity entity) {
+  public void onAddEntity(Entity entity, AntSimulationState state) {
     if (entity instanceof Ant) {
       ants.add((Ant) entity);
     } else if (entity instanceof Nest) {
@@ -192,7 +216,7 @@ public class AntReproductionModule implements AntSimulationModule {
   }
 
   @Override
-  public void onRemoveEntity(Entity entity) {
+  public void onRemoveEntity(Entity entity, AntSimulationState state) {
     if (entity instanceof Ant) {
       ants.remove(entity);
     } else if (entity instanceof Nest) {
@@ -215,5 +239,21 @@ public class AntReproductionModule implements AntSimulationModule {
       }
     }
     return reproductiveAnts;
+  }
+
+  private void writeAntGenerationReplayData(List<Ant> ants, AntSimulationState state) {
+    // Write ant generation replay data.
+    if (antGenerationReplayDataOut != null) {
+      try {
+        antGenerationReplayDataOut.writeLong(state.getIteration());
+        // Write entity count.
+        antGenerationReplayDataOut.writeInt(ants.size());
+        for(Ant ant : ants) {
+          antGenerationReplayDataOut.writeEntity(ant);
+        }
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
   }
 }

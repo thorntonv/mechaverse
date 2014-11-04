@@ -33,14 +33,14 @@ public class CircuitAntSimulationImplTest extends AbstractAntSimulationImplTest 
   @Override
   protected AntSimulationImpl newSimulationImpl() {
     AbstractApplicationContext context =
-        new ClassPathXmlApplicationContext("simulation-context-circuit.xml");
+        new ClassPathXmlApplicationContext("test-simulation-context-circuit.xml");
     contexts.add(context);
     return (AntSimulationImpl) context.getBean(Simulation.class);
   }
 
   @Override
   protected int testIterationCount() {
-    return 500;
+    return 300;
   }
 
   @Test
@@ -65,11 +65,12 @@ public class CircuitAntSimulationImplTest extends AbstractAntSimulationImplTest 
           antCount++;
         }
       }
-      // State should have a model value.
+      // State should have a model, initial model, random seed replay data, and ant generation
+      // replay values.
       // Each ant should have circuit state genetic data, output map genetic data,
       // bit output map genetic data, circuit state, output map, bit output map values, and
       // output replay data.
-      assertEquals("Key set: " + state.keySet(), antCount * 10 + 1, state.keySet().size());
+      assertEquals("Key set: " + state.keySet(), antCount * 10 + 4, state.keySet().size());
     }
   }
 }

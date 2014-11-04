@@ -10,7 +10,7 @@ import org.mechaverse.simulation.common.datastore.SimulationDataStore;
  */
 public abstract class SimulationState<M> extends MemorySimulationDataStore {
 
-  protected final M model;
+  protected M model;
 
   public SimulationState(M model, SimulationDataStore dataStore) {
     super(dataStore);
@@ -30,5 +30,9 @@ public abstract class SimulationState<M> extends MemorySimulationDataStore {
 
   public M getModel() {
     return model;
+  }
+
+  public void setModel(M model) {
+    this.model = model;
   }
 }

@@ -1,5 +1,6 @@
 package org.mechaverse.simulation.ant.core;
 
+import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.model.Entity;
 
 /**
@@ -9,8 +10,8 @@ public interface EntityManager {
 
   public static interface Observer {
 
-    void onAddEntity(Entity entity);
-    void onRemoveEntity(Entity entity);
+    void onAddEntity(Entity entity, AntSimulationState state);
+    void onRemoveEntity(Entity entity, AntSimulationState state);
   }
 
   void addEntity(Entity entity);

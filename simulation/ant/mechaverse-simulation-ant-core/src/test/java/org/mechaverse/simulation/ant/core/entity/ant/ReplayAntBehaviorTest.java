@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.core.entity.ant.ActiveAnt.AntBehavior;
+import org.mechaverse.simulation.ant.core.entity.ant.ReplayActiveAntProvider.ReplayAntBehavior;
 import org.mechaverse.simulation.common.util.ArrayUtil;
 import org.mechaverse.simulation.common.util.RandomUtil;
 

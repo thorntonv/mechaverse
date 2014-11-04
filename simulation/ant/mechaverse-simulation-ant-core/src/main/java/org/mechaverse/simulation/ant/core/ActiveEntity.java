@@ -18,4 +18,5 @@ public interface ActiveEntity {
 
   void setState(AntSimulationState state);
   void updateState(AntSimulationState state);
+  void onRemoveEntity();
 }

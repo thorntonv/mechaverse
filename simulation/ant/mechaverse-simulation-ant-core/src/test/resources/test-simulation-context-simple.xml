@@ -12,13 +12,13 @@
   
   <util:properties id="properties">
     <prop key="antMaxCount">500</prop>
-    <prop key="antInitialEnergy">1000</prop>
-    <prop key="antMinReproductiveAge">200</prop>
+    <prop key="antInitialEnergy">100</prop>
+    <prop key="antMinReproductiveAge">25</prop>
     <prop key="foodMinCount">1000</prop>
     <prop key="foodClusterRadius">15</prop>
-    <prop key="foodInitialEnergy">300</prop>
-    <prop key="pheromoneInitialEnergy">3600</prop>
-    <prop key="pheromoneDecayInterval">3600</prop>
+    <prop key="foodInitialEnergy">10</prop>
+    <prop key="pheromoneInitialEnergy">100</prop>
+    <prop key="pheromoneDecayInterval">100</prop>
   </util:properties>
 
   <bean id="activeAntProvider" class="org.mechaverse.simulation.ant.core.entity.ant.ActiveAntProvider" scope="prototype" />
@@ -34,13 +34,15 @@
     </constructor-arg>
   </bean>
 
-  <bean id="antReproductionModule" class="org.mechaverse.simulation.ant.core.module.AntReproductionModule" scope="prototype" />
+  <bean id="replayRecorderModule" class="org.mechaverse.simulation.ant.core.module.ReplayRecorderModule" scope="prototype" />
   <bean id="foodGenerationModule" class="org.mechaverse.simulation.ant.core.module.FoodGenerationModule" scope="prototype" />
   <bean id="pheromoneDecayModule" class="org.mechaverse.simulation.ant.core.module.PheromoneDecayModule" scope="prototype" />
+  <bean id="antReproductionModule" class="org.mechaverse.simulation.ant.core.module.AntReproductionModule" scope="prototype" />
 
   <util:list id="modules" value-type="org.mechaverse.simulation.ant.core.module.AntSimulationModule" scope="prototype">
-    <ref bean="antReproductionModule" />
+    <ref bean="replayRecorderModule" />
     <ref bean="foodGenerationModule" />
     <ref bean="pheromoneDecayModule" />
+    <ref bean="antReproductionModule" />
   </util:list>
 </beans>

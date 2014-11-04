@@ -65,15 +65,15 @@ public class FoodGenerationModule implements AntSimulationModule {
   private int foodCount = 0;
 
   @Override
+  public void setState(AntSimulationState state, CellEnvironment env, EntityManager entityManager) {
+  }
+
+  @Override
+  public void updateState(AntSimulationState state, CellEnvironment env,
+      EntityManager entityManager) {}
+
+  @Override
   public void beforeUpdate(AntSimulationState state, CellEnvironment env,
-      EntityManager entityManager, RandomGenerator random) {}
-
-  @Override
-  public void beforePerformAction(AntSimulationState state, CellEnvironment env,
-      EntityManager entityManager, RandomGenerator random) {}
-
-  @Override
-  public void afterUpdate(final AntSimulationState state, CellEnvironment env,
       EntityManager entityManager, RandomGenerator random) {
     if (foodCount < minFoodCount) {
       int row = random.nextInt(env.getRowCount());
@@ -98,14 +98,22 @@ public class FoodGenerationModule implements AntSimulationModule {
   }
 
   @Override
-  public void onAddEntity(Entity entity) {
+  public void beforePerformAction(AntSimulationState state, CellEnvironment env,
+      EntityManager entityManager, RandomGenerator random) {}
+
+  @Override
+  public void afterUpdate(final AntSimulationState state, CellEnvironment env,
+      EntityManager entityManager, RandomGenerator random) {}
+
+  @Override
+  public void onAddEntity(Entity entity, AntSimulationState state) {
     if (entity instanceof Food) {
       foodCount++;
     }
   }
 
   @Override
-  public void onRemoveEntity(Entity entity) {
+  public void onRemoveEntity(Entity entity, AntSimulationState state) {
     if (entity instanceof Food) {
       foodCount--;
     }

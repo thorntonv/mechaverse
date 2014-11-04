@@ -3,6 +3,7 @@ package org.mechaverse.simulation.common;
 import org.mechaverse.circuit.model.Circuit;
 import org.mechaverse.simulation.common.circuit.CircuitDataSource;
 import org.mechaverse.simulation.common.circuit.CircuitReader;
+import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +23,9 @@ public class SimulationStateCircuitDataSource implements CircuitDataSource {
   @Override
   public Circuit getCircuit() {
     try {
-      if (simulation.getState().containsKey(CIRCUIT_XML_KEY)) {
-        return CircuitReader.read(simulation.getState().get(CIRCUIT_XML_KEY));
+      SimulationDataStore state = simulation.getState();
+      if (state.containsKey(CIRCUIT_XML_KEY)) {
+        return CircuitReader.read(state.get(CIRCUIT_XML_KEY));
       }
     } catch (Throwable e) {}
 

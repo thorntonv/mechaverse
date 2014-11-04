@@ -12,6 +12,16 @@ import org.mechaverse.simulation.ant.core.EntityManager;
 public interface AntSimulationModule extends EntityManager.Observer {
 
   /**
+   * Sets the state of the module before iterations are performed.
+   */
+  void setState(AntSimulationState state, CellEnvironment env, EntityManager entityManager);
+
+  /**
+   * Updates the {@link AntSimulationState}.
+   */
+  void updateState(AntSimulationState state, CellEnvironment env, EntityManager entityManager);
+
+  /**
    * Performs any actions that are appropriate on before each update of the environment.
    */
   void beforeUpdate(AntSimulationState state, CellEnvironment env, EntityManager entityManager,

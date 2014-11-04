@@ -1,6 +1,7 @@
 package org.mechaverse.simulation.ant.core.entity.ant;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
@@ -15,6 +16,8 @@ import org.mechaverse.simulation.ant.core.AntSimulationUtil;
 import org.mechaverse.simulation.ant.core.Cell;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
 import org.mechaverse.simulation.ant.core.EntityManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
 /**
@@ -50,6 +53,8 @@ public final class ActiveAnt implements ActiveEntity {
 
   private static final EntityType[] CARRIABLE_ENTITY_TYPES =
       {EntityType.DIRT, EntityType.FOOD,EntityType.ROCK};
+
+  private static final Logger logger = LoggerFactory.getLogger(ActiveAnt.class);
 
   @Value("#{properties['pheromoneInitialEnergy']}") private int pheromoneInitialEnergy;
 
@@ -165,6 +170,7 @@ public final class ActiveAnt implements ActiveEntity {
 
     try {
       outputReplayDataOutputStream.writeAntOutput(output);
+      logger.trace("Recorded output {} for ant {}", Arrays.toString(output.getData()), entity.getId());
     } catch (IOException e) {}
 
     Cell cell = env.getCell(entity);
@@ -275,6 +281,11 @@ public final class ActiveAnt implements ActiveEntity {
     behavior.updateState(state);
     state.getEntityReplayDataStore(entity).put(
         OUTPUT_REPLAY_DATA_KEY, outputReplayDataOutputStream.toByteArray());
+  }
+
+  @Override
+  public void onRemoveEntity() {
+    behavior.onRemoveEntity();
   }
 
   private boolean moveForward(Cell cell, Cell frontCell, CellEnvironment env) {

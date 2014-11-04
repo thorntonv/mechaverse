@@ -8,23 +8,29 @@ import static org.junit.Assert.assertTrue;
 import static org.mechaverse.simulation.common.datastore.SimulationDataStoreOutputStream.toByteArray;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.Before;
 import org.junit.Test;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
+import org.mechaverse.simulation.ant.api.SimulationModelUtil;
 import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.EntityType;
+import org.mechaverse.simulation.ant.api.model.Environment;
 import org.mechaverse.simulation.ant.api.model.SimulationModel;
 import org.mechaverse.simulation.ant.api.util.EntityUtil;
 import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore;
+import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 import org.mechaverse.simulation.common.util.RandomUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.google.common.io.ByteStreams;
 
@@ -55,12 +61,12 @@ public abstract class AbstractAntSimulationImplTest {
     private EntityTypeCounter entityTypeCounter = new EntityTypeCounter();
 
     @Override
-    public void onAddEntity(Entity entity) {
+    public void onAddEntity(Entity entity, AntSimulationState state) {
       entityTypeCounter.addEntity(entity);
     }
 
     @Override
-    public void onRemoveEntity(Entity entity) {
+    public void onRemoveEntity(Entity entity, AntSimulationState state) {
       entityTypeCounter.removeEntity(entity);
     }
 
@@ -104,8 +110,6 @@ public abstract class AbstractAntSimulationImplTest {
 
       verifyEntityTypeCounts(simulation.getState().getModel(), entityCountObserver);
     }
-
-    assertTrue(entityCountObserver.getEntityCount(EntityType.FOOD) >= minFoodCount);
   }
 
   @Test
@@ -141,6 +145,48 @@ public abstract class AbstractAntSimulationImplTest {
       simulation2.step();
 
       verifyStatesEqual(simulation1.getState(), simulation2.getState());
+    }
+  }
+
+  @Test
+  public void simulation_verifyReplay() throws IOException {
+    // Generate the initial state.
+    SimulationDataStore initialState =
+        AntSimulationImpl.randomState(new AntSimulationEnvironmentGenerator(null, random), random);
+    AntSimulationImpl simulation = newSimulationImpl();
+    simulation.setState(new MemorySimulationDataStore(initialState));
+    for (int cnt = 0; cnt < testIterationCount(); cnt++) {
+      simulation.step();
+    }
+    initialState = simulation.getState();
+
+    simulation = newSimulationImpl();
+    simulation.setState(new MemorySimulationDataStore(initialState));
+    for (int cnt = 0; cnt < testIterationCount(); cnt++) {
+      simulation.step();
+    }
+
+    try(ClassPathXmlApplicationContext replayCtx =
+        new ClassPathXmlApplicationContext("test-simulation-context-replay.xml")) {
+      AntSimulationImpl replaySimulation = replayCtx.getBean(AntSimulationImpl.class);
+      replaySimulation.setState(simulation.getState());
+      simulation.setState(new MemorySimulationDataStore(initialState));
+      
+      assertModelsEqual(simulation.getState().getModel(), replaySimulation.getState().getModel());
+      for (int cnt = 0; cnt < testIterationCount(); cnt++) {
+        replaySimulation.step();
+        simulation.step();
+
+        SimulationModel replayModel = replaySimulation.getState().getModel();
+        SimulationModel expectedModel = simulation.getState().getModel();
+
+        // The replay simulator random number generator will be out of sync by the end of the
+        // iteration so the next seed will be incorrect. The seed is set here so that it won't cause
+        // the comparison to fail.
+        replayModel.setSeed(expectedModel.getSeed());
+        
+        assertModelsEqual(expectedModel, replayModel);
+      }
     }
   }
 
@@ -182,6 +228,29 @@ public abstract class AbstractAntSimulationImplTest {
 
       assertArrayEquals("Data for key " + key + " does not match.", data1, data2);
     }
+  }
+
+  // TODO(thorntonv): Move this to a common test utility class.
+  private void assertModelsEqual(SimulationModel expected, SimulationModel actual)
+      throws IOException {
+    assertEquals(new CellEnvironment(expected.getEnvironment()).toString(),
+      new CellEnvironment(actual.getEnvironment()).toString());
+
+    // Sort the entities so that order will not cause the comparison to fail.
+    for (Environment env : SimulationModelUtil.getEnvironments(expected)) {
+      Collections.sort(env.getEntities(), EntityUtil.ENTITY_ORDERING);
+    }
+    for (Environment env : SimulationModelUtil.getEnvironments(actual)) {
+      Collections.sort(env.getEntities(), EntityUtil.ENTITY_ORDERING);
+    }
+
+    ByteArrayOutputStream model1ByteOut = new ByteArrayOutputStream(16 * 1024);
+    ByteArrayOutputStream model2ByteOut = new ByteArrayOutputStream(16 * 1024);
+
+    SimulationModelUtil.serialize(expected, model1ByteOut);
+    SimulationModelUtil.serialize(actual, model2ByteOut);
+
+    assertEquals(model1ByteOut.toString(), model2ByteOut.toString());
   }
 
   private byte[] decompress(byte[] data) throws IOException {

@@ -3,15 +3,9 @@ package org.mechaverse.simulation.ant.api;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.SimulationModel;
@@ -38,7 +32,7 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
   }
 
   public AntSimulationState(SimulationDataStore dataStore) throws IOException {
-    super(deserializeModel(new GZIPInputStream(
+    super(SimulationModelUtil.deserialize(new GZIPInputStream(
         new ByteArrayInputStream(dataStore.get(MODEL_KEY)))), dataStore);
 
     // Add placeholder for the model. This will be serialized when requested.
@@ -79,27 +73,8 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
         REPLAY_DATA_ROOT_KEY + SimulationDataStore.KEY_SEPARATOR + getEntityRootKey(entity), this);
   }
 
-  public static void serializeModel(SimulationModel model, OutputStream out) throws IOException {
-    try {
-      JAXBContext jaxbContext = JAXBContext.newInstance(SimulationModel.class);
-      Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-      jaxbMarshaller.marshal(model, out);
-    } catch (JAXBException e) {
-      throw new IOException(e);
-    }
-  }
-
-  public static SimulationModel deserializeModel(InputStream in) throws IOException {
-    if (in == null) {
-      return new SimulationModel();
-    }
-    try {
-      JAXBContext jaxbContext = JAXBContext.newInstance(SimulationModel.class);
-      Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-      return (SimulationModel) jaxbUnmarshaller.unmarshal(in);
-    } catch (JAXBException e) {
-      throw new IOException(e);
-    }
+  public SimulationDataStore getReplayDataStore() {
+    return new SimulationDataStoreView(REPLAY_DATA_ROOT_KEY, this);
   }
 
   private String getEntityRootKey(Entity entity) {
@@ -109,7 +84,7 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
   private byte[] serializeModel() throws IOException {
     ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
     try (OutputStream out = new GZIPOutputStream(byteOut)) {
-      serializeModel(model, out);
+      SimulationModelUtil.serialize(model, out);
     }
     return byteOut.toByteArray();
   }

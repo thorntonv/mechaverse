@@ -58,7 +58,7 @@ public class AntReproductionModuleTest {
     AntSimulationState state = new AntSimulationState();
     CellEnvironment env = newEnvironment();
     Ant ant = module.generateRandomAnt(state, random);
-    module.onAddEntity(ant);
+    module.onAddEntity(ant, state);
     module.setAntMaxCount(1);
     module.beforeUpdate(state, env, mockEntityManager, random);
 
@@ -89,12 +89,12 @@ public class AntReproductionModuleTest {
     GeneticDataStore parent1GeneticData =
         randomGeneticDataStore(state.getEntityGeneticDataStore(parent1));
 
-    module.onAddEntity(parent1);
+    module.onAddEntity(parent1, state);
 
     Ant parent2 = module.generateRandomAnt(state, random);
     GeneticDataStore parent2GeneticData =
         randomGeneticDataStore(state.getEntityGeneticDataStore(parent2));
-    module.onAddEntity(parent2);
+    module.onAddEntity(parent2, state);
 
     GeneticDataStore childGeneticData = randomGeneticDataStore(new GeneticDataStore());
 
@@ -139,7 +139,7 @@ public class AntReproductionModuleTest {
     nest.setX(20);
     nest.setY(20);
     env.getEntities().add(nest);
-    module.onAddEntity(nest);
+    module.onAddEntity(nest, new AntSimulationState());
     return new CellEnvironment(env);
   }
 
