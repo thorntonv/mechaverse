@@ -108,7 +108,7 @@ public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
         .getAttribute(SIMULATION_SERVICE_KEY);
     if (service == null) {
       ClassPathXmlApplicationContext ctx =
-          new ClassPathXmlApplicationContext("simulation-context.xml");
+          new ClassPathXmlApplicationContext("simulation-context-replay.xml");
       service = ctx.getBean(Simulation.class);
       request.getSession().setAttribute(SIMULATION_SERVICE_KEY, service);
       request.getSession().setAttribute(SIMULATION_CONTEXT_KEY, ctx);
