@@ -1,27 +1,21 @@
 package org.mechaverse.simulation.ant.core;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.mechaverse.simulation.ant.core.AntSimulationTestUtil.assertModelsEqual;
+import static org.mechaverse.simulation.ant.core.AntSimulationTestUtil.assertStatesEqual;
 import static org.mechaverse.simulation.common.datastore.SimulationDataStoreOutputStream.toByteArray;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.Before;
 import org.junit.Test;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
-import org.mechaverse.simulation.ant.api.SimulationModelUtil;
 import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.EntityType;
-import org.mechaverse.simulation.ant.api.model.Environment;
 import org.mechaverse.simulation.ant.api.model.SimulationModel;
 import org.mechaverse.simulation.ant.api.util.EntityUtil;
 import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore;
@@ -31,8 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import com.google.common.io.ByteStreams;
 
 /**
  * Unit test for {@link AntSimulationImpl}.
@@ -131,7 +123,7 @@ public abstract class AbstractAntSimulationImplTest {
       simulation1.step();
       simulation2.step();
 
-      verifyStatesEqual(simulation1.getState(), simulation2.getState());
+      assertStatesEqual(simulation1.getState(), simulation2.getState());
     }
 
     byte[] state = toByteArray(simulation1.getState());
@@ -144,7 +136,7 @@ public abstract class AbstractAntSimulationImplTest {
       simulation1.step();
       simulation2.step();
 
-      verifyStatesEqual(simulation1.getState(), simulation2.getState());
+      assertStatesEqual(simulation1.getState(), simulation2.getState());
     }
   }
 
@@ -171,7 +163,7 @@ public abstract class AbstractAntSimulationImplTest {
       AntSimulationImpl replaySimulation = replayCtx.getBean(AntSimulationImpl.class);
       replaySimulation.setState(simulation.getState());
       simulation.setState(new MemorySimulationDataStore(initialState));
-      
+
       assertModelsEqual(simulation.getState().getModel(), replaySimulation.getState().getModel());
       for (int cnt = 0; cnt < testIterationCount(); cnt++) {
         replaySimulation.step();
@@ -184,7 +176,7 @@ public abstract class AbstractAntSimulationImplTest {
         // iteration so the next seed will be incorrect. The seed is set here so that it won't cause
         // the comparison to fail.
         replayModel.setSeed(expectedModel.getSeed());
-        
+
         assertModelsEqual(expectedModel, replayModel);
       }
     }
@@ -208,52 +200,5 @@ public abstract class AbstractAntSimulationImplTest {
       logger.debug("{} count = {}", entityType.name(), actualCount);
       assertEquals(actualCount, observer.getEntityCount(entityType));
     }
-  }
-
-  private void verifyStatesEqual(AntSimulationState state1, AntSimulationState state2)
-      throws IOException {
-    assertEquals(state1.getModel().getSeed(), state2.getModel().getSeed());
-    assertEquals(state1.getModel().getEnvironment().getEntities().size(),
-        state2.getModel().getEnvironment().getEntities().size());
-
-    assertTrue(state1.keySet().toString(), state1.keySet().contains(AntSimulationState.MODEL_KEY));
-    assertEquals(state1.keySet(), state2.keySet());
-    for (String key : state1.keySet()) {
-      byte[] data1 = state1.get(key);
-      byte[] data2 = state2.get(key);
-      if (key.equalsIgnoreCase(AntSimulationState.MODEL_KEY)) {
-        data1 = decompress(data1);
-        data2 = decompress(data2);
-      }
-
-      assertArrayEquals("Data for key " + key + " does not match.", data1, data2);
-    }
-  }
-
-  // TODO(thorntonv): Move this to a common test utility class.
-  private void assertModelsEqual(SimulationModel expected, SimulationModel actual)
-      throws IOException {
-    assertEquals(new CellEnvironment(expected.getEnvironment()).toString(),
-      new CellEnvironment(actual.getEnvironment()).toString());
-
-    // Sort the entities so that order will not cause the comparison to fail.
-    for (Environment env : SimulationModelUtil.getEnvironments(expected)) {
-      Collections.sort(env.getEntities(), EntityUtil.ENTITY_ORDERING);
-    }
-    for (Environment env : SimulationModelUtil.getEnvironments(actual)) {
-      Collections.sort(env.getEntities(), EntityUtil.ENTITY_ORDERING);
-    }
-
-    ByteArrayOutputStream model1ByteOut = new ByteArrayOutputStream(16 * 1024);
-    ByteArrayOutputStream model2ByteOut = new ByteArrayOutputStream(16 * 1024);
-
-    SimulationModelUtil.serialize(expected, model1ByteOut);
-    SimulationModelUtil.serialize(actual, model2ByteOut);
-
-    assertEquals(model1ByteOut.toString(), model2ByteOut.toString());
-  }
-
-  private byte[] decompress(byte[] data) throws IOException {
-    return ByteStreams.toByteArray(new GZIPInputStream(new ByteArrayInputStream(data)));
   }
 }
