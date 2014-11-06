@@ -12,6 +12,9 @@ import java.util.zip.GZIPInputStream;
 
 import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.SimulationModelUtil;
+import org.mechaverse.simulation.ant.api.model.Direction;
+import org.mechaverse.simulation.ant.api.model.Entity;
+import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Environment;
 import org.mechaverse.simulation.ant.api.model.SimulationModel;
 import org.mechaverse.simulation.ant.api.util.EntityUtil;
@@ -22,6 +25,18 @@ import com.google.common.io.ByteStreams;
  * Common ant simulation test utility methods.
  */
 public class AntSimulationTestUtil {
+
+  public static Entity newEntity(EntityType entityType, String id, int x, int y,
+      Direction direction, int energy, int maxEnergy) {
+    Entity entity = EntityUtil.newEntity(entityType);
+    entity.setId(id);
+    entity.setX(x);
+    entity.setY(y);
+    entity.setDirection(direction);
+    entity.setEnergy(energy);
+    entity.setMaxEnergy(maxEnergy);
+    return entity;
+  }
 
   public static void assertStatesEqual(AntSimulationState state1, AntSimulationState state2)
       throws IOException {
@@ -63,6 +78,15 @@ public class AntSimulationTestUtil {
     SimulationModelUtil.serialize(actual, model2ByteOut);
 
     assertEquals(model1ByteOut.toString(), model2ByteOut.toString());
+  }
+
+  public static void assertEntitiesEqual(Entity expected, Entity actual) {
+    assertEquals(expected.getClass(), actual.getClass());
+    assertEquals(expected.getId(), actual.getId());
+    assertEquals(expected.getX(), actual.getX());
+    assertEquals(expected.getY(), actual.getY());
+    assertEquals(expected.getEnergy(), actual.getEnergy());
+    assertEquals(expected.getMaxEnergy(), actual.getMaxEnergy());
   }
 
   public static byte[] decompress(byte[] data) throws IOException {
