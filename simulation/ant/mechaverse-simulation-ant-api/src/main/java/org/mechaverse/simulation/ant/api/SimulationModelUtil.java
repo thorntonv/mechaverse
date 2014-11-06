@@ -1,10 +1,12 @@
 package org.mechaverse.simulation.ant.api;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.List;
+import java.util.zip.GZIPOutputStream;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -78,6 +80,18 @@ public final class SimulationModelUtil {
     } catch (JAXBException e) {
       throw new IOException(e);
     }
+  }
+
+  /**
+   * Serializes a {@link SimulationModel} to a byte array that contains the compressed xml
+   * representation of the model.
+   */
+  public static byte[] serialize(SimulationModel model) throws IOException {
+    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+    try (OutputStream out = new GZIPOutputStream(byteOut)) {
+      SimulationModelUtil.serialize(model, out);
+    }
+    return byteOut.toByteArray();
   }
 
   private SimulationModelUtil() {}

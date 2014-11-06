@@ -1,11 +1,8 @@
 package org.mechaverse.simulation.ant.api;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.api.model.SimulationModel;
@@ -53,7 +50,7 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
   public byte[] get(String key) {
     if(key.equals(MODEL_KEY)) {
       try {
-        put(MODEL_KEY, serializeModel());
+        put(MODEL_KEY, SimulationModelUtil.serialize(model));
       } catch (IOException e) {}
     }
     return super.get(key);
@@ -79,13 +76,5 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
 
   private String getEntityRootKey(Entity entity) {
     return ENTITY_DATA_ROOT_KEY + SimulationDataStore.KEY_SEPARATOR + entity.getId();
-  }
-
-  private byte[] serializeModel() throws IOException {
-    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-    try (OutputStream out = new GZIPOutputStream(byteOut)) {
-      SimulationModelUtil.serialize(model, out);
-    }
-    return byteOut.toByteArray();
   }
 }
