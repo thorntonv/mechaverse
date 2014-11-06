@@ -3,12 +3,15 @@ package org.mechaverse.simulation.ant.core.module;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mechaverse.simulation.ant.core.AntSimulationTestUtil.assertEntitiesEqual;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -22,6 +25,7 @@ import org.mechaverse.simulation.ant.api.model.Environment;
 import org.mechaverse.simulation.ant.api.model.Nest;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
 import org.mechaverse.simulation.ant.core.EntityManager;
+import org.mechaverse.simulation.ant.core.entity.EntityDataInputStream;
 import org.mechaverse.simulation.common.genetic.GeneticData;
 import org.mechaverse.simulation.common.genetic.GeneticDataStore;
 import org.mechaverse.simulation.common.genetic.GeneticRecombinator;
@@ -30,7 +34,6 @@ import org.mechaverse.simulation.common.util.RandomUtil;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
 /**
  * Unit test for {@link AntReproductionModule}.
  */
@@ -128,6 +131,35 @@ public class AntReproductionModuleTest {
         geneticDataCaptor2.getValue().getData());
       assertArrayEquals(parent2GeneticData.get(TEST_GENETIC_DATA_KEY).getData(),
         geneticDataCaptor1.getValue().getData());
+    }
+  }
+
+  @Test
+  public void recordAntGenerationReplayData() throws IOException {
+    AntSimulationState state = new AntSimulationState();
+    CellEnvironment env = newEnvironment();
+    module.setAntMaxCount(5);
+    module.setState(state, env, mockEntityManager);
+    state.getModel().setIteration(10);
+    module.beforeUpdate(state, env, mockEntityManager, random);
+    state.getModel().setIteration(18);
+    module.beforeUpdate(state, env, mockEntityManager, random);
+
+    ArgumentCaptor<Ant> antCaptor = ArgumentCaptor.forClass(Ant.class);
+    verify(mockEntityManager, times(2)).addEntity(antCaptor.capture());
+    assertNotNull(env.getCell(antCaptor.getValue()));
+    verifyZeroInteractions(mockGeneticRecombinator);
+
+    module.updateState(state, env, mockEntityManager);
+
+    try(EntityDataInputStream replayDataIn = new EntityDataInputStream(new ByteArrayInputStream(
+        state.getReplayDataStore().get(AntReproductionReplayModule.ANT_GENERATION_DATA_KEY)))) {
+      assertEquals(10, replayDataIn.readLong());
+      assertEquals(1, replayDataIn.readInt());
+      assertEntitiesEqual(antCaptor.getAllValues().get(0), replayDataIn.readEntity());
+      assertEquals(18, replayDataIn.readLong());
+      assertEquals(1, replayDataIn.readInt());
+      assertEntitiesEqual(antCaptor.getAllValues().get(1), replayDataIn.readEntity());
     }
   }
 
