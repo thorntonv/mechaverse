@@ -6,7 +6,11 @@ import java.io.InputStream;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
-import org.mechaverse.simulation.common.SimulationDataStore;
+import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore;
+import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore.MemorySimulationDataStoreInputStream;
+import org.mechaverse.simulation.common.datastore.SimulationDataStore;
+import org.mechaverse.simulation.common.datastore.SimulationDataStoreInputStream;
+import org.mechaverse.simulation.common.datastore.SimulationDataStoreOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -190,7 +194,7 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
     }
 
     // Reconstruct state from available files
-    SimulationDataStore store = new SimulationDataStore();
+    SimulationDataStore store = new MemorySimulationDataStore();
     while (cursor.hasNext()) {
       DBObject fileEntry = cursor.next();
       String filename = (String) fileEntry.get(gridfsFilenameKey);
@@ -198,7 +202,8 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
       store.put(filename.replace(prefix, "").replace('/', '.'),
           IOUtils.readBytesFromStream(gridfsFile.getInputStream()));
     }
-    InputStream state = new ByteArrayInputStream(store.serialize());
+    InputStream state =
+        new ByteArrayInputStream(SimulationDataStoreOutputStream.toByteArray(store));
 
     return state;
   }
@@ -221,8 +226,10 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
     deleteState(simulationId, instanceId, iteration);
 
     // Decode state and add to document
-    SimulationDataStore store =
-        SimulationDataStore.deserialize(IOUtils.readBytesFromStream(stateInput));
+    SimulationDataStoreInputStream storeStream =
+        new MemorySimulationDataStoreInputStream(stateInput);
+    SimulationDataStore store = storeStream.readDataStore();
+    storeStream.close();
     for (String storeKey : store.keySet()) {
       String keyName = storeKey.replace('.', '/');
       String filename = String.format("/%s/%s/%d/%s", simulationId, instanceId, iteration, keyName);

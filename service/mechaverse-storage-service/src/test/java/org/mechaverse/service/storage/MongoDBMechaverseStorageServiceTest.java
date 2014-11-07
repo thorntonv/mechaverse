@@ -7,7 +7,6 @@ import static org.junit.Assert.fail;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -15,7 +14,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mechaverse.simulation.common.SimulationDataStore;
+import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore;
+import org.mechaverse.simulation.common.datastore.SimulationDataStore;
+import org.mechaverse.simulation.common.datastore.SimulationDataStoreInputStream;
+import org.mechaverse.simulation.common.datastore.SimulationDataStoreOutputStream;
 
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.MongodProcess;
@@ -40,21 +42,6 @@ public class MongoDBMechaverseStorageServiceTest {
   private static int mongoPort = 37017;
   private static String mongoHost = "127.0.0.1";
   private static String mongoDatabaseName = "mechaverse-storage-test";
-
-  // TODO(dhendrickson): relocate this to SimulationDataStore and provide new hashCode()
-  boolean compareSimulationDataStore(SimulationDataStore storeA, SimulationDataStore storeB) {
-    if (storeA.size() != storeB.size()) {
-      return false;
-    }
-
-    for (String key : storeA.keySet()) {
-      if (!Arrays.equals(storeA.get(key), storeB.get(key))) {
-        return false;
-      }
-    }
-
-    return true;
-  }
 
   @BeforeClass
   public static void beforeClass() throws IOException {
@@ -131,53 +118,62 @@ public class MongoDBMechaverseStorageServiceTest {
    */
   @Test
   public void testStateA() throws IOException {
-    SimulationDataStore setStore = new SimulationDataStore();
+    SimulationDataStore setStore = new MemorySimulationDataStore();
     setStore.put("a", "value1".getBytes());
     setStore.put("b.a", "value2".getBytes());
     setStore.put("b.b", "value3".getBytes());
     setStore.put("b.c.a", "value4".getBytes());
 
-    InputStream setStream = new ByteArrayInputStream(setStore.serialize());
+    InputStream setStream =
+        new ByteArrayInputStream(SimulationDataStoreOutputStream.toByteArray(setStore));
     this.service.setState("simulation-id", "instance-id", 0, setStream);
 
     InputStream getStream;
     getStream = this.service.getState("simulation-id", "instance-id", 0);
-    SimulationDataStore getStore = SimulationDataStore.deserialize(getStream);
+    SimulationDataStoreInputStream tmpStream =
+        new MemorySimulationDataStore.MemorySimulationDataStoreInputStream(getStream);
+    SimulationDataStore getStore = tmpStream.readDataStore();
+    tmpStream.close();
 
-    assertTrue(compareSimulationDataStore(setStore, getStore));
+    assertEquals(setStore, getStore);
   }
 
-  /**
-   * Test setter/getter for state.
+  /*
+   * /** Test setter/getter for state.
    * 
    * 1) Database is empty 2) Set state 3) Update state with same key set 4) Get state 5) Confirm
    * equality of update and get
    */
   @Test
   public void testStateB() throws IOException {
-    SimulationDataStore setStore = new SimulationDataStore();
+    SimulationDataStore setStore = new MemorySimulationDataStore();
     setStore.put("a", "value1".getBytes());
     setStore.put("b.a", "value2".getBytes());
     setStore.put("b.b", "value3".getBytes());
     setStore.put("b.c.a", "value4".getBytes());
 
-    InputStream setStream = new ByteArrayInputStream(setStore.serialize());
+    InputStream setStream =
+        new ByteArrayInputStream(SimulationDataStoreOutputStream.toByteArray(setStore));
     this.service.setState("simulation-id", "instance-id", 0, setStream);
 
-    SimulationDataStore updateStore = new SimulationDataStore();
+    SimulationDataStore updateStore = new MemorySimulationDataStore();
     updateStore.put("a", "value5".getBytes());
     updateStore.put("b.a", "value6".getBytes());
     updateStore.put("b.b", "value7".getBytes());
     updateStore.put("b.c.a", "value8".getBytes());
 
-    InputStream updateStream = new ByteArrayInputStream(updateStore.serialize());
+    InputStream updateStream =
+        new ByteArrayInputStream(SimulationDataStoreOutputStream.toByteArray(updateStore));
     this.service.setState("simulation-id", "instance-id", 0, updateStream);
 
     InputStream getStream;
     getStream = this.service.getState("simulation-id", "instance-id", 0);
-    SimulationDataStore getStore = SimulationDataStore.deserialize(getStream);
+    SimulationDataStoreInputStream tmpStream =
+        new MemorySimulationDataStore.MemorySimulationDataStoreInputStream(getStream);
+    SimulationDataStore getStore = tmpStream.readDataStore();
+    tmpStream.close();
 
-    assertTrue(compareSimulationDataStore(updateStore, getStore));
+    assertEquals(updateStore, getStore);
   }
 
   /**
@@ -188,29 +184,34 @@ public class MongoDBMechaverseStorageServiceTest {
    */
   @Test
   public void testStateC() throws IOException {
-    SimulationDataStore setStore = new SimulationDataStore();
+    SimulationDataStore setStore = new MemorySimulationDataStore();
     setStore.put("a", "value1".getBytes());
     setStore.put("b.a", "value2".getBytes());
     setStore.put("b.b", "value3".getBytes());
     setStore.put("b.c.a", "value4".getBytes());
 
-    InputStream setStream = new ByteArrayInputStream(setStore.serialize());
+    InputStream setStream =
+        new ByteArrayInputStream(SimulationDataStoreOutputStream.toByteArray(setStore));
     this.service.setState("simulation-id", "instance-id", 0, setStream);
 
-    SimulationDataStore updateStore = new SimulationDataStore();
+    SimulationDataStore updateStore = new MemorySimulationDataStore();
     updateStore.put("d", "value5".getBytes());
     updateStore.put("e.f", "value6".getBytes());
     updateStore.put("e.g", "value7".getBytes());
     updateStore.put("e.h.i", "value8".getBytes());
 
-    InputStream updateStream = new ByteArrayInputStream(updateStore.serialize());
+    InputStream updateStream =
+        new ByteArrayInputStream(SimulationDataStoreOutputStream.toByteArray(updateStore));
     this.service.setState("simulation-id", "instance-id", 0, updateStream);
 
     InputStream getStream;
     getStream = this.service.getState("simulation-id", "instance-id", 0);
-    SimulationDataStore getStore = SimulationDataStore.deserialize(getStream);
+    SimulationDataStoreInputStream tmpStream =
+        new MemorySimulationDataStore.MemorySimulationDataStoreInputStream(getStream);
+    SimulationDataStore getStore = tmpStream.readDataStore();
+    tmpStream.close();
 
-    assertTrue(compareSimulationDataStore(updateStore, getStore));
+    assertEquals(updateStore, getStore);
   }
 
   /**
@@ -223,24 +224,29 @@ public class MongoDBMechaverseStorageServiceTest {
   @Ignore
   // TODO(dhendrickson): figure out support for empty states
   public void testStateD() throws IOException {
-    SimulationDataStore setStore = new SimulationDataStore();
+    SimulationDataStore setStore = new MemorySimulationDataStore();
     setStore.put("key1", "value1".getBytes());
     setStore.put("key2", "value2".getBytes());
     setStore.put("key3", "value3".getBytes());
 
-    InputStream setStream = new ByteArrayInputStream(setStore.serialize());
+    InputStream setStream =
+        new ByteArrayInputStream(SimulationDataStoreOutputStream.toByteArray(setStore));
     this.service.setState("simulation-id", "instance-id", 0, setStream);
 
-    SimulationDataStore updateStore = new SimulationDataStore();
+    SimulationDataStore updateStore = new MemorySimulationDataStore();
 
-    InputStream updateStream = new ByteArrayInputStream(updateStore.serialize());
+    InputStream updateStream =
+        new ByteArrayInputStream(SimulationDataStoreOutputStream.toByteArray(updateStore));
     this.service.setState("simulation-id", "instance-id", 0, updateStream);
 
     InputStream getStream;
     getStream = this.service.getState("simulation-id", "instance-id", 0);
-    SimulationDataStore getStore = SimulationDataStore.deserialize(getStream);
+    SimulationDataStoreInputStream tmpStream =
+        new MemorySimulationDataStore.MemorySimulationDataStoreInputStream(getStream);
+    SimulationDataStore getStore = tmpStream.readDataStore();
+    tmpStream.close();
 
-    assertTrue(compareSimulationDataStore(updateStore, getStore));
+    assertEquals(updateStore, getStore);
   }
 
   /**
@@ -267,27 +273,27 @@ public class MongoDBMechaverseStorageServiceTest {
    */
   @Test
   public void testDeleteSimulationA() throws IOException {
-    SimulationDataStore store = new SimulationDataStore();
+    SimulationDataStore store = new MemorySimulationDataStore();
     store.put("key1", "value1".getBytes());
     store.put("key2", "value2".getBytes());
     store.put("key3", "value3".getBytes());
 
-    this.service.setState("simulation1", "instance1", 0,
-        new ByteArrayInputStream(store.serialize()));
-    this.service.setState("simulation1", "instance1", 1,
-        new ByteArrayInputStream(store.serialize()));
-    this.service.setState("simulation1", "instance2", 0,
-        new ByteArrayInputStream(store.serialize()));
-    this.service.setState("simulation1", "instance2", 1,
-        new ByteArrayInputStream(store.serialize()));
-    this.service.setState("simulation2", "instance1", 0,
-        new ByteArrayInputStream(store.serialize()));
-    this.service.setState("simulation2", "instance1", 1,
-        new ByteArrayInputStream(store.serialize()));
-    this.service.setState("simulation2", "instance2", 0,
-        new ByteArrayInputStream(store.serialize()));
-    this.service.setState("simulation2", "instance2", 1,
-        new ByteArrayInputStream(store.serialize()));
+    this.service.setState("simulation1", "instance1", 0, new ByteArrayInputStream(
+        SimulationDataStoreOutputStream.toByteArray(store)));
+    this.service.setState("simulation1", "instance1", 1, new ByteArrayInputStream(
+        SimulationDataStoreOutputStream.toByteArray(store)));
+    this.service.setState("simulation1", "instance2", 0, new ByteArrayInputStream(
+        SimulationDataStoreOutputStream.toByteArray(store)));
+    this.service.setState("simulation1", "instance2", 1, new ByteArrayInputStream(
+        SimulationDataStoreOutputStream.toByteArray(store)));
+    this.service.setState("simulation2", "instance1", 0, new ByteArrayInputStream(
+        SimulationDataStoreOutputStream.toByteArray(store)));
+    this.service.setState("simulation2", "instance1", 1, new ByteArrayInputStream(
+        SimulationDataStoreOutputStream.toByteArray(store)));
+    this.service.setState("simulation2", "instance2", 0, new ByteArrayInputStream(
+        SimulationDataStoreOutputStream.toByteArray(store)));
+    this.service.setState("simulation2", "instance2", 1, new ByteArrayInputStream(
+        SimulationDataStoreOutputStream.toByteArray(store)));
 
     this.service.deleteSimulation("simulation2");
 
@@ -344,27 +350,27 @@ public class MongoDBMechaverseStorageServiceTest {
    */
   @Test
   public void testDeleteInstance() throws IOException {
-    SimulationDataStore store = new SimulationDataStore();
+    SimulationDataStore store = new MemorySimulationDataStore();
     store.put("key1", "value1".getBytes());
     store.put("key2", "value2".getBytes());
     store.put("key3", "value3".getBytes());
 
-    this.service.setState("simulation1", "instance1", 0,
-        new ByteArrayInputStream(store.serialize()));
-    this.service.setState("simulation1", "instance1", 1,
-        new ByteArrayInputStream(store.serialize()));
-    this.service.setState("simulation1", "instance2", 0,
-        new ByteArrayInputStream(store.serialize()));
-    this.service.setState("simulation1", "instance2", 1,
-        new ByteArrayInputStream(store.serialize()));
-    this.service.setState("simulation2", "instance1", 0,
-        new ByteArrayInputStream(store.serialize()));
-    this.service.setState("simulation2", "instance1", 1,
-        new ByteArrayInputStream(store.serialize()));
-    this.service.setState("simulation2", "instance2", 0,
-        new ByteArrayInputStream(store.serialize()));
-    this.service.setState("simulation2", "instance2", 1,
-        new ByteArrayInputStream(store.serialize()));
+    this.service.setState("simulation1", "instance1", 0, new ByteArrayInputStream(
+        SimulationDataStoreOutputStream.toByteArray(store)));
+    this.service.setState("simulation1", "instance1", 1, new ByteArrayInputStream(
+        SimulationDataStoreOutputStream.toByteArray(store)));
+    this.service.setState("simulation1", "instance2", 0, new ByteArrayInputStream(
+        SimulationDataStoreOutputStream.toByteArray(store)));
+    this.service.setState("simulation1", "instance2", 1, new ByteArrayInputStream(
+        SimulationDataStoreOutputStream.toByteArray(store)));
+    this.service.setState("simulation2", "instance1", 0, new ByteArrayInputStream(
+        SimulationDataStoreOutputStream.toByteArray(store)));
+    this.service.setState("simulation2", "instance1", 1, new ByteArrayInputStream(
+        SimulationDataStoreOutputStream.toByteArray(store)));
+    this.service.setState("simulation2", "instance2", 0, new ByteArrayInputStream(
+        SimulationDataStoreOutputStream.toByteArray(store)));
+    this.service.setState("simulation2", "instance2", 1, new ByteArrayInputStream(
+        SimulationDataStoreOutputStream.toByteArray(store)));
 
     this.service.deleteInstance("simulation2", "instance2");
 
