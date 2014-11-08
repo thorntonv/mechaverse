@@ -70,6 +70,12 @@ public final class OpenClCircuitSimulator implements CircuitSimulator {
         new CircuitSimulationModelBuilder().buildModel(circuit));
   }
 
+  public OpenClCircuitSimulator(int numCircuits, int circuitInputSize,
+      int circuitOutputSize, CircuitSimulationModel circuitModel) {
+    this(numCircuits, circuitInputSize, circuitOutputSize,
+        CLPlatform.getDefault().getMaxFlopsDevice(), circuitModel);
+  }
+  
   private OpenClCircuitSimulator(int numCircuits, int circuitInputSize,
       int circuitOutputSize, CLDevice device, CircuitSimulationModel circuitModel) {
     this(numCircuits, circuitInputSize, circuitModel.getCircuitStateSize(), circuitOutputSize,

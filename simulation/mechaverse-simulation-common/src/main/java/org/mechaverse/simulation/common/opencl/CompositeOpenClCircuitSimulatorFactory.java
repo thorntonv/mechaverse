@@ -33,7 +33,7 @@ public final class CompositeOpenClCircuitSimulatorFactory {
     List<CircuitSimulator> componentSimulators = new ArrayList<>();
     for (int groupIdx = 0; groupIdx < numCircuitGroups; groupIdx++) {
       componentSimulators.add(new OpenClCircuitSimulator(numCircuitsPerGroup, circuitInputSize,
-          circuitOutputSize, circuitDataSource));
+          circuitOutputSize, circuitDataSource.getCircuitSimulationModel()));
     }
 
     return new CompositeCircuitSimulator(componentSimulators);

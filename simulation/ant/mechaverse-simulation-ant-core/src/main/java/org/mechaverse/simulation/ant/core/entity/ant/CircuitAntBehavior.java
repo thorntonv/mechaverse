@@ -6,7 +6,9 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.core.entity.ant.ActiveAnt.AntBehavior;
+import org.mechaverse.simulation.common.circuit.CircuitDataSource;
 import org.mechaverse.simulation.common.circuit.CircuitSimulator;
+import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel;
 import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 import org.mechaverse.simulation.common.genetic.CircuitGeneticDataGenerator;
 import org.mechaverse.simulation.common.genetic.GeneticData;
@@ -36,10 +38,13 @@ public class CircuitAntBehavior implements AntBehavior {
   private SimulationDataStore dataStore;
   private GeneticDataStore geneticDataStore;
   private boolean stateSet = false;
+  private final CircuitSimulationModel circuitModel;
   private final CircuitSimulator circuitSimulator;
   private CircuitGeneticDataGenerator geneticDataGenerator = new CircuitGeneticDataGenerator();
 
-  public CircuitAntBehavior(CircuitSimulator circuitSimulator) {
+  public CircuitAntBehavior(
+      CircuitDataSource circuitDataSource, CircuitSimulator circuitSimulator) {
+    this.circuitModel = circuitDataSource.getCircuitSimulationModel();
     this.circuitSimulator = circuitSimulator;
 
     this.antOutputData = new int[AntOutput.DATA_SIZE];
@@ -126,8 +131,8 @@ public class CircuitAntBehavior implements AntBehavior {
   }
 
   private void generateGeneticData(RandomGenerator random) {
-    geneticDataGenerator.generateGeneticData(geneticDataStore,
-        circuitSimulator.getCircuitStateSize(), circuitSimulator.getCircuitOutputSize(), random);
+    geneticDataGenerator.generateGeneticData(geneticDataStore, circuitModel,
+        circuitSimulator.getCircuitOutputSize(), random);
     GeneticData bitOutputMapData = geneticDataGenerator.generateOutputMapGeneticData(
         circuitSimulator.getCircuitOutputSize(), 32, random);
     geneticDataStore.put(CIRCUIT_BIT_OUTPUT_MAP_KEY, bitOutputMapData);

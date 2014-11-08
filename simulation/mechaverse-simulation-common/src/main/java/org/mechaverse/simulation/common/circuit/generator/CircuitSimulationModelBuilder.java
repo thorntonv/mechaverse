@@ -20,6 +20,7 @@ import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel.Input;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel.LogicalUnitInfo;
 import org.mechaverse.simulation.common.circuit.generator.ExternalElement.ExternalElementType;
+import org.springframework.beans.BeanUtils;
 
 import com.google.common.collect.ImmutableBiMap;
 
@@ -165,7 +166,10 @@ public class CircuitSimulationModelBuilder {
       Row row = unit.getRows().get(rowIdx);
       matrix[rowIdx] = new Element[row.getElements().size()];
       for (int colIdx = 0; colIdx < matrix[rowIdx].length; colIdx++) {
-        Element element = row.getElements().get(colIdx);
+        // Create a copy of the element because it will be modified as part of building the model.
+        Element element = new Element();
+        BeanUtils.copyProperties(row.getElements().get(colIdx), element);
+
         if (element.getId() == null) {
           // If the element does not have an id assign one.
           element.setId(String.valueOf(id));

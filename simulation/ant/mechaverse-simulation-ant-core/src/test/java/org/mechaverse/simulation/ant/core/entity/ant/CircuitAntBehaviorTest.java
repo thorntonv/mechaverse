@@ -19,9 +19,12 @@ import org.junit.runner.RunWith;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.api.model.Entity;
+import org.mechaverse.simulation.common.SimulationStateCircuitDataSource;
 import org.mechaverse.simulation.common.circuit.CircuitAllocator;
+import org.mechaverse.simulation.common.circuit.CircuitDataSource;
 import org.mechaverse.simulation.common.circuit.CircuitSimulator;
 import org.mechaverse.simulation.common.circuit.CircuitUtil;
+import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel;
 import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 import org.mechaverse.simulation.common.genetic.CircuitGeneticDataGenerator;
 import org.mechaverse.simulation.common.genetic.GeneticData;
@@ -57,6 +60,7 @@ public class CircuitAntBehaviorTest {
   private AntInput input;
   private RandomGenerator random;
   private AntSimulationState state;
+  private CircuitDataSource circuitDataSource = new SimulationStateCircuitDataSource();
 
   @Before
   public void setUp() {
@@ -66,7 +70,7 @@ public class CircuitAntBehaviorTest {
     when(mockCircuitSimulator.getCircuitOutputSize()).thenReturn(TEST_CIRCUIT_OUTPUT_SIZE);
     input = new AntInput();
     random = RandomUtil.newGenerator(CircuitAntBehavior.class.getName().hashCode());
-    behavior = new CircuitAntBehavior(mockCircuitSimulator);
+    behavior = new CircuitAntBehavior(circuitDataSource, mockCircuitSimulator);
     state = new AntSimulationState();
 
     ant = new Ant();
@@ -87,7 +91,9 @@ public class CircuitAntBehaviorTest {
     byte[] outputMap = entityDataStore.get(CircuitAntBehavior.CIRCUIT_OUTPUT_MAP_KEY);
     byte[] bitOutputMap = entityDataStore.get(CircuitAntBehavior.CIRCUIT_BIT_OUTPUT_MAP_KEY);
 
-    assertEquals(TEST_CIRCUIT_STATE_SIZE_BYTES, circuitState.length);
+    CircuitSimulationModel circuitModel = circuitDataSource.getCircuitSimulationModel();
+    assertEquals(
+        CircuitUtil.stateSizeInBytes(circuitModel.getCircuitStateSize()), circuitState.length);
     assertEquals(TEST_CIRCUIT_OUTPUT_SIZE_BYTES, outputMap.length);
     assertEquals(TEST_CIRCUIT_OUTPUT_SIZE_BYTES, bitOutputMap.length);
 

@@ -41,6 +41,7 @@
 
   <bean id="activeAntProvider" class="org.mechaverse.simulation.ant.core.entity.ant.ActiveAntProvider" scope="prototype" />
   <bean id="antBehavior" class="org.mechaverse.simulation.ant.core.entity.ant.CircuitAntBehavior" scope="prototype" >
+      <constructor-arg><ref bean="circuitDataSource" /></constructor-arg>
       <constructor-arg><ref bean="circuitSimulator" /></constructor-arg>
   </bean>
 
