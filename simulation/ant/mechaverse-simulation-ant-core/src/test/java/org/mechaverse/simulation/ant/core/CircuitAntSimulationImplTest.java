@@ -40,7 +40,12 @@ public class CircuitAntSimulationImplTest extends AbstractAntSimulationImplTest 
 
   @Override
   protected int testIterationCount() {
-    return 300;
+    return 1000;
+  }
+
+  @Override
+  protected int smallTestIterationCount() {
+    return 50;
   }
 
   @Test

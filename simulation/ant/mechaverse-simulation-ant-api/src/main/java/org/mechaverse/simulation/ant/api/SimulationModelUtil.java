@@ -23,6 +23,8 @@ import com.google.common.collect.Lists;
  */
 public final class SimulationModelUtil {
 
+  private static final int DEFAULT_GZIP_BUFFER_SIZE = 128 * 1024;
+
   /**
    * @return the environment with the given id from the given state
    */
@@ -88,7 +90,7 @@ public final class SimulationModelUtil {
    */
   public static byte[] serialize(SimulationModel model) throws IOException {
     ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-    try (OutputStream out = new GZIPOutputStream(byteOut)) {
+    try (OutputStream out = new GZIPOutputStream(byteOut, DEFAULT_GZIP_BUFFER_SIZE)) {
       SimulationModelUtil.serialize(model, out);
     }
     return byteOut.toByteArray();

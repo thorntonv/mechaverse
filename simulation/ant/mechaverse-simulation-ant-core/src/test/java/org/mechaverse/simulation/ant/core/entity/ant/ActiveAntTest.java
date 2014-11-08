@@ -2,6 +2,7 @@ package org.mechaverse.simulation.ant.core.entity.ant;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.mechaverse.simulation.ant.core.AntSimulationTestUtil.decompress;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
@@ -671,8 +672,8 @@ public class ActiveAntTest {
 
     AntSimulationState state = new AntSimulationState();
     activeAnt.updateState(state);
-    assertArrayEquals(expectedOutputData.toByteArray(),
-        state.getEntityReplayDataStore(mockAntEntity).get(ActiveAnt.OUTPUT_REPLAY_DATA_KEY));
+    assertArrayEquals(expectedOutputData.toByteArray(), decompress(
+        state.getEntityReplayDataStore(mockAntEntity).get(ActiveAnt.OUTPUT_REPLAY_DATA_KEY)));
 
     // The output replay data is cleared when the state is set.
     activeAnt.setState(new AntSimulationState());
@@ -685,8 +686,8 @@ public class ActiveAntTest {
     expectedOutputData.write(outputDataBytes);
 
     activeAnt.updateState(state);
-    assertArrayEquals(expectedOutputData.toByteArray(),
-        state.getEntityReplayDataStore(mockAntEntity).get(ActiveAnt.OUTPUT_REPLAY_DATA_KEY));
+    assertArrayEquals(expectedOutputData.toByteArray(), decompress(
+        state.getEntityReplayDataStore(mockAntEntity).get(ActiveAnt.OUTPUT_REPLAY_DATA_KEY)));
   }
 
   private void mockEntityAtCellInDirection(

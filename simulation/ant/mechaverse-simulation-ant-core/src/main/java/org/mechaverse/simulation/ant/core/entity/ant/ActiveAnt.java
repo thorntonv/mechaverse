@@ -279,8 +279,13 @@ public final class ActiveAnt implements ActiveEntity {
   @Override
   public void updateState(AntSimulationState state) {
     behavior.updateState(state);
-    state.getEntityReplayDataStore(entity).put(
+    try {
+      outputReplayDataOutputStream.close();
+      state.getEntityReplayDataStore(entity).put(
         OUTPUT_REPLAY_DATA_KEY, outputReplayDataOutputStream.toByteArray());
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override
@@ -361,23 +366,6 @@ public final class ActiveAnt implements ActiveEntity {
       int energy = energyNeeded <= nest.getEnergy() ? energyNeeded : nest.getEnergy();
       addEnergy(energy);
       nest.setEnergy(nest.getEnergy() - energy);
-    }
-    return false;
-  }
-
-  private boolean feed(Entity entityToFeed, EntityManager entityManager, CellEnvironment env) {
-    if (carriedEntityType == EntityType.FOOD) {
-      Entity food = entity.getCarriedEntity();
-
-      if (food != null) {
-        int energy = entityToFeed.getEnergy() + food.getEnergy();
-        entityToFeed.setEnergy(energy <= entityToFeed.getMaxEnergy()
-            ? energy : entityToFeed.getMaxEnergy());
-        carriedEntityType = EntityType.NONE;
-        entity.setCarriedEntity(null);
-        entityManager.removeEntity(food);
-        return true;
-      }
     }
     return false;
   }

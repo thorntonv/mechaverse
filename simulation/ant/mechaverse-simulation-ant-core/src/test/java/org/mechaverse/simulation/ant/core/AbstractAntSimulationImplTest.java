@@ -76,6 +76,7 @@ public abstract class AbstractAntSimulationImplTest {
 
   protected abstract AntSimulationImpl newSimulationImpl();
   protected abstract int testIterationCount();
+  protected abstract int smallTestIterationCount();
 
   @Before
   public void setUp() {
@@ -119,7 +120,7 @@ public abstract class AbstractAntSimulationImplTest {
     simulation1.setState(MemorySimulationDataStore.fromByteArray(initialState));
     simulation2.setState(MemorySimulationDataStore.fromByteArray(initialState));
 
-    for (int cnt = 0; cnt < 50; cnt++) {
+    for (int cnt = 0; cnt < smallTestIterationCount(); cnt++) {
       simulation1.step();
       simulation2.step();
 
@@ -132,7 +133,7 @@ public abstract class AbstractAntSimulationImplTest {
     simulation2 = newSimulationImpl();
     simulation2.setState(MemorySimulationDataStore.fromByteArray(state));
 
-    for (int cnt = 0; cnt < 50; cnt++) {
+    for (int cnt = 0; cnt < smallTestIterationCount(); cnt++) {
       simulation1.step();
       simulation2.step();
 
@@ -154,7 +155,7 @@ public abstract class AbstractAntSimulationImplTest {
 
     simulation = newSimulationImpl();
     simulation.setState(new MemorySimulationDataStore(initialState));
-    for (int cnt = 0; cnt < testIterationCount(); cnt++) {
+    for (int cnt = 0; cnt < smallTestIterationCount(); cnt++) {
       simulation.step();
     }
 
@@ -165,7 +166,7 @@ public abstract class AbstractAntSimulationImplTest {
       simulation.setState(new MemorySimulationDataStore(initialState));
 
       assertModelsEqual(simulation.getState().getModel(), replaySimulation.getState().getModel());
-      for (int cnt = 0; cnt < testIterationCount(); cnt++) {
+      for (int cnt = 0; cnt < smallTestIterationCount(); cnt++) {
         replaySimulation.step();
         simulation.step();
 

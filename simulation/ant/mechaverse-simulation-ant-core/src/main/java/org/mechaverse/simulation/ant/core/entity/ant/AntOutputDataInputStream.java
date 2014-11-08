@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.zip.GZIPInputStream;
 
 /**
  * A {@link DataInputStream} for reading {@link AntOutput} data.
@@ -11,6 +12,8 @@ import java.io.InputStream;
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public final class AntOutputDataInputStream extends DataInputStream {
+
+  private static final int BUFFER_SIZE = 128 * 1024;
 
   // TODO(thorntonv): Implement unit test for this class.
 
@@ -22,7 +25,7 @@ public final class AntOutputDataInputStream extends DataInputStream {
   }
 
   public AntOutputDataInputStream(InputStream in) {
-    super(in);
+    super(newGZIPInputStream(in));
   }
 
   public AntOutput readAntOutput() throws IOException {
@@ -31,5 +34,13 @@ public final class AntOutputDataInputStream extends DataInputStream {
     }
     antOutput.setData(antOutputData);
     return antOutput;
+  }
+
+  private static final GZIPInputStream newGZIPInputStream(InputStream in) {
+    try {
+      return new GZIPInputStream(in, BUFFER_SIZE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

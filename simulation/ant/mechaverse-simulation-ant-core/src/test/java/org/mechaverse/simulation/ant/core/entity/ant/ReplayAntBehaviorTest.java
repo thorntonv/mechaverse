@@ -47,6 +47,7 @@ public class ReplayAntBehaviorTest {
         replayDataOut.writeAntOutput(expectedOutput);
         expectedOutputs.add(expectedOutput);
       }
+      replayDataOut.close();
       state.getEntityReplayDataStore(entity)
           .put(ActiveAnt.OUTPUT_REPLAY_DATA_KEY, replayDataOut.toByteArray());
     }

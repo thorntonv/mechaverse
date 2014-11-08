@@ -21,4 +21,9 @@ public class SimpleAntSimulationImplTest extends AbstractAntSimulationImplTest {
   protected int testIterationCount() {
     return 2500;
   }
+
+  @Override
+  protected int smallTestIterationCount() {
+    return 100;
+  }
 }
