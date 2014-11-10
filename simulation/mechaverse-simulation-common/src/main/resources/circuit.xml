@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<circuit xmlns="http://www.mechaverse.org/circuit/model" width="16" height="16" iterationsPerUpdate="200">
+<circuit xmlns="http://www.mechaverse.org/circuit/model" width="16" height="16" iterationsPerUpdate="1">
 
   <element-type id="register">
     <output id="1">
@@ -73,9 +73,11 @@
       <param id="t4InvertInput3" />
       <param id="t4MaskInput3" />
       <expression><![CDATA[
-  ({input1}^{t1InvertInput1}&{t1MaskInput1}) | ({input2}^{t1InvertInput2}&{t1MaskInput2}) | ({input3}^{t1InvertInput3}&{t1MaskInput3})
+     (({input1}^{t1InvertInput1}&{t1MaskInput1}) | ({input2}^{t1InvertInput2}&{t1MaskInput2}) | ({input3}^{t1InvertInput3}&{t1MaskInput3})
     & ({input1}^{t2InvertInput1}&{t2MaskInput1}) | ({input2}^{t2InvertInput2}&{t2MaskInput2}) | ({input3}^{t2InvertInput3}&{t2MaskInput3})
     & ({input1}^{t3InvertInput1}&{t3MaskInput1}) | ({input2}^{t3InvertInput2}&{t3MaskInput2}) | ({input3}^{t3InvertInput3}&{t3MaskInput3})
+    & ({input1}^{t4InvertInput1}&{t4MaskInput1}) | ({input2}^{t4InvertInput2}&{t4MaskInput2}) | ({input3}^{t4InvertInput3}&{t4MaskInput3}))
+    ^ {invert}
       ]]></expression>
     </output>
   </element-type>
@@ -94,9 +96,9 @@
       <element type="boolean3in3out" outputs="{1}" />
     </row>
     <row>
-      <element type="interplaneRouting" />
-      <element type="boolean3in3out" />
       <element type="register" />
+      <element type="boolean3in3out" />
+      <element type="input" />
       <element type="boolean3in3out" outputs="{1}" />
     </row>
     <row>
