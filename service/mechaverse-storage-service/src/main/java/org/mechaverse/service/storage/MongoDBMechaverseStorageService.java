@@ -3,8 +3,11 @@ package org.mechaverse.service.storage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
 
-import org.apache.cxf.helpers.IOUtils;
+import org.bson.types.ObjectId;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
 import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore;
 import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore.MemorySimulationDataStoreInputStream;
@@ -17,13 +20,9 @@ import org.springframework.beans.factory.annotation.Value;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
-import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
-import com.mongodb.gridfs.GridFS;
-import com.mongodb.gridfs.GridFSDBFile;
-import com.mongodb.gridfs.GridFSInputFile;
 
 /**
  * A storage service implementation that utilizes MongoDB.
@@ -72,11 +71,14 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
   private Logger logger = LoggerFactory.getLogger(MongoDBMechaverseStorageService.class);
 
   // Constants
+  private final String mongoDataCollectionName = "data";
+  private final String mongoMetadataCollectionName = "metadata";
   private final String simulationIdKey = "simulationId";
   private final String instanceIdKey = "instanceId";
   private final String iterationKey = "iteration";
-  private final String gridfsName = "fs";
-  private final String gridfsFilenameKey = "filename";
+  private final String catalogKey = "catalog";
+  private final String dataKey = "data";
+  private final String idKey = "_id";
 
   // Configuration
   @Value("${org.mechaverse.service.storage.mongoHost}")
@@ -91,7 +93,6 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
   // MongoDB client and database
   private MongoClient mongoClient;
   private DB mongoDatabase;
-  private GridFS gridfs;
 
   /**
    * Returns an instance of a MongoDB database.
@@ -109,7 +110,15 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
 
       mongoClient = new MongoClient(mongoHost, mongoPort);
       mongoDatabase = mongoClient.getDB(mongoDatabaseName);
-      gridfs = new GridFS(mongoDatabase, gridfsName);
+
+      // Create a unique index using the simulation, instance, and iteration as the key
+      // Note: this is safe to run multiple times, as subsequent creations are ignored
+      DBObject indexKeys = new BasicDBObject();
+      indexKeys.put(simulationIdKey, 1);
+      indexKeys.put(instanceIdKey, 1);
+      indexKeys.put(iterationKey, 1);
+      mongoDatabase.getCollection(mongoMetadataCollectionName).createIndex(indexKeys,
+          new BasicDBObject("unique", true));
     }
   }
 
@@ -182,26 +191,34 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
 
     ensureDatabaseSetup();
 
-    // Build query to find all files for given state
-    String prefix = String.format("/%s/%s/%d/", simulationId, instanceId, iteration);
+    // Build query to find existing document
     DBObject query = new BasicDBObject();
-    query.put("filename", new BasicDBObject("$regex", prefix));
+    query.put(simulationIdKey, simulationId);
+    query.put(instanceIdKey, instanceId);
+    query.put(iterationKey, iteration);
 
-    // Get list of files for given state
-    DBCursor cursor = gridfs.getFileList(query);
-    if (cursor.count() == 0) {
-      throw new IOException(String.format("unable to get state for %s", prefix));
+    // Retrieve individual document from collection
+    DBObject record = mongoDatabase.getCollection(mongoMetadataCollectionName).findOne(query);
+    if (record == null) {
+      throw new IOException(String.format("unable to get state for /%s/%s/%s", simulationId,
+          instanceId, iteration));
     }
+    DBObject catalog = (DBObject) record.get(catalogKey);
 
-    // Reconstruct state from available files
     SimulationDataStore store = new MemorySimulationDataStore();
-    while (cursor.hasNext()) {
-      DBObject fileEntry = cursor.next();
-      String filename = (String) fileEntry.get(gridfsFilenameKey);
-      GridFSDBFile gridfsFile = gridfs.findOne(filename);
-      store.put(filename.replace(prefix, "").replace('/', '.'),
-          IOUtils.readBytesFromStream(gridfsFile.getInputStream()));
+    Map<String, ObjectId> keys = new HashMap<String, ObjectId>();
+    buildList(keys, new StringBuilder(), catalog);
+    for (String key : keys.keySet()) {
+      query = new BasicDBObject();
+      query.put(idKey, keys.get(key));
+      record = mongoDatabase.getCollection(mongoDataCollectionName).findOne(query);
+      if (record == null) {
+        throw new IOException(String.format("unable to get state for /%s/%s/%s", simulationId,
+            instanceId, iteration));
+      }
+      store.put(key, (byte[]) record.get(dataKey));
     }
+
     InputStream state =
         new ByteArrayInputStream(SimulationDataStoreOutputStream.toByteArray(store));
 
@@ -225,17 +242,37 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
     // Delete any existing state
     deleteState(simulationId, instanceId, iteration);
 
+    // Build basic document
+    DBObject metadataDocument = new BasicDBObject();
+    metadataDocument.put(simulationIdKey, simulationId);
+    metadataDocument.put(instanceIdKey, instanceId);
+    metadataDocument.put(iterationKey, iteration);
+
     // Decode state and add to document
     SimulationDataStoreInputStream storeStream =
         new MemorySimulationDataStoreInputStream(stateInput);
     SimulationDataStore store = storeStream.readDataStore();
     storeStream.close();
+    DBObject catalog = new BasicDBObject();
     for (String storeKey : store.keySet()) {
-      String keyName = storeKey.replace('.', '/');
-      String filename = String.format("/%s/%s/%d/%s", simulationId, instanceId, iteration, keyName);
-      GridFSInputFile gridfsFile = gridfs.createFile(store.get(storeKey));
-      gridfsFile.setFilename(filename);
-      gridfsFile.save();
+      DBObject dataDocument = new BasicDBObject();
+      dataDocument.put(dataKey, store.get(storeKey));
+      try {
+        mongoDatabase.getCollection(mongoDataCollectionName).insert(dataDocument);
+      } catch (MongoException ex) {
+        throw new IOException(String.format("unable to set state for /%s/%s/%s", simulationId,
+            instanceId, iteration), ex);
+      }
+      buildTree(storeKey, catalog, (ObjectId) dataDocument.get(idKey));
+    }
+    metadataDocument.put(catalogKey, catalog);
+
+    // Attempt to update an existing document with matching query, otherwise insert a new document
+    try {
+      mongoDatabase.getCollection(mongoMetadataCollectionName).insert(metadataDocument);
+    } catch (MongoException ex) {
+      throw new IOException(String.format("unable to set state for /%s/%s/%s", simulationId,
+          instanceId, iteration), ex);
     }
   }
 
@@ -260,33 +297,76 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
       throws IOException {
     ensureDatabaseSetup();
 
-    DBObject fileQuery = new BasicDBObject();
-    DBObject indexQuery = new BasicDBObject();
-
-    // Build queries to find all entries for the given simulation, instance, and iteration
-    StringBuilder path = new StringBuilder("/");
+    // Build query to find all documents for the given simulation and instance
+    DBObject query = new BasicDBObject();
     if (simulationId != null) {
-      path.append(simulationId);
-      path.append('/');
-      indexQuery.put(simulationIdKey, simulationId);
+      query.put(simulationIdKey, simulationId);
     }
     if (instanceId != null) {
-      path.append(instanceId);
-      path.append('/');
-      indexQuery.put(instanceIdKey, instanceId);
+      query.put(instanceIdKey, instanceId);
     }
     if (iteration != null) {
-      path.append(iteration);
-      path.append('/');
-      indexQuery.put(iterationKey, iteration);
+      query.put(iterationKey, iteration);
     }
-    fileQuery.put("filename", new BasicDBObject("$regex", path.toString()));
 
-    // Remove all files that match query
-    try {
-      gridfs.remove(fileQuery);
-    } catch (MongoException ex) {
-      throw new IOException(String.format("unable to delete state for %s", path), ex);
+    // Retrieve individual document from collection
+    DBObject record = mongoDatabase.getCollection(mongoMetadataCollectionName).findOne(query);
+    if (record != null) {
+      DBObject catalog = (DBObject) record.get(catalogKey);
+
+      Map<String, ObjectId> keys = new HashMap<String, ObjectId>();
+      buildList(keys, new StringBuilder(), catalog);
+
+      // Remove metadata document
+      try {
+        mongoDatabase.getCollection(mongoMetadataCollectionName).remove(query);
+      } catch (MongoException ex) {
+        throw new IOException(String.format("unable to delete instance %s:%s", simulationId,
+            instanceId), ex);
+      }
+
+      // Remove data documents
+      for (String key : keys.keySet()) {
+        query = new BasicDBObject();
+        query.put(idKey, (ObjectId) keys.get(key));
+
+        try {
+          mongoDatabase.getCollection(mongoDataCollectionName).remove(query);
+        } catch (MongoException ex) {
+          throw new IOException(String.format("unable to delete instance /%s/%s", simulationId,
+              instanceId), ex);
+        }
+      }
+    }
+  }
+
+  private DBObject buildTree(String key, DBObject node, ObjectId objectId) {
+    String[] split = key.split(Pattern.quote("."), 2);
+
+    if (split.length == 1) {
+      node.put(split[0], objectId);
+      return node;
+    } else {
+      DBObject child = (DBObject) node.get(split[0]);
+      if (child == null) {
+        child = new BasicDBObject();
+      }
+      node.put(split[0], buildTree(split[1], child, objectId));
+    }
+
+    return node;
+  }
+
+  private void buildList(Map<String, ObjectId> keys, StringBuilder keyBuilder, DBObject node) {
+    for (String key : node.keySet()) {
+      if (node.get(key) instanceof DBObject) {
+        StringBuilder childKeyBuilder = new StringBuilder(keyBuilder);
+        buildList(keys, childKeyBuilder.append(key).append("."), (DBObject) node.get(key));
+      } else {
+        StringBuilder childKeyBuilder = new StringBuilder(keyBuilder);
+        childKeyBuilder.append(key);
+        keys.put(childKeyBuilder.toString(), (ObjectId) node.get(key));
+      }
     }
   }
 }

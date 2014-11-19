@@ -12,7 +12,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore;
 import org.mechaverse.simulation.common.datastore.SimulationDataStore;
@@ -39,7 +38,7 @@ public class MongoDBMechaverseStorageServiceTest {
   private MongoDBMechaverseStorageService service;
   private static MongodExecutable mongodExecutable;
   private static MongodProcess mongodProcess;
-  private static int mongoPort = 37017;
+  private static int mongoPort = 27017;
   private static String mongoHost = "127.0.0.1";
   private static String mongoDatabaseName = "mechaverse-storage-test";
 
@@ -67,12 +66,12 @@ public class MongoDBMechaverseStorageServiceTest {
     this.service.setMongoPort(mongoPort);
     this.service.setMongoHost(mongoHost);
     this.service.setMongoDatabaseName(mongoDatabaseName);
-    this.service.clear();
+    // this.service.clear();
   }
 
   @After
   public void after() throws IOException {
-    this.service.clear();
+    // this.service.clear();
   }
 
   /**
@@ -221,8 +220,6 @@ public class MongoDBMechaverseStorageServiceTest {
    * equality of update and get
    */
   @Test
-  @Ignore
-  // TODO(dhendrickson): figure out support for empty states
   public void testStateD() throws IOException {
     SimulationDataStore setStore = new MemorySimulationDataStore();
     setStore.put("key1", "value1".getBytes());
