@@ -8,7 +8,6 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.math3.random.Well19937c;
@@ -17,6 +16,8 @@ import org.mechaverse.simulation.common.circuit.CircuitReader;
 import org.mechaverse.simulation.common.circuit.CircuitSimulator;
 import org.mechaverse.simulation.common.circuit.CircuitUtil;
 import org.mechaverse.simulation.common.circuit.generator.CircuitGeneratorCLI;
+import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel;
+import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModelBuilder;
 import org.mechaverse.simulation.common.opencl.OpenClCircuitSimulator;
 
 /**
@@ -25,10 +26,6 @@ import org.mechaverse.simulation.common.opencl.OpenClCircuitSimulator;
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class CircuitAnalysisCLI {
-
-  // TODO(thorntonv): Allow these to be provided as command line arguments.
-  private static final int SAMPLE_SIZE = 10;
-  private static final int MAX_ITERATION_COUNT = 15000;
 
   public static void main(String[] args) throws Exception {
     Options options = buildOptions();
@@ -39,21 +36,25 @@ public class CircuitAnalysisCLI {
 
       String inputFilename = cmd.getOptionValue('i');
       String outputFilename = cmd.getOptionValue('o');
+      int numSamples = Integer.parseInt(cmd.getOptionValue("n"));
+      int maxIterations = Integer.parseInt(cmd.getOptionValue("maxIterations"));
 
       Circuit circuit = CircuitReader.read(new FileInputStream(inputFilename));
-      ;
 
       PrintStream out = System.out;
       if (outputFilename != null) {
         out = new PrintStream(outputFilename);
       }
 
+      out.println("cycleStartIteration,cycleLength,avgDifference,avgSetBitCount,"
+          + "elementOutputBitsPerState,bitsPerState");
+
       try(OpenClCircuitSimulator simulator = new OpenClCircuitSimulator(1, 1, 1, circuit)) {
-        performAnalysis(SAMPLE_SIZE, MAX_ITERATION_COUNT, simulator, out);
+        performAnalysis(numSamples, maxIterations, circuit, simulator, out);
       } finally {
         out.close();
       }
-    } catch (ParseException ex) {
+    } catch (NumberFormatException | ParseException ex) {
       System.out.println(ex.getMessage());
       System.out.println();
       HelpFormatter formatter = new HelpFormatter();
@@ -62,12 +63,14 @@ public class CircuitAnalysisCLI {
   }
 
   private static void performAnalysis(int sampleSize, int maxIterationCount,
-      CircuitSimulator simulator, PrintStream out) {
+      Circuit circuit, CircuitSimulator simulator, PrintStream out) {
     for (int cnt = 1; cnt <= sampleSize; cnt++) {
       CircuitAnalyzer circuitAnalyzer = new CircuitAnalyzer();
       int[] circuitState =
           CircuitUtil.randomState(simulator.getCircuitStateSize(), new Well19937c());
       simulator.setCircuitState(0, circuitState);
+
+      CircuitSimulationModel circuitModel = CircuitSimulationModelBuilder.build(circuit);
 
       int iteration = 1;
       do {
@@ -79,8 +82,18 @@ public class CircuitAnalysisCLI {
         iteration++;
       } while (circuitAnalyzer.getCycleLength() == 0 && iteration < maxIterationCount);
 
-      out.printf("%d,%d,%d%n", circuitAnalyzer.getCycleStartIteration(),
-          circuitAnalyzer.getCycleLength(), circuitAnalyzer.getAverageStateDifference());
+      long bitsPerState = CircuitUtil.stateSizeInBytes(circuitState.length) * 8;
+      long elementOutputBitsPerState =
+          CircuitUtil.stateSizeInBytes(circuitModel.getElementOutputStateSize()) * 8;
+      int cycleLength = circuitAnalyzer.getCycleLength();
+      out.printf("%d,%d,%d,%d,%d,%d%n",
+          circuitAnalyzer.getCycleStartIteration(),
+          cycleLength > 0 ? cycleLength : maxIterationCount,
+          circuitAnalyzer.getAverageStateDifference(),
+          circuitAnalyzer.getAverageSetBitCount(),
+          circuitModel.getElementOutputStateSize(),
+          elementOutputBitsPerState,
+          bitsPerState);
 
       System.gc();
     }
@@ -89,12 +102,20 @@ public class CircuitAnalysisCLI {
   private static final Options buildOptions() {
     Options options = new Options();
 
-    OptionGroup group = new OptionGroup();
-    group.addOption(new Option("i", "input", true, "Circuit XML file name"));
-    group.setRequired(true);
-    options.addOption(new Option("o", "output", true, "Output file name"));
+    Option inputOption = new Option("i", "input", true, "Circuit XML file name");
+    inputOption.setRequired(true);
+    options.addOption(inputOption);
 
-    options.addOptionGroup(group);
+    Option sampleSizeOption = new Option("n", true, "Sample size");
+    sampleSizeOption.setRequired(true);
+    options.addOption(sampleSizeOption);
+
+    Option maxIterationsOption = new Option("maxIterations", true, "Maximum number of iterations");
+    maxIterationsOption.setRequired(true);
+    options.addOption(maxIterationsOption);
+
+    options.addOption("o", "output", true, "Output file name");
+
     return options;
   }
 }

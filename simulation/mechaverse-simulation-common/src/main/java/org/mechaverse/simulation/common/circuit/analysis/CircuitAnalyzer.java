@@ -1,5 +1,6 @@
 package org.mechaverse.simulation.common.circuit.analysis;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -41,7 +42,8 @@ public class CircuitAnalyzer {
   private Map<Integer, ArrayList<CircuitStateRecord>> previousStatesMap = new HashMap<>();
   private int cycleStartIteration;
   private int cycleLength;
-  private int averageStateDifference;
+  private BigInteger averageStateDifference;
+  private BigInteger averageSetBitCount;
 
   public void update(int iteration, int[] circuitState) {
     if (cycleLength > 0) {
@@ -65,12 +67,16 @@ public class CircuitAnalyzer {
         cycleLength = cycleEndIteration - cycleStartIteration;
         int cycleStartIdx = cycleStartIteration - 1;
         int cycleEndIdx = cycleEndIteration - 1;
-        averageStateDifference = 0;
+
+        averageStateDifference = BigInteger.ZERO;
+        averageSetBitCount = getSetBitCount(stateHistory.get(cycleStartIdx));
         for (int idx = cycleStartIdx + 1; idx <= cycleEndIdx; idx++) {
-          averageStateDifference +=
-              getDifferenceInBits(stateHistory.get(idx - 1), stateHistory.get(idx));
+          averageStateDifference = averageStateDifference.add(BigInteger.valueOf(
+              getDifferenceInBits(stateHistory.get(idx - 1), stateHistory.get(idx))));
+          averageSetBitCount = averageSetBitCount.add(getSetBitCount(stateHistory.get(idx)));
         }
-        averageStateDifference /= cycleLength;
+        averageStateDifference = averageStateDifference.divide(BigInteger.valueOf(cycleLength));
+        averageSetBitCount = averageSetBitCount.divide(BigInteger.valueOf(cycleLength));
         return;
       }
     }
@@ -87,15 +93,48 @@ public class CircuitAnalyzer {
   }
 
   public int getAverageStateDifference() {
-    if(cycleLength == 0 && averageStateDifference == 0) {
+    if (cycleLength == 0 && averageStateDifference == null) {
       // If there is no cycle return the average across the entire history.
-      for(int idx = 1; idx < stateHistory.size(); idx++) {
-        averageStateDifference +=
-            getDifferenceInBits(stateHistory.get(idx - 1), stateHistory.get(idx));
+      averageStateDifference = BigInteger.ZERO;
+      for (int idx = 1; idx < stateHistory.size(); idx++) {
+        averageStateDifference = averageStateDifference.add(BigInteger.valueOf(
+            getDifferenceInBits(stateHistory.get(idx - 1), stateHistory.get(idx))));
       }
-      averageStateDifference /= stateHistory.size();
+      averageStateDifference =
+          averageStateDifference.divide(BigInteger.valueOf(stateHistory.size()));
     }
-    return averageStateDifference;
+    return averageStateDifference.intValue();
+  }
+
+  public int getAverageSetBitCount() {
+    if (cycleLength == 0 && averageSetBitCount == null) {
+      // If there is no cycle return the average across the entire history.
+      averageSetBitCount = BigInteger.ZERO;
+      for (int[] historyEntry : stateHistory) {
+        averageSetBitCount = averageSetBitCount.add(getSetBitCount(historyEntry));
+      }
+      averageSetBitCount = averageSetBitCount.divide(BigInteger.valueOf(stateHistory.size()));
+    }
+    return averageSetBitCount.intValue();
+  }
+
+  public static BigInteger getSetBitCount(int[] array) {
+    BigInteger setBitCount = BigInteger.ZERO;
+    for (int idx = 0; idx < array.length; idx++) {
+      setBitCount = setBitCount.add(BigInteger.valueOf(getSetBitCount(array[idx])));
+    }
+    return setBitCount;
+  }
+
+  public static int getSetBitCount(int value) {
+    int setBitCount = 0;
+    for (int cnt = 1; cnt <= 32; cnt++) {
+      if ((value & 0b1) == 1) {
+        setBitCount++;
+      }
+      value >>= 1;
+    }
+    return setBitCount;
   }
 
   public static int getDifferenceInBits(int[] state1, int[] state2) {

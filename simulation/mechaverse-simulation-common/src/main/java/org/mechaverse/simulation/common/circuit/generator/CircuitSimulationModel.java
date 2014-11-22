@@ -313,6 +313,18 @@ public class CircuitSimulationModel {
   }
 
   /**
+   * Returns the number of element output state values.
+   */
+  public int getElementOutputStateSize() {
+    int elementOutputStateSize = 0;
+    for (ElementInfo elementInfo : getLogicalUnitInfo().getElements()) {
+      elementOutputStateSize += elementInfo.getOutputVarNames().size();
+    }
+    elementOutputStateSize *= getLogicalUnitCount();
+    return elementOutputStateSize;
+  }
+
+  /**
    * Returns the size of the circuit state in bytes.
    */
   public int getCircuitStateSizeBytes() {

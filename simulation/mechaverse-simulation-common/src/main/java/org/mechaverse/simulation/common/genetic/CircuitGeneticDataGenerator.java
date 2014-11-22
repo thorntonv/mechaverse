@@ -2,7 +2,6 @@ package org.mechaverse.simulation.common.genetic;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel;
-import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel.ElementInfo;
 import org.mechaverse.simulation.common.util.ArrayUtil;
 
 /**
@@ -36,12 +35,8 @@ public class CircuitGeneticDataGenerator {
 
   public GeneticData generateOutputMapGeneticData(CircuitSimulationModel circuitModel,
       int outputSize, RandomGenerator random) {
-    int elementOutputStateSize = 0;
-    for(ElementInfo elementInfo : circuitModel.getLogicalUnitInfo().getElements()) {
-      elementOutputStateSize += elementInfo.getOutputVarNames().size();
-    }
-    elementOutputStateSize *= circuitModel.getLogicalUnitCount();
-    return generateOutputMapGeneticData(outputSize, elementOutputStateSize, random);
+    return generateOutputMapGeneticData(
+        outputSize, circuitModel.getElementOutputStateSize(), random);
   }
 
   public GeneticData generateOutputMapGeneticData(int outputSize, int stateSize,
