@@ -6,6 +6,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.mechaverse.circuit.model.Circuit;
+import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModel;
+import org.mechaverse.simulation.common.circuit.generator.CircuitSimulationModelBuilder;
+
 import com.google.common.base.Preconditions;
 
 /**
@@ -44,6 +48,11 @@ public class CircuitAnalyzer {
   private int cycleLength;
   private BigInteger averageStateDifference;
   private BigInteger averageSetBitCount;
+  private final CircuitSimulationModel circuitModel;
+
+  public CircuitAnalyzer(Circuit circuit) {
+    circuitModel = CircuitSimulationModelBuilder.build(circuit);
+  }
 
   public void update(int iteration, int[] circuitState) {
     if (cycleLength > 0) {
@@ -51,6 +60,8 @@ public class CircuitAnalyzer {
       return;
     }
 
+    // Truncate the constant portion of the state.
+    circuitState = Arrays.copyOf(circuitState, circuitModel.getElementOutputStateSize());
     stateHistory.add(circuitState);
 
     int hashCode = Arrays.hashCode(circuitState);
@@ -76,7 +87,7 @@ public class CircuitAnalyzer {
           averageSetBitCount = averageSetBitCount.add(getSetBitCount(stateHistory.get(idx)));
         }
         averageStateDifference = averageStateDifference.divide(BigInteger.valueOf(cycleLength));
-        averageSetBitCount = averageSetBitCount.divide(BigInteger.valueOf(cycleLength));
+        averageSetBitCount = averageSetBitCount.divide(BigInteger.valueOf(cycleLength + 1));
         return;
       }
     }
@@ -161,5 +172,9 @@ public class CircuitAnalyzer {
       value2 >>= 1;
     }
     return difference;
+  }
+
+  public int getElementOutputStateSize() {
+    return circuitModel.getElementOutputStateSize();
   }
 }
