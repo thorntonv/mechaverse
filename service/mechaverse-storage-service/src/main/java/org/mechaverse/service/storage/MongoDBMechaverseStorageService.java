@@ -1,28 +1,18 @@
 package org.mechaverse.service.storage;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Pattern;
 
-import org.bson.types.ObjectId;
+import org.mechaverse.service.storage.MongoDBSimulationDataStore.MongoDBInputStream;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
-import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore;
-import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore.MemorySimulationDataStoreInputStream;
 import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 import org.mechaverse.simulation.common.datastore.SimulationDataStoreInputStream;
-import org.mechaverse.simulation.common.datastore.SimulationDataStoreOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
-import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
-import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
-import com.mongodb.MongoException;
 
 /**
  * A storage service implementation that utilizes MongoDB.
@@ -70,16 +60,6 @@ import com.mongodb.MongoException;
 public class MongoDBMechaverseStorageService implements MechaverseStorageService {
   private Logger logger = LoggerFactory.getLogger(MongoDBMechaverseStorageService.class);
 
-  // Constants
-  private final String mongoDataCollectionName = "data";
-  private final String mongoMetadataCollectionName = "metadata";
-  private final String simulationIdKey = "simulationId";
-  private final String instanceIdKey = "instanceId";
-  private final String iterationKey = "iteration";
-  private final String catalogKey = "catalog";
-  private final String dataKey = "data";
-  private final String idKey = "_id";
-
   // Configuration
   @Value("${org.mechaverse.service.storage.mongoHost}")
   private String mongoHost = "localhost";
@@ -110,15 +90,6 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
 
       mongoClient = new MongoClient(mongoHost, mongoPort);
       mongoDatabase = mongoClient.getDB(mongoDatabaseName);
-
-      // Create a unique index using the simulation, instance, and iteration as the key
-      // Note: this is safe to run multiple times, as subsequent creations are ignored
-      DBObject indexKeys = new BasicDBObject();
-      indexKeys.put(simulationIdKey, 1);
-      indexKeys.put(instanceIdKey, 1);
-      indexKeys.put(iterationKey, 1);
-      mongoDatabase.getCollection(mongoMetadataCollectionName).createIndex(indexKeys,
-          new BasicDBObject("unique", true));
     }
   }
 
@@ -191,38 +162,15 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
 
     ensureDatabaseSetup();
 
-    // Build query to find existing document
-    DBObject query = new BasicDBObject();
-    query.put(simulationIdKey, simulationId);
-    query.put(instanceIdKey, instanceId);
-    query.put(iterationKey, iteration);
-
-    // Retrieve individual document from collection
-    DBObject record = mongoDatabase.getCollection(mongoMetadataCollectionName).findOne(query);
-    if (record == null) {
-      throw new IOException(String.format("unable to get state for /%s/%s/%s", simulationId,
-          instanceId, iteration));
-    }
-    DBObject catalog = (DBObject) record.get(catalogKey);
-
-    SimulationDataStore store = new MemorySimulationDataStore();
-    Map<String, ObjectId> keys = new HashMap<String, ObjectId>();
-    buildList(keys, new StringBuilder(), catalog);
-    for (String key : keys.keySet()) {
-      query = new BasicDBObject();
-      query.put(idKey, keys.get(key));
-      record = mongoDatabase.getCollection(mongoDataCollectionName).findOne(query);
-      if (record == null) {
-        throw new IOException(String.format("unable to get state for /%s/%s/%s", simulationId,
-            instanceId, iteration));
-      }
-      store.put(key, (byte[]) record.get(dataKey));
+    SimulationDataStore store;
+    try {
+      store = new MongoDBSimulationDataStore(mongoDatabase, simulationId, instanceId, iteration);
+    } catch (IOException ex) {
+      throw new IOException(String.format("state does not exist for /%s/%s/%d", simulationId,
+          instanceId, iteration), ex);
     }
 
-    InputStream state =
-        new ByteArrayInputStream(SimulationDataStoreOutputStream.toByteArray(store));
-
-    return state;
+    return SimulationDataStoreInputStream.newInputStream(store);
   }
 
   @Override
@@ -239,40 +187,15 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
 
     ensureDatabaseSetup();
 
-    // Delete any existing state
-    deleteState(simulationId, instanceId, iteration);
-
-    // Build basic document
-    DBObject metadataDocument = new BasicDBObject();
-    metadataDocument.put(simulationIdKey, simulationId);
-    metadataDocument.put(instanceIdKey, instanceId);
-    metadataDocument.put(iterationKey, iteration);
-
-    // Decode state and add to document
-    SimulationDataStoreInputStream storeStream =
-        new MemorySimulationDataStoreInputStream(stateInput);
-    SimulationDataStore store = storeStream.readDataStore();
-    storeStream.close();
-    DBObject catalog = new BasicDBObject();
-    for (String storeKey : store.keySet()) {
-      DBObject dataDocument = new BasicDBObject();
-      dataDocument.put(dataKey, store.get(storeKey));
-      try {
-        mongoDatabase.getCollection(mongoDataCollectionName).insert(dataDocument);
-      } catch (MongoException ex) {
-        throw new IOException(String.format("unable to set state for /%s/%s/%s", simulationId,
-            instanceId, iteration), ex);
-      }
-      buildTree(storeKey, catalog, (ObjectId) dataDocument.get(idKey));
-    }
-    metadataDocument.put(catalogKey, catalog);
-
-    // Attempt to update an existing document with matching query, otherwise insert a new document
+    MongoDBInputStream stream = null;
     try {
-      mongoDatabase.getCollection(mongoMetadataCollectionName).insert(metadataDocument);
-    } catch (MongoException ex) {
-      throw new IOException(String.format("unable to set state for /%s/%s/%s", simulationId,
-          instanceId, iteration), ex);
+      stream =
+          new MongoDBInputStream(stateInput, mongoDatabase, simulationId, instanceId, iteration);
+      stream.readDataStore();
+    } finally {
+      if (stream != null) {
+        stream.close();
+      }
     }
   }
 
@@ -285,88 +208,13 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
 
   @Override
   public void deleteSimulation(String simulationId) throws IOException {
-    deleteState(simulationId, null, null);
+    ensureDatabaseSetup();
+    MongoDBSimulationDataStore.delete(mongoDatabase, simulationId, null, null);
   }
 
   @Override
   public void deleteInstance(String simulationId, String instanceId) throws IOException {
-    deleteState(simulationId, instanceId, null);
-  }
-
-  private void deleteState(String simulationId, String instanceId, Long iteration)
-      throws IOException {
     ensureDatabaseSetup();
-
-    // Build query to find all documents for the given simulation and instance
-    DBObject query = new BasicDBObject();
-    if (simulationId != null) {
-      query.put(simulationIdKey, simulationId);
-    }
-    if (instanceId != null) {
-      query.put(instanceIdKey, instanceId);
-    }
-    if (iteration != null) {
-      query.put(iterationKey, iteration);
-    }
-
-    // Retrieve individual document from collection
-    DBObject record = mongoDatabase.getCollection(mongoMetadataCollectionName).findOne(query);
-    if (record != null) {
-      DBObject catalog = (DBObject) record.get(catalogKey);
-
-      Map<String, ObjectId> keys = new HashMap<String, ObjectId>();
-      buildList(keys, new StringBuilder(), catalog);
-
-      // Remove metadata document
-      try {
-        mongoDatabase.getCollection(mongoMetadataCollectionName).remove(query);
-      } catch (MongoException ex) {
-        throw new IOException(String.format("unable to delete instance %s:%s", simulationId,
-            instanceId), ex);
-      }
-
-      // Remove data documents
-      for (String key : keys.keySet()) {
-        query = new BasicDBObject();
-        query.put(idKey, (ObjectId) keys.get(key));
-
-        try {
-          mongoDatabase.getCollection(mongoDataCollectionName).remove(query);
-        } catch (MongoException ex) {
-          throw new IOException(String.format("unable to delete instance /%s/%s", simulationId,
-              instanceId), ex);
-        }
-      }
-    }
-  }
-
-  private DBObject buildTree(String key, DBObject node, ObjectId objectId) {
-    String[] split = key.split(Pattern.quote("."), 2);
-
-    if (split.length == 1) {
-      node.put(split[0], objectId);
-      return node;
-    } else {
-      DBObject child = (DBObject) node.get(split[0]);
-      if (child == null) {
-        child = new BasicDBObject();
-      }
-      node.put(split[0], buildTree(split[1], child, objectId));
-    }
-
-    return node;
-  }
-
-  private void buildList(Map<String, ObjectId> keys, StringBuilder keyBuilder, DBObject node) {
-    for (String key : node.keySet()) {
-      if (node.get(key) instanceof DBObject) {
-        StringBuilder childKeyBuilder = new StringBuilder(keyBuilder);
-        buildList(keys, childKeyBuilder.append(key).append("."), (DBObject) node.get(key));
-      } else {
-        StringBuilder childKeyBuilder = new StringBuilder(keyBuilder);
-        childKeyBuilder.append(key);
-        keys.put(childKeyBuilder.toString(), (ObjectId) node.get(key));
-      }
-    }
+    MongoDBSimulationDataStore.delete(mongoDatabase, simulationId, instanceId, null);
   }
 }

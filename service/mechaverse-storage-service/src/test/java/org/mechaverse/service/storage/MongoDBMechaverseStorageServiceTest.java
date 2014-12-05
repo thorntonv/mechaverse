@@ -66,12 +66,12 @@ public class MongoDBMechaverseStorageServiceTest {
     this.service.setMongoPort(mongoPort);
     this.service.setMongoHost(mongoHost);
     this.service.setMongoDatabaseName(mongoDatabaseName);
-    // this.service.clear();
+    this.service.clear();
   }
 
   @After
   public void after() throws IOException {
-    // this.service.clear();
+    this.service.clear();
   }
 
   /**
