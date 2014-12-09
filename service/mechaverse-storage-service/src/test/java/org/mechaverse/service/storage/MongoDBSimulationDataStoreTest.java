@@ -27,6 +27,13 @@ import de.flapdoodle.embed.mongo.config.MongodConfigBuilder;
 import de.flapdoodle.embed.mongo.config.Net;
 import de.flapdoodle.embed.mongo.distribution.Version;
 
+/**
+ * 
+ * Unit tests for {@link MongoDBSimulationDataStore}.
+ * 
+ * @author Dusty Hendrickson (dhendrickson@mechaverse.org)
+ */
+// TODO(dhendrickson): reintegrate with AbstractSimulationDataStoreTest
 public class MongoDBSimulationDataStoreTest {
   private SimulationDataStore dataStore;
 
@@ -61,6 +68,7 @@ public class MongoDBSimulationDataStoreTest {
 
   @Before
   public void before() throws IOException {
+    MongoDBSimulationDataStore.delete(mongoDatabase, "simulation1", "instance1", 1L);
     MongoDBSimulationDataStore.create(mongoDatabase, "simulation1", "instance1", 1);
     dataStore = new MongoDBSimulationDataStore(mongoDatabase, "simulation1", "instance1", 1);
   }
@@ -71,13 +79,18 @@ public class MongoDBSimulationDataStoreTest {
   }
 
   @Test
-  public void putAndGet() throws IOException {
+  public void testPutGetA() throws IOException {
     dataStore.put("foo.bar", "testValue".getBytes());
     assertArrayEquals("testValue".getBytes(), dataStore.get("foo.bar"));
   }
 
   @Test
-  public void remove() throws IOException {
+  public void testGetA() throws IOException {
+    assertArrayEquals(null, dataStore.get("foo.bar"));
+  }
+
+  @Test
+  public void testRemoveA() throws IOException {
     dataStore.put("foo.bar", "testValue".getBytes());
     dataStore.remove("foo.bar");
     assertFalse(dataStore.containsKey("foo.bar"));
@@ -86,7 +99,15 @@ public class MongoDBSimulationDataStoreTest {
   }
 
   @Test
-  public void clear() {
+  public void testRemoveB() throws IOException {
+    dataStore.remove("foo.bar");
+    assertFalse(dataStore.containsKey("foo.bar"));
+    assertEquals(0, dataStore.keySet().size());
+    assertEquals(null, dataStore.get("foo.bar"));
+  }
+
+  @Test
+  public void testClearA() {
     dataStore.put("foo.bar.1", "testValue".getBytes());
     dataStore.put("foo.bar.2", "testValue".getBytes());
     dataStore.put("foo.bar.3", "testValue".getBytes());
@@ -100,7 +121,14 @@ public class MongoDBSimulationDataStoreTest {
   }
 
   @Test
-  public void keySet() {
+  public void testClearB() {
+    dataStore.clear();
+    assertEquals(0, dataStore.size());
+    assertEquals(Collections.emptySet(), dataStore.keySet());
+  }
+
+  @Test
+  public void testKeySetA() {
     dataStore.put("foo.bar.1", "testValue".getBytes());
     dataStore.put("foo.bar.2", "testValue".getBytes());
     dataStore.put("foo.bar.3", "testValue".getBytes());
@@ -109,11 +137,21 @@ public class MongoDBSimulationDataStoreTest {
   }
 
   @Test
-  public void size() {
+  public void testKeySetB() {
+    assertEquals(Collections.emptySet(), dataStore.keySet());
+  }
+
+  @Test
+  public void testSizeA() {
     dataStore.put("foo.bar.1", "testValue".getBytes());
     dataStore.put("foo.bar.2", "testValue".getBytes());
     dataStore.put("foo.bar.3", "testValue".getBytes());
 
     assertEquals(3, dataStore.size());
+  }
+
+  @Test
+  public void testSizeB() {
+    assertEquals(0, dataStore.size());
   }
 }

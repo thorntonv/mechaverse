@@ -3,7 +3,7 @@ package org.mechaverse.service.storage;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.mechaverse.service.storage.MongoDBSimulationDataStore.MongoDBInputStream;
+import org.mechaverse.service.storage.MongoDBSimulationDataStore.MongoDBSimulationDataStoreInputStream;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
 import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 import org.mechaverse.simulation.common.datastore.SimulationDataStoreInputStream;
@@ -17,43 +17,7 @@ import com.mongodb.MongoClient;
 /**
  * A storage service implementation that utilizes MongoDB.
  *
- * All state is represented within a GridFS filesystem. As an example, a simple state might have
- * simulationId 1, instanceId 2, iteration 3, and contain keys model, entity.1.key1, and
- * entity.1.key2. This would be represented in GridFS as the following files:
  * 
- * <pre>
- * /1/2/3/model
- * /1/2/3/entity/1/key1
- * /1/2/3/entity/1/key2
- * </pre>
- * 
- * Each file contains the binary data associated with the given key. GridFS utilizes two collections
- * within the database to represent the virtual filesystem. The collection fs.files will contain the
- * filesystem metadata (filename, timestamp, checksum, etc.). The collection fs.chunks contains the
- * actual binary data, which will be chunked into multiple pieces if necessary to ensure
- * compatibility with the MongoFS maximum document size. GridFS is implemented entirely by client
- * drivers. All data can be accessed by any client that is GridFS aware as well as by standard
- * MongoDB queries directly utilizing the standard GridFS collections.
- *
- * The mongofiles application can be used to easily browse the available data via a command line
- * shell:
- * 
- * <pre>
- * # mongofiles -d mechaverse list
- * connected to: 127.0.0.1
- * /1/2/3/model
- * /1/2/3/entity/1/key1
- * /1/2/3/entity/1/key2
- * 
- * # mongofiles -d mechaverse search /1/2/3/entity
- * connected to: 127.0.0.1
- * /1/2/3/entity/1/key1
- * /1/2/3/entity/1/key2
- * 
- * # mongofiles -d mechaverse get -l key1.bin /1/2/3/entity/1/key1
- * connected to: 127.0.0.1
- * done write to: model.bin
- * </pre>
  * 
  * @author Dusty Hendrickson (dhendrickson@mechaverse.org)
  */
@@ -187,10 +151,11 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
 
     ensureDatabaseSetup();
 
-    MongoDBInputStream stream = null;
+    MongoDBSimulationDataStoreInputStream stream = null;
     try {
       stream =
-          new MongoDBInputStream(stateInput, mongoDatabase, simulationId, instanceId, iteration);
+          new MongoDBSimulationDataStoreInputStream(stateInput, mongoDatabase, simulationId,
+              instanceId, iteration);
       stream.readDataStore();
     } finally {
       if (stream != null) {

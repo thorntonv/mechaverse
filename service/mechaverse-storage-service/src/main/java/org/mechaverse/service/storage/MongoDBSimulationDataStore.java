@@ -16,6 +16,39 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoException;
 
+/**
+ * A {@link SimulationDataStore} implementation that utilizes MongoDB.
+ *
+ * For a given store, at least one document will be created that includes the simulation Id,
+ * instance Id, and iteration. This is to allow for a store that contains no keys. As keys are
+ * added, additional documents will be added that contain the simulation Id, instance Id, iteration,
+ * key, and value. A unique index exists for simulation Id, instance Id, iteration, and key, which
+ * not only provides performance optimizations, but all ensure that duplicate entries are not
+ * allowed.
+ * 
+ * Useful queries when working with the MongoDB database directly:
+ * 
+ * <pre>
+ * Find all unique stores:
+ * > db.SimulationDataStores.find({"key": {$exists: false}})
+ * 
+ * Find all keys for given simulation Id, instance Id, and iteration:
+ * > db.SimulationDataStores.find({"simulationId" : "0249baa9-f38f-4435-add8-da988d217fbb", 
+ *                                 "instanceId" : "719912d5-809b-462f-a9c4-b9748d5a8f95", 
+ *                                 "iteration" : 0, 
+ *                                 "key": {$exists: true}})
+ *
+ * Find all keys with a given prefix for given simulation Id, instance Id, and iteration:
+ * > db.SimulationDataStores.find({"simulationId" : "0249baa9-f38f-4435-add8-da988d217fbb", 
+ *                                 "instanceId" : "719912d5-809b-462f-a9c4-b9748d5a8f95",
+ *                                 "iteration" : 100,
+ *                                 "key": {$regex: "entity"}} 
+ * </pre>
+ * 
+ * 
+ * 
+ * @author Dusty Hendrickson (dhendrickson@mechaverse.org)
+ */
 public class MongoDBSimulationDataStore extends AbstractSimulationDataStore {
 
   // Constants
@@ -31,7 +64,17 @@ public class MongoDBSimulationDataStore extends AbstractSimulationDataStore {
   private String instanceId;
   private long iteration;
 
-  public static final class MongoDBInputStream extends SimulationDataStoreInputStream {
+  /**
+   * A {@link SimulationDataStoreInputStream} implementation utilizing
+   * {@link MongoDBSimulationDataStore}.
+   */
+  public static final class MongoDBSimulationDataStoreInputStream
+      extends SimulationDataStoreInputStream {
+
+    /**
+     * Generates a supplier for the given database and state parameters. This process will delete an
+     * existing store and recreate it.
+     */
     private static Supplier<SimulationDataStore> getSupplier(final DB mongoDatabase,
         final String simulationId, final String instanceId, long iteration) throws IOException {
       MongoDBSimulationDataStore.delete(mongoDatabase, simulationId, instanceId, iteration);
@@ -47,12 +90,16 @@ public class MongoDBSimulationDataStore extends AbstractSimulationDataStore {
       };
     }
 
-    public MongoDBInputStream(InputStream in, final DB mongoDatabase, final String simulationId,
-        final String instanceId, final long iteration) throws IOException {
+    public MongoDBSimulationDataStoreInputStream(InputStream in, final DB mongoDatabase,
+        final String simulationId, final String instanceId, final long iteration)
+        throws IOException {
       super(in, getSupplier(mongoDatabase, simulationId, instanceId, iteration));
     }
   }
 
+  /**
+   * Creates a MongoDB store for the given parameters.
+   */
   public static void create(DB mongoDatabase, String simulationId, String instanceId, long iteration)
       throws IOException {
     // Ensure unique index exists
@@ -78,6 +125,14 @@ public class MongoDBSimulationDataStore extends AbstractSimulationDataStore {
     }
   }
 
+  /**
+   * Deletes one or more MongoDB stores based on the given parameters.
+   * 
+   * @param mongoDatabase MongoDB database connection
+   * @param simulationId If not null, add simulation Id to query of stores to be deleted
+   * @param instanceId If not null, add instance Id to query of stores to be deleted
+   * @param iteration If not null, add iteration to query of stores to be deleted
+   */
   public static void delete(DB mongoDatabase, String simulationId, String instanceId, Long iteration) {
     DBObject query = new BasicDBObject();
 
@@ -94,6 +149,16 @@ public class MongoDBSimulationDataStore extends AbstractSimulationDataStore {
     mongoDatabase.getCollection(mongoCollectionName).remove(query);
   }
 
+  /**
+   * Instantiates a store object tied to the given database and store parameters. An exception will
+   * be thrown if the store object does not exist in the database.
+   * 
+   * @param mongoDatabase
+   * @param simulationId
+   * @param instanceId
+   * @param iteration
+   * @throws IOException
+   */
   public MongoDBSimulationDataStore(DB mongoDatabase, String simulationId, String instanceId,
       long iteration) throws IOException {
     this.mongoDatabase = mongoDatabase;
@@ -167,6 +232,7 @@ public class MongoDBSimulationDataStore extends AbstractSimulationDataStore {
     query.put(simulationIdKey, this.simulationId);
     query.put(instanceIdKey, this.instanceId);
     query.put(iterationKey, this.iteration);
+    query.put(keyKey, new BasicDBObject("$exists", true));
 
     mongoDatabase.getCollection(mongoCollectionName).remove(query);
   }
