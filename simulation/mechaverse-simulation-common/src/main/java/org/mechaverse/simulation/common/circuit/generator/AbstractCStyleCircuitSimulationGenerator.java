@@ -44,26 +44,21 @@ public abstract class AbstractCStyleCircuitSimulationGenerator
    */
   protected void generateCopyStateValuesToExternalInputs(
       String stateArrayVarName, LogicalUnitInfo logicalUnitInfo, PrintWriter out) {
-    for (ExternalElementInfo externalElementRef : logicalUnitInfo.getExternalElements()) {
-      ElementInfo externalElementInfo = logicalUnitInfo.getElementInfo(
-          externalElementRef.getElement().getElementId());
-      String externalElementVarName =
-          externalElementInfo.getOutputVarName(externalElementRef.getElement().getOutputId());
+    for (int idx = 0; idx < logicalUnitInfo.getExternalElements().size(); idx++) {
+      ExternalElementInfo externalElementInfo = logicalUnitInfo.getExternalElements().get(idx);
+
       int externalLogicalUnitRelativeIdx =
-          getRelativeLogicalUnitIndex(externalElementRef.getElement());
-      int externalStateIdx = logicalUnitInfo.getStateIndex(externalElementVarName);
+          getRelativeLogicalUnitIndex(externalElementInfo.getElement());
 
       // An expression that evaluates to the index of the external logical unit. This is computed
       // by adding the external relative logical unit index to the logical unit index and taking the
       // modulus to ensure that the index is in a valid range.
-      String externalLogicalUnitIndexExpr = String.format("(%s + %d + %d) %% %d",
-          luIndexExpr, externalLogicalUnitRelativeIdx, numLogicalUnits, numLogicalUnits);
+      String externalLogicalUnitIndexExpr =
+          String.format("(%s + %d + %d) %% %d", luIndexExpr, externalLogicalUnitRelativeIdx,
+              numLogicalUnits, numLogicalUnits);
 
-      for (String outputVarName : externalElementRef.getOutputVarNames()) {
-        String stateIndexExpr = getStateIndexExpr(externalLogicalUnitIndexExpr, externalStateIdx);
-        if (PRINT_DEBUG_INFO) {
-          printExternalElementDebugInfo(outputVarName, stateIndexExpr, out);
-        }
+      for (String outputVarName : externalElementInfo.getOutputVarNames()) {
+        String stateIndexExpr = getStateIndexExpr(externalLogicalUnitIndexExpr, idx);
         out.printf("int %s = %s[%s];%n", outputVarName, stateArrayVarName, stateIndexExpr);
       }
     }
@@ -76,10 +71,14 @@ public abstract class AbstractCStyleCircuitSimulationGenerator
    */
   protected void generateCopyExternalInputsToState(
       String stateArrayVarName, LogicalUnitInfo logicalUnitInfo, PrintWriter out) {
-    String[] varNames = model.getLogicalUnitInfo().getVarNames();
-    for (int idx = 0; idx < logicalUnitInfo.getExternalElements().size(); idx++) {
+
+    for(int idx = 0; idx < logicalUnitInfo.getExternalElements().size(); idx++) {
+      ExternalElement externalElement = logicalUnitInfo.getExternalElements().get(idx).getElement();
+      ElementInfo elementRef = logicalUnitInfo.getElementInfo(externalElement.getElementId());
+      
       out.printf("%s[(%d * %d) + %s] = %s;%n",
-          stateArrayVarName, idx, numLogicalUnits, luIndexExpr, varNames[idx]);
+          stateArrayVarName, idx, numLogicalUnits, luIndexExpr, 
+              elementRef.getOutputVarName(externalElement.getOutputId()));          
     }
   }
 

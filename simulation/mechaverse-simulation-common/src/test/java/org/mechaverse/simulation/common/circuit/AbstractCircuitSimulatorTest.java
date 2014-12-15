@@ -45,6 +45,7 @@ public abstract class AbstractCircuitSimulatorTest {
   @Before
   public void setUp() {
     routingCircuit = CircuitBuilder.newCircuit(3, 3, Routing3In3OutElementType.newInstance(), 4, 4);
+    routingCircuit.getLogicalUnit().setNeighborConnections("3");
   }
 
   @Test

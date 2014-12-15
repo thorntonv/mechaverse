@@ -82,7 +82,7 @@
     </output>
   </element-type>
 
-  <logical-unit>
+  <logical-unit neighborConnections="3">
     <row>
       <element type="routing3in3out" />
       <element type="routing3in3out" />

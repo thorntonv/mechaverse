@@ -30,6 +30,7 @@
       <element name="row" type="circuit:row" minOccurs="0" maxOccurs="unbounded" />
     </sequence>
     <attribute name="id" type="string" />
+    <attribute name="neighborConnections" type="string" />
   </complexType>
 
   <complexType name="row">

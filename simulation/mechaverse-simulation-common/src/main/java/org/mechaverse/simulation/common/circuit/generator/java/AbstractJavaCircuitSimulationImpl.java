@@ -63,8 +63,8 @@ public abstract class AbstractJavaCircuitSimulationImpl implements JavaCircuitSi
   @Override
   public void update() {
     for (int iteration = 0; iteration < iterationsPerUpdate; iteration++) {
-      for (int idx = 0; idx < external.length; idx++) {
-        external[idx] = circuitState[idx];
+      for (int luIndex = 0; luIndex < numLogicalUnits; luIndex++) {
+        updateExternalInputs(luIndex);
       }
       for (int luIndex = 0; luIndex < numLogicalUnits; luIndex++) {
         update(luIndex);
@@ -77,5 +77,7 @@ public abstract class AbstractJavaCircuitSimulationImpl implements JavaCircuitSi
     }
   }
 
+  protected abstract void updateExternalInputs(int luIndex);
+  
   protected abstract void update(int luIndex);
 }

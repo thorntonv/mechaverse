@@ -24,16 +24,18 @@ public class AbstractCircuitSimulationGeneratorTest {
     public void generate(PrintWriter out) {}
   }
 
-  protected static final Circuit CIRCUIT1 =
-      CircuitBuilder.newCircuit(1, 1, Routing3In3OutElementType.newInstance(), 1, 2);
+  protected Circuit circuit1;
 
   @Before
-  public void setUp() throws Exception {}
+  public void setUp() throws Exception {
+    circuit1 = CircuitBuilder.newCircuit(1, 1, Routing3In3OutElementType.newInstance(), 1, 2);
+    circuit1.getLogicalUnit().setNeighborConnections("3");
+  }
 
   @Test
   public void testGetVarMappedExpression() {
     CircuitSimulationModelBuilder modelBuilder = new CircuitSimulationModelBuilder();
-    CircuitSimulationModel model = modelBuilder.buildModel(CIRCUIT1);
+    CircuitSimulationModel model = modelBuilder.buildModel(circuit1);
     TestCircuitSimulationGenerator generator = new TestCircuitSimulationGenerator(model);
 
     LogicalUnitInfo logicalUnitInfo = model.getLogicalUnitInfo();

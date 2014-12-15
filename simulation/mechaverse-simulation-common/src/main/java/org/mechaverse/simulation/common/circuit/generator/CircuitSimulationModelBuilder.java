@@ -180,9 +180,15 @@ public class CircuitSimulationModelBuilder {
     }
 
     // Connect elements.
-    // TODO(thorntonv): Make connection configurable.
-    ConnectionInfoBuilder connectionInfoBuilder =
-        new ThreeNeighborConnectionInfoBuilder(matrix, elementTypeMap);
+    ConnectionInfoBuilder connectionInfoBuilder = 
+        new EightNeighborConnectionInfoBuilder(matrix, elementTypeMap);
+    if (unit.getNeighborConnections() != null) {
+      if (unit.getNeighborConnections().equals("3")) {
+        connectionInfoBuilder = new ThreeNeighborConnectionInfoBuilder(matrix, elementTypeMap);
+      } else if (unit.getNeighborConnections().equals("4")) {
+        connectionInfoBuilder = new FourNeighborConnectionInfoBuilder(matrix, elementTypeMap);
+      }
+    }
     ConnectionInfo connectionInfo = connectionInfoBuilder.build();
 
     List<ElementInfo> elements = new ArrayList<>();

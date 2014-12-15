@@ -53,6 +53,7 @@ public class JavaCircuitGeneratorImpl extends AbstractCStyleCircuitSimulationGen
     out.printf("package %s;%n", IMPL_PACKAGE);
     out.println("public class CircuitSimulationImpl extends AbstractJavaCircuitSimulationImpl {");
     generateConstructor(logicalUnitInfo, out);
+    generateUpdateExternalInputs(logicalUnitInfo, out);
     generateLogicalUnitUpdateMethod(logicalUnitInfo, out);
     out.println("}");
     out.flush();
@@ -66,6 +67,16 @@ public class JavaCircuitGeneratorImpl extends AbstractCStyleCircuitSimulationGen
     out.println("}");
   }
 
+  private void generateUpdateExternalInputs(LogicalUnitInfo logicalUnitInfo, PrintWriter out) {
+    out.println("@Override");
+    out.printf("public void updateExternalInputs(int %s) {%n", luIndexExpr);
+    
+    generateCopyStateValuesToVariables(logicalUnitInfo, out);
+    generateCopyExternalInputsToState("external", logicalUnitInfo, out);
+
+    out.println("}");
+  }
+  
   private void generateLogicalUnitUpdateMethod(LogicalUnitInfo logicalUnitInfo, PrintWriter out) {
     out.println("@Override");
     out.printf("public void update(int %s) {%n", luIndexExpr);

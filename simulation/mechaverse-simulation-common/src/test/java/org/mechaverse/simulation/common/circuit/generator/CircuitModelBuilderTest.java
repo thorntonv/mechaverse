@@ -28,6 +28,7 @@ public class CircuitModelBuilderTest {
   public void testBuildModel_singleRowCircuit() {
     Circuit circuit1 =
         CircuitBuilder.newCircuit(1, 1, Routing3In3OutElementType.newInstance(), 1, 2);
+    circuit1.getLogicalUnit().setNeighborConnections("3");
 
     CircuitSimulationModelBuilder modelBuilder = new CircuitSimulationModelBuilder();
     CircuitSimulationModel model = modelBuilder.buildModel(circuit1);
@@ -88,6 +89,7 @@ public class CircuitModelBuilderTest {
   public void testBuildModel_multiRowCircuit() {
     Circuit circuit1 =
         CircuitBuilder.newCircuit(3, 3, Routing3In3OutElementType.newInstance(), 3, 3);
+    circuit1.getLogicalUnit().setNeighborConnections("3");
 
     CircuitSimulationModelBuilder modelBuilder = new CircuitSimulationModelBuilder();
     CircuitSimulationModel model = modelBuilder.buildModel(circuit1);
