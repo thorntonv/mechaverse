@@ -2,15 +2,15 @@ package org.mechaverse.simulation.ant.core.entity.ant;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.mechaverse.simulation.ant.core.AntSimulationTestUtil.decompress;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.Before;
@@ -25,6 +25,7 @@ import org.mechaverse.simulation.ant.api.model.Food;
 import org.mechaverse.simulation.ant.api.model.Nest;
 import org.mechaverse.simulation.ant.api.model.Pheromone;
 import org.mechaverse.simulation.ant.api.model.Rock;
+import org.mechaverse.simulation.ant.core.AntSimulationTestUtil;
 import org.mechaverse.simulation.ant.core.Cell;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
 import org.mechaverse.simulation.ant.core.EntityManager;
@@ -32,7 +33,6 @@ import org.mechaverse.simulation.ant.core.entity.ant.ActiveAnt.AntBehavior;
 import org.mechaverse.simulation.ant.core.entity.ant.AntInput.SensorInfo;
 import org.mechaverse.simulation.common.model.MoveDirection;
 import org.mechaverse.simulation.common.model.TurnDirection;
-import org.mechaverse.simulation.common.util.ArrayUtil;
 import org.mechaverse.simulation.common.util.RandomUtil;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -658,36 +658,35 @@ public class ActiveAntTest {
 
   @Test
   public void outputReplayData() throws IOException {
-    int[] outputData;
-    byte[] outputDataBytes;
-
-    ByteArrayOutputStream expectedOutputData = new ByteArrayOutputStream();
+    AntOutputDataOutputStream out = new AntOutputDataOutputStream();
+    List<AntOutput> expectedOutputs = new ArrayList<AntOutput>();
     for (int cnt = 1; cnt <= 100; cnt++) {
-      outputDataBytes = RandomUtil.randomBytes(AntOutput.DATA_SIZE_BYTES, random);
-      outputData = ArrayUtil.toIntArray(outputDataBytes);
-      mockOutput(new AntOutput(outputData));
+      AntOutput antOutput = AntSimulationTestUtil.randomAntOutput(random);
+      out.writeAntOutput(antOutput);
+      expectedOutputs.add(antOutput);
+      mockOutput(antOutput);
       activeAnt.performAction(mockEnvironment, mockEntityManager, random);
-      expectedOutputData.write(outputDataBytes);
     }
+    out.close();
 
     AntSimulationState state = new AntSimulationState();
     activeAnt.updateState(state);
-    assertArrayEquals(expectedOutputData.toByteArray(), decompress(
-        state.getEntityReplayDataStore(mockAntEntity).get(ActiveAnt.OUTPUT_REPLAY_DATA_KEY)));
+    assertArrayEquals(out.toByteArray(),
+        state.getEntityReplayDataStore(mockAntEntity).get(ActiveAnt.OUTPUT_REPLAY_DATA_KEY));
 
     // The output replay data is cleared when the state is set.
     activeAnt.setState(new AntSimulationState());
 
-    expectedOutputData = new ByteArrayOutputStream();
-    outputDataBytes = RandomUtil.randomBytes(AntOutput.DATA_SIZE_BYTES, random);
-    outputData = ArrayUtil.toIntArray(outputDataBytes);
-    mockOutput(new AntOutput(outputData));
+    out = new AntOutputDataOutputStream();
+    AntOutput antOutput = AntSimulationTestUtil.randomAntOutput(random);
+    out.writeAntOutput(antOutput);
+    mockOutput(antOutput);
     activeAnt.performAction(mockEnvironment, mockEntityManager, random);
-    expectedOutputData.write(outputDataBytes);
+    out.close();
 
     activeAnt.updateState(state);
-    assertArrayEquals(expectedOutputData.toByteArray(), decompress(
-        state.getEntityReplayDataStore(mockAntEntity).get(ActiveAnt.OUTPUT_REPLAY_DATA_KEY)));
+    assertArrayEquals(out.toByteArray(),
+        state.getEntityReplayDataStore(mockAntEntity).get(ActiveAnt.OUTPUT_REPLAY_DATA_KEY));
   }
 
   private void mockEntityAtCellInDirection(

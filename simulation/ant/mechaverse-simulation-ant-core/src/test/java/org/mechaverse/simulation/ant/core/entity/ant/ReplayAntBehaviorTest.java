@@ -11,9 +11,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.model.Ant;
+import org.mechaverse.simulation.ant.core.AntSimulationTestUtil;
 import org.mechaverse.simulation.ant.core.entity.ant.ActiveAnt.AntBehavior;
 import org.mechaverse.simulation.ant.core.entity.ant.ReplayActiveAntProvider.ReplayAntBehavior;
-import org.mechaverse.simulation.common.util.ArrayUtil;
 import org.mechaverse.simulation.common.util.RandomUtil;
 
 /**
@@ -42,8 +42,7 @@ public class ReplayAntBehaviorTest {
     List<AntOutput> expectedOutputs = new ArrayList<>();
     try (AntOutputDataOutputStream replayDataOut = new AntOutputDataOutputStream()) {
       for (int cnt = 1; cnt <= 100; cnt++) {
-        AntOutput expectedOutput = new AntOutput(ArrayUtil.toIntArray(
-            RandomUtil.randomBytes(AntOutput.DATA_SIZE_BYTES, random)));
+        AntOutput expectedOutput = AntSimulationTestUtil.randomAntOutput(random);
         replayDataOut.writeAntOutput(expectedOutput);
         expectedOutputs.add(expectedOutput);
       }

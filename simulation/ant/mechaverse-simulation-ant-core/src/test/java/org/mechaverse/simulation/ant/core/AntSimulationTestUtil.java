@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.zip.GZIPInputStream;
 
+import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.SimulationModelUtil;
 import org.mechaverse.simulation.ant.api.model.Direction;
@@ -18,6 +19,7 @@ import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Environment;
 import org.mechaverse.simulation.ant.api.model.SimulationModel;
 import org.mechaverse.simulation.ant.api.util.EntityUtil;
+import org.mechaverse.simulation.ant.core.entity.ant.AntOutput;
 
 import com.google.common.io.ByteStreams;
 
@@ -87,6 +89,14 @@ public class AntSimulationTestUtil {
     assertEquals(expected.getY(), actual.getY());
     assertEquals(expected.getEnergy(), actual.getEnergy());
     assertEquals(expected.getMaxEnergy(), actual.getMaxEnergy());
+  }
+
+  public static AntOutput randomAntOutput(RandomGenerator random) {
+    int[] antOutputData = new int[AntOutput.DATA_SIZE];
+    for (int idx = 0; idx < antOutputData.length; idx++) {
+      antOutputData[idx] = random.nextInt(Short.MAX_VALUE);
+    }
+    return new AntOutput(antOutputData);
   }
 
   public static byte[] decompress(byte[] data) throws IOException {
