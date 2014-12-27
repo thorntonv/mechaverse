@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.mechaverse.org/cellautomaton/model"
+  xmlns:cellautomaton="http://www.mechaverse.org/cellautomaton/model" elementFormDefault="qualified">
+
+  <element name="CellularAutomatonDescriptor" type="cellautomaton:CellularAutomatonDescriptor"></element>
+  <element name="LogicalUnit" type="cellautomaton:LogicalUnit"></element>
+  <element name="CellType" type="cellautomaton:CellType"></element>
+
+  <complexType name="CellularAutomatonDescriptor">
+    <sequence>
+      <element name="CellType" type="cellautomaton:CellType" minOccurs="1" maxOccurs="unbounded" />
+      <element name="LogicalUnit" type="cellautomaton:LogicalUnit" minOccurs="1" maxOccurs="1" />
+    </sequence>
+    <attribute name="id" type="string" />
+    <attribute name="width" type="int" use="required" />
+    <attribute name="height" type="int" use="required" />
+    <attribute name="iterationsPerUpdate" type="int" use="optional" />
+  </complexType>
+
+  <complexType name="CellType">
+    <sequence>
+      <element name="Param" type="cellautomaton:Param" minOccurs="0" maxOccurs="unbounded" />
+      <element name="Output" type="cellautomaton:Output" minOccurs="0" maxOccurs="unbounded" />
+    </sequence>
+    <attribute name="id" type="string" use="required" />
+  </complexType>
+
+  <complexType name="LogicalUnit">
+    <sequence>
+      <element name="row" type="cellautomaton:row" minOccurs="0" maxOccurs="unbounded" />
+    </sequence>
+    <attribute name="id" type="string" />
+    <attribute name="neighborConnections" type="string" />
+  </complexType>
+
+  <complexType name="row">
+    <sequence>
+      <element name="Cell" type="cellautomaton:Cell" minOccurs="1" maxOccurs="unbounded" />
+    </sequence>
+  </complexType>
+
+  <complexType name="Cell">
+    <attribute name="id" type="string" />
+    <attribute name="type" type="string" use="required" />
+    <attribute name="outputs" type="string" />
+  </complexType>
+
+  <complexType name="Output">
+    <sequence>
+      <element name="Param" type="cellautomaton:Param" minOccurs="0" maxOccurs="unbounded" />
+      <element name="BeforeUpdate" type="string" minOccurs="0" maxOccurs="1" />
+      <element name="UpdateExpression" type="string" minOccurs="1" maxOccurs="1" />
+    </sequence>
+    <attribute name="id" type="string" use="required" />
+  </complexType>
+
+  <complexType name="Param">
+    <attribute name="id" type="string" use="required" />
+  </complexType>
+
+</schema>

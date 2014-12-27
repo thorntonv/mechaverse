@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CellularAutomatonDescriptor xmlns="http://www.mechaverse.org/cellautomaton/model" 
+    width="16" height="16" iterationsPerUpdate="200">
+
+  <CellType id="boolean3in3out">
+    <Param id="notInput1" />
+    <Param id="notInput2" />
+    <Param id="notInput3" />
+    <Output id="{1,2,3}">
+      <Param id="param1" />
+      <Param id="param2" />
+      <Param id="param3" />
+      <Param id="param4" />
+      <Param id="param5" />
+      <Param id="param6" />
+      <Param id="param7" />
+      <Param id="param8" />
+      
+      <BeforeUpdate><![CDATA[
+        {notInput1} = ~{input1};
+        {notInput2} = ~{input2};
+        {notInput3} = ~{input3};
+        
+      ]]></BeforeUpdate>
+      <UpdateExpression><![CDATA[(
+          (({input1} & {input2}) & ({input3} & {param1} | {notInput3} & {param2})) | 
+          (({input1} & {notInput2}) & ({input3} & {param3} | {notInput3} & {param4})) |
+    	  (({notInput1} & {input2}) & ({input3} & {param5} | {notInput3} & {param6})) |
+    	  (({notInput1} & {notInput2} & {input3}) & {param7}) ) ^ {param8};        
+      ]]></UpdateExpression>
+    </Output>
+  </CellType>
+
+  <LogicalUnit neighborConnections="3" >
+    <row>
+      <Cell type="boolean3in3out" />
+      <Cell type="boolean3in3out" />
+      <Cell type="boolean3in3out" />
+      <Cell type="boolean3in3out" />
+    </row>
+    <row>
+      <Cell type="boolean3in3out" />
+      <Cell type="boolean3in3out" />
+      <Cell type="boolean3in3out" />
+      <Cell type="boolean3in3out" />
+    </row>
+    <row>
+      <Cell type="boolean3in3out" />
+      <Cell type="boolean3in3out" />
+      <Cell type="boolean3in3out" />
+      <Cell type="boolean3in3out" />
+    </row>
+    <row>
+      <Cell type="boolean3in3out" />
+      <Cell type="boolean3in3out" />
+      <Cell type="boolean3in3out" />
+      <Cell type="boolean3in3out" />
+    </row>
+  </LogicalUnit>
+</CellularAutomatonDescriptor>

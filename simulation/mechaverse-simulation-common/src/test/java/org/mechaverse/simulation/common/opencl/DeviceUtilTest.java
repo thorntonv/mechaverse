@@ -3,6 +3,7 @@ package org.mechaverse.simulation.common.opencl;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.mechaverse.simulation.common.cellautomaton.simulation.opencl.DeviceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

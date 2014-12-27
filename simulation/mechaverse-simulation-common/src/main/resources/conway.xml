@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CellularAutomatonDescriptor xmlns="http://www.mechaverse.org/cellautomaton/model" 
+    width="12" height="12" iterationsPerUpdate="1">
+
+  <CellType id="ConwayCell">
+    <Param id="sum"/>
+    <Output id="1">
+      <BeforeUpdate><![CDATA[
+      	{sum} = {input1}+{input2}+{input3}+{input4}+{input5}+{input6}+{input7}+{input8};
+      ]]></BeforeUpdate>
+
+      <UpdateExpression><![CDATA[
+	    ({sum} == 3) ? 1 : (({sum} == 2) ? {output1} : 0)
+      ]]></UpdateExpression>
+    </Output>
+  </CellType>
+
+  <LogicalUnit neighborConnections="8" >
+    <row>
+      <Cell type="ConwayCell" />
+      <Cell type="ConwayCell" />
+      <Cell type="ConwayCell" />
+      <Cell type="ConwayCell" />
+    </row>
+    <row>
+      <Cell type="ConwayCell" />
+      <Cell type="ConwayCell" />
+      <Cell type="ConwayCell" />
+      <Cell type="ConwayCell" />
+    </row>
+    <row>
+      <Cell type="ConwayCell" />
+      <Cell type="ConwayCell" />
+      <Cell type="ConwayCell" />
+      <Cell type="ConwayCell" />
+    </row>
+    <row>
+      <Cell type="ConwayCell" />
+      <Cell type="ConwayCell" />
+      <Cell type="ConwayCell" />
+      <Cell type="ConwayCell" />
+    </row>
+  </LogicalUnit>
+</CellularAutomatonDescriptor>
