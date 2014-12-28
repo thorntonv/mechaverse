@@ -12,13 +12,13 @@ import org.junit.Test;
 import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.model.Ant;
 import org.mechaverse.simulation.ant.api.model.Entity;
-import org.mechaverse.simulation.ant.core.entity.ant.CircuitAntBehavior;
+import org.mechaverse.simulation.ant.core.entity.ant.CellularAutomatonAntBehavior;
 import org.mechaverse.simulation.common.Simulation;
 import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class CircuitAntSimulationImplTest extends AbstractAntSimulationImplTest {
+public class CellularAutomatonAntSimulationImplTest extends AbstractAntSimulationImplTest {
 
   private List<AbstractApplicationContext> contexts = new ArrayList<>();
 
@@ -33,7 +33,7 @@ public class CircuitAntSimulationImplTest extends AbstractAntSimulationImplTest 
   @Override
   protected AntSimulationImpl newSimulationImpl() {
     AbstractApplicationContext context =
-        new ClassPathXmlApplicationContext("test-simulation-context-circuit.xml");
+        new ClassPathXmlApplicationContext("test-simulation-context-cellautomaton.xml");
     contexts.add(context);
     return (AntSimulationImpl) context.getBean(Simulation.class);
   }
@@ -61,20 +61,20 @@ public class CircuitAntSimulationImplTest extends AbstractAntSimulationImplTest 
       for (Entity entity : state.getModel().getEnvironment().getEntities()) {
         if (entity instanceof Ant) {
           SimulationDataStore entityDataStore = state.getEntityDataStore(entity);
-          assertTrue(entityDataStore.containsKey(CircuitAntBehavior.CIRCUIT_STATE_KEY));
-          assertTrue(entityDataStore.get(CircuitAntBehavior.CIRCUIT_STATE_KEY).length > 0);
-          assertTrue(entityDataStore.containsKey(CircuitAntBehavior.CIRCUIT_OUTPUT_MAP_KEY));
-          assertTrue(entityDataStore.get(CircuitAntBehavior.CIRCUIT_OUTPUT_MAP_KEY).length > 0);
-          assertTrue(entityDataStore.containsKey(CircuitAntBehavior.CIRCUIT_BIT_OUTPUT_MAP_KEY));
-          assertTrue(entityDataStore.get(CircuitAntBehavior.CIRCUIT_BIT_OUTPUT_MAP_KEY).length > 0);
+          assertTrue(entityDataStore.containsKey(CellularAutomatonAntBehavior.AUTOMATON_STATE_KEY));
+          assertTrue(entityDataStore.get(CellularAutomatonAntBehavior.AUTOMATON_STATE_KEY).length > 0);
+          assertTrue(entityDataStore.containsKey(CellularAutomatonAntBehavior.AUTOMATON_OUTPUT_MAP_KEY));
+          assertTrue(entityDataStore.get(CellularAutomatonAntBehavior.AUTOMATON_OUTPUT_MAP_KEY).length > 0);
+          assertTrue(entityDataStore.containsKey(CellularAutomatonAntBehavior.AUTOMATON_BIT_OUTPUT_MAP_KEY));
+          assertTrue(entityDataStore.get(CellularAutomatonAntBehavior.AUTOMATON_BIT_OUTPUT_MAP_KEY).length > 0);
           antCount++;
         }
       }
       // State should have a model, initial model, random seed replay data, and ant generation
       // replay values.
-      // Each ant should have circuit state genetic data, output map genetic data,
-      // bit output map genetic data, circuit state, output map, bit output map values, and
-      // output replay data.
+      // Each ant should have cellular automaton state genetic data, output map genetic data,
+      // bit output map genetic data, cellular automaton state, output map, bit output map values, 
+      // and output replay data.
       assertEquals("Key set: " + state.keySet(), antCount * 10 + 4, state.keySet().size());
     }
   }

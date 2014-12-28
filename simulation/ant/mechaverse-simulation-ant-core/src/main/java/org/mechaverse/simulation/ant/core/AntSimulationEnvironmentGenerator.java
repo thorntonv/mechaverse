@@ -10,7 +10,7 @@ import org.mechaverse.simulation.ant.api.model.EntityType;
 import org.mechaverse.simulation.ant.api.model.Environment;
 import org.mechaverse.simulation.ant.api.model.Nest;
 import org.mechaverse.simulation.ant.api.util.EntityUtil;
-import org.mechaverse.simulation.common.cellautomata.AbstractProbabilisticEnvironmentGenerator;
+import org.mechaverse.simulation.common.cellautomaton.AbstractProbabilisticEnvironmentGenerator;
 import org.mechaverse.simulation.common.util.RandomUtil;
 
 import com.google.common.base.Function;

@@ -23,26 +23,28 @@
 
   <bean class="org.mechaverse.simulation.ant.core.AntSimulationImpl" lazy-init="true" />
 
-  <bean id="circuitDataSource" class="org.mechaverse.simulation.common.SimulationStateCircuitDataSource" lazy-init="true" />
+  <bean id="cellularAutomatonDescriptorDataSource" lazy-init="true" 
+      class="org.mechaverse.simulation.common.SimulationStateCellularAutomatonDescriptor" />
 
-  <bean class="org.mechaverse.simulation.common.opencl.CompositeOpenClCircuitSimulatorFactory" 
-      name="CompositeCircuitSimulatorFactory">
+  <bean class="org.mechaverse.simulation.common.cellautomaton.simulation.opencl.CompositeOpenClCellularAutomatonSimulatorFactory" 
+      name="CompositeCellularAutomatonSimulatorFactory">
     <constructor-arg index="0" value="4" />
     <constructor-arg index="1" value="1" />
     <constructor-arg index="2" >
       <util:constant static-field="org.mechaverse.simulation.ant.core.entity.ant.AntInput.DATA_SIZE" />
     </constructor-arg>
     <constructor-arg index="3" value="32" />
-    <constructor-arg index="4"><ref bean="circuitDataSource" /></constructor-arg>
+    <constructor-arg index="4"><ref bean="cellularAutomatonDescriptorDataSource" /></constructor-arg>
   </bean>
   
-  <bean id="circuitSimulator" class="org.mechaverse.simulation.common.circuit.CircuitSimulator" 
-      factory-bean="CompositeCircuitSimulatorFactory" factory-method="getObject" lazy-init="true" />
+  <bean id="cellularAutomatonSimulator" lazy-init="true"
+      class="org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator" 
+          factory-bean="CompositeCellularAutomatonSimulatorFactory" factory-method="getObject" />
 
   <bean id="activeAntProvider" class="org.mechaverse.simulation.ant.core.entity.ant.ActiveAntProvider" scope="prototype" />
-  <bean id="antBehavior" class="org.mechaverse.simulation.ant.core.entity.ant.CircuitAntBehavior" scope="prototype" >
-      <constructor-arg><ref bean="circuitDataSource" /></constructor-arg>
-      <constructor-arg><ref bean="circuitSimulator" /></constructor-arg>
+  <bean id="antBehavior" class="org.mechaverse.simulation.ant.core.entity.ant.CellularAutomatonAntBehavior" scope="prototype" >
+      <constructor-arg><ref bean="cellularAutomatonDescriptorDataSource" /></constructor-arg>
+      <constructor-arg><ref bean="cellularAutomatonSimulator" /></constructor-arg>
   </bean>
 
   <bean class="org.mechaverse.simulation.ant.core.EnvironmentSimulator.Factory" scope="prototype" />
@@ -58,13 +60,13 @@
   <bean id="foodGenerationModule" class="org.mechaverse.simulation.ant.core.module.FoodGenerationModule" scope="prototype" />
   <bean id="pheromoneDecayModule" class="org.mechaverse.simulation.ant.core.module.PheromoneDecayModule" scope="prototype" />
   <bean id="antReproductionModule" class="org.mechaverse.simulation.ant.core.module.AntReproductionModule" scope="prototype" />
-  <bean id="circuitModule" class="org.mechaverse.simulation.ant.core.module.CircuitSimulationModule" lazy-init="true" />
+  <bean id="cellularAutomatonModule" class="org.mechaverse.simulation.ant.core.module.CellularAutomatonSimulationModule" lazy-init="true" />
 
   <util:list id="modules" value-type="org.mechaverse.simulation.ant.core.module.AntSimulationModule" scope="prototype">
     <ref bean="replayRecorderModule" />
     <ref bean="foodGenerationModule" />
     <ref bean="pheromoneDecayModule" />
     <ref bean="antReproductionModule" />
-    <ref bean="circuitModule" />
+    <ref bean="cellularAutomatonModule" />
   </util:list>
 </beans>

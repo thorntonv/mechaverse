@@ -5,17 +5,18 @@ import org.mechaverse.simulation.ant.api.AntSimulationState;
 import org.mechaverse.simulation.ant.api.model.Entity;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
 import org.mechaverse.simulation.ant.core.EntityManager;
-import org.mechaverse.simulation.common.circuit.CircuitSimulator;
+import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * An environment module that updates simulated circuits before active entity actions are performed.
+ * An environment module that updates simulated cellular automata before active entity actions are
+ * performed.
  */
-public class CircuitSimulationModule implements AntSimulationModule {
+public class CellularAutomatonSimulationModule implements AntSimulationModule {
 
-  @Autowired private ObjectFactory<CircuitSimulator> circuitSimulatorFactory;
-  private CircuitSimulator circuitSimulator;
+  @Autowired private ObjectFactory<CellularAutomatonSimulator> simulatorFactory;
+  private CellularAutomatonSimulator simulator;
 
   @Override
   public void setState(AntSimulationState state, CellEnvironment env, EntityManager entityManager) {
@@ -38,11 +39,11 @@ public class CircuitSimulationModule implements AntSimulationModule {
   @Override
   public void beforePerformAction(AntSimulationState state, CellEnvironment env,
       EntityManager entityManager, RandomGenerator random) {
-    if (circuitSimulator == null) {
-      // Lazily load the circuit simulator.
-      circuitSimulator = circuitSimulatorFactory.getObject();
+    if (simulator == null) {
+      // Lazily load the cellular automaton simulator.
+      simulator = simulatorFactory.getObject();
     }
-    circuitSimulator.update();
+    simulator.update();
   }
 
   @Override
