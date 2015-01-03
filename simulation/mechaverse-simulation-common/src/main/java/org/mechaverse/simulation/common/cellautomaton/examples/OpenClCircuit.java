@@ -8,17 +8,17 @@ import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomat
 import com.google.common.base.Function;
 
 /**
- * Three input boolean function implementation of {@link OpenClCellularAutomatonCLI}.
+ * Four input boolean function implementation of {@link OpenClCellularAutomatonCLI}.
  */
-public class OpenClBooleanFunction3 extends OpenClCellularAutomatonCLI {
-  
+public class OpenClCircuit extends OpenClCellularAutomatonCLI {
+
   public static void main(String[] args) throws Exception {
-    OpenClCellularAutomatonCLI.main(args, new OpenClBooleanFunction3());
+    OpenClCellularAutomatonCLI.main(args, new OpenClCircuit());
   }
 
   @Override
   protected InputStream getDescriptorInputStream() {
-    return ClassLoader.getSystemResourceAsStream("boolean3.xml");
+    return ClassLoader.getSystemResourceAsStream("circuit.xml");
   }
 
   @Override

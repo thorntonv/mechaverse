@@ -1,36 +1,27 @@
 package org.mechaverse.simulation.common.cellautomaton.examples;
 
 import java.awt.Color;
+import java.io.IOException;
+import java.io.InputStream;
 
-import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
-import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomaton;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomaton.Cell;
-import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorReader;
 import org.mechaverse.simulation.common.cellautomaton.simulation.SimulatorCellularAutomaton;
-import org.mechaverse.simulation.common.cellautomaton.simulation.opencl.OpenClCellularAutomatonSimulator;
-import org.mechaverse.simulation.common.cellautomaton.ui.CellularAutomatonVisualizer;
 
 import com.google.common.base.Function;
 
-public class Conway {
-
-  private static final Function<Cell, Color> CELL_COLOR_PROVIDER = new Function<Cell, Color>() {
-    @Override
-    public Color apply(Cell cell) {
-      return cell.getOutput(0) == 1 ? Color.WHITE : Color.BLACK;
-    }
-  };
+public class OpenClConway extends OpenClCellularAutomatonCLI {
 
   public static void main(String[] args) throws Exception {
-    CellularAutomatonDescriptor descriptor = CellularAutomatonDescriptorReader.read(
-        ClassLoader.getSystemResourceAsStream("conway.xml"));
-    OpenClCellularAutomatonSimulator simulator =
-        new OpenClCellularAutomatonSimulator(1, 1, 1, descriptor);
+    OpenClCellularAutomatonCLI.main(args, new OpenClConway());
+  }
 
-    CellularAutomaton cells = new SimulatorCellularAutomaton(descriptor, simulator);
-    CellularAutomatonVisualizer visualizer = 
-        new CellularAutomatonVisualizer(cells, CELL_COLOR_PROVIDER);
-    
+  @Override
+  protected SimulatorCellularAutomaton createCellularAutomaton() throws IOException {
+    SimulatorCellularAutomaton cells = super.createCellularAutomaton();
+
+    int[] state = new int[cells.getSimulator().getAutomatonStateSize()];
+    cells.setState(state);
+
     int col = cells.getWidth() / 2;
     int row = cells.getHeight() / 2;
 
@@ -40,7 +31,16 @@ public class Conway {
     cells.getCell(row - 1, col).setOutput(0, 1);
     cells.getCell(row - 1, col + 1).setOutput(0, 1);
     cells.getCell(row, col - 1).setOutput(0, 1);
-    
-    visualizer.start();
+    return cells;
+  }
+
+  @Override
+  protected InputStream getDescriptorInputStream() {
+    return ClassLoader.getSystemResourceAsStream("conway.xml");
+  }
+
+  @Override
+  protected Function<Cell, Color> getCellColorProvider() {
+    return SINGLE_BITPLANE_CELL_COLOR_PROVIDER;
   }
 }
