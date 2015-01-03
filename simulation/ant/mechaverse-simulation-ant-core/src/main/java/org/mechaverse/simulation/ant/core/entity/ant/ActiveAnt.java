@@ -202,35 +202,24 @@ public final class ActiveAnt implements ActiveEntity {
         if(consumeFood(entity.getCarriedEntity(), entityManager)) {
           entity.setCarriedEntity(null);
           carriedEntityType = EntityType.NONE;
-          return;
         }
       } else if (consumeFood(cell.getEntity(EntityType.FOOD), entityManager)) {
-        return;
-      } else if (consumeFoodFromNest(cell.getEntity(EntityType.NEST))) {
-        return;
-      }
+      } else if (consumeFoodFromNest(cell.getEntity(EntityType.NEST))) {}
     }
 
     // Pickup / Drop action.
     if (carriedEntityType == EntityType.NONE && output.shouldPickUp()) {
       if (pickup(cell)) {
-        return;
-      } else if (pickup(frontCell)) {
-        return;
-      }
+      } else if (pickup(frontCell)) {}
     } else if (carriedEntityType != EntityType.NONE && output.shouldDrop()) {
       if (carriedEntityType == EntityType.FOOD && drop(cell)) {
-        return;
-      } else if (drop(frontCell)) {
-        return;
-      }
+      } else if (drop(frontCell)) {}
     }
 
     // Leave pheromone action.
     int pheromoneType = output.shouldLeavePheromone();
     if (pheromoneType > 0) {
       leavePheromone(cell, pheromoneType, entityManager);
-      return;
     }
 
     // Move action.
@@ -238,9 +227,7 @@ public final class ActiveAnt implements ActiveEntity {
       case NONE:
         break;
       case FORWARD:
-        if (moveForward(cell, frontCell, env)) {
-          return;
-        }
+        moveForward(cell, frontCell, env);
         break;
       case BACKWARD:
         break;
@@ -252,10 +239,8 @@ public final class ActiveAnt implements ActiveEntity {
         break;
       case CLOCKWISE:
         AntSimulationUtil.turnCW(entity);
-        return;
       case COUNTERCLOCKWISE:
         AntSimulationUtil.turnCCW(entity);
-        return;
     }
   }
 
