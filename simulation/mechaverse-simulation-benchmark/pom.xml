@@ -51,7 +51,7 @@
           <archive>
             <manifest>
               <addClasspath>true</addClasspath>
-              <mainClass>org.mechaverse.simulation.benchmark.OpenClCircuitSimulationBenchmark</mainClass>
+              <mainClass>org.mechaverse.simulation.benchmark.OpenClCellularAutomatonSimulationBenchmark</mainClass>
             </manifest>
           </archive>
         </configuration>
@@ -63,7 +63,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>org.mechaverse.simulation.benchmark.OpenClCircuitSimulationBenchmark</mainClass>
+              <mainClass>org.mechaverse.simulation.benchmark.OpenClCellularAutomatonSimulationBenchmark</mainClass>
             </manifest>
           </archive>
           <descriptors>
