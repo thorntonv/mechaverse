@@ -74,8 +74,15 @@ public class OpenClCellularAutomatonGeneratorImpl extends AbstractCStyleSimulati
     generateBarrier(out);
     out.println();
 
-    // Perform updates.
+    // Precalculate indices into the external inputs array.
+    generateExternalInputIndexVars("external", logicalUnitInfo, out);
+    out.println();
 
+    generateConstants(logicalUnitInfo, out);
+    out.println();
+
+    // Perform updates.
+    
     if (model.getIterationsPerUpdate() > 1) {
       out.println("for(int cnt = 0; cnt < " + model.getIterationsPerUpdate() + "; cnt++) {");
     }

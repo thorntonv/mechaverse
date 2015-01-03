@@ -20,6 +20,7 @@
   <complexType name="CellType">
     <sequence>
       <element name="Param" type="cellautomaton:Param" minOccurs="0" maxOccurs="unbounded" />
+      <element name="Var" type="cellautomaton:Var" minOccurs="0" maxOccurs="unbounded" />
       <element name="Output" type="cellautomaton:Output" minOccurs="0" maxOccurs="unbounded" />
     </sequence>
     <attribute name="id" type="string" use="required" />
@@ -52,9 +53,14 @@
       <element name="UpdateExpression" type="string" minOccurs="1" maxOccurs="1" />
     </sequence>
     <attribute name="id" type="string" use="required" />
+    <attribute name="constant" type="boolean" use="optional" default="false"/>
   </complexType>
 
   <complexType name="Param">
+    <attribute name="id" type="string" use="required" />
+  </complexType>
+
+  <complexType name="Var">
     <attribute name="id" type="string" use="required" />
   </complexType>
 

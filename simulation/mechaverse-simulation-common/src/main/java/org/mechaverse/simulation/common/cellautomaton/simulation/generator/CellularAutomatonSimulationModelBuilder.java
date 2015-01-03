@@ -14,6 +14,7 @@ import org.mechaverse.cellautomaton.model.LogicalUnit;
 import org.mechaverse.cellautomaton.model.Output;
 import org.mechaverse.cellautomaton.model.Param;
 import org.mechaverse.cellautomaton.model.Row;
+import org.mechaverse.cellautomaton.model.Var;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel.CellInfo;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel.ConnectionInfo;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel.ExternalCellInfo;
@@ -48,6 +49,7 @@ public class CellularAutomatonSimulationModelBuilder {
     public I build() {
       Map<String, String> outputVarNameMap = new HashMap<>();
       Map<String, String> paramVarNameMap = new HashMap<>();
+      Map<String, String> varNameMap = new HashMap<>();
       Map<String, Map<String, String>> outputParamIdMap = new HashMap<>();
 
       // Build a map that maps a param id (used to refer to the parameter in output expressions) to
@@ -61,6 +63,18 @@ public class CellularAutomatonSimulationModelBuilder {
               + " is defined more than once for cell " + cell.getId());
         }
       }
+
+      // Build a map that maps a variable id to its name.
+      for (Var var : cellType.getVars()) {
+        String varName = getCellVarName(cell, var);
+        if (!varNameMap.containsKey(var.getId())) {
+          paramVarNameMap.put(var.getId(), varName);
+        } else {
+          throw new IllegalStateException("Variable " + var.getId()
+              + " is defined more than once for cell " + cell.getId());
+        }
+      }
+      
       for (Output output : cellType.getOutputs()) {
         outputVarNameMap.put(output.getId(), getCellOutputVarName(cell, output));
         Map<String, String> paramIdMap = new HashMap<>();
@@ -77,11 +91,12 @@ public class CellularAutomatonSimulationModelBuilder {
         }
         outputParamIdMap.put(output.getId(), paramIdMap);
       }
-      return createCellInfo(outputVarNameMap, paramVarNameMap, outputParamIdMap);
+      return createCellInfo(outputVarNameMap, paramVarNameMap, varNameMap, outputParamIdMap);
     }
 
     protected abstract I createCellInfo(Map<String, String> outputVarNameMap,
-        Map<String, String> paramVarNameMap, Map<String, Map<String, String>> outputParamIdMap);
+        Map<String, String> paramVarNameMap, Map<String, String> varNameMap, 
+            Map<String, Map<String, String>> outputParamIdMap);
   }
 
   protected class CellInfoBuilder extends AbstractCellInfoBuilder<Cell, CellInfo> {
@@ -92,8 +107,9 @@ public class CellularAutomatonSimulationModelBuilder {
 
     @Override
     protected CellInfo createCellInfo(Map<String, String> outputVarNameMap,
-        Map<String, String> paramVarNameMap, Map<String, Map<String, String>> outputParamIdMap) {
-      return new CellInfo(cell, cellType, inputs, outputVarNameMap, paramVarNameMap,
+        Map<String, String> paramVarNameMap, Map<String, String> varNameMap, 
+            Map<String, Map<String, String>> outputParamIdMap) {
+      return new CellInfo(cell, cellType, inputs, outputVarNameMap, paramVarNameMap, varNameMap,
           outputParamIdMap);
     }
   }
@@ -107,7 +123,8 @@ public class CellularAutomatonSimulationModelBuilder {
 
     @Override
     protected ExternalCellInfo createCellInfo(Map<String, String> outputVarNameMap,
-        Map<String, String> paramVarNameMap, Map<String, Map<String, String>> outputParamIdMap) {
+        Map<String, String> paramVarNameMap, Map<String, String> varNameMap, 
+            Map<String, Map<String, String>> outputParamIdMap) {
       return new ExternalCellInfo(cell, outputVarNameMap);
     }
   }
@@ -143,7 +160,8 @@ public class CellularAutomatonSimulationModelBuilder {
     CellType processedCellType = new CellType();
     processedCellType.setId(cellType.getId());
     processedCellType.getParams().addAll(cellType.getParams());
-
+    processedCellType.getVars().addAll(cellType.getVars());
+    
     for (Output output : cellType.getOutputs()) {
       Matcher matcher = ID_PATTERN.matcher(output.getId());
       while (matcher.find()) {
@@ -152,6 +170,7 @@ public class CellularAutomatonSimulationModelBuilder {
         newOutput.getParams().addAll(output.getParams());
         newOutput.setBeforeUpdate(output.getBeforeUpdate());
         newOutput.setUpdateExpression(output.getUpdateExpression());
+        newOutput.setConstant(output.isConstant());
         processedCellType.getOutputs().add(newOutput);
       }
     }
@@ -312,6 +331,13 @@ public class CellularAutomatonSimulationModelBuilder {
    */
   protected String getCellParamVarName(Cell cell, Param param) {
     return String.format("cell_%s_%s", cell.getId(), param.getId());
+  }
+
+  /**
+   * Returns the name of a cell variable.
+   */
+  protected String getCellVarName(Cell cell, Var var) {
+    return String.format("cell_%s_%s", cell.getId(), var.getId());
   }
 
   /**

@@ -121,6 +121,10 @@ public class SimulatorCellularAutomaton implements CellularAutomaton {
     }
   }
 
+  public CellularAutomatonSimulator getSimulator() {
+    return simulator;
+  }
+  
   public void setState(int[] state) {
     this.state = state;
   }

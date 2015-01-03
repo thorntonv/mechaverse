@@ -57,7 +57,7 @@ public class SimulationStateCellularAutomatonDescriptor
       // Attempt to load from xml on the classpath.
       try {
         descriptor = CellularAutomatonDescriptorReader.read(
-            ClassLoader.getSystemResourceAsStream("boolean3.xml"));
+            ClassLoader.getSystemResourceAsStream("boolean4.xml"));
       } catch (Throwable t) {
         logger.warn("Unable to load cellular automaton descriptor xml.", t);
         throw new IllegalStateException("Unable to load cellular automaton descriptor xml.", t);

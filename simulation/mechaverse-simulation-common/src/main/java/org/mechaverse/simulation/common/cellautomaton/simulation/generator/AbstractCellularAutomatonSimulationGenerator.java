@@ -47,8 +47,11 @@ public abstract class AbstractCellularAutomatonSimulationGenerator
       // Attempt to map the id to a cell parameter.
       String varName = cell.getParamVarName(placeholderId);
       if (varName == null) {
-        // Attempt to map the id to a cell output parameter.
-        varName = cell.getOutputParamVarName(output, placeholderId);
+        varName = cell.getVarName(placeholderId);
+        if (varName == null) {
+          // Attempt to map the id to a cell output parameter.
+          varName = cell.getOutputParamVarName(output, placeholderId);
+        }
       }
       if (varName == null && placeholderId.startsWith(CELL_INPUT_ID_PREFIX)) {
         // Attempt to map the id to a cell input.

@@ -37,6 +37,25 @@ public abstract class AbstractCStyleSimulationGenerator
   protected abstract void printUpdateDebugInfo(CellInfo cell, Output output,
       String updateExpr, LogicalUnitInfo logicalUnitInfo, PrintWriter out);
 
+  
+  protected void generateExternalInputIndexVars(String stateArrayVarName,
+      LogicalUnitInfo logicalUnitInfo, PrintWriter out) {
+    for (int idx = 0; idx < logicalUnitInfo.getExternalCells().size(); idx++) {
+      ExternalCellInfo externalCellInfo = logicalUnitInfo.getExternalCells().get(idx);
+
+      String externalLogicalUnitIndexExpr =
+          String.format("((luRow + %d + %d) %% %d) * %d + (luCol + %d + %d) %% %d",
+              externalCellInfo.getCell().getRelativeUnitRow(), model.getHeight(),
+              model.getHeight(), model.getWidth(), externalCellInfo.getCell()
+                  .getRelativeUnitColumn(), model.getWidth(), model.getWidth());
+
+      for (String outputVarName : externalCellInfo.getOutputVarNames()) {
+        String stateIndexExpr = getStateIndexExpr(externalLogicalUnitIndexExpr, idx);
+        out.printf("int %s_idx = %s;%n", outputVarName, stateIndexExpr);
+      }
+    }
+  }
+
   /**
    * Generates code to copy state values to external input variables.
    *
@@ -46,16 +65,8 @@ public abstract class AbstractCStyleSimulationGenerator
       String stateArrayVarName, LogicalUnitInfo logicalUnitInfo, PrintWriter out) {
     for (int idx = 0; idx < logicalUnitInfo.getExternalCells().size(); idx++) {
       ExternalCellInfo externalCellInfo = logicalUnitInfo.getExternalCells().get(idx);
-      
-      String externalLogicalUnitIndexExpr =
-          String.format("((luRow + %d + %d) %% %d) * %d + (luCol + %d + %d) %% %d", 
-            externalCellInfo.getCell().getRelativeUnitRow(), model.getHeight(), model.getHeight(), 
-                model.getWidth(), externalCellInfo.getCell().getRelativeUnitColumn(), 
-                    model.getWidth(), model.getWidth());
-
       for (String outputVarName : externalCellInfo.getOutputVarNames()) {
-        String stateIndexExpr = getStateIndexExpr(externalLogicalUnitIndexExpr, idx);
-        out.printf("int %s = %s[%s];%n", outputVarName, stateArrayVarName, stateIndexExpr);
+        out.printf("int %s = %s[%s_idx];%n", outputVarName, stateArrayVarName, outputVarName);
       }
     }
   }
@@ -89,13 +100,38 @@ public abstract class AbstractCStyleSimulationGenerator
   }
 
   /**
+   * Generates code to update constant values.
+   */
+  protected void generateConstants(LogicalUnitInfo logicalUnitInfo, PrintWriter out) {
+    // Generate statements executed before update.
+    for (CellInfo cell : logicalUnitInfo.getCells()) {
+      for (Output output : cell.getOutputs()) {
+        if (output.isConstant() && output.getBeforeUpdate() != null) {
+          String statements = getVarMappedString(output.getBeforeUpdate(), cell, output);
+          out.printf("%s%n", statements);
+        }
+      }
+    }
+
+    // Generate update statements.
+    for (CellInfo cell : logicalUnitInfo.getCells()) {
+      for (Output output : cell.getOutputs()) {
+        if (output.isConstant() && output.getUpdateExpression() != null) {
+          String updateExpr = getVarMappedString(output.getUpdateExpression(), cell, output);
+          out.printf("%s = %s;%n", cell.getOutputVarName(output), updateExpr);
+        }
+      }
+    }
+  }
+  
+  /**
    * Generates code to update state variables.
    */
   protected void generateUpdates(LogicalUnitInfo logicalUnitInfo, PrintWriter out) {
     // Generate statements executed before update.
     for (CellInfo cell : logicalUnitInfo.getCells()) {
       for (Output output : cell.getOutputs()) {
-        if (output.getBeforeUpdate() != null) {
+        if (!output.isConstant() && output.getBeforeUpdate() != null) {
           String statements = getVarMappedString(output.getBeforeUpdate(), cell, output);
           if (PRINT_DEBUG_INFO) {
             printUpdateDebugInfo(cell, output, statements, logicalUnitInfo, out);
@@ -108,7 +144,7 @@ public abstract class AbstractCStyleSimulationGenerator
     // Generate update statements.
     for (CellInfo cell : logicalUnitInfo.getCells()) {
       for (Output output : cell.getOutputs()) {
-        if (output.getUpdateExpression() != null) {
+        if (!output.isConstant() && output.getUpdateExpression() != null) {
           String updateExpr = getVarMappedString(output.getUpdateExpression(), cell, output);
           if (PRINT_DEBUG_INFO) {
             printUpdateDebugInfo(cell, output, updateExpr, logicalUnitInfo, out);

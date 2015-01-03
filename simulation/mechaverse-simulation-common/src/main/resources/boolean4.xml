@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CellularAutomatonDescriptor xmlns="http://www.mechaverse.org/cellautomaton/model" 
+    width="16" height="16" iterationsPerUpdate="100">
+
+  <!-- An element that outputs an input value. -->
+  <CellType id="input">
+    <Output id="1" constant="true" >
+      <Param id="idx" />
+      <UpdateExpression><![CDATA[
+        automatonInput[{idx} % automatonInputLength]
+	  ]]></UpdateExpression>
+    </Output>
+  </CellType>
+
+  <!-- An element that outputs either an external input value or the bit from an adjacent plane. -->
+  <CellType id="input">
+    <Output id="1" >
+      <Param id="selector" />
+      <Param id="idx" />
+      <UpdateExpression><![CDATA[
+        (({input1} << 31) | ({input2} >> 1) & {selector}) | 
+            ((automatonInput[{idx} % automatonInputLength]) & ~{selector})
+	  ]]></UpdateExpression>
+    </Output>
+  </CellType>
+
+  <CellType id="boolean4">
+    <Var id="nextOutput" />
+
+    <Output id="1">
+      <Param id="param1" />
+      <Param id="param2" />
+      <Param id="param3" />
+      <Param id="param4" />
+      <Param id="param5" />
+      <Param id="param6" />
+      <Param id="param7" />
+      <Param id="param8" />
+      <Param id="param9" />
+      <Param id="param10" />
+      <Param id="param11" />
+      <Param id="param12" />
+      <Param id="param13" />
+      <Param id="param14" />
+      <Param id="param15" />
+      <Param id="param16" />
+            
+      <BeforeUpdate><![CDATA[
+int {nextOutput} = ({input1} & {input2} & ({input3} & {input4} & {param1} | {input3} & ~{input4} & {param2} | ~{input3} & {input4} & {param3} | ~{input3} & ~{input4} & {param4})) |
+({input1} & ~{input2} & ({input3} & {input4} & {param5} | {input3} & ~{input4} & {param6} | ~{input3} & {input4} & {param7} | ~{input3} & ~{input4} & {param8})) |
+(~{input1} & {input2} & ({input3} & {input4} & {param9} | {input3} & ~{input4} & {param10} | ~{input3} & {input4} & {param11} | ~{input3} & ~{input4} & {param12})) |
+(~{input1} & ~{input2} & ({input3} & {input4} & {param13} | {input3} & ~{input4} & {param14} | ~{input3} & {input4} & {param15} | ~{input3} & ~{input4} & {param16}));        
+      ]]></BeforeUpdate>
+      <UpdateExpression><![CDATA[{nextOutput}]]></UpdateExpression>
+    </Output>
+  </CellType>
+
+  <LogicalUnit neighborConnections="4" >
+    <row>
+      <Cell type="boolean4" />
+      <Cell type="boolean4" />
+      <Cell type="boolean4" />
+    </row>
+    <row>
+      <Cell type="boolean4" />
+      <Cell type="input" />
+      <Cell type="boolean4" />
+    </row>
+    <row>
+      <Cell type="boolean4" />
+      <Cell type="boolean4" />
+      <Cell type="boolean4" />
+    </row>
+  </LogicalUnit>
+</CellularAutomatonDescriptor>

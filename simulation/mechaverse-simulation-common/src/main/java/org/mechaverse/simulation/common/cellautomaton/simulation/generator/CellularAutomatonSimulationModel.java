@@ -10,6 +10,7 @@ import org.mechaverse.cellautomaton.model.CellType;
 import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
 import org.mechaverse.cellautomaton.model.Output;
 import org.mechaverse.cellautomaton.model.Param;
+import org.mechaverse.cellautomaton.model.Var;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.ExternalCell.ExternalCellType;
 
 import com.google.common.collect.ImmutableBiMap;
@@ -50,7 +51,7 @@ public class CellularAutomatonSimulationModel {
 
     public ExternalCellInfo(ExternalCell cell, Map<String, String> outputVarNameMap) {
       super(cell, ExternalCellType.INSTANCE, new Input[] {}, outputVarNameMap,
-        Collections.<String, String>emptyMap(),
+        Collections.<String, String>emptyMap(), Collections.<String, String>emptyMap(),
         Collections.<String, Map<String, String>>emptyMap());
       this.cell = cell;
     }
@@ -76,17 +77,19 @@ public class CellularAutomatonSimulationModel {
     private final Input[] inputs;
     private final Map<String, String> outputVarNameMap;
     private final Map<String, String> paramVarNameMap;
+    private final Map<String, String> varNameMap;   
     // Maps an output id to a param id map.
     private final Map<String, Map<String, String>> outputParamIdMap;
 
     public CellInfo(Cell cell, CellType cellType, Input[] inputs,
         Map<String, String> outputVarNameMap, Map<String, String> paramVarNameMap,
-        Map<String, Map<String, String>> outputParamIdMap) {
+        Map<String, String> varNameMap, Map<String, Map<String, String>> outputParamIdMap) {
       this.cell = cell;
       this.cellType = cellType;
       this.inputs = inputs;
       this.outputVarNameMap = outputVarNameMap;
       this.paramVarNameMap = paramVarNameMap;
+      this.varNameMap = varNameMap;
       this.outputParamIdMap = outputParamIdMap;
     }
 
@@ -134,6 +137,19 @@ public class CellularAutomatonSimulationModel {
       return paramVarNameMap.values();
     }
 
+    public String getVarName(Var var) {
+      return getVarName(var.getId());
+    }
+
+    public String getVarName(String paramId) {
+      return varNameMap.get(paramId);
+    }
+
+    public Collection<String> getVarNames() {
+      return varNameMap.values();
+    }
+
+    
     public String getOutputParamVarName(Output output, Param param) {
       return getOutputParamVarName(output, param.getId());
     }

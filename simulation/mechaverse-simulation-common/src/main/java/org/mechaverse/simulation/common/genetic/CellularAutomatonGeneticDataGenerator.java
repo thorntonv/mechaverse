@@ -18,7 +18,7 @@ public class CellularAutomatonGeneticDataGenerator {
   public static final String OUTPUT_MAP_KEY = "outputMap";
 
   public void generateGeneticData(GeneticDataStore dataStore, 
-      CellularAutomatonSimulationModel model, int outputSize,RandomGenerator random) {
+      CellularAutomatonSimulationModel model, int outputSize, RandomGenerator random) {
     dataStore.put(CELLULAR_AUTOMATON_STATE_KEY, generateStateGeneticData(model, random));
     dataStore.put(OUTPUT_MAP_KEY, generateOutputMapGeneticData(model, outputSize, random));
   }

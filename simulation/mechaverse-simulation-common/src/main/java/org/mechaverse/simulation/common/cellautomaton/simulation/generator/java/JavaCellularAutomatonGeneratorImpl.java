@@ -91,11 +91,15 @@ public class JavaCellularAutomatonGeneratorImpl extends AbstractCStyleSimulation
     generateCopyStateValuesToVariables(logicalUnitInfo, out);
     out.println();
 
+    // Precalculate indices into the external inputs array.
+    generateExternalInputIndexVars("external", logicalUnitInfo, out);
+    out.println();
     generateCopyStateValuesToExternalInputs("external", logicalUnitInfo, out);
     out.println();
 
     // Perform updates.
 
+    generateConstants(logicalUnitInfo, out);
     generateUpdates(logicalUnitInfo, out);
 
     // Copy output values from variables back to state array.

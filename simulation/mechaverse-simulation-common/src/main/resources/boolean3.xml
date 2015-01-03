@@ -2,11 +2,19 @@
 <CellularAutomatonDescriptor xmlns="http://www.mechaverse.org/cellautomaton/model" 
     width="16" height="16" iterationsPerUpdate="200">
 
+  <!-- An element that outputs an input value. -->
+  <CellType id="input">
+    <Output id="1" constant="true" >
+      <Param id="idx" />
+      <UpdateExpression><![CDATA[
+        automatonInput[{idx} % automatonInputLength]
+	  ]]></UpdateExpression>
+    </Output>
+  </CellType>
+
   <CellType id="boolean3in3out">
-    <Param id="notInput1" />
-    <Param id="notInput2" />
-    <Param id="notInput3" />
-    <Output id="{1,2,3}">
+    <Param id="nextOutput" />
+    <Output id="1">
       <Param id="param1" />
       <Param id="param2" />
       <Param id="param3" />
@@ -15,18 +23,15 @@
       <Param id="param6" />
       <Param id="param7" />
       <Param id="param8" />
-      
+            
       <BeforeUpdate><![CDATA[
-        {notInput1} = ~{input1};
-        {notInput2} = ~{input2};
-        {notInput3} = ~{input3};
-        
+        {nextOutput} = ((({input1} & {input2}) & ({input3} & {param1} | ~{input3} & {param2})) | 
+                        (({input1} & ~{input2}) & ({input3} & {param3} | ~{input3} & {param4})) |
+                        ((~{input1} & {input2}) & ({input3} & {param5} | ~{input3} & {param6})) |
+                        ((~{input1} & ~{input2} & {input3}) & {param7}) ) ^ {param8}; 
       ]]></BeforeUpdate>
-      <UpdateExpression><![CDATA[(
-          (({input1} & {input2}) & ({input3} & {param1} | {notInput3} & {param2})) | 
-          (({input1} & {notInput2}) & ({input3} & {param3} | {notInput3} & {param4})) |
-    	  (({notInput1} & {input2}) & ({input3} & {param5} | {notInput3} & {param6})) |
-    	  (({notInput1} & {notInput2} & {input3}) & {param7}) ) ^ {param8};        
+      <UpdateExpression><![CDATA[
+        {nextOutput}
       ]]></UpdateExpression>
     </Output>
   </CellType>
