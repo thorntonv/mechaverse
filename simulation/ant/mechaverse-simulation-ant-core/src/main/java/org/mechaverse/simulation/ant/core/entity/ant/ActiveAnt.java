@@ -208,18 +208,17 @@ public final class ActiveAnt implements ActiveEntity {
     }
 
     // Pickup / Drop action.
-    if (carriedEntityType == EntityType.NONE && output.shouldPickUp()) {
-      if (pickup(cell)) {
-      } else if (pickup(frontCell)) {}
-    } else if (carriedEntityType != EntityType.NONE && output.shouldDrop()) {
-      if (carriedEntityType == EntityType.FOOD && drop(cell)) {
-      } else if (drop(frontCell)) {}
+    if (output.shouldPickUpOrDrop()) {
+      if (carriedEntityType == EntityType.NONE) {
+        if (pickup(cell)) {} else if (pickup(frontCell)) {}
+      } else {
+        if (carriedEntityType == EntityType.FOOD && drop(cell)) {} else if (drop(frontCell)) {}
+      }
     }
 
     // Leave pheromone action.
-    int pheromoneType = output.shouldLeavePheromone();
-    if (pheromoneType > 0) {
-      leavePheromone(cell, pheromoneType, entityManager);
+    if (output.shouldLeavePheromone()) {
+      leavePheromone(cell, output.getPheromoneType(), entityManager);
     }
 
     // Move action.
@@ -227,9 +226,11 @@ public final class ActiveAnt implements ActiveEntity {
       case NONE:
         break;
       case FORWARD:
-        moveForward(cell, frontCell, env);
+        move(cell, frontCell, env);
         break;
       case BACKWARD:
+        move(cell, env.getCellInDirection(cell, 
+            AntSimulationUtil.oppositeDirection(entity.getDirection())), env);
         break;
     }
 
@@ -239,8 +240,10 @@ public final class ActiveAnt implements ActiveEntity {
         break;
       case CLOCKWISE:
         AntSimulationUtil.turnCW(entity);
+        break;
       case COUNTERCLOCKWISE:
         AntSimulationUtil.turnCCW(entity);
+        break;
     }
   }
 
@@ -278,9 +281,9 @@ public final class ActiveAnt implements ActiveEntity {
     behavior.onRemoveEntity();
   }
 
-  private boolean moveForward(Cell cell, Cell frontCell, CellEnvironment env) {
-    if (frontCell != null && canMoveToCell(frontCell)) {
-      env.moveEntityToCell(EntityType.ANT, cell, frontCell);
+  private boolean move(Cell fromCell, Cell toCell, CellEnvironment env) {
+    if (toCell != null && canMoveToCell(toCell)) {
+      env.moveEntityToCell(EntityType.ANT, fromCell, toCell);
       updateCarriedEntityLocation();
       return true;
     }

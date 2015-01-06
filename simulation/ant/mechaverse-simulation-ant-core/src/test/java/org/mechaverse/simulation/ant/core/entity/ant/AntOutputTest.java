@@ -34,17 +34,18 @@ public class AntOutputTest {
 
     assertEquals(MoveDirection.NONE, output.getMoveDirection());
     assertEquals(TurnDirection.NONE, output.getTurnDirection());
-    assertEquals(false, output.shouldPickUp());
-    assertEquals(false, output.shouldDrop());
-    assertEquals(0, output.shouldLeavePheromone());
+    assertEquals(false, output.shouldPickUpOrDrop());
+    assertEquals(false, output.shouldLeavePheromone());
+    assertEquals(0, output.getPheromoneType());
   }
 
   @Test
   public void moveDirection() {
-    for (MoveDirection moveDirection : MoveDirection.values()) {
-      output.setMoveDirection(moveDirection);
-      assertEquals(moveDirection, output.getMoveDirection());
-    }
+    output.setMoveDirection(MoveDirection.FORWARD);
+    assertEquals(MoveDirection.FORWARD, output.getMoveDirection());
+
+    output.setMoveDirection(MoveDirection.NONE);
+    assertEquals(MoveDirection.NONE, output.getMoveDirection());
   }
 
   @Test
@@ -56,28 +57,26 @@ public class AntOutputTest {
   }
 
   @Test
-  public void pickUp() {
-    output.setPickUp(true);
-    assertEquals(true, output.shouldPickUp());
+  public void pickUpOrDrop() {
+    output.setPickUpOrDrop(true);
+    assertEquals(true, output.shouldPickUpOrDrop());
 
-    output.setPickUp(false);
-    assertEquals(false, output.shouldPickUp());
-  }
-
-  @Test
-  public void drop() {
-    output.setDrop(true);
-    assertEquals(true, output.shouldDrop());
-
-    output.setDrop(false);
-    assertEquals(false, output.shouldDrop());
+    output.setPickUpOrDrop(false);
+    assertEquals(false, output.shouldPickUpOrDrop());
   }
 
   @Test
   public void leavePheromone() {
-    for (int type = 0; type < 15; type++) {
-      output.setLeavePheromone(type);
-      assertEquals(type, output.shouldLeavePheromone());
+    for (int type = 0; type < 8; type++) {
+      output.setLeavePheromone(true);
+      output.setPheromoneType(type);
+      assertEquals(true, output.shouldLeavePheromone());
+      assertEquals(type, output.getPheromoneType());
+      
+      output.setLeavePheromone(false);
+      output.setPheromoneType(type);
+      assertEquals(false, output.shouldLeavePheromone());
+      assertEquals(type, output.getPheromoneType());
     }
   }
 

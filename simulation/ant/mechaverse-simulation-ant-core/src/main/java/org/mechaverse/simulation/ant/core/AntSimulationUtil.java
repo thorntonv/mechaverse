@@ -61,6 +61,28 @@ public final class AntSimulationUtil {
     return direction;
   }
 
+  public static Direction oppositeDirection(Direction direction) {
+    switch (direction) {
+      case EAST:
+        return Direction.WEST;
+      case NORTH_EAST:
+        return Direction.SOUTH_WEST;
+      case NORTH:
+        return Direction.SOUTH;
+      case NORTH_WEST:
+        return Direction.SOUTH_EAST;
+      case WEST:
+        return Direction.EAST;
+      case SOUTH_WEST:
+        return Direction.NORTH_EAST;
+      case SOUTH:
+        return Direction.NORTH;
+      case SOUTH_EAST:
+        return Direction.SOUTH_WEST;
+    }
+    throw new IllegalArgumentException("Invalid direction " + direction.name());
+  }
+
   public static Direction randomDirection(RandomGenerator random) {
     return EntityUtil.DIRECTIONS[random.nextInt(EntityUtil.DIRECTIONS.length)];
   }

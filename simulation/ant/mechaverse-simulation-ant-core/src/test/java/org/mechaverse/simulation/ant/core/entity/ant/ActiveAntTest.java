@@ -7,6 +7,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -384,6 +385,7 @@ public class ActiveAntTest {
 
     activeAnt.performAction(mockEnvironment, mockEntityManager, random);
 
+    verify(mockAntEntity, times(1)).setDirection(any(Direction.class));
     verify(mockAntEntity).setDirection(Direction.SOUTH_EAST);
   }
 
@@ -395,6 +397,7 @@ public class ActiveAntTest {
 
     activeAnt.performAction(mockEnvironment, mockEntityManager, random);
 
+    verify(mockAntEntity).setDirection(any(Direction.class));
     verify(mockAntEntity).setDirection(Direction.NORTH_EAST);
   }
 
@@ -413,7 +416,7 @@ public class ActiveAntTest {
   public void pickup_food() {
     when(mockCell.getEntity(EntityType.FOOD)).thenReturn(mockFood);
     AntOutput output = new AntOutput();
-    output.setPickUp(true);
+    output.setPickUpOrDrop(true);
     mockOutput(output);
 
     activeAnt.performAction(mockEnvironment, mockEntityManager, random);
@@ -428,7 +431,7 @@ public class ActiveAntTest {
     when(mockAntEntity.getY()).thenReturn(38);
     when(mockFrontCell.getEntity(EntityType.ROCK)).thenReturn(mockRock);
     AntOutput output = new AntOutput();
-    output.setPickUp(true);
+    output.setPickUpOrDrop(true);
     mockOutput(output);
 
     activeAnt.performAction(mockEnvironment, mockEntityManager, random);
@@ -442,22 +445,7 @@ public class ActiveAntTest {
   @Test
   public void pickup_empty() {
     AntOutput output = new AntOutput();
-    output.setPickUp(true);
-    mockOutput(output);
-
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
-
-    verify(mockCell, never()).removeEntity(any(EntityType.class));
-    verify(mockAntEntity, never()).setCarriedEntity(any(Entity.class));
-  }
-
-  @Test
-  public void pickup_alreadyCarrying() {
-    when(mockAntEntity.getCarriedEntity()).thenReturn(mockFood);
-    activeAnt = new ActiveAnt(mockAntEntity, mockAntBehavior);
-
-    AntOutput output = new AntOutput();
-    output.setPickUp(true);
+    output.setPickUpOrDrop(true);
     mockOutput(output);
 
     activeAnt.performAction(mockEnvironment, mockEntityManager, random);
@@ -470,7 +458,7 @@ public class ActiveAntTest {
   public void pickup_pheromone() {
     when(mockCell.getEntity(EntityType.PHEROMONE)).thenReturn(mockPheromone);
     AntOutput output = new AntOutput();
-    output.setPickUp(true);
+    output.setPickUpOrDrop(true);
     mockOutput(output);
 
     activeAnt.performAction(mockEnvironment, mockEntityManager, random);
@@ -482,7 +470,7 @@ public class ActiveAntTest {
   @Test
   public void drop_notCarrying() {
     AntOutput output = new AntOutput();
-    output.setDrop(true);
+    output.setPickUpOrDrop(true);
     mockOutput(output);
 
     activeAnt.performAction(mockEnvironment, mockEntityManager, random);
@@ -496,7 +484,7 @@ public class ActiveAntTest {
     when(mockAntEntity.getCarriedEntity()).thenReturn(mockFood);
     activeAnt = new ActiveAnt(mockAntEntity, mockAntBehavior);
     AntOutput output = new AntOutput();
-    output.setDrop(true);
+    output.setPickUpOrDrop(true);
     mockOutput(output);
 
     activeAnt.performAction(mockEnvironment, mockEntityManager, random);
@@ -510,7 +498,7 @@ public class ActiveAntTest {
     when(mockAntEntity.getCarriedEntity()).thenReturn(mockRock);
     activeAnt = new ActiveAnt(mockAntEntity, mockAntBehavior);
     AntOutput output = new AntOutput();
-    output.setDrop(true);
+    output.setPickUpOrDrop(true);
     mockOutput(output);
 
     activeAnt.performAction(mockEnvironment, mockEntityManager, random);
@@ -526,7 +514,7 @@ public class ActiveAntTest {
     when(mockFrontCell.getEntity(EntityType.FOOD)).thenReturn(mockFood);
     activeAnt = new ActiveAnt(mockAntEntity, mockAntBehavior);
     AntOutput output = new AntOutput();
-    output.setDrop(true);
+    output.setPickUpOrDrop(true);
     mockOutput(output);
 
     activeAnt.performAction(mockEnvironment, mockEntityManager, random);
@@ -541,7 +529,7 @@ public class ActiveAntTest {
     when(mockAntEntity.getCarriedEntity()).thenReturn(mockRock);
     activeAnt = new ActiveAnt(mockAntEntity, mockAntBehavior);
     AntOutput output = new AntOutput();
-    output.setDrop(true);
+    output.setPickUpOrDrop(true);
     mockOutput(output);
 
     activeAnt.performAction(mockEnvironment, mockEntityManager, random);
@@ -555,7 +543,8 @@ public class ActiveAntTest {
     when(mockCell.getColumn()).thenReturn(123);
     when(mockCell.getRow()).thenReturn(321);
     AntOutput output = new AntOutput();
-    output.setLeavePheromone(4);
+    output.setLeavePheromone(true);
+    output.setPheromoneType(4);
     mockOutput(output);
 
     activeAnt.performAction(mockEnvironment, mockEntityManager, random);

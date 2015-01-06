@@ -18,26 +18,26 @@ public final class AntOutput {
   // TODO(thorntonv) Implement attack output.
 
   private static final int MOVE_DIRECTION_IDX = 0;
-  private static final int MOVE_DIRECTION_MASK = ~0b11;
+  private static final int MOVE_DIRECTION_MASK = 0b1;
 
   private static final int TURN_DIRECTION_IDX = 0;
-  private static final int TURN_DIRECTION_BIT_IDX = 2;
-  private static final int TURN_DIRECTION_MASK = ~(0b11 << TURN_DIRECTION_BIT_IDX);
+  private static final int TURN_DIRECTION_BIT_IDX = 1;
+  private static final int TURN_DIRECTION_MASK = 0b11 << TURN_DIRECTION_BIT_IDX;
 
-  private static final int PICKUP_IDX = 0;
-  private static final int PICKUP_BIT_IDX = 4;
-  private static final int PICKUP_MASK = ~(0b1 << PICKUP_BIT_IDX);
-
-  private static final int DROP_IDX = 0;
-  private static final int DROP_BIT_IDX = 5;
-  private static final int DROP_MASK = ~(0b1 << DROP_BIT_IDX);
+  private static final int PICKUP_OR_DROP_IDX = 0;
+  private static final int PICKUP_OR_DROP_BIT_IDX = 3;
+  private static final int PICKUP_OR_DROP_MASK = 0b1 << PICKUP_OR_DROP_BIT_IDX;
 
   private static final int LEAVE_PHEROMONE_IDX = 0;
-  private static final int LEAVE_PHEROMONE_BIT_IDX = 6;
-  private static final int LEAVE_PHEROMONE_MASK = 0b1111 << LEAVE_PHEROMONE_BIT_IDX;
+  private static final int LEAVE_PHEROMONE_BIT_IDX = 4;
+  private static final int LEAVE_PHEROMONE_MASK = 0b1 << LEAVE_PHEROMONE_BIT_IDX;
+
+  private static final int PHEROMONE_TYPE_IDX = 0;
+  private static final int PHEROMONE_TYPE_BIT_IDX = 5;
+  private static final int PHEROMONE_TYPE_MASK = 0b111 << PHEROMONE_TYPE_BIT_IDX;
 
   private static final int CONSUME_IDX = 0;
-  private static final int CONSUME_BIT_IDX = 10;
+  private static final int CONSUME_BIT_IDX = 8;
   private static final int CONSUME_MASK = 0b1 << CONSUME_BIT_IDX;
 
   private int[] data;
@@ -47,9 +47,9 @@ public final class AntOutput {
 
     setMoveDirection(MoveDirection.NONE);
     setTurnDirection(TurnDirection.NONE);
-    setPickUp(false);
-    setDrop(false);
-    setLeavePheromone(0);
+    setPickUpOrDrop(false);
+    setLeavePheromone(false);
+    setPheromoneType(0);
   }
 
   public AntOutput(int[] data) {
@@ -57,19 +57,22 @@ public final class AntOutput {
   }
 
   public MoveDirection getMoveDirection() {
-    int moveDirectionOrdinal = (data[MOVE_DIRECTION_IDX] & ~MOVE_DIRECTION_MASK);
+    int moveDirectionOrdinal = (data[MOVE_DIRECTION_IDX] & MOVE_DIRECTION_MASK);
     moveDirectionOrdinal = moveDirectionOrdinal < MOVE_DIRECTIONS.length ? moveDirectionOrdinal : 0;
     return MOVE_DIRECTIONS[moveDirectionOrdinal];
   }
 
   public void setMoveDirection(MoveDirection moveDirection) {
+    if (moveDirection == MoveDirection.BACKWARD) {
+      throw new IllegalArgumentException(MoveDirection.BACKWARD.name() + " is not supported");
+    }
     int value = moveDirection.ordinal();
-    data[MOVE_DIRECTION_IDX] = (data[MOVE_DIRECTION_IDX] & MOVE_DIRECTION_MASK) | value;
+    data[MOVE_DIRECTION_IDX] = (data[MOVE_DIRECTION_IDX] & ~MOVE_DIRECTION_MASK) | value;
   }
 
   public TurnDirection getTurnDirection() {
     int turnDirectionOrdinal =
-        (data[TURN_DIRECTION_IDX] & ~TURN_DIRECTION_MASK) >> TURN_DIRECTION_BIT_IDX;
+        (data[TURN_DIRECTION_IDX] & TURN_DIRECTION_MASK) >> TURN_DIRECTION_BIT_IDX;
     turnDirectionOrdinal = turnDirectionOrdinal < TURN_DIRECTIONS.length ? turnDirectionOrdinal : 0;
     return TURN_DIRECTIONS[turnDirectionOrdinal];
   }
@@ -77,36 +80,39 @@ public final class AntOutput {
   public void setTurnDirection(TurnDirection turnDirection) {
     int value = turnDirection.ordinal();
     data[TURN_DIRECTION_IDX] =
-        (data[TURN_DIRECTION_IDX] & TURN_DIRECTION_MASK) | (value << TURN_DIRECTION_BIT_IDX);
+        (data[TURN_DIRECTION_IDX] & ~TURN_DIRECTION_MASK) | (value << TURN_DIRECTION_BIT_IDX);
   }
 
-  public boolean shouldPickUp() {
-    int pickUp = (data[PICKUP_IDX] & ~PICKUP_MASK) >> PICKUP_BIT_IDX;
-    return pickUp == 1;
+  public boolean shouldPickUpOrDrop() {
+    int pickUpOrDrop = (data[PICKUP_OR_DROP_IDX] & PICKUP_OR_DROP_MASK) >> PICKUP_OR_DROP_BIT_IDX;
+    return pickUpOrDrop == 1;
   }
 
-  public void setPickUp(boolean shouldPickUp) {
-    int value = shouldPickUp ? 1 : 0;
-    data[PICKUP_IDX] = (data[PICKUP_IDX] & PICKUP_MASK) | (value << PICKUP_BIT_IDX);
+  public void setPickUpOrDrop(boolean pickUpOrDrop) {
+    int value = pickUpOrDrop ? 1 : 0;
+    data[PICKUP_OR_DROP_IDX] =
+        (data[PICKUP_OR_DROP_IDX] & ~PICKUP_OR_DROP_MASK) | (value << PICKUP_OR_DROP_BIT_IDX);
   }
 
-  public boolean shouldDrop() {
-    int value = (data[DROP_IDX] & ~DROP_MASK) >> DROP_BIT_IDX;
-    return value == 1;
+  public boolean shouldLeavePheromone() {
+    int leavePheromone =
+        (data[LEAVE_PHEROMONE_IDX] & LEAVE_PHEROMONE_MASK) >> LEAVE_PHEROMONE_BIT_IDX;
+    return leavePheromone == 1;
   }
 
-  public void setDrop(boolean shouldDrop) {
-    int value = shouldDrop ? 1 : 0;
-    data[DROP_IDX] = (data[DROP_IDX] & DROP_MASK) | (value << DROP_BIT_IDX);
-  }
-
-  public int shouldLeavePheromone() {
-    return (data[LEAVE_PHEROMONE_IDX] & LEAVE_PHEROMONE_MASK) >> LEAVE_PHEROMONE_BIT_IDX;
-  }
-
-  public void setLeavePheromone(int type) {
+  public void setLeavePheromone(boolean leavePheromone) {
+    int value = leavePheromone ? 1 : 0;
     data[LEAVE_PHEROMONE_IDX] =
-        (data[LEAVE_PHEROMONE_IDX] & ~LEAVE_PHEROMONE_MASK) | (type << LEAVE_PHEROMONE_BIT_IDX);
+        (data[LEAVE_PHEROMONE_IDX] & ~LEAVE_PHEROMONE_MASK) | (value << LEAVE_PHEROMONE_BIT_IDX);
+  }
+
+  public int getPheromoneType() {
+    return (data[PHEROMONE_TYPE_IDX] & PHEROMONE_TYPE_MASK) >> PHEROMONE_TYPE_BIT_IDX;
+  }
+
+  public void setPheromoneType(int type) {
+    data[PHEROMONE_TYPE_IDX] =
+        (data[PHEROMONE_TYPE_IDX] & ~PHEROMONE_TYPE_MASK) | (type << PHEROMONE_TYPE_BIT_IDX);
   }
 
   public boolean shouldConsume() {

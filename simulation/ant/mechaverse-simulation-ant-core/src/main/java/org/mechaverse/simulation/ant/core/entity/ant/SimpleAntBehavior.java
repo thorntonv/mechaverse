@@ -47,7 +47,7 @@ public class SimpleAntBehavior implements AntBehavior {
     if (input.getCarriedEntityType() == EntityType.NONE) {
       // Look for nearby food.
       if (cellEntityType == EntityType.FOOD) {
-        output.setPickUp(true);
+        output.setPickUpOrDrop(true);
         return output;
       } else if (input.getFrontSensor().getEntityType() == EntityType.FOOD
           && RandomUtil.nextEvent(.9, random)) {
@@ -68,7 +68,7 @@ public class SimpleAntBehavior implements AntBehavior {
 
     if (frontEntityType == EntityType.ROCK) {
       if(input.getCarriedEntityType() == EntityType.NONE && RandomUtil.nextEvent(.25, random)) {
-        output.setPickUp(true);
+        output.setPickUpOrDrop(true);
         return output;
       }
     }
@@ -106,12 +106,13 @@ public class SimpleAntBehavior implements AntBehavior {
 
     // Occasionally drop a rock that is being carried.
     if(input.getCarriedEntityType() == EntityType.ROCK && RandomUtil.nextEvent(.1, random)) {
-      output.setDrop(true);
+      output.setPickUpOrDrop(true);
       return output;
     }
 
     if(leavePheromone && input.getCellSensor() != EntityType.PHEROMONE) {
-      output.setLeavePheromone(1);
+      output.setLeavePheromone(true);
+      output.setPheromoneType(1);
       leavePheromone = false;
       return output;
     }
