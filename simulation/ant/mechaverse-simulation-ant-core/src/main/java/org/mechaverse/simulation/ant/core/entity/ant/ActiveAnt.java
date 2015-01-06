@@ -57,8 +57,9 @@ public final class ActiveAnt implements ActiveEntity {
   private static final Logger logger = LoggerFactory.getLogger(ActiveAnt.class);
 
   @Value("#{properties['pheromoneInitialEnergy']}") private int pheromoneInitialEnergy;
-
-
+  private int leavePheromoneEnergyCost = 2;
+  private int pickUpEnergyCost = 1;
+  
   private final Ant entity;
   private final AntBehavior behavior;
   private EntityType carriedEntityType = EntityType.NONE;
@@ -306,6 +307,11 @@ public final class ActiveAnt implements ActiveEntity {
           this.carriedEntityType = type;
           carriableEntity.setX(entity.getX());
           carriableEntity.setY(entity.getY());
+
+          int energy = entity.getEnergy();
+          if (energy > pickUpEnergyCost) {
+            entity.setEnergy(energy - pickUpEnergyCost);
+          }
           return true;
         }
       }
@@ -326,17 +332,22 @@ public final class ActiveAnt implements ActiveEntity {
   }
 
   private void leavePheromone(Cell cell, int type, EntityManager entityManager) {
-    Pheromone pheromone = new Pheromone();
-    pheromone.setValue(type);
-    pheromone.setEnergy(pheromoneInitialEnergy);
-    pheromone.setMaxEnergy(pheromoneInitialEnergy);
+    int energy = entity.getEnergy();
+    if (energy > leavePheromoneEnergyCost) {
+      entity.setEnergy(energy - leavePheromoneEnergyCost);
 
-    Entity existingPheromone = cell.getEntity(EntityType.PHEROMONE);
-    if (existingPheromone != null) {
-      entityManager.removeEntity(existingPheromone);
+      Pheromone pheromone = new Pheromone();
+      pheromone.setValue(type);
+      pheromone.setEnergy(pheromoneInitialEnergy);
+      pheromone.setMaxEnergy(pheromoneInitialEnergy);
+
+      Entity existingPheromone = cell.getEntity(EntityType.PHEROMONE);
+      if (existingPheromone != null) {
+        entityManager.removeEntity(existingPheromone);
+      }
+      cell.setEntity(pheromone, EntityType.PHEROMONE);
+      entityManager.addEntity(pheromone);
     }
-    cell.setEntity(pheromone, EntityType.PHEROMONE);
-    entityManager.addEntity(pheromone);
   }
 
   private boolean consumeFood(Entity food, EntityManager entityManager) {
