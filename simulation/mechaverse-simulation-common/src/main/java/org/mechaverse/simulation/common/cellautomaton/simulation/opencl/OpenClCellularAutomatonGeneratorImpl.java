@@ -69,6 +69,9 @@ public class OpenClCellularAutomatonGeneratorImpl extends AbstractCStyleSimulati
 
     out.printf("__local int external[%d];%n", model.getLogicalUnitCount() * numExternalCells);
 
+    // Declare temporary variables.
+    out.println("int tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7, tmp8;");
+
     // Copy external cells to shared memory.
     generateCopyExternalInputsToState("external", logicalUnitInfo, out);
     generateBarrier(out);

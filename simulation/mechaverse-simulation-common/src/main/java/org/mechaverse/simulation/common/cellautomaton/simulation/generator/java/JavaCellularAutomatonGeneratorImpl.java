@@ -87,6 +87,9 @@ public class JavaCellularAutomatonGeneratorImpl extends AbstractCStyleSimulation
     out.printf("int luRow = %s / %d;%n", luIndexExpr, model.getHeight());
     out.printf("int luCol = %s %% %d;%n", luIndexExpr, model.getHeight());
 
+    // Declare temporary variables.
+    out.println("int tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7, tmp8;");
+
     // Copy state values into the appropriate variables.
     generateCopyStateValuesToVariables(logicalUnitInfo, out);
     out.println();

@@ -25,15 +25,21 @@ public final class BooleanFunctions {
       new ParameterizedBooleanFunction() {
         @Override
         public int getValue(int[] input, int[] params) {
-          int notInput0 = ~input[0];
-          int notInput1 = ~input[1];
-          int notInput2 = ~input[2];
-
-          int term1 = (input[0] & input[1]) & (input[2] & params[0] | notInput2 & params[1]);
-          int term2 = (input[0] & notInput1) & (input[2] & params[2] | notInput2 & params[3]);
-          int term3 = (notInput0 & input[1]) & (input[2] & params[4] | notInput2 & params[5]);
-          int term4 = (notInput0 & notInput1 & input[2]) & params[6];
-          return (term1 | term2 | term3 | term4) ^ params[7];
+          int i1 = input[0], i2 = input[1], i3 = input[2];
+          int p1 = params[0], p2 = params[1], p3 = params[2], p4 = params[3];
+          int p5 = params[4], p6 = params[5], p7 = params[6], p8 = params[7];
+          
+          int iInverted = ~i3;
+          int t1 = i3 & p1 | iInverted & p2;
+          int t2 = i3 & p3 | iInverted & p4;
+          int t3 = i3 & p5 | iInverted & p6;
+          int t4 = i3 & p7 | iInverted & p8;
+          
+          iInverted = ~i2;
+          t1 = i2 & t1 | iInverted & t2;
+          t2 = i2 & t3 | iInverted & t4;
+          
+          return i1 & t1 | ~i1 & t2 & 0b1;
         }
       };
 
@@ -46,11 +52,28 @@ public final class BooleanFunctions {
           int p5 = params[4], p6 = params[5], p7 = params[6], p8 = params[7];
           int p9 = params[8], p10 = params[9], p11 = params[10], p12 = params[11];
           int p13 = params[12], p14 = params[13], p15 = params[14], p16 = params[15];
-          return (i1 & i2 & (i3 & i4 & p1 | i3 & ~i4 & p2 | ~i3 & i4 & p3 | ~i3 & ~i4 & p4))
-              | (i1 & ~i2 & (i3 & i4 & p5 | i3 & ~i4 & p6 | ~i3 & i4 & p7 | ~i3 & ~i4 & p8))
-              | (~i1 & i2 & (i3 & i4 & p9 | i3 & ~i4 & p10 | ~i3 & i4 & p11 | ~i3 & ~i4 & p12))
-              | (~i1 & ~i2 & (i3 & i4 & p13 | i3 & ~i4 & p14 | ~i3 & i4 & p15 | ~i3 & ~i4 & p16))
-              & 0b1;
+          
+          int iInverted = ~i4;
+          int t1 = i4 & p1 | iInverted & p2;
+          int t2 = i4 & p3 | iInverted & p4;
+          int t3 = i4 & p5 | iInverted & p6;
+          int t4 = i4 & p7 | iInverted & p8;
+          int t5 = i4 & p9 | iInverted & p10;
+          int t6 = i4 & p11 | iInverted & p12;
+          int t7 = i4 & p13 | iInverted & p14;
+          int t8 = i4 & p15 | iInverted & p16;
+          
+          iInverted = ~i3;
+          t1 = i3 & t1 | iInverted & t2;
+          t2 = i3 & t3 | iInverted & t4;
+          t3 = i3 & t5 | iInverted & t6;
+          t4 = i3 & t7 | iInverted & t8;
+          
+          iInverted = ~i2;
+          t1 = i2 & t1 | iInverted & t2;
+          t2 = i2 & t3 | iInverted & t4;
+          
+          return i1 & t1 | ~i1 & t2 & 0b1;
         }
       };
 

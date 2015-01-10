@@ -21,7 +21,7 @@ public class OpenClCellularAutomatonSimulationBenchmark extends Benchmark {
 
   private static final String DESCRIPTOR_XML_FILENAME = "boolean4.xml";
   
-  @Param(value = {"200"}) int iterationsPerUpdate;
+  @Param(value = {"175"}) int iterationsPerUpdate;
   @Param(value = {"528"}) int numAutomata;
   @Param(value = {"16"}) int size;
   @Param(value = {"16"}) int width;

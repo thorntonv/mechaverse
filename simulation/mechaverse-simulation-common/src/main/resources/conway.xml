@@ -3,10 +3,10 @@
     width="12" height="12" iterationsPerUpdate="1">
 
   <CellType id="ConwayCell">
-    <Param id="sum"/>
+    <Var id="sum" />
     <Output id="1">
       <BeforeUpdate><![CDATA[
-      	{sum} = {input1}+{input2}+{input3}+{input4}+{input5}+{input6}+{input7}+{input8};
+      	int {sum} = {input1}+{input2}+{input3}+{input4}+{input5}+{input6}+{input7}+{input8};
       ]]></BeforeUpdate>
 
       <UpdateExpression><![CDATA[
