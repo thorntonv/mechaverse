@@ -24,15 +24,20 @@ public class CellularAutomatonRenderer {
 
   public CellularAutomatonRenderer(
       CellularAutomaton cells, Function<Cell, Color> cellColorProvider) {
-    this(cells, Math.min(
-        (3 * Toolkit.getDefaultToolkit().getScreenSize().width / 4) / cells.getWidth(),
-        (3 * Toolkit.getDefaultToolkit().getScreenSize().height / 4) / cells.getHeight()));
+    this(cells, cellColorProvider, 
+      3 * Toolkit.getDefaultToolkit().getScreenSize().width / 4,
+      3 * Toolkit.getDefaultToolkit().getScreenSize().height / 4);
+  }
+
+  public CellularAutomatonRenderer(CellularAutomaton cells, Function<Cell, Color> cellColorProvider, 
+      int maxWidth, int maxHeight) {
+    this(cells, Math.min(maxWidth / cells.getWidth(), maxHeight / cells.getHeight()));
     this.cellColorProvider = cellColorProvider;
   }
   
   public CellularAutomatonRenderer(CellularAutomaton cells, int scale) {
     this.cells = cells;
-    this.scale = scale;
+    this.scale = Math.max(scale, 1);
   }
   
   public BufferedImage draw() {
@@ -45,7 +50,11 @@ public class CellularAutomatonRenderer {
       for (int col = 0; col < cells.getWidth(); col++) {
         Cell cell = cells.getCell(row, col);
         g2d.setColor(cellColorProvider.apply(cell));
-        g2d.fillRect(col * scale + 1, row * scale + 1, scale - 2, scale - 2);
+        if (scale > 2) {
+          g2d.fillRect(col * scale + 1, row * scale + 1, scale - 2, scale - 2);
+        } else {
+          g2d.fillRect(col * scale, row * scale, scale, scale);
+        }
       }
     }
     return image;

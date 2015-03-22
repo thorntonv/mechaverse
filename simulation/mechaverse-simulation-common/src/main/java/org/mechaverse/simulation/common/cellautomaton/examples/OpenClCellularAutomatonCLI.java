@@ -19,7 +19,7 @@ import org.mechaverse.simulation.common.cellautomaton.ui.CellularAutomatonVisual
 
 import com.google.common.base.Function;
 
-public abstract class OpenClCellularAutomatonCLI extends CellularAutomatonCLI{
+public abstract class OpenClCellularAutomatonCLI extends CellularAutomatonCLI {
 
   protected static final Function<Cell, Color> SINGLE_BITPLANE_CELL_COLOR_PROVIDER =
       new Function<Cell, Color>() {

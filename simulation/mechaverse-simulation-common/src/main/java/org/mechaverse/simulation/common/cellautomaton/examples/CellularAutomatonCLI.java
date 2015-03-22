@@ -19,6 +19,9 @@ import org.mechaverse.simulation.common.cellautomaton.ui.CellularAutomatonVisual
 
 public abstract class CellularAutomatonCLI {
 
+  public static final int DEFAULT_IMAGE_WIDTH = 1920;
+  public static final int DEFAULT_IMAGE_HEIGHT = 1080;
+  
   protected static void main(String[] args, CellularAutomatonCLI cli) throws IOException {
     Options options = buildOptions();
 

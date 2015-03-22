@@ -37,6 +37,10 @@ public abstract class AbstractCellularAutomaton implements CellularAutomaton {
       return outputs.length;
     }
 
+    public Cell[] getNeighbors() {
+      return this.neighbors;
+    }
+    
     public void setNeighbors(Cell[] neighbors) {
       this.neighbors = neighbors;
     }
