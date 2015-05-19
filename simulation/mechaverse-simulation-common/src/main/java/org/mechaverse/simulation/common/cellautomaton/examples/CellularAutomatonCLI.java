@@ -17,11 +17,13 @@ import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomat
 import org.mechaverse.simulation.common.cellautomaton.ui.CellularAutomatonRenderer;
 import org.mechaverse.simulation.common.cellautomaton.ui.CellularAutomatonVisualizer;
 
+/**
+ * A base class for cellular automata visualization command line applications.
+ * 
+ * @author Vance Thornton (thorntonv@mechaverse.org)
+ */
 public abstract class CellularAutomatonCLI {
 
-  public static final int DEFAULT_IMAGE_WIDTH = 1920;
-  public static final int DEFAULT_IMAGE_HEIGHT = 1080;
-  
   protected static void main(String[] args, CellularAutomatonCLI cli) throws IOException {
     Options options = buildOptions();
 
@@ -29,12 +31,18 @@ public abstract class CellularAutomatonCLI {
       CommandLineParser parser = new GnuParser();
       CommandLine cmd = parser.parse(options, args);
 
+      int width = Integer.parseInt(cmd.getOptionValue("width", "1920"));
+      int height = Integer.parseInt(cmd.getOptionValue("height", "1080"));
+
       if (cmd.hasOption('v')) {
-        cli.createVisualizer().start();
+        int framesPerSecond = Integer.parseInt(cmd.getOptionValue("frameRate", "60"));
+        cli.createVisualizer(width, height, framesPerSecond).start();
       } else if (cmd.hasOption('f')) {
-        int frameCount = Integer.parseInt(cmd.getOptionValue("frameCount", "60"));
+        int frameCount = Integer.parseInt(cmd.getOptionValue("frameCount", "1800"));
         CellularAutomaton cells = cli.createCellularAutomaton();
-        writeImages(cells, cli.createCellularAutomatonRenderer(cells), 0, frameCount);
+        CellularAutomatonRenderer renderer =
+            cli.createCellularAutomatonRenderer(cells, width, height);
+        writeImages(cells, renderer, 0, frameCount);
       } else if (cmd.hasOption('a')) {
         // TODO(thorntonv): Integrate analysis.
       } else {
@@ -65,9 +73,10 @@ public abstract class CellularAutomatonCLI {
   protected abstract CellularAutomaton createCellularAutomaton() throws IOException;
 
   protected abstract CellularAutomatonRenderer createCellularAutomatonRenderer(
-      CellularAutomaton cells);
+      CellularAutomaton cells, int width, int height);
 
-  protected abstract CellularAutomatonVisualizer createVisualizer() throws IOException;
+  protected abstract CellularAutomatonVisualizer createVisualizer(int width, int height,
+      int framesPerSecond) throws IOException;
   
   private static final Options buildOptions() {
     Options options = new Options();
@@ -75,6 +84,9 @@ public abstract class CellularAutomatonCLI {
     options.addOption(new Option("a", "analyze", false, "Analyze cellular automaton"));
     options.addOption(new Option("f", "frames", false, "Generate visualization image frames"));
     options.addOption(new Option("c", "frameCount", true, "Number of frames to generate"));
+    options.addOption(new Option("w", "width", true, "Image width"));
+    options.addOption(new Option("h", "height", true, "Image height"));
+    options.addOption(new Option("r", "frameRate", true, "Visualization frame rate (fps)"));
     return options;
   }
 }

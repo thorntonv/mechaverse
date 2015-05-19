@@ -56,6 +56,7 @@ public class SimulationStateCellularAutomatonDescriptor
     if (descriptor == null) {
       // Attempt to load from xml on the classpath.
       try {
+        // TODO(thorntonv): Make this configurable.
         descriptor = CellularAutomatonDescriptorReader.read(
             ClassLoader.getSystemResourceAsStream("boolean4.xml"));
       } catch (Throwable t) {

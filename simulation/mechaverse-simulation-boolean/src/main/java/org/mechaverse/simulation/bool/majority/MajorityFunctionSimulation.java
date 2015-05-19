@@ -39,7 +39,7 @@ public class MajorityFunctionSimulation
     super(new SimpleSimulationState<>(new SimpleSimulationModel(), 
       SimpleSimulationModel.SERIALIZER), 
       new MajorityFunctionEntitySupplier(),
-      FitnessFunctions.<MajorityFunctionEntity>zero(), // MajorityFunctionFitnessCalculator.INSTANCE, 
+      MajorityFunctionFitnessCalculator.INSTANCE, 
       populationSize, 
       MajorityFunctionEntity.ENTITY_INPUT_SIZE, 
       MajorityFunctionEntity.ENTITY_OUTPUT_SIZE, 

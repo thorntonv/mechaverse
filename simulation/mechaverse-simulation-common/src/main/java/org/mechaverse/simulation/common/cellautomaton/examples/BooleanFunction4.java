@@ -1,18 +1,27 @@
 package org.mechaverse.simulation.common.cellautomaton.examples;
 
 import java.awt.Color;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
 import org.mechaverse.simulation.common.cellautomaton.simulation.AbstractCellularAutomaton;
+import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomaton;
 import org.mechaverse.simulation.common.cellautomaton.simulation.FourNeighborCellConnector;
+import org.mechaverse.simulation.common.cellautomaton.ui.CellularAutomatonRenderer;
 import org.mechaverse.simulation.common.cellautomaton.ui.CellularAutomatonVisualizer;
 
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 
+/**
+ * A cellular automaton where the output of each cell is determined by computing a Boolean function 
+ * of the values of its four neighbor cells.
+ * 
+ * @author Vance Thornton (thorntonv@mechaverse.org)
+ */
 public class BooleanFunction4 extends AbstractCellularAutomaton {
 
   private static class Boolean4Cell extends AbstractCell {
@@ -102,9 +111,26 @@ public class BooleanFunction4 extends AbstractCellularAutomaton {
     }, new FourNeighborCellConnector());
   }
   
-  public static void main(String[] args) {
-    CellularAutomatonVisualizer visualizer =
-        new CellularAutomatonVisualizer(new BooleanFunction4(64, 64), CELL_COLOR_PROVIDER);
-    visualizer.start();
+  public static void main(String[] args) throws IOException {
+    CellularAutomatonCLI cli = new CellularAutomatonCLI() {
+      @Override
+      protected CellularAutomaton createCellularAutomaton() throws IOException {
+        return new BooleanFunction4(64, 64);
+      }
+
+      @Override
+      protected CellularAutomatonRenderer createCellularAutomatonRenderer(CellularAutomaton cells,
+          int width, int height) {
+        return new CellularAutomatonRenderer(cells, CELL_COLOR_PROVIDER, width, height);
+      }
+
+      @Override
+      protected CellularAutomatonVisualizer createVisualizer(int width, int height,
+          int framesPerSecond) throws IOException {
+        return new CellularAutomatonVisualizer(createCellularAutomaton(), CELL_COLOR_PROVIDER,
+            width, height, framesPerSecond);
+      }
+    };
+    CellularAutomatonCLI.main(args, cli);    
   }
 }

@@ -21,12 +21,20 @@ import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 import com.google.common.collect.Sets;
 
+/**
+ * A cellular automaton with a number of entities. An entity can be associated with other entities.
+ * Entities move randomly, but if an entity is part of an association its movement will be
+ * restricted so that the associated entities form a connected component. An entity will join an
+ * association if it has at least one neighbor that is part of the association.
+ * 
+ * @author Vance Thornton (thorntonv@mechaverse.org)
+ */
 public class Association extends AbstractCellularAutomaton {
 
-  private static final int ROW_COUNT = 108*2;
-  private static final int COL_COUNT = 192*2;
-  private static final double ENTITY_PROBABILITY = .1;
-  private static final int MAX_DEPTH = 20;
+  private static final int ROW_COUNT = 108;
+  private static final int COL_COUNT = 192;
+  private static final double ENTITY_PROBABILITY = .05;
+  private static final int MAX_DEPTH = 10;
   private static final double ASSOCIATION_PROBABILITY = .01;
   private static final String DEFAULT_ASSOCIATION_ID = "1";
   
@@ -142,6 +150,18 @@ public class Association extends AbstractCellularAutomaton {
       }
     }
     
+    @SuppressWarnings("unused")
+    protected int getNeighborCount() {
+      int neighborCount = 0;
+      for (Cell neighborCell : neighbors) {
+        if (neighborCell != null && neighborCell instanceof AssociationCell
+            && cellEntityMap.containsKey(neighborCell)) {
+          neighborCount++;
+        }
+      }
+      return neighborCount;
+    }
+
     protected boolean isConnected(Cell cell, String association) {
       return isConnected(cell, association, Sets.<Cell>newIdentityHashSet(), 0);
     }
@@ -237,14 +257,16 @@ public class Association extends AbstractCellularAutomaton {
       }
 
       @Override
-      protected CellularAutomatonRenderer createCellularAutomatonRenderer(CellularAutomaton cells) {
-        return new CellularAutomatonRenderer(cells, CELL_COLOR_PROVIDER, 
-            DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT);
+      protected CellularAutomatonRenderer createCellularAutomatonRenderer(CellularAutomaton cells,
+          int width, int height) {
+        return new CellularAutomatonRenderer(cells, CELL_COLOR_PROVIDER, width, height);
       }
 
       @Override
-      protected CellularAutomatonVisualizer createVisualizer() throws IOException {
-        return new CellularAutomatonVisualizer(createCellularAutomaton(), CELL_COLOR_PROVIDER);
+      protected CellularAutomatonVisualizer createVisualizer(int width, int height,
+          int framesPerSecond) throws IOException {
+        return new CellularAutomatonVisualizer(createCellularAutomaton(), CELL_COLOR_PROVIDER,
+            width, height, framesPerSecond);
       }
     };
     CellularAutomatonCLI.main(args, cli);

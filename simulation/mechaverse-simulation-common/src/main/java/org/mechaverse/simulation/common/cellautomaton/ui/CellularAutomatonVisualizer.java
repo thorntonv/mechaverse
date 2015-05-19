@@ -23,12 +23,15 @@ public class CellularAutomatonVisualizer extends JFrame {
   private final CellularAutomaton cellularAutomaton;
   private final CellularAutomatonRenderer renderer;
   private final BufferedImageView imageView;
+  private final int framesPerSecond;
 
   public CellularAutomatonVisualizer(CellularAutomaton cellularAutomaton,
-      Function<Cell, Color> cellColorProvider) {
+      Function<Cell, Color> cellColorProvider, int width, int height, int framesPerSecond) {
     this.cellularAutomaton = cellularAutomaton;
-    this.renderer = new CellularAutomatonRenderer(cellularAutomaton, cellColorProvider);
+    this.renderer =
+        new CellularAutomatonRenderer(cellularAutomaton, cellColorProvider, width, height);
     this.imageView = new BufferedImageView();
+    this.framesPerSecond = framesPerSecond;
 
     initUI();
     
@@ -44,7 +47,7 @@ public class CellularAutomatonVisualizer extends JFrame {
     try {
       while (true) {
         update();
-        Thread.sleep(500);
+        Thread.sleep(1000 / framesPerSecond);
       }
     } catch (InterruptedException e) {}
   }

@@ -19,6 +19,11 @@ import org.mechaverse.simulation.common.cellautomaton.ui.CellularAutomatonVisual
 
 import com.google.common.base.Function;
 
+/**
+ * A base class for OpenCL based cellular automata visualization command line applications.
+ * 
+ * @author Vance Thornton (thorntonv@mechaverse.org)
+ */
 public abstract class OpenClCellularAutomatonCLI extends CellularAutomatonCLI {
 
   protected static final Function<Cell, Color> SINGLE_BITPLANE_CELL_COLOR_PROVIDER =
@@ -60,12 +65,15 @@ public abstract class OpenClCellularAutomatonCLI extends CellularAutomatonCLI {
   }
 
   @Override
-  protected CellularAutomatonRenderer createCellularAutomatonRenderer(CellularAutomaton cells) {
-    return new CellularAutomatonRenderer(cells, getCellColorProvider());
+  protected CellularAutomatonRenderer createCellularAutomatonRenderer(CellularAutomaton cells,
+      int width, int height) {
+    return new CellularAutomatonRenderer(cells, getCellColorProvider(), width, height);
   }
 
   @Override
-  protected CellularAutomatonVisualizer createVisualizer() throws IOException {
-    return new CellularAutomatonVisualizer(createCellularAutomaton(), getCellColorProvider());
+  protected CellularAutomatonVisualizer createVisualizer(int width, int height, int framesPerSecond)
+      throws IOException {
+    return new CellularAutomatonVisualizer(createCellularAutomaton(), getCellColorProvider(),
+        width, height, framesPerSecond);
   }
 }
