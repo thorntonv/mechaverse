@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.PrintWriter;
 
 import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
-import org.mechaverse.simulation.common.FitnessFunctions;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorReader;
 import org.mechaverse.simulation.common.simple.SimpleSimulation;
 import org.mechaverse.simulation.common.simple.SimpleSimulationLogger;
@@ -23,8 +22,8 @@ import com.google.common.base.Supplier;
 public class MajorityFunctionSimulation
     extends SimpleSimulation<MajorityFunctionEntity, SimpleSimulationModel> {
 
-  private static final int NUM_ENTITIES = 2000;
-  private static final int NUM_ITERATIONS = 10000;
+  private static final int NUM_ENTITIES = 1000;
+  private static final int NUM_ITERATIONS = 100000;
   
   private static class MajorityFunctionEntitySupplier implements Supplier<MajorityFunctionEntity> {
     
@@ -35,7 +34,8 @@ public class MajorityFunctionSimulation
   };
   
   public MajorityFunctionSimulation(int populationSize, CellularAutomatonDescriptor descriptor, 
-      SimpleSimulationLogger<MajorityFunctionEntity, SimpleSimulationModel> simulationLogger) {
+      SimpleSimulationLogger<MajorityFunctionEntity, SimpleSimulationModel> simulationLogger, 
+          boolean geneticAlgorithmEnabled) {
     super(new SimpleSimulationState<>(new SimpleSimulationModel(), 
       SimpleSimulationModel.SERIALIZER), 
       new MajorityFunctionEntitySupplier(),
@@ -45,6 +45,7 @@ public class MajorityFunctionSimulation
       MajorityFunctionEntity.ENTITY_OUTPUT_SIZE, 
       descriptor, 
       simulationLogger);
+    setGeneticAlgorithmEnabled(geneticAlgorithmEnabled);
   }
   
   public static void main(String[] args) throws Exception {
@@ -56,7 +57,7 @@ public class MajorityFunctionSimulation
         new SimpleSimulationLogger<>(results, MajorityFunctionFitnessCalculator.INSTANCE);
 
     MajorityFunctionSimulation simulation =
-        new MajorityFunctionSimulation(NUM_ENTITIES, descriptor, simulationLogger);
+        new MajorityFunctionSimulation(NUM_ENTITIES, descriptor, simulationLogger, true);
 
     for (int iteration = 1; iteration <= NUM_ITERATIONS; iteration++) {
       simulation.step();

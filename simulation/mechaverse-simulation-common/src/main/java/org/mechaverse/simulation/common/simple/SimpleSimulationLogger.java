@@ -25,6 +25,7 @@ public class SimpleSimulationLogger<E extends AbstractEntity, M> implements Simu
   private final PrintWriter results;
   private final Function<E, Double> entityFitnessFunction;
   private int iterationsPerLog = 10;
+  private double overallBestFitness = 0;
   
   public SimpleSimulationLogger(PrintWriter results, Function<E, Double> entityFitnessFunction) {
     super();
@@ -57,9 +58,12 @@ public class SimpleSimulationLogger<E extends AbstractEntity, M> implements Simu
     }
     
     if (bestEntity != null) {
+      if(bestFitness > overallBestFitness) {
+        overallBestFitness = bestFitness;
+      }
       double averageFitness = fitnessSum / fitEntityCount;
       String result = String.format("%d,%f,%f", iteration, bestFitness, averageFitness);
-      logger.info("Iteration {}: {}, best: {}", iteration, result, bestEntity.toString());
+      logger.info("Iteration {}: {}, best: {}", iteration, result, overallBestFitness);
 
       results.println(result);
       results.flush();

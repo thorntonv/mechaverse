@@ -58,8 +58,8 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
   private final Map<E, Integer> entityIndexMap = new IdentityHashMap<>();
   private final RandomGenerator random = new Well19937c();
   private final SimpleSimulationState<M> state;
-  
   private final SimulationLogger<E, M> simulationLogger;
+  private boolean geneticAlgorithmEnabled = true; 
   
   public SimpleSimulation(SimpleSimulationState<M> state, Supplier<E> entitySupplier, 
       Function<E, Double> entityFitnessFunction, int populationSize, int inputSize, int outputSize,
@@ -81,7 +81,8 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
   public SimpleSimulation(SimpleSimulationState<M> state, Supplier<E> entitySupplier, 
       Function<E, Double> entityFitnessFunction, 
       CellularAutomatonSimulationModel cellularAutomatonModel,
-      CellularAutomatonSimulator simulator, SimulationLogger<E, M> simulationLogger) {
+      CellularAutomatonSimulator simulator, SimulationLogger<E, M> simulationLogger,
+      boolean geneticAlgorithmEnabled) {
     this(state, entitySupplier, entityFitnessFunction, cellularAutomatonModel, simulator, 
         new CutAndSpliceCrossoverGeneticRecombinator(), simulationLogger);
   }
@@ -100,11 +101,10 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
     this.geneticRecombinator = geneticRecombinator;
     this.state = state;
     this.simulationLogger = simulationLogger;
-    
-    // Start with a random initial population.
-    while (simulator.getAllocator().getAvailableCount() > 0) {
-      generateRandomEntity();
-    }
+  }
+  
+  public void setGeneticAlgorithmEnabled(boolean geneticAlgorithmEnabled) {
+    this.geneticAlgorithmEnabled = geneticAlgorithmEnabled;
   }
   
   @Override
@@ -131,11 +131,10 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
   
   public void step() throws Exception {
     if (simulator.getAllocator().getAvailableCount() > 0) {
-      EnumeratedDistribution<E> fitnessDistribution = null;
-      if (fitnessDistribution == null) {
-        fitnessDistribution = getFitnessDistribution();
+      EnumeratedDistribution<E> fitnessDistribution = getFitnessDistribution();
+      while (simulator.getAllocator().getAvailableCount() > 0) {
+        generateEntity(fitnessDistribution);
       }
-      generateEntity(fitnessDistribution);
     }
 
     for (E entity : entities) {
@@ -185,7 +184,8 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
   }
   
   private E generateEntity(EnumeratedDistribution<E> fitnessDistribution) {
-    if (fitnessDistribution == null || fitnessDistribution.getPmf().size() < 2) {
+    if (!geneticAlgorithmEnabled || fitnessDistribution == null 
+        || fitnessDistribution.getPmf().size() < 2) {
       return generateRandomEntity();
     }
 
