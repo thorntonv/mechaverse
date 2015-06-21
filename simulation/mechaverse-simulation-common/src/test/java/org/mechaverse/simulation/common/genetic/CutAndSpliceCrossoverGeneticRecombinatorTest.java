@@ -25,7 +25,8 @@ public class CutAndSpliceCrossoverGeneticRecombinatorTest {
 
   @Test
   public void recombine() {
-    GeneticRecombinator recombinator = new CutAndSpliceCrossoverGeneticRecombinator();
+    BitMutator mutator = null;
+    GeneticRecombinator recombinator = new CutAndSpliceCrossoverGeneticRecombinator(mutator);
 
     ByteArrayOutputStream parent1Out = new ByteArrayOutputStream();
     ByteArrayOutputStream parent2Out = new ByteArrayOutputStream();

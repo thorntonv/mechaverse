@@ -14,6 +14,8 @@ import com.google.common.base.Preconditions;
  */
 public class CutAndSpliceCrossoverGeneticRecombinator implements GeneticRecombinator {
 
+  private static final float DEFAULT_MUTATION_RATE = .001f;
+
   private static class RecombinationState extends GeneticData {
 
     private int position;
@@ -46,6 +48,16 @@ public class CutAndSpliceCrossoverGeneticRecombinator implements GeneticRecombin
     }
   }
 
+  private final BitMutator mutator;
+
+  public CutAndSpliceCrossoverGeneticRecombinator() {
+    this(new BitMutator(DEFAULT_MUTATION_RATE));
+  }
+
+  public CutAndSpliceCrossoverGeneticRecombinator(BitMutator mutator) {
+    this.mutator = mutator;
+  }
+
   @Override
   public GeneticData recombine(
       GeneticData parent1Data, GeneticData parent2Data, RandomGenerator random) {
@@ -71,6 +83,12 @@ public class CutAndSpliceCrossoverGeneticRecombinator implements GeneticRecombin
       otherParent.nextCrossoverPoint();
       childCrossoverPoints.add(childData.size());
     }
-    return new GeneticData(childData.toByteArray(), childCrossoverPoints.toArray());
+    byte[] childDataByteArray = childData.toByteArray();
+
+    if (mutator != null) {
+      mutator.mutate(childDataByteArray, random);
+    }
+
+    return new GeneticData(childDataByteArray, childCrossoverPoints.toArray());
   }
 }
