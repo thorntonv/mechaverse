@@ -1,6 +1,7 @@
 package org.mechaverse.simulation.common.genetic;
 
-import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import org.apache.commons.math3.distribution.BinomialDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
@@ -29,7 +30,7 @@ public class BitMutator implements Mutator {
     int bitCount = data.length * BITS_PER_BYTE;
     int numBitsToMutate = getNumBitsToMutate(bitCount, random);
 
-    TIntArrayList mutatedBits = new TIntArrayList(numBitsToMutate);
+    TIntSet mutatedBits = new TIntHashSet(numBitsToMutate);
     for (int cnt = 1; cnt <= numBitsToMutate; cnt++) {
       // Mutate one of the remaining bits at random.
       int bitToMutateIdx = random.nextInt(bitCount);
