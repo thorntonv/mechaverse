@@ -68,7 +68,7 @@ public class CellularAutomatonSimulationModelBuilder {
       for (Var var : cellType.getVars()) {
         String varName = getCellVarName(cell, var);
         if (!varNameMap.containsKey(var.getId())) {
-          paramVarNameMap.put(var.getId(), varName);
+          varNameMap.put(var.getId(), varName);
         } else {
           throw new IllegalStateException("Variable " + var.getId()
               + " is defined more than once for cell " + cell.getId());

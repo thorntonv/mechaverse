@@ -1,10 +1,13 @@
 package org.mechaverse.simulation.common.cellautomaton.simulation.generator;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonBuilder.ROUTING_3IN3OUT_TYPE;
 
 import org.junit.Test;
+import org.mechaverse.cellautomaton.model.CellType;
 import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
+import org.mechaverse.cellautomaton.model.Var;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonBuilder;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonBuilder.Routing3In3OutCellType;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonTestUtil.CellInfoVerifier;
@@ -17,8 +20,50 @@ import org.mechaverse.simulation.common.cellautomaton.simulation.generator.Cellu
  */
 public class CellularAutomatonSimulationModelBuilderTest {
 
+  /**
+   * A cell that uses a {@link Var}.
+   */
+  public static class VarCellType extends CellType {
+
+    private static final long serialVersionUID = 1L;
+
+    public VarCellType() {
+      setId("var");
+      Var testVar = new Var();
+      testVar.setId("testVar");
+      getVars().add(testVar);
+      getOutputs().add(CellularAutomatonBuilder.newOutput("1", "({input2} & {testVar})"));
+    }
+
+    public static VarCellType newInstance() {
+      return new VarCellType();
+    }
+  }
+
+
   // TODO(thorntonv): Test cell type output duplication and restriction.
   // TODO(thorntonv): Test logical units with cells with fewer than 3 cells on the boundary.
+
+  /**
+   * Tests building the model of an automaton with a single logical unit that consists of a cell
+   * with a {@link Var}.
+   */
+  @Test
+  public void testBuildModel_cellWithVar() {
+    CellularAutomatonDescriptor descriptor = CellularAutomatonBuilder.newCellularAutomaton(
+      1, 1, VarCellType.newInstance(), 1, 1);
+    descriptor.getLogicalUnit().setNeighborConnections("3");
+
+    CellularAutomatonSimulationModelBuilder modelBuilder =
+        new CellularAutomatonSimulationModelBuilder();
+    CellularAutomatonSimulationModel model = modelBuilder.buildModel(descriptor);
+    LogicalUnitInfo logicalUnitInfo = model.getLogicalUnitInfo();
+
+    assertEquals(1, logicalUnitInfo.getCells().size());
+    CellInfo cell = logicalUnitInfo.getCells().get(0);
+    assertEquals(1, cell.getVarNames().size());
+    assertNotNull(cell.getVarName("testVar"));
+  }
 
   /**
    * Tests building the model of an automaton with a single logical unit that consists of two
@@ -38,8 +83,14 @@ public class CellularAutomatonSimulationModelBuilderTest {
     // Verify logical unit.
     assertEquals(2, logicalUnitInfo.getCells().size());
     assertEquals(4, logicalUnitInfo.getExternalCells().size());
+    for (CellInfo cell : logicalUnitInfo.getCells()) {
+      assertEquals(3, cell.getOutputVarNames().size());
+      assertEquals(6, cell.getParamVarNames().size());
+      assertEquals(0, cell.getVarNames().size());
+    }
+
     // 9 values per cell * 2 cells.
-    assertEquals(9*2, logicalUnitInfo.getStateSize());
+    assertEquals(9 * 2, logicalUnitInfo.getStateSize());
 
     // Verify external cells.
     ExternalCellInfoVerifier.of(logicalUnitInfo.getExternalCellInfo("in1"))
@@ -75,7 +126,7 @@ public class CellularAutomatonSimulationModelBuilderTest {
   }
 
   /**
-   * Tests building the model of an automaton with 3x3 logical units that consists of a 3x3 matrix 
+   * Tests building the model of an automaton with 3x3 logical units that consists of a 3x3 matrix
    * of routing3in3out cells.
    *
    *      [2]     [3]
@@ -100,6 +151,13 @@ public class CellularAutomatonSimulationModelBuilderTest {
     // Verify logical unit.
     assertEquals(9, logicalUnitInfo.getCells().size());
     assertEquals(9, logicalUnitInfo.getExternalCells().size());
+
+    for (CellInfo cell : logicalUnitInfo.getCells()) {
+      assertEquals(3, cell.getOutputVarNames().size());
+      assertEquals(6, cell.getParamVarNames().size());
+      assertEquals(0, cell.getVarNames().size());
+    }
+
     // 9 values per cell * 9 cells.
     assertEquals(81, logicalUnitInfo.getStateSize());
 
