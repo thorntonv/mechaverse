@@ -33,7 +33,7 @@ public class GeneticDataStore {
 
   public void put(String key, GeneticData geneticData) {
     dataStore.put(geneticDataKey(key), geneticData.getData());
-    dataStore.put(crossoverDataKey(key), ArrayUtil.toByteArray(geneticData.getCrossoverPoints()));
+    dataStore.put(crossoverDataKey(key), ArrayUtil.toByteArray(geneticData.getCrossoverData()));
   }
 
   public GeneticData get(String key) {

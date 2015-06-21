@@ -22,7 +22,7 @@ public class CutAndSpliceCrossoverGeneticRecombinator implements GeneticRecombin
     private int nextCrossoverPointIdx;
 
     public RecombinationState(GeneticData data) {
-      super(data.getData(), data.getCrossoverPoints());
+      super(data.getData(), data.getCrossoverData());
     }
 
     public boolean hasNextCrossoverPoint() {
@@ -34,15 +34,15 @@ public class CutAndSpliceCrossoverGeneticRecombinator implements GeneticRecombin
     }
 
     public void nextCrossoverPoint(ByteArrayOutputStream out) {
-      int nextCrossoverPoint = (nextCrossoverPointIdx < crossoverPoints.length) ?
-          crossoverPoints[nextCrossoverPointIdx] : data.length;
+      int nextCrossoverPoint = (nextCrossoverPointIdx < crossoverData.length) ?
+          crossoverData[nextCrossoverPointIdx] : data.length;
       while (position < data.length && position < nextCrossoverPoint) {
         if(out != null) {
           out.write(data[position]);
         }
         position++;
       }
-      if (nextCrossoverPointIdx < crossoverPoints.length) {
+      if (nextCrossoverPointIdx < crossoverData.length) {
         nextCrossoverPointIdx++;
       }
     }
@@ -68,7 +68,7 @@ public class CutAndSpliceCrossoverGeneticRecombinator implements GeneticRecombin
     ByteArrayOutputStream childData = new ByteArrayOutputStream(
         Math.max(parent1Data.getData().length, parent2Data.getData().length));
     TIntArrayList childCrossoverPoints = new TIntArrayList(
-        Math.max(parent1Data.crossoverPoints.length, parent2Data.crossoverPoints.length));
+        Math.max(parent1Data.crossoverData.length, parent2Data.crossoverData.length));
 
     RecombinationState parent1 = new RecombinationState(parent1Data);
     RecombinationState parent2 = new RecombinationState(parent2Data);

@@ -65,10 +65,10 @@ public class CutAndSpliceCrossoverGeneticRecombinatorTest {
         assertEquals(n, childIn.read());
         pos++;
       }
-      assertEquals(pos, childData.getCrossoverPoints()[crossoverIdx]);
+      assertEquals(pos, childData.getCrossoverData()[crossoverIdx]);
       crossoverIdx++;
     }
 
-    assertEquals(crossoverIdx, childData.getCrossoverPoints().length);
+    assertEquals(crossoverIdx, childData.getCrossoverData().length);
   }
 }

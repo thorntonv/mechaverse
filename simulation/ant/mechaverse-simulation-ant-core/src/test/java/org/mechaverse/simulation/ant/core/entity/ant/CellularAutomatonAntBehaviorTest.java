@@ -110,17 +110,17 @@ public class CellularAutomatonAntBehaviorTest {
     GeneticData automatonStateData =
         geneticData.get(CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_STATE_KEY);
     assertArrayEquals(automatonState, automatonStateData.getData());
-    assertNotNull(automatonStateData.getCrossoverPoints());
+    assertNotNull(automatonStateData.getCrossoverData());
 
     GeneticData outputMapData =
         geneticData.get(CellularAutomatonGeneticDataGenerator.OUTPUT_MAP_KEY);
     assertArrayEquals(outputMap, outputMapData.getData());
-    assertNotNull(outputMapData.getCrossoverPoints());
+    assertNotNull(outputMapData.getCrossoverData());
 
     GeneticData bitOutputMapData =
         geneticData.get(CellularAutomatonAntBehavior.AUTOMATON_BIT_OUTPUT_MAP_KEY);
     assertArrayEquals(bitOutputMap, bitOutputMapData.getData());
-    assertNotNull(bitOutputMapData.getCrossoverPoints());
+    assertNotNull(bitOutputMapData.getCrossoverData());
   }
 
   @Test

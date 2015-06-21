@@ -20,7 +20,7 @@ public class GeneticData {
 
     private final ByteArrayOutputStream out = new ByteArrayOutputStream(512*1024);
     private final DataOutputStream dataOut = new DataOutputStream(out);
-    private final TIntArrayList crossoverPoints = new TIntArrayList(128*1024);
+    private final TIntArrayList crossoverData = new TIntArrayList(128*1024);
 
     public Builder write(byte[] data) {
       try {
@@ -44,7 +44,7 @@ public class GeneticData {
      * Marks the current position as a crossover point.
      */
     public Builder markCrossoverPoint() {
-      crossoverPoints.add(out.size());
+      crossoverData.add(out.size());
       return this;
     }
 
@@ -52,33 +52,33 @@ public class GeneticData {
      * Adds a position to the list of crossover points.
      */
     public Builder addCrossoverPoint(int position) {
-      crossoverPoints.add(position);
+      crossoverData.add(position);
       return this;
     }
 
     public GeneticData build() {
-      return new GeneticData(out.toByteArray(), crossoverPoints.toArray());
+      return new GeneticData(out.toByteArray(), crossoverData.toArray());
     }
   }
 
   protected final byte[] data;
-  protected final int[] crossoverPoints;
+  protected final int[] crossoverData;
 
   public static Builder newBuilder() {
     return new Builder();
   }
 
-  public GeneticData(byte[] data, int[] crossoverPoints) {
+  public GeneticData(byte[] data, int[] crossoverData) {
     this.data = data;
-    this.crossoverPoints = crossoverPoints;
+    this.crossoverData = crossoverData;
   }
 
   public byte[] getData() {
     return data;
   }
 
-  public int[] getCrossoverPoints() {
-    return crossoverPoints;
+  public int[] getCrossoverData() {
+    return crossoverData;
   }
 
   @Override
@@ -93,11 +93,11 @@ public class GeneticData {
 
     GeneticData otherData = (GeneticData) otherObject;
     return Arrays.equals(data, otherData.data)
-        && Arrays.equals(crossoverPoints, otherData.crossoverPoints);
+        && Arrays.equals(crossoverData, otherData.crossoverData);
   }
 
   @Override
   public int hashCode() {
-    return Arrays.hashCode(data) + Arrays.hashCode(crossoverPoints);
+    return Arrays.hashCode(data) + Arrays.hashCode(crossoverData);
   }
 }
