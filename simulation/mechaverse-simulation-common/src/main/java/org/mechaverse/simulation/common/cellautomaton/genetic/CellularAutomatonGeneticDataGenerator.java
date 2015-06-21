@@ -1,7 +1,10 @@
-package org.mechaverse.simulation.common.genetic;
+package org.mechaverse.simulation.common.cellautomaton.genetic;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel;
+import org.mechaverse.simulation.common.genetic.GeneticData;
+import org.mechaverse.simulation.common.genetic.GeneticDataStore;
+import org.mechaverse.simulation.common.genetic.GeneticData.Builder;
 import org.mechaverse.simulation.common.util.ArrayUtil;
 
 /**
