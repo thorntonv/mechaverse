@@ -4,7 +4,6 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel;
 import org.mechaverse.simulation.common.genetic.GeneticData;
 import org.mechaverse.simulation.common.genetic.GeneticDataStore;
-import org.mechaverse.simulation.common.genetic.GeneticData.Builder;
 import org.mechaverse.simulation.common.util.ArrayUtil;
 
 /**
@@ -15,12 +14,14 @@ import org.mechaverse.simulation.common.util.ArrayUtil;
 public class CellularAutomatonGeneticDataGenerator {
 
   // TODO(thorntonv): Implement unit test for this class.
-  // TODO(thorntonv): Explore other crossover strategies.
+
+  // TODO(thorntonv): Modify this class to generate crossover groups based on the two-dimensional
+  // cellular automaton structure.
 
   public static final String CELLULAR_AUTOMATON_STATE_KEY = "cellularAutomatonState";
   public static final String OUTPUT_MAP_KEY = "outputMap";
 
-  public void generateGeneticData(GeneticDataStore dataStore, 
+  public void generateGeneticData(GeneticDataStore dataStore,
       CellularAutomatonSimulationModel model, int outputSize, RandomGenerator random) {
     dataStore.put(CELLULAR_AUTOMATON_STATE_KEY, generateStateGeneticData(model, random));
     dataStore.put(OUTPUT_MAP_KEY, generateOutputMapGeneticData(model, outputSize, random));
@@ -30,8 +31,7 @@ public class CellularAutomatonGeneticDataGenerator {
       CellularAutomatonSimulationModel model, RandomGenerator random) {
     GeneticData.Builder geneticDataBuilder = GeneticData.newBuilder();
     for (int idx = 0; idx < model.getStateSize(); idx++) {
-      geneticDataBuilder.writeInt(random.nextInt());
-      geneticDataBuilder.markCrossoverPoint();
+      geneticDataBuilder.writeInt(random.nextInt(), idx);
     }
     return geneticDataBuilder.build();
   }
@@ -46,8 +46,7 @@ public class CellularAutomatonGeneticDataGenerator {
       RandomGenerator random) {
     GeneticData.Builder geneticDataBuilder = GeneticData.newBuilder();
     for (int idx = 0; idx < outputSize; idx++) {
-      geneticDataBuilder.writeInt(random.nextInt(stateSize));
-      geneticDataBuilder.markCrossoverPoint();
+      geneticDataBuilder.writeInt(random.nextInt(stateSize), idx);
     }
     return geneticDataBuilder.build();
   }

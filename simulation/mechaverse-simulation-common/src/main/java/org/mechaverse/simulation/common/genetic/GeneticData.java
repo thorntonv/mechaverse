@@ -16,6 +16,8 @@ public class GeneticData {
 
   // TODO(thorntonv): Implement unit test for this class.
 
+  private static final int BYTES_PER_INT = Integer.SIZE / Byte.SIZE;
+
   public static class Builder {
 
     private final ByteArrayOutputStream out = new ByteArrayOutputStream(512*1024);
@@ -31,28 +33,16 @@ public class GeneticData {
       return this;
     }
 
-    public Builder writeInt(int value) {
+    public Builder writeInt(int value, int group) {
       try {
         dataOut.writeInt(value);
+
+        for (int cnt = 1; cnt <= BYTES_PER_INT; cnt++) {
+          crossoverData.add(group);
+        }
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
-      return this;
-    }
-
-    /**
-     * Marks the current position as a crossover point.
-     */
-    public Builder markCrossoverPoint() {
-      crossoverData.add(out.size());
-      return this;
-    }
-
-    /**
-     * Adds a position to the list of crossover points.
-     */
-    public Builder addCrossoverPoint(int position) {
-      crossoverData.add(position);
       return this;
     }
 

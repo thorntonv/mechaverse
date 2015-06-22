@@ -1,74 +1,75 @@
 package org.mechaverse.simulation.common.genetic;
 
-import static org.junit.Assert.assertEquals;
-import gnu.trove.list.array.TIntArrayList;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import static org.junit.Assert.assertArrayEquals;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mechaverse.simulation.common.util.RandomUtil;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * A unit test for {@link CutAndSpliceCrossoverGeneticRecombinator}.
  */
+@RunWith(MockitoJUnitRunner.class)
 public class CutAndSpliceCrossoverGeneticRecombinatorTest {
+
+  private static final GeneticData TEST_PARENT1_DATA =
+      new GeneticData(new byte[] {50, 72, 21, 35}, new int[] {00, 01, 00, 00});
+  private static final GeneticData TEST_PARENT2_DATA =
+      new GeneticData(new byte[] {39, 12, 96, 77}, new int[] {00, 00, 00, 01});
+
+  @Mock BitMutator mockBitMutator;
+  @Mock private RandomGenerator mockRandom;
 
   private RandomGenerator random;
 
   @Before
   public void setUp() {
-    random = RandomUtil.newGenerator(BitMutatorTest.class.getName().hashCode());
+    random = RandomUtil.newGenerator(
+        CutAndSpliceCrossoverGeneticRecombinatorTest.class.getName().hashCode());
   }
 
+  /**
+   * Implements the example from the {@link CutAndSpliceCrossoverGeneticRecombinator} java doc.
+   */
   @Test
   public void recombine() {
     BitMutator mutator = null;
     GeneticRecombinator recombinator = new CutAndSpliceCrossoverGeneticRecombinator(mutator);
 
-    ByteArrayOutputStream parent1Out = new ByteArrayOutputStream();
-    ByteArrayOutputStream parent2Out = new ByteArrayOutputStream();
+    when(mockRandom.nextDouble())
+        // Index 0: Choose parent at random and assign to group 0. Parent 2 is assigned to group 0.
+        .thenReturn(.75)
+        // Index 1: Choose parent at random and use its group assignment.
+        // Group assignment from parent 1 is used.
+        .thenReturn(.25)
+        // Index 1: Choose parent at random and assign to group 1. Parent 1 is assigned to group 1.
+        .thenReturn(.25)
+        // Index 3: Choose parent at random and use its group assignment.
+        // Group assignment from parent 2 is used.
+        .thenReturn(.75);
 
-    TIntArrayList parent1CrossoverPoints = new TIntArrayList();
-    TIntArrayList parent2CrossoverPoints = new TIntArrayList();
-    for (int n = 1; n <= 100; n++) {
-      // Select parent1 for evens and parent2 for odds
-      ByteArrayOutputStream selectedParent = (n % 2 == 0) ? parent1Out : parent2Out;
-      TIntArrayList selectParentCrossoverPoints = (n % 2 == 0) ?
-          parent1CrossoverPoints : parent2CrossoverPoints;
+    GeneticData childData =
+        recombinator.recombine(TEST_PARENT1_DATA, TEST_PARENT2_DATA, mockRandom);
 
-      // Write the value n, n times to the parent.
-      for (int cnt = 1; cnt <= n; cnt++) {
-        selectedParent.write(n);
-      }
-      selectParentCrossoverPoints.add(selectedParent.size());
-    }
+    assertArrayEquals(new byte[] {39, 72, 96, 35}, childData.getData());
+    assertArrayEquals(new int[] {00, 01, 00, 01}, childData.getCrossoverData());
+  }
 
-    GeneticData parent1Data =
-        new GeneticData(parent1Out.toByteArray(), parent1CrossoverPoints.toArray());
-    GeneticData parent2Data =
-        new GeneticData(parent2Out.toByteArray(), parent2CrossoverPoints.toArray());
+  /**
+   * Verifies that the mutate method is called when a {@link BitMutator} is provided.
+   */
+  @Test
+  public void recombine_mutate() {
+    GeneticRecombinator recombinator = new CutAndSpliceCrossoverGeneticRecombinator(mockBitMutator);
 
-    GeneticData childData = recombinator.recombine(parent1Data, parent2Data, random);
+    GeneticData childData = recombinator.recombine(TEST_PARENT1_DATA, TEST_PARENT2_DATA, random);
 
-    ByteArrayInputStream childIn = new ByteArrayInputStream(childData.getData());
-
-    int pos = 0;
-    int crossoverIdx = 0;
-    while(childIn.available() > 0) {
-      int n = childIn.read();
-      pos++;
-      // Read the remaining n - 1 copies of n.
-      for(int cnt = 1; cnt < n; cnt++) {
-        assertEquals(n, childIn.read());
-        pos++;
-      }
-      assertEquals(pos, childData.getCrossoverData()[crossoverIdx]);
-      crossoverIdx++;
-    }
-
-    assertEquals(crossoverIdx, childData.getCrossoverData().length);
+    verify(mockBitMutator).mutate(childData.getData(), random);
   }
 }
