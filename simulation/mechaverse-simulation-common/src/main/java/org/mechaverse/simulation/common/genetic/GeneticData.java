@@ -14,9 +14,7 @@ import java.util.Arrays;
  */
 public class GeneticData {
 
-  // TODO(thorntonv): Implement unit test for this class.
-
-  private static final int BYTES_PER_INT = Integer.SIZE / Byte.SIZE;
+  protected static final int BYTES_PER_INT = Integer.SIZE / Byte.SIZE;
 
   public static class Builder {
 
@@ -56,6 +54,10 @@ public class GeneticData {
 
   public static Builder newBuilder() {
     return new Builder();
+  }
+
+  protected GeneticData(GeneticData geneticData) {
+    this(geneticData.getData(), geneticData.getCrossoverData());
   }
 
   public GeneticData(byte[] data, int[] crossoverData) {
