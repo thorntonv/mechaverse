@@ -77,7 +77,7 @@ public class CellularAutomatonSimulationModel {
     private final Input[] inputs;
     private final Map<String, String> outputVarNameMap;
     private final Map<String, String> paramVarNameMap;
-    private final Map<String, String> varNameMap;   
+    private final Map<String, String> varNameMap;
     // Maps an output id to a param id map.
     private final Map<String, Map<String, String>> outputParamIdMap;
 
@@ -149,7 +149,6 @@ public class CellularAutomatonSimulationModel {
       return varNameMap.values();
     }
 
-    
     public String getOutputParamVarName(Output output, Param param) {
       return getOutputParamVarName(output, param.getId());
     }
@@ -161,7 +160,7 @@ public class CellularAutomatonSimulationModel {
       }
       return null;
     }
-    
+
     public Collection<String> getOutputParamVarNames(Output output) {
       Map<String, String> paramIdMap = outputParamIdMap.get(output.getId());
       if (paramIdMap != null) {
@@ -172,13 +171,23 @@ public class CellularAutomatonSimulationModel {
 
     @Override
     public boolean equals(Object obj) {
-      if (this == obj) return true;
-      if (obj == null) return false;
-      if (getClass() != obj.getClass()) return false;
+      if (this == obj) {
+        return true;
+      }
+      if (obj == null) {
+        return false;
+      }
+      if (getClass() != obj.getClass()) {
+        return false;
+      }
       CellInfo other = (CellInfo) obj;
       if (cell == null) {
-        if (other.cell != null) return false;
-      } else if (!cell.getId().equals(other.cell.getId())) return false;
+        if (other.cell != null) {
+          return false;
+        }
+      } else if (!cell.getId().equals(other.cell.getId())) {
+        return false;
+      }
       return true;
     }
 
@@ -222,15 +231,27 @@ public class CellularAutomatonSimulationModel {
    */
   public static class LogicalUnitInfo {
 
+    private final int width;
+    private final int height;
     private final List<CellInfo> cells;
     private final List<ExternalCellInfo> externalCells;
     private final ImmutableBiMap<String, Integer> varNameStateIndexMap;
 
-    public LogicalUnitInfo(List<CellInfo> cells, List<ExternalCellInfo> externalCells,
-        ImmutableBiMap<String, Integer> varNameStateIndexMap) {
+    public LogicalUnitInfo(int width, int height, List<CellInfo> cells,
+        List<ExternalCellInfo> externalCells, ImmutableBiMap<String, Integer> varNameStateIndexMap) {
+      this.width = width;
+      this.height = height;
       this.cells = cells;
       this.externalCells = externalCells;
       this.varNameStateIndexMap = varNameStateIndexMap;
+    }
+
+    public int getWidth() {
+      return width;
+    }
+
+    public int getHeight() {
+      return height;
     }
 
     public List<CellInfo> getCells() {
@@ -295,7 +316,7 @@ public class CellularAutomatonSimulationModel {
   protected final Map<String, CellType> cellTypeMap;
   protected final LogicalUnitInfo logicalUnitInfo;
 
-  public CellularAutomatonSimulationModel(CellularAutomatonDescriptor descriptor, 
+  public CellularAutomatonSimulationModel(CellularAutomatonDescriptor descriptor,
       Map<String, CellType> cellTypeMap, LogicalUnitInfo logicalUnitInfo) {
     this.descriptor = descriptor;
     this.logicalUnitInfo = logicalUnitInfo;

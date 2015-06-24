@@ -74,7 +74,7 @@ public class CellularAutomatonSimulationModelBuilder {
               + " is defined more than once for cell " + cell.getId());
         }
       }
-      
+
       for (Output output : cellType.getOutputs()) {
         outputVarNameMap.put(output.getId(), getCellOutputVarName(cell, output));
         Map<String, String> paramIdMap = new HashMap<>();
@@ -95,7 +95,7 @@ public class CellularAutomatonSimulationModelBuilder {
     }
 
     protected abstract I createCellInfo(Map<String, String> outputVarNameMap,
-        Map<String, String> paramVarNameMap, Map<String, String> varNameMap, 
+        Map<String, String> paramVarNameMap, Map<String, String> varNameMap,
             Map<String, Map<String, String>> outputParamIdMap);
   }
 
@@ -107,7 +107,7 @@ public class CellularAutomatonSimulationModelBuilder {
 
     @Override
     protected CellInfo createCellInfo(Map<String, String> outputVarNameMap,
-        Map<String, String> paramVarNameMap, Map<String, String> varNameMap, 
+        Map<String, String> paramVarNameMap, Map<String, String> varNameMap,
             Map<String, Map<String, String>> outputParamIdMap) {
       return new CellInfo(cell, cellType, inputs, outputVarNameMap, paramVarNameMap, varNameMap,
           outputParamIdMap);
@@ -123,7 +123,7 @@ public class CellularAutomatonSimulationModelBuilder {
 
     @Override
     protected ExternalCellInfo createCellInfo(Map<String, String> outputVarNameMap,
-        Map<String, String> paramVarNameMap, Map<String, String> varNameMap, 
+        Map<String, String> paramVarNameMap, Map<String, String> varNameMap,
             Map<String, Map<String, String>> outputParamIdMap) {
       return new ExternalCellInfo(cell, outputVarNameMap);
     }
@@ -138,7 +138,7 @@ public class CellularAutomatonSimulationModelBuilder {
 
   public CellularAutomatonSimulationModel buildModel(CellularAutomatonDescriptor descriptor) {
     Map<String, CellType> cellTypeMap = buildCellTypeMap(descriptor);
-    LogicalUnitInfo logicalUnitInfo = 
+    LogicalUnitInfo logicalUnitInfo =
         buildLogicalUnitInfo(descriptor.getLogicalUnit(), cellTypeMap);
     return new CellularAutomatonSimulationModel(descriptor, cellTypeMap, logicalUnitInfo);
   }
@@ -161,7 +161,7 @@ public class CellularAutomatonSimulationModelBuilder {
     processedCellType.setId(cellType.getId());
     processedCellType.getParams().addAll(cellType.getParams());
     processedCellType.getVars().addAll(cellType.getVars());
-    
+
     for (Output output : cellType.getOutputs()) {
       Matcher matcher = ID_PATTERN.matcher(output.getId());
       while (matcher.find()) {
@@ -200,7 +200,7 @@ public class CellularAutomatonSimulationModelBuilder {
     }
 
     // Connect cells.
-    ConnectionInfoBuilder connectionInfoBuilder = 
+    ConnectionInfoBuilder connectionInfoBuilder =
         new EightNeighborConnectionInfoBuilder(matrix, cellTypeMap);
     if (unit.getNeighborConnections() != null) {
       if (unit.getNeighborConnections().equals("3")) {
@@ -221,7 +221,7 @@ public class CellularAutomatonSimulationModelBuilder {
     for (ExternalCell externalCell : connectionInfo.getExternalCells()) {
       externalCells.add(new ExternalCellInfoBuilder(externalCell).build());
     }
-    return new LogicalUnitInfo(cells, externalCells, 
+    return new LogicalUnitInfo(matrix[0].length, matrix.length, cells, externalCells,
         buildVarNameStateIndexMap(cells, externalCells));
   }
 
