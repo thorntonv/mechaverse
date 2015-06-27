@@ -66,10 +66,29 @@ public class CellularAutomatonBuilder {
     }
   }
 
+  public static final String CONSTANT_TYPE = "constant";
+
+  /**
+   * A cell the outputs a constant value specified by a parameter.
+   */
+  public static class ConstantCellType extends CellType {
+
+    private static final long serialVersionUID = 1L;
+
+    public ConstantCellType() {
+      setId(CONSTANT_TYPE);
+      getOutputs().add(newOutput("1", "{param}", "param"));
+    }
+
+    public static ConstantCellType newInstance() {
+      return new ConstantCellType();
+    }
+  }
+
   public static final String TOGGLE_TYPE = "toggle";
 
   /**
-   * An cell that toggles between 1 and 0.
+   * A cell that toggles between 1 and 0.
    */
   public static class ToggleCellType extends CellType {
 
@@ -167,7 +186,7 @@ public class CellularAutomatonBuilder {
    * @param unitRowCount the number of rows in a logical unit
    * @param unitColumnCount the number of columns in a logical unit
    */
-  public static CellularAutomatonDescriptor newCellularAutomaton(int width, int height, 
+  public static CellularAutomatonDescriptor newCellularAutomaton(int width, int height,
       CellType cellType, int unitRowCount, int unitColumnCount) {
     String[][] cellTypeIds = new String[unitRowCount][unitColumnCount];
     for (int row = 0; row < cellTypeIds.length; row++) {
@@ -178,7 +197,7 @@ public class CellularAutomatonBuilder {
     return newCellularAutomaton(width, height, ImmutableList.of(cellType), cellTypeIds);
   }
 
-  public static CellularAutomatonDescriptor newCellularAutomaton(int width, int height, 
+  public static CellularAutomatonDescriptor newCellularAutomaton(int width, int height,
       Collection<CellType> cellTypes, String[][] cellTypeIds) {
     CellularAutomatonDescriptor descriptor = new CellularAutomatonDescriptor();
     descriptor.setWidth(width);

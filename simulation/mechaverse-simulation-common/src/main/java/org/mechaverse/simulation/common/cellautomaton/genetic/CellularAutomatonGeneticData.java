@@ -1,6 +1,12 @@
 package org.mechaverse.simulation.common.cellautomaton.genetic;
 
+import gnu.trove.list.array.TIntArrayList;
+
+import java.util.Arrays;
+
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomaton;
+import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel;
+import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel.CellInfo;
 import org.mechaverse.simulation.common.genetic.GeneticData;
 import org.mechaverse.simulation.common.util.ArrayUtil;
 
@@ -24,6 +30,24 @@ public class CellularAutomatonGeneticData extends GeneticData {
     public int[] getData() {
       return data;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) {
+        return true;
+      }
+      if (obj == null) {
+        return false;
+      }
+      if (getClass() != obj.getClass()) {
+        return false;
+      }
+      CellGeneticData other = (CellGeneticData) obj;
+      if (!Arrays.equals(data, other.data)) {
+        return false;
+      }
+      return true;
+    }
   }
 
   private final int rowCount;
@@ -41,12 +65,13 @@ public class CellularAutomatonGeneticData extends GeneticData {
   }
 
   public CellularAutomatonGeneticData(byte[] dataBytes, int[] crossoverData,
-      int rowCount, int colCount, int cellValueCount) {
-    this(toCellGeneticData(dataBytes, crossoverData, rowCount, colCount, cellValueCount));
+      CellularAutomatonSimulationModel model) {
+    this(toCellGeneticData(dataBytes, crossoverData, model));
   }
 
   private CellularAutomatonGeneticData(CellularAutomatonGeneticData geneticData) {
     super(geneticData.getData(), geneticData.getCrossoverData());
+
     this.rowCount = geneticData.rowCount;
     this.colCount = geneticData.colCount;
     this.cellData = geneticData.cellData;
@@ -72,31 +97,31 @@ public class CellularAutomatonGeneticData extends GeneticData {
   private static GeneticData toGeneticData(CellGeneticData[][] cellData, int[][] cellGroups) {
     int rowCount = cellGroups.length;
     int colCount = cellGroups[0].length;
-    int cellValuesCount = cellData[0][0].getData().length;
 
-    int[] data = new int[rowCount * colCount * cellValuesCount];
-    int[] crossoverData = new int[data.length * BYTES_PER_INT];
+    TIntArrayList data = new TIntArrayList();
+    TIntArrayList crossoverData = new TIntArrayList();
 
-    int dataIdx = 0;
-    int crossoverDataIdx = 0;
     for (int row = 0; row < rowCount; row++) {
       for (int col = 0; col < colCount; col++) {
         for (int value : cellData[row][col].getData()) {
-          data[dataIdx++] = value;
+          data.add(value);
           for (int cnt = 0; cnt < BYTES_PER_INT; cnt++) {
-            crossoverData[crossoverDataIdx++] = cellGroups[row][col];
+            crossoverData.add(cellGroups[row][col]);
           }
         }
       }
     }
-    return new GeneticData(ArrayUtil.toByteArray(data), crossoverData);
+
+    return new GeneticData(ArrayUtil.toByteArray(data.toArray()), crossoverData.toArray());
   }
 
   private static CellularAutomatonGeneticData toCellGeneticData(
-      byte[] dataBytes, int[] crossoverData, int rowCount, int colCount, int cellValueCount) {
-    Preconditions.checkArgument(
-        dataBytes.length == rowCount * colCount * cellValueCount * BYTES_PER_INT);
+      byte[] dataBytes, int[] crossoverData, CellularAutomatonSimulationModel model) {
+    Preconditions.checkArgument(dataBytes.length == model.getStateSize() * BYTES_PER_INT);
     Preconditions.checkArgument(crossoverData.length == dataBytes.length);
+
+    int rowCount = model.getHeight() * model.getLogicalUnitInfo().getHeight();
+    int colCount = model.getWidth() * model.getLogicalUnitInfo().getWidth();
 
     CellGeneticData[][] cellData = new CellGeneticData[rowCount][colCount];
     int[][] cellGroups = new int[rowCount][colCount];
@@ -106,13 +131,14 @@ public class CellularAutomatonGeneticData extends GeneticData {
     int crossoverDataIdx = 0;
     for (int row = 0; row < rowCount; row++) {
       for (int col = 0; col < colCount; col++) {
-        int[] cellValues = new int[cellValueCount];
-        for (int idx = 0; idx < cellValues.length; idx++) {
-          cellValues[idx] = data[dataIdx++];
+        CellInfo cellInfo = model.getCell(row, col);
+        int[] cellState = new int[cellInfo.getStateSize()];
+        for (int idx = 0; idx < cellState.length; idx++) {
+          cellState[idx] = data[dataIdx++];
         }
-        cellData[row][col] = new CellGeneticData(cellValues);
+        cellData[row][col] = new CellGeneticData(cellState);
         cellGroups[row][col] = crossoverData[crossoverDataIdx];
-        crossoverDataIdx += cellValueCount * BYTES_PER_INT;
+        crossoverDataIdx += cellState.length * BYTES_PER_INT;
       }
     }
     return new CellularAutomatonGeneticData(cellData, cellGroups);

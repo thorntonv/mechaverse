@@ -2,33 +2,44 @@ package org.mechaverse.simulation.common.cellautomaton.genetic;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonBuilder.CONSTANT_TYPE;
+import static org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonBuilder.TOGGLE_TYPE;
 
 import org.junit.Test;
+import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticData.CellGeneticData;
+import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonBuilder;
+import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonBuilder.ConstantCellType;
+import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonBuilder.ToggleCellType;
+import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel;
+import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModelBuilder;
 import org.mechaverse.simulation.common.util.ArrayUtil;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Unit test for {@link CellularAutomatonGeneticData}.
  */
 public class CellularAutomatonGeneticDataTest {
 
-  private static final int TEST_ROW_COUNT = 2;
-  private static final int TEST_COL_COUNT = 2;
-  private static final int TEST_CELL_VALUE_COUNT = 2;
-
+  private static final CellularAutomatonDescriptor TEST_DESCRIPTOR = 
+      CellularAutomatonBuilder.newCellularAutomaton(1, 1,
+          ImmutableList.of(ConstantCellType.newInstance(), ToggleCellType.newInstance()),
+              new String[][]{{CONSTANT_TYPE, TOGGLE_TYPE}, {TOGGLE_TYPE, CONSTANT_TYPE}});
+  
   private static final CellGeneticData[][] TEST_CELL_DATA = new CellGeneticData[][] {
-      { new CellGeneticData(new int[] {0, 1}), new CellGeneticData(new int[] {2, 3}) },
-      { new CellGeneticData(new int[] {4, 5}), new CellGeneticData(new int[] {6, 7}) }
+      {new CellGeneticData(new int[] {0, 1}), new CellGeneticData(new int[] {2, 3, 4})},
+      {new CellGeneticData(new int[] {5, 6, 7}), new CellGeneticData(new int[] {8, 9})}
   };
 
   private static final int[][] TEST_CELL_GROUPS = new int[][] { {0, 1}, {2, 3} };
 
   private static final byte[] TEST_GENETIC_DATA = ArrayUtil.toByteArray(
-      new int[] {0, 1, 2, 3, 4, 5, 6, 7});
+      new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
 
   private static final int[] TEST_GENETIC_CROSSOVER_DATA = new int[] {
-      0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
-      2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3
+      0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+      2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3
   };
 
   @Test
@@ -42,14 +53,20 @@ public class CellularAutomatonGeneticDataTest {
 
   @Test
   public void testToCellGeneticData() {
-    CellularAutomatonGeneticData geneticData = new CellularAutomatonGeneticData(TEST_GENETIC_DATA,
-        TEST_GENETIC_CROSSOVER_DATA, TEST_ROW_COUNT, TEST_COL_COUNT, TEST_CELL_VALUE_COUNT);
+    CellularAutomatonSimulationModel model = 
+        CellularAutomatonSimulationModelBuilder.build(TEST_DESCRIPTOR);
+    CellularAutomatonGeneticData geneticData = new CellularAutomatonGeneticData(
+        TEST_GENETIC_DATA, TEST_GENETIC_CROSSOVER_DATA, model);
 
-    for (int row = 0; row < TEST_ROW_COUNT; row++) {
-      for (int col = 0; col < TEST_COL_COUNT; col++) {
-        CellGeneticData expectedCellData = TEST_CELL_DATA[row][col];
-        CellGeneticData cellData = geneticData.getCellData(row, col);
-        assertArrayEquals(expectedCellData.getData(), cellData.getData());
+    int rowCount = model.getHeight() * model.getLogicalUnitInfo().getHeight();
+    int colCount = model.getWidth() * model.getLogicalUnitInfo().getWidth();
+
+    assertEquals(rowCount, geneticData.getRowCount());
+    assertEquals(colCount, geneticData.getColumnCount());
+    
+    for (int row = 0; row < rowCount; row++) {
+      for (int col = 0; col < colCount; col++) {
+        assertEquals(TEST_CELL_DATA[row][col], geneticData.getCellData(row, col));
         assertEquals(TEST_CELL_GROUPS[row][col], geneticData.getCrossoverGroup(row, col));
       }
     }

@@ -169,6 +169,10 @@ public class CellularAutomatonSimulationModel {
       return null;
     }
 
+    public int getStateSize() {
+      return outputVarNameMap.size() + paramVarNameMap.size();
+    }
+
     @Override
     public boolean equals(Object obj) {
       if (this == obj) {
@@ -272,6 +276,10 @@ public class CellularAutomatonSimulationModel {
         }
       }
       return null;
+    }
+
+    public CellInfo getCellInfo(int row, int col) {
+      return cells.get(row * width + col);
     }
 
     /**
@@ -378,5 +386,11 @@ public class CellularAutomatonSimulationModel {
 
   public int getLogicalUnitCount() {
     return descriptor.getWidth() * descriptor.getHeight();
+  }
+
+  public CellInfo getCell(int row, int col) {
+    row = row % logicalUnitInfo.getHeight();
+    col = col % logicalUnitInfo.getWidth();
+    return logicalUnitInfo.getCellInfo(row, col);
   }
 }
