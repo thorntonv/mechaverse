@@ -1,11 +1,11 @@
 package org.mechaverse.simulation.common.genetic;
 
-import gnu.trove.list.array.TIntArrayList;
-
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+
+import gnu.trove.list.array.TIntArrayList;
 
 /**
  * Base class for genetic data.
@@ -18,78 +18,118 @@ public class GeneticData {
 
   public static class Builder {
 
-    private final ByteArrayOutputStream out = new ByteArrayOutputStream(512*1024);
-    private final DataOutputStream dataOut = new DataOutputStream(out);
-    private final TIntArrayList crossoverData = new TIntArrayList(128*1024);
+    private final ByteArrayOutputStream byteOut = new ByteArrayOutputStream(16 * 1024);
+    private final DataOutputStream out = new DataOutputStream(byteOut);
+    private final TIntArrayList crossoverGroups = new TIntArrayList(16 * 1024);
+    private final TIntArrayList crossoverSplitPoints = new TIntArrayList(4 * 1024);
 
-    public Builder write(byte[] data) {
+    public Builder write(byte data, int group) {
       try {
-        dataOut.write(data);
+        out.writeByte(data);
+        crossoverGroups.add(group);
+        return this;
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
-      return this;
+    }
+
+    public Builder write(byte[] data, int group) {
+      try {
+        out.write(data);
+        for (int cnt = 1; cnt <= data.length; cnt++) {
+          crossoverGroups.add(group);
+        }
+        return this;
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
 
     public Builder writeInt(int value, int group) {
       try {
-        dataOut.writeInt(value);
-
+        out.writeInt(value);
         for (int cnt = 1; cnt <= BYTES_PER_INT; cnt++) {
-          crossoverData.add(group);
+          crossoverGroups.add(group);
         }
+        return this;
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
+    }
+
+    public Builder markSplitPoint() {
+      crossoverSplitPoints.add(out.size());
       return this;
     }
 
     public GeneticData build() {
-      return new GeneticData(out.toByteArray(), crossoverData.toArray());
+      return new GeneticData(byteOut.toByteArray(), crossoverGroups.toArray(),
+          crossoverSplitPoints.toArray());
     }
   }
 
   protected final byte[] data;
-  protected final int[] crossoverData;
+  protected final int[] crossoverGroups;
+  protected final int[] crossoverSplitPoints;
 
   public static Builder newBuilder() {
     return new Builder();
   }
 
   protected GeneticData(GeneticData geneticData) {
-    this(geneticData.getData(), geneticData.getCrossoverData());
+    this(geneticData.getData(), geneticData.getCrossoverGroups(),
+        geneticData.getCrossoverSplitPoints());
   }
 
-  public GeneticData(byte[] data, int[] crossoverData) {
+  public GeneticData(byte[] data, int[] crossoverGroups, int[] crossoverSplitPoints) {
     this.data = data;
-    this.crossoverData = crossoverData;
+    this.crossoverGroups = crossoverGroups;
+    this.crossoverSplitPoints = crossoverSplitPoints;
   }
 
   public byte[] getData() {
     return data;
   }
 
-  public int[] getCrossoverData() {
-    return crossoverData;
+  public int[] getCrossoverGroups() {
+    return crossoverGroups;
+  }
+
+  public int[] getCrossoverSplitPoints() {
+    return crossoverSplitPoints;
   }
 
   @Override
-  public boolean equals(Object otherObject) {
-    if (otherObject == null) {
-      return false;
-    } else if (otherObject == this) {
+  public boolean equals(Object obj) {
+    if (this == obj) {
       return true;
-    } else if(!(otherObject instanceof GeneticData)) {
+    }
+    if (obj == null) {
       return false;
     }
-
-    GeneticData otherData = (GeneticData) otherObject;
-    return Arrays.equals(data, otherData.data)
-        && Arrays.equals(crossoverData, otherData.crossoverData);
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    GeneticData other = (GeneticData) obj;
+    if (!Arrays.equals(crossoverGroups, other.crossoverGroups)) {
+      return false;
+    }
+    if (!Arrays.equals(crossoverSplitPoints, other.crossoverSplitPoints)) {
+      return false;
+    }
+    if (!Arrays.equals(data, other.data)) {
+      return false;
+    }
+    return true;
   }
 
   @Override
   public int hashCode() {
-    return Arrays.hashCode(data) + Arrays.hashCode(crossoverData);
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + Arrays.hashCode(crossoverGroups);
+    result = prime * result + Arrays.hashCode(crossoverSplitPoints);
+    result = prime * result + Arrays.hashCode(data);
+    return result;
   }
 }

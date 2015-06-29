@@ -73,9 +73,9 @@ public class CellularAutomatonAntSimulationImplTest extends AbstractAntSimulatio
       // State should have a model, initial model, random seed replay data, and ant generation
       // replay values.
       // Each ant should have cellular automaton state genetic data, output map genetic data,
-      // bit output map genetic data, cellular automaton state, output map, bit output map values, 
+      // bit output map genetic data, cellular automaton state, output map, bit output map values,
       // and output replay data.
-      assertEquals("Key set: " + state.keySet(), antCount * 10 + 4, state.keySet().size());
+      assertEquals("Key set: " + state.keySet(), antCount * 13 + 4, state.keySet().size());
     }
   }
 }

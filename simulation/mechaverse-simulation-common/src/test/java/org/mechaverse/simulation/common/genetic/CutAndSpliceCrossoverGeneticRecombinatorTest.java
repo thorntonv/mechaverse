@@ -18,10 +18,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class CutAndSpliceCrossoverGeneticRecombinatorTest {
 
-  private static final GeneticData TEST_PARENT1_DATA =
-      new GeneticData(new byte[] {50, 72, 21, 35}, new int[] {00, 01, 00, 00});
-  private static final GeneticData TEST_PARENT2_DATA =
-      new GeneticData(new byte[] {39, 12, 96, 77}, new int[] {00, 00, 00, 01});
+  private static final GeneticData TEST_PARENT1_DATA = new GeneticData(new byte[] {50, 72, 21, 35},
+      new int[] {00, 01, 00, 00}, new int[] {1, 2, 3, 4});
+  private static final GeneticData TEST_PARENT2_DATA = new GeneticData(new byte[] {39, 12, 96, 77},
+      new int[] {00, 00, 00, 01}, new int[] {1, 2, 3, 4});
 
   @Mock BitMutator mockBitMutator;
   @Mock private RandomGenerator mockRandom;
@@ -58,7 +58,37 @@ public class CutAndSpliceCrossoverGeneticRecombinatorTest {
         recombinator.recombine(TEST_PARENT1_DATA, TEST_PARENT2_DATA, mockRandom);
 
     assertArrayEquals(new byte[] {39, 72, 96, 35}, childData.getData());
-    assertArrayEquals(new int[] {00, 01, 00, 01}, childData.getCrossoverData());
+    assertArrayEquals(new int[] {00, 01, 00, 01}, childData.getCrossoverGroups());
+    assertArrayEquals(new int[] {1, 2, 3, 4}, childData.getCrossoverSplitPoints());
+  }
+
+  @Test
+  public void recombine_splitPoints() {
+    BitMutator mutator = null;
+    GeneticRecombinator recombinator = new CutAndSpliceCrossoverGeneticRecombinator(mutator);
+
+    GeneticData parent1 = new GeneticData(new byte[] {50, 72, 21, 35},
+      new int[] {01, 01, 00, 00}, new int[] {2});
+    GeneticData parent2 = new GeneticData(new byte[] {39, 12, 96, 77},
+      new int[] {00, 00, 02, 02}, new int[] {2});
+
+    when(mockRandom.nextDouble())
+        // Index 0, 1: Choose parent at random and use its group assignment.
+        // Group assignment from parent 2 is used
+        // Select parent 1 at random and assign to group 0
+        .thenReturn(.75)
+        .thenReturn(.25)
+        // Index 2, 3: Choose parent at random and use its group assignment.
+        // Group assignment from parent 2 is used
+        // Select parent 2 at random and assign to group 2.
+        .thenReturn(.75)
+        .thenReturn(.75);
+
+    GeneticData childData = recombinator.recombine(parent1, parent2, mockRandom);
+
+    assertArrayEquals(new byte[] {50, 72, 96, 77}, childData.getData());
+    assertArrayEquals(new int[] {00, 00, 02, 02}, childData.getCrossoverGroups());
+    assertArrayEquals(new int[] {2}, childData.getCrossoverSplitPoints());
   }
 
   /**

@@ -22,11 +22,11 @@ import com.google.common.collect.ImmutableList;
  */
 public class CellularAutomatonGeneticDataTest {
 
-  private static final CellularAutomatonDescriptor TEST_DESCRIPTOR = 
+  private static final CellularAutomatonDescriptor TEST_DESCRIPTOR =
       CellularAutomatonBuilder.newCellularAutomaton(1, 1,
           ImmutableList.of(ConstantCellType.newInstance(), ToggleCellType.newInstance()),
               new String[][]{{CONSTANT_TYPE, TOGGLE_TYPE}, {TOGGLE_TYPE, CONSTANT_TYPE}});
-  
+
   private static final CellGeneticData[][] TEST_CELL_DATA = new CellGeneticData[][] {
       {new CellGeneticData(new int[] {0, 1}), new CellGeneticData(new int[] {2, 3, 4})},
       {new CellGeneticData(new int[] {5, 6, 7}), new CellGeneticData(new int[] {8, 9})}
@@ -37,10 +37,13 @@ public class CellularAutomatonGeneticDataTest {
   private static final byte[] TEST_GENETIC_DATA = ArrayUtil.toByteArray(
       new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
 
-  private static final int[] TEST_GENETIC_CROSSOVER_DATA = new int[] {
+  private static final int[] TEST_CROSSOVER_GROUPS = new int[] {
       0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
       2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3
   };
+
+  private static final int[] TEST_CROSSOVER_SPLIT_POINTS =
+      new int[] {4 * 2, (4 * 2) + 4 * 3, (4 * 2 + 4 * 3) + 4 * 3, (4 * 2 + 4 * 3 + 4 * 3) + 4 * 2};
 
   @Test
   public void testToGeneticData() {
@@ -48,27 +51,30 @@ public class CellularAutomatonGeneticDataTest {
         new CellularAutomatonGeneticData(TEST_CELL_DATA, TEST_CELL_GROUPS);
 
     assertArrayEquals(TEST_GENETIC_DATA, geneticData.getData());
-    assertArrayEquals(TEST_GENETIC_CROSSOVER_DATA, geneticData.getCrossoverData());
+    assertArrayEquals(TEST_CROSSOVER_GROUPS, geneticData.getCrossoverGroups());
+    assertArrayEquals(TEST_CROSSOVER_SPLIT_POINTS, geneticData.getCrossoverSplitPoints());
   }
 
   @Test
   public void testToCellGeneticData() {
-    CellularAutomatonSimulationModel model = 
+    CellularAutomatonSimulationModel model =
         CellularAutomatonSimulationModelBuilder.build(TEST_DESCRIPTOR);
     CellularAutomatonGeneticData geneticData = new CellularAutomatonGeneticData(
-        TEST_GENETIC_DATA, TEST_GENETIC_CROSSOVER_DATA, model);
+        TEST_GENETIC_DATA, TEST_CROSSOVER_GROUPS, model);
 
     int rowCount = model.getHeight() * model.getLogicalUnitInfo().getHeight();
     int colCount = model.getWidth() * model.getLogicalUnitInfo().getWidth();
 
     assertEquals(rowCount, geneticData.getRowCount());
     assertEquals(colCount, geneticData.getColumnCount());
-    
+
     for (int row = 0; row < rowCount; row++) {
       for (int col = 0; col < colCount; col++) {
         assertEquals(TEST_CELL_DATA[row][col], geneticData.getCellData(row, col));
         assertEquals(TEST_CELL_GROUPS[row][col], geneticData.getCrossoverGroup(row, col));
       }
     }
+
+    assertArrayEquals(TEST_CROSSOVER_SPLIT_POINTS, geneticData.getCrossoverSplitPoints());
   }
 }

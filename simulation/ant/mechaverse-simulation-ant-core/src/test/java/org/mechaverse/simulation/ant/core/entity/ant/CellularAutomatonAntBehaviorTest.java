@@ -101,7 +101,7 @@ public class CellularAutomatonAntBehaviorTest {
     // Verify that the genetic data was stored.
     GeneticDataStore geneticData = state.getEntityGeneticDataStore(ant);
     assertEquals(ImmutableSet.of(CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_STATE_KEY,
-        CellularAutomatonGeneticDataGenerator.OUTPUT_MAP_KEY, 
+        CellularAutomatonGeneticDataGenerator.OUTPUT_MAP_KEY,
             CellularAutomatonAntBehavior.AUTOMATON_BIT_OUTPUT_MAP_KEY), geneticData.keySet());
 
     // Verify that the stored genetic data matches the initial cellular automaton state.
@@ -109,17 +109,20 @@ public class CellularAutomatonAntBehaviorTest {
     GeneticData automatonStateData =
         geneticData.get(CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_STATE_KEY);
     assertArrayEquals(automatonState, automatonStateData.getData());
-    assertNotNull(automatonStateData.getCrossoverData());
+    assertNotNull(automatonStateData.getCrossoverGroups());
+    assertNotNull(automatonStateData.getCrossoverSplitPoints());
 
     GeneticData outputMapData =
         geneticData.get(CellularAutomatonGeneticDataGenerator.OUTPUT_MAP_KEY);
     assertArrayEquals(outputMap, outputMapData.getData());
-    assertNotNull(outputMapData.getCrossoverData());
+    assertNotNull(outputMapData.getCrossoverGroups());
+    assertNotNull(outputMapData.getCrossoverSplitPoints());
 
     GeneticData bitOutputMapData =
         geneticData.get(CellularAutomatonAntBehavior.AUTOMATON_BIT_OUTPUT_MAP_KEY);
     assertArrayEquals(bitOutputMap, bitOutputMapData.getData());
-    assertNotNull(bitOutputMapData.getCrossoverData());
+    assertNotNull(bitOutputMapData.getCrossoverGroups());
+    assertNotNull(bitOutputMapData.getCrossoverSplitPoints());
   }
 
   @Test
@@ -139,7 +142,7 @@ public class CellularAutomatonAntBehaviorTest {
 
     assertArrayEquals(
         expectedState, entityDataStore.get(CellularAutomatonAntBehavior.AUTOMATON_STATE_KEY));
-    assertArrayEquals(expectedOutputMap, 
+    assertArrayEquals(expectedOutputMap,
         entityDataStore.get(CellularAutomatonAntBehavior.AUTOMATON_OUTPUT_MAP_KEY));
     assertArrayEquals(entityGeneticDataStore.get(
         CellularAutomatonAntBehavior.AUTOMATON_BIT_OUTPUT_MAP_KEY).getData(),
@@ -251,20 +254,24 @@ public class CellularAutomatonAntBehaviorTest {
   }
 
   private void createGeneticDataStore(GeneticDataStore geneticDataStore) {
-    GeneticData stateData = new GeneticData(RandomUtil.randomBytes(
-        TEST_AUTOMATON_STATE_SIZE_BYTES, random), new int[0]);
+    GeneticData stateData = new GeneticData(
+        RandomUtil.randomBytes(TEST_AUTOMATON_STATE_SIZE_BYTES, random),
+            new int[TEST_AUTOMATON_STATE_SIZE_BYTES], new int[0]);
     geneticDataStore.put(
         CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_STATE_KEY, stateData);
 
-    GeneticData outputMapData = new GeneticData(RandomUtil.randomBytes(
-        TEST_AUTOMATON_OUTPUT_SIZE_BYTES, random), new int[0]);
+    GeneticData outputMapData = new GeneticData(
+        RandomUtil.randomBytes(TEST_AUTOMATON_OUTPUT_SIZE_BYTES, random),
+            new int[TEST_AUTOMATON_OUTPUT_SIZE_BYTES], new int[0]);
     geneticDataStore.put(CellularAutomatonGeneticDataGenerator.OUTPUT_MAP_KEY, outputMapData);
 
     int[] bitOutputMap = new int[TEST_AUTOMATON_OUTPUT_SIZE];
     for (int idx = 0; idx < bitOutputMap.length; idx++) {
       bitOutputMap[idx] = random.nextInt(Integer.SIZE);
     }
-    GeneticData bitOutputMapData = new GeneticData(ArrayUtil.toByteArray(bitOutputMap), new int[0]);
+    byte[] bitOutputMapBytes = ArrayUtil.toByteArray(bitOutputMap);
+    GeneticData bitOutputMapData =
+        new GeneticData(bitOutputMapBytes, new int[bitOutputMapBytes.length], new int[0]);
     geneticDataStore.put(CellularAutomatonAntBehavior.AUTOMATON_BIT_OUTPUT_MAP_KEY,
         bitOutputMapData);
  }

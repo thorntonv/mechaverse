@@ -19,7 +19,8 @@ public class GeneticDataStore {
   public static final String KEY = "geneticData";
 
   private static final String DATA_KEY = "data";
-  private static final String CROSSOVER_DATA_KEY = "crossoverData";
+  private static final String CROSSOVER_GROUPS_KEY = "crossoverGroups";
+  private static final String CROSSOVER_SPLIT_POINTS_KEY = "crossoverSplitPoints";
 
   private final SimulationDataStore dataStore;
 
@@ -33,18 +34,22 @@ public class GeneticDataStore {
 
   public void put(String key, GeneticData geneticData) {
     dataStore.put(geneticDataKey(key), geneticData.getData());
-    dataStore.put(crossoverDataKey(key), ArrayUtil.toByteArray(geneticData.getCrossoverData()));
+    dataStore.put(crossoverGroupsKey(key), ArrayUtil.toByteArray(geneticData.getCrossoverGroups()));
+    dataStore.put(crossoverSplitPointsKey(key),
+        ArrayUtil.toByteArray(geneticData.getCrossoverSplitPoints()));
   }
 
   public GeneticData get(String key) {
     byte[] data = dataStore.get(geneticDataKey(key));
-    int[] crossoverPoints = ArrayUtil.toIntArray(dataStore.get(crossoverDataKey(key)));
-    return new GeneticData(data, crossoverPoints);
+    int[] crossoverGroups = ArrayUtil.toIntArray(dataStore.get(crossoverGroupsKey(key)));
+    int[] crossoverSplitPoints = ArrayUtil.toIntArray(dataStore.get(crossoverSplitPointsKey(key)));
+    return new GeneticData(data, crossoverGroups, crossoverSplitPoints);
   }
 
   public void remove(String key) {
     dataStore.remove(geneticDataKey(key));
-    dataStore.remove(crossoverDataKey(key));
+    dataStore.remove(crossoverGroupsKey(key));
+    dataStore.remove(crossoverSplitPointsKey(key));
   }
 
   public Set<String> keySet() {
@@ -70,7 +75,11 @@ public class GeneticDataStore {
     return key + SimulationDataStore.KEY_SEPARATOR + DATA_KEY;
   }
 
-  private String crossoverDataKey(String key) {
-    return key + SimulationDataStore.KEY_SEPARATOR + CROSSOVER_DATA_KEY;
+  private String crossoverGroupsKey(String key) {
+    return key + SimulationDataStore.KEY_SEPARATOR + CROSSOVER_GROUPS_KEY;
+  }
+
+  private String crossoverSplitPointsKey(String key) {
+    return key + SimulationDataStore.KEY_SEPARATOR + CROSSOVER_SPLIT_POINTS_KEY;
   }
 }

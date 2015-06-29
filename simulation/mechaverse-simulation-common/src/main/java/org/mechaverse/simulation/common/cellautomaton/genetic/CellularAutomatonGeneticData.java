@@ -1,7 +1,5 @@
 package org.mechaverse.simulation.common.cellautomaton.genetic;
 
-import gnu.trove.list.array.TIntArrayList;
-
 import java.util.Arrays;
 
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomaton;
@@ -70,7 +68,8 @@ public class CellularAutomatonGeneticData extends GeneticData {
   }
 
   private CellularAutomatonGeneticData(CellularAutomatonGeneticData geneticData) {
-    super(geneticData.getData(), geneticData.getCrossoverData());
+    super(geneticData.getData(), geneticData.getCrossoverGroups(),
+        geneticData.getCrossoverSplitPoints());
 
     this.rowCount = geneticData.rowCount;
     this.colCount = geneticData.colCount;
@@ -95,24 +94,17 @@ public class CellularAutomatonGeneticData extends GeneticData {
   }
 
   private static GeneticData toGeneticData(CellGeneticData[][] cellData, int[][] cellGroups) {
-    int rowCount = cellGroups.length;
-    int colCount = cellGroups[0].length;
-
-    TIntArrayList data = new TIntArrayList();
-    TIntArrayList crossoverData = new TIntArrayList();
-
-    for (int row = 0; row < rowCount; row++) {
-      for (int col = 0; col < colCount; col++) {
+    GeneticData.Builder builder = GeneticData.newBuilder();
+    for (int row = 0; row < cellGroups.length; row++) {
+      for (int col = 0; col < cellGroups[row].length; col++) {
         for (int value : cellData[row][col].getData()) {
-          data.add(value);
-          for (int cnt = 0; cnt < BYTES_PER_INT; cnt++) {
-            crossoverData.add(cellGroups[row][col]);
-          }
+          builder.writeInt(value, cellGroups[row][col]);
         }
+        builder.markSplitPoint();
       }
     }
 
-    return new GeneticData(ArrayUtil.toByteArray(data.toArray()), crossoverData.toArray());
+    return builder.build();
   }
 
   private static CellularAutomatonGeneticData toCellGeneticData(

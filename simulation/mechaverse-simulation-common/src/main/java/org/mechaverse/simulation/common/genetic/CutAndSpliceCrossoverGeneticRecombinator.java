@@ -1,11 +1,11 @@
 package org.mechaverse.simulation.common.genetic;
 
-import gnu.trove.map.hash.TIntObjectHashMap;
-
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.util.RandomUtil;
 
 import com.google.common.base.Preconditions;
+
+import gnu.trove.map.hash.TIntObjectHashMap;
 
 /**
  * Performs genetic recombination using cut and splice crossover. The crossover data for each parent
@@ -71,21 +71,25 @@ public class CutAndSpliceCrossoverGeneticRecombinator implements GeneticRecombin
     Preconditions.checkNotNull(random);
 
     byte[] parent1Data = parent1.getData();
-    int[] parent1CrossoverData = parent1.getCrossoverData();
+    int[] parent1Groups = parent1.getCrossoverGroups();
+    int[] parent1SplitPoints = parent1.getCrossoverSplitPoints();
+    int parent1SplitPointIdx = 0;
+
     byte[] parent2Data = parent2.getData();
-    int[] parent2CrossoverData = parent2.getCrossoverData();
+    int[] parent2Groups = parent2.getCrossoverGroups();
+    int[] parent2SplitPoints = parent2.getCrossoverSplitPoints();
+    int parent2SplitPointIdx = 0;
 
     Preconditions.checkArgument(parent1Data.length == parent2Data.length);
-    Preconditions.checkArgument(parent1Data.length == parent1CrossoverData.length);
-    Preconditions.checkArgument(parent2Data.length == parent2CrossoverData.length);
+    Preconditions.checkArgument(parent1Data.length == parent1Groups.length);
+    Preconditions.checkArgument(parent2Data.length == parent2Groups.length);
 
-    byte[] childData = new byte[parent1Data.length];
-    int[] childCrossoverData = new int[childData.length];
+    GeneticData.Builder child = GeneticData.newBuilder();
 
     TIntObjectHashMap<GeneticData> groupParentMap = new TIntObjectHashMap<GeneticData>();
-    for (int idx = 0; idx < childData.length; idx++) {
-      int parent1Group = parent1CrossoverData[idx];
-      int parent2Group = parent2CrossoverData[idx];
+    for (int idx = 0; idx < parent1Data.length; idx++) {
+      int parent1Group = parent1Groups[idx];
+      int parent2Group = parent2Groups[idx];
 
       int group = parent1Group;
       if (parent1Group != parent2Group) {
@@ -98,14 +102,43 @@ public class CutAndSpliceCrossoverGeneticRecombinator implements GeneticRecombin
         groupParentMap.put(group, selectedParent);
       }
 
-      childData[idx] = (selectedParent == parent1) ? parent1Data[idx] : parent2Data[idx];
-      childCrossoverData[idx] = group;
+      byte[] selectedParentData = (selectedParent == parent1) ? parent1Data : parent2Data;
+
+      // Copy data from the selected parent until a split point is reached.
+      boolean splitPointReached = false;
+      while (idx < selectedParentData.length && !splitPointReached) {
+        child.write(selectedParentData[idx], group);
+
+        if (parent1SplitPointIdx < parent1SplitPoints.length
+            && parent1SplitPoints[parent1SplitPointIdx] == idx + 1) {
+          parent1SplitPointIdx++;
+          if (selectedParent == parent1) {
+            splitPointReached = true;
+          }
+        }
+        if (parent2SplitPointIdx < parent2SplitPoints.length
+            && parent2SplitPoints[parent2SplitPointIdx] == idx + 1) {
+          parent2SplitPointIdx++;
+          if (selectedParent == parent2) {
+            splitPointReached = true;
+          }
+        }
+        if (!splitPointReached) {
+          idx++;
+        }
+      };
+
+      if (idx < selectedParentData.length) {
+        child.markSplitPoint();
+      }
     }
+
+    GeneticData childGeneticData = child.build();
 
     if (mutator != null) {
-      mutator.mutate(childData, random);
+      mutator.mutate(childGeneticData.getData(), random);
     }
 
-    return new GeneticData(childData, childCrossoverData);
+    return childGeneticData;
   }
 }
