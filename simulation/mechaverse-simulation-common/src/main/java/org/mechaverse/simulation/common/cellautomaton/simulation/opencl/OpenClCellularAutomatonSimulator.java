@@ -53,12 +53,12 @@ public final class OpenClCellularAutomatonSimulator implements CellularAutomaton
   private boolean automatonStateUpdated = false;
   private boolean outputMapUpdated = false;
 
-  public OpenClCellularAutomatonSimulator(int numAutomata, int automatonInputSize, 
+  public OpenClCellularAutomatonSimulator(int numAutomata, int automatonInputSize,
       int automatonOutputSize, CellularAutomatonDescriptorDataSource dataSource) {
     this(numAutomata, automatonInputSize, automatonOutputSize, dataSource.getDescriptor());
   }
 
-  public OpenClCellularAutomatonSimulator(int numAutomata, int automatonInputSize, 
+  public OpenClCellularAutomatonSimulator(int numAutomata, int automatonInputSize,
       int automatonOutputSize, CellularAutomatonDescriptor descriptor) {
     this(numAutomata, automatonInputSize, automatonOutputSize,
         CLPlatform.getDefault().getMaxFlopsDevice(),
@@ -76,7 +76,7 @@ public final class OpenClCellularAutomatonSimulator implements CellularAutomaton
     this(numAutomata, automatonInputSize, automatonOutputSize,
         CLPlatform.getDefault().getMaxFlopsDevice(), model);
   }
-  
+
   private OpenClCellularAutomatonSimulator(int numAutomata, int automatonInputSize,
       int automatonOutputSize, CLDevice device, CellularAutomatonSimulationModel model) {
     this(numAutomata, automatonInputSize, model.getStateSize(), automatonOutputSize,
@@ -84,8 +84,8 @@ public final class OpenClCellularAutomatonSimulator implements CellularAutomaton
             device, getKernelSource(model));
   }
 
-  public OpenClCellularAutomatonSimulator(int numAutomata, int automatonInputSize, 
-      int automatonStateSize, int automatonOutputSize, long globalWorkSize, long localWorkSize, 
+  public OpenClCellularAutomatonSimulator(int numAutomata, int automatonInputSize,
+      int automatonStateSize, int automatonOutputSize, long globalWorkSize, long localWorkSize,
           CLDevice device, String kernelSource) {
     logger.debug("{}(numAutomata = {}, automatonInputSize = {}, "
         + "automatonStateSize = {}, automatonOutputSize = {})", getClass().getSimpleName(),
@@ -192,6 +192,9 @@ public final class OpenClCellularAutomatonSimulator implements CellularAutomaton
 
   @Override
   public void setAutomatonOutputMap(int index, int[] outputMap) {
+    for (int idx = 0; idx < outputMap.length; idx++) {
+      outputMap[idx] = Math.abs(outputMap[idx]) % automatonStateSize;
+    }
     if (!finished) {
       queue.finish();
       finished = true;

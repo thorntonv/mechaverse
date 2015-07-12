@@ -117,7 +117,7 @@ public class CellularAutomatonAntBehavior implements AntBehavior {
 
     byte[] bitOutputMapBytes = dataStore.get(AUTOMATON_BIT_OUTPUT_MAP_KEY);
     if (bitOutputMapBytes != null) {
-      this.bitOutputMap = ArrayUtil.toIntArray(bitOutputMapBytes);
+      setBitOutputMap(ArrayUtil.toIntArray(bitOutputMapBytes));
     }
   }
 
@@ -155,7 +155,7 @@ public class CellularAutomatonAntBehavior implements AntBehavior {
 
     // Bit output map.
     byte[] bitOutputMapBytes = geneticDataStore.get(AUTOMATON_BIT_OUTPUT_MAP_KEY).getData();
-    this.bitOutputMap = ArrayUtil.toIntArray(bitOutputMapBytes);
+    setBitOutputMap(ArrayUtil.toIntArray(bitOutputMapBytes));
     dataStore.put(AUTOMATON_BIT_OUTPUT_MAP_KEY, bitOutputMapBytes);
   }
 
@@ -173,5 +173,12 @@ public class CellularAutomatonAntBehavior implements AntBehavior {
       antOutputData[antOutputIdx] |=
           ((automatonOutputData[idx] >> bitOutputMap[idx]) & 0b1) << bitPosition;
     }
+  }
+
+  private void setBitOutputMap(int[] bitOutputMap) {
+    for (int idx = 0; idx < bitOutputMap.length; idx++) {
+      bitOutputMap[idx] = Math.abs(bitOutputMap[idx]) % 32;
+    }
+    this.bitOutputMap = bitOutputMap;
   }
 }

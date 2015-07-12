@@ -98,6 +98,9 @@ public final class JavaCellularAutomatonSimulator implements CellularAutomatonSi
 
   @Override
   public void setAutomatonOutputMap(int index, int[] outputMap) {
+    for (int idx = 0; idx < outputMap.length; idx++) {
+      outputMap[idx] = Math.abs(outputMap[idx]) % getAutomatonStateSize();
+    }
     simulations[index].setOutputMap(outputMap);
   }
 
@@ -124,7 +127,7 @@ public final class JavaCellularAutomatonSimulator implements CellularAutomatonSi
         new JavaCellularAutomatonGeneratorImpl(model, inputSize, outputSize);
     StringWriter out = new StringWriter();
     generator.generate(new PrintWriter(out));
-    return JavaCompilerUtil.compile(JavaCellularAutomatonGeneratorImpl.IMPL_PACKAGE 
+    return JavaCompilerUtil.compile(JavaCellularAutomatonGeneratorImpl.IMPL_PACKAGE
         + "." + JavaCellularAutomatonGeneratorImpl.IMPL_CLASS_NAME, out.toString());
   }
 
