@@ -81,6 +81,8 @@ public class CellularAutomatonSimulationModelBuilderTest {
     LogicalUnitInfo logicalUnitInfo = model.getLogicalUnitInfo();
 
     // Verify logical unit.
+    assertEquals(2, logicalUnitInfo.getWidth());
+    assertEquals(1, logicalUnitInfo.getHeight());
     assertEquals(2, logicalUnitInfo.getCells().size());
     assertEquals(4, logicalUnitInfo.getExternalCells().size());
     for (CellInfo cell : logicalUnitInfo.getCells()) {
@@ -149,6 +151,8 @@ public class CellularAutomatonSimulationModelBuilderTest {
     LogicalUnitInfo logicalUnitInfo = model.getLogicalUnitInfo();
 
     // Verify logical unit.
+    assertEquals(3, logicalUnitInfo.getWidth());
+    assertEquals(3, logicalUnitInfo.getHeight());
     assertEquals(9, logicalUnitInfo.getCells().size());
     assertEquals(9, logicalUnitInfo.getExternalCells().size());
 

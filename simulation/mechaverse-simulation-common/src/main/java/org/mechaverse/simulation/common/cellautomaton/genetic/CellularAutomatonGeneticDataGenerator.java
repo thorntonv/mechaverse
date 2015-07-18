@@ -1,10 +1,10 @@
 package org.mechaverse.simulation.common.cellautomaton.genetic;
 
 import org.apache.commons.math3.random.RandomGenerator;
+import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticData.CellGeneticData;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel;
 import org.mechaverse.simulation.common.genetic.GeneticData;
 import org.mechaverse.simulation.common.genetic.GeneticDataStore;
-import org.mechaverse.simulation.common.genetic.GeneticData.Builder;
 import org.mechaverse.simulation.common.util.ArrayUtil;
 
 /**
@@ -14,26 +14,38 @@ import org.mechaverse.simulation.common.util.ArrayUtil;
  */
 public class CellularAutomatonGeneticDataGenerator {
 
-  // TODO(thorntonv): Implement unit test for this class.
-  // TODO(thorntonv): Explore other crossover strategies.
-
   public static final String CELLULAR_AUTOMATON_STATE_KEY = "cellularAutomatonState";
   public static final String OUTPUT_MAP_KEY = "outputMap";
 
-  public void generateGeneticData(GeneticDataStore dataStore, 
+  public void generateGeneticData(GeneticDataStore dataStore,
       CellularAutomatonSimulationModel model, int outputSize, RandomGenerator random) {
     dataStore.put(CELLULAR_AUTOMATON_STATE_KEY, generateStateGeneticData(model, random));
     dataStore.put(OUTPUT_MAP_KEY, generateOutputMapGeneticData(model, outputSize, random));
   }
 
-  public GeneticData generateStateGeneticData(
+  public CellularAutomatonGeneticData generateStateGeneticData(
       CellularAutomatonSimulationModel model, RandomGenerator random) {
-    GeneticData.Builder geneticDataBuilder = GeneticData.newBuilder();
-    for (int idx = 0; idx < model.getStateSize(); idx++) {
-      geneticDataBuilder.writeInt(random.nextInt());
-      geneticDataBuilder.markCrossoverPoint();
+    int rowCount = model.getHeight() * model.getLogicalUnitInfo().getHeight();
+    int colCount = model.getWidth() * model.getLogicalUnitInfo().getWidth();
+
+    CellGeneticData[][] cellData = new CellGeneticData[rowCount][colCount];
+    int[][] cellGroups = new int[rowCount][colCount];
+
+    for (int row = 0; row < rowCount; row++) {
+      for (int col = 0; col < colCount; col++) {
+        int[] values = new int[model.getCell(row, col).getStateSize()];
+        for (int idx = 0; idx < values.length; idx++) {
+          values[idx] = random.nextInt();
+        }
+        cellData[row][col] = new CellGeneticData(values);
+
+        int groupRow = row / model.getLogicalUnitInfo().getHeight();
+        int groupCol = col / model.getLogicalUnitInfo().getWidth();
+        cellGroups[row][col] = groupRow * model.getWidth() + groupCol;
+      }
     }
-    return geneticDataBuilder.build();
+
+    return new CellularAutomatonGeneticData(cellData, cellGroups);
   }
 
   public GeneticData generateOutputMapGeneticData(CellularAutomatonSimulationModel model,
@@ -46,8 +58,8 @@ public class CellularAutomatonGeneticDataGenerator {
       RandomGenerator random) {
     GeneticData.Builder geneticDataBuilder = GeneticData.newBuilder();
     for (int idx = 0; idx < outputSize; idx++) {
-      geneticDataBuilder.writeInt(random.nextInt(stateSize));
-      geneticDataBuilder.markCrossoverPoint();
+      geneticDataBuilder.writeInt(random.nextInt(stateSize), idx);
+      geneticDataBuilder.markSplitPoint();
     }
     return geneticDataBuilder.build();
   }

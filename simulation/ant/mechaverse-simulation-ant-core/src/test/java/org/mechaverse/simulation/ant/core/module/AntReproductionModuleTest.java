@@ -177,7 +177,8 @@ public class AntReproductionModuleTest {
 
   private GeneticDataStore randomGeneticDataStore(GeneticDataStore geneticData) throws IOException {
     geneticData.put(TEST_GENETIC_DATA_KEY, new GeneticData(RandomUtil.randomBytes(100, random),
-        ArrayUtil.toIntArray(RandomUtil.randomBytes(25, random))));
+        ArrayUtil.toIntArray(RandomUtil.randomBytes(400, random)),
+            ArrayUtil.toIntArray(RandomUtil.randomBytes(24, random))));
     return geneticData;
   }
 }
