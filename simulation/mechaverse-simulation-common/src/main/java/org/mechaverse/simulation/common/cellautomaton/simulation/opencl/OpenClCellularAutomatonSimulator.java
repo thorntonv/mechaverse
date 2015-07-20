@@ -6,8 +6,8 @@ import java.nio.IntBuffer;
 
 import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonAllocator;
-import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorDataSource;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
+import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulatorConfig;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModelBuilder;
 import org.slf4j.Logger;
@@ -53,16 +53,10 @@ public final class OpenClCellularAutomatonSimulator implements CellularAutomaton
   private boolean automatonStateUpdated = false;
   private boolean outputMapUpdated = false;
 
-  public OpenClCellularAutomatonSimulator(int numAutomata, int automatonInputSize,
-      int automatonOutputSize, CellularAutomatonDescriptorDataSource dataSource) {
-    this(numAutomata, automatonInputSize, automatonOutputSize, dataSource.getDescriptor());
-  }
-
-  public OpenClCellularAutomatonSimulator(int numAutomata, int automatonInputSize,
-      int automatonOutputSize, CellularAutomatonDescriptor descriptor) {
-    this(numAutomata, automatonInputSize, automatonOutputSize,
+  public OpenClCellularAutomatonSimulator(CellularAutomatonSimulatorConfig config) {
+    this(config.getNumAutomata(), config.getAutomatonInputSize(), config.getAutomatonOutputSize(),
         CLPlatform.getDefault().getMaxFlopsDevice(),
-            new CellularAutomatonSimulationModelBuilder().buildModel(descriptor));
+            new CellularAutomatonSimulationModelBuilder().buildModel(config.getDescriptor()));
   }
 
   public OpenClCellularAutomatonSimulator(int numAutomata, int automatonInputSize,

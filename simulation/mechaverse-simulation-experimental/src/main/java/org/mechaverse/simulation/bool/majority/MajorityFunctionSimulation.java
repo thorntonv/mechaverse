@@ -1,12 +1,8 @@
 package org.mechaverse.simulation.bool.majority;
 
-import java.io.File;
-import java.io.PrintWriter;
-
-import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
-import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorReader;
+import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulatorConfig;
 import org.mechaverse.simulation.common.simple.SimpleSimulation;
-import org.mechaverse.simulation.common.simple.SimpleSimulationLogger;
+import org.mechaverse.simulation.common.simple.SimpleSimulationConfig;
 import org.mechaverse.simulation.common.simple.SimpleSimulationModel;
 import org.mechaverse.simulation.common.simple.SimpleSimulationState;
 
@@ -16,7 +12,7 @@ import com.google.common.base.Supplier;
  * A {@link SimpleSimulation} implementation of the bitwise majority function. Every iteration each
  * entity is provided with a random N bit number as input. Entities that output the bit value that
  * occurred more frequently on the input are assigned a high fitness.
- * 
+ *
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class MajorityFunctionSimulation
@@ -24,45 +20,36 @@ public class MajorityFunctionSimulation
 
   private static final int NUM_ENTITIES = 1000;
   private static final int NUM_ITERATIONS = 100000;
-  
+
   private static class MajorityFunctionEntitySupplier implements Supplier<MajorityFunctionEntity> {
-    
+
     @Override
     public MajorityFunctionEntity get() {
       return new MajorityFunctionEntity();
     }
   };
-  
-  public MajorityFunctionSimulation(int populationSize, CellularAutomatonDescriptor descriptor, 
-      SimpleSimulationLogger<MajorityFunctionEntity, SimpleSimulationModel> simulationLogger, 
-          boolean geneticAlgorithmEnabled) {
-    super(new SimpleSimulationState<>(new SimpleSimulationModel(), 
-      SimpleSimulationModel.SERIALIZER), 
-      new MajorityFunctionEntitySupplier(),
-      MajorityFunctionFitnessCalculator.INSTANCE, 
-      populationSize, 
-      MajorityFunctionEntity.ENTITY_INPUT_SIZE, 
-      MajorityFunctionEntity.ENTITY_OUTPUT_SIZE, 
-      descriptor, 
-      simulationLogger);
-    setGeneticAlgorithmEnabled(geneticAlgorithmEnabled);
+
+  public MajorityFunctionSimulation(
+      SimpleSimulationConfig<MajorityFunctionEntity, SimpleSimulationModel> config) {
+    super(new SimpleSimulationState<>(
+        new SimpleSimulationModel(), SimpleSimulationModel.SERIALIZER), config);
   }
-  
+
   public static void main(String[] args) throws Exception {
-    CellularAutomatonDescriptor descriptor = CellularAutomatonDescriptorReader.read(
-        ClassLoader.getSystemResourceAsStream("boolean4-small.xml"));
-  
-    PrintWriter results = new PrintWriter(new File("results.csv"));
-    SimpleSimulationLogger<MajorityFunctionEntity, SimpleSimulationModel> simulationLogger =
-        new SimpleSimulationLogger<>(results, MajorityFunctionFitnessCalculator.INSTANCE);
+    SimpleSimulationConfig.Builder<MajorityFunctionEntity, SimpleSimulationModel> configBuilder =
+        new SimpleSimulationConfig.Builder<MajorityFunctionEntity, SimpleSimulationModel>();
 
-    MajorityFunctionSimulation simulation =
-        new MajorityFunctionSimulation(NUM_ENTITIES, descriptor, simulationLogger, true);
+    MajorityFunctionSimulation simulation = new MajorityFunctionSimulation(configBuilder
+        .setEntitySupplier(new MajorityFunctionEntitySupplier())
+        .setEntityFitnessFunction(MajorityFunctionFitnessCalculator.INSTANCE)
+        .setOpenCLSimulator(new CellularAutomatonSimulatorConfig.Builder()
+            .setNumAutomata(NUM_ENTITIES)
+            .setAutomatonInputSize(MajorityFunctionEntity.ENTITY_INPUT_SIZE)
+            .setAutomatonOutputSize(MajorityFunctionEntity.ENTITY_OUTPUT_SIZE)
+            .setDescriptorResource("boolean4-small.xml")
+            .build())
+        .build());
 
-    for (int iteration = 1; iteration <= NUM_ITERATIONS; iteration++) {
-      simulation.step();
-    }
-    
-    results.close();
+    simulation.step(NUM_ITERATIONS);
   }
 }

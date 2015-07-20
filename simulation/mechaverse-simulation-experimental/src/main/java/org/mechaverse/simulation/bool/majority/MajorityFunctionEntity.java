@@ -7,7 +7,7 @@ import org.mechaverse.simulation.common.cellautomaton.analysis.CellularAutomaton
 
 /**
  * An {@link AbstractEntity} implementation for the {@link MajorityFunctionSimulation}.
- * 
+ *
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public final class MajorityFunctionEntity extends AbstractEntity {
@@ -19,7 +19,7 @@ public final class MajorityFunctionEntity extends AbstractEntity {
   private int correct = 0;
   private int[] input = new int[1];
   private RandomGenerator random = new Well19937c();
-  
+
   @Override
   public int[] getInput() {
     input[0] = random.nextInt(128);
@@ -34,20 +34,16 @@ public final class MajorityFunctionEntity extends AbstractEntity {
     }
     age++;
   }
-  
+
   public int getAge() {
     return age;
   }
-  
+
   public int getNumCorrect() {
     return correct;
   }
 
   @Override
-  public boolean isAlive() {
-    return age < 100;
-  }    
-  
   public String toString() {
     return String.format("%s - %d / %d (%f)", getId(), correct, age, correct / (double) age);
   }

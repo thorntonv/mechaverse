@@ -5,11 +5,9 @@
   <!-- An element that outputs either an external input value or the bit from an adjacent plane. -->
   <CellType id="input">
     <Output id="1" >
-      <Param id="selector" />
       <Param id="idx" />
       <UpdateExpression><![CDATA[
-        {selector} & (({input1} >> 1) | ({input1} << 31)) 
-            | ~{selector} & (automatonInput[{idx} % automatonInputLength])
+        automatonInput[{idx} % automatonInputLength]
 	  ]]></UpdateExpression>
     </Output>
   </CellType>

@@ -12,7 +12,7 @@ import com.google.common.base.Function;
 
 /**
  * A simple {@link SimulationLogger} that logs the best and average entity fitness.
- * 
+ *
  * @author Vance Thornton (thorntonv@mechaverse.org)
  *
  * @param <E> the entity type
@@ -24,9 +24,9 @@ public class SimpleSimulationLogger<E extends AbstractEntity, M> implements Simu
 
   private final PrintWriter results;
   private final Function<E, Double> entityFitnessFunction;
-  private int iterationsPerLog = 10;
+  private int iterationsPerLog = 1;
   private double overallBestFitness = 0;
-  
+
   public SimpleSimulationLogger(PrintWriter results, Function<E, Double> entityFitnessFunction) {
     super();
     this.results = results;
@@ -38,7 +38,7 @@ public class SimpleSimulationLogger<E extends AbstractEntity, M> implements Simu
     if (iteration % iterationsPerLog != 0) {
       return;
     }
-    
+
     double bestFitness = 0;
     E bestEntity = null;
 
@@ -46,7 +46,7 @@ public class SimpleSimulationLogger<E extends AbstractEntity, M> implements Simu
     int fitEntityCount = 0;
     for (E entity : entities) {
       double fitness = entityFitnessFunction.apply(entity);
-      
+
       if (fitness > 0) {
         if (fitness > bestFitness) {
           bestEntity = entity;
@@ -56,7 +56,7 @@ public class SimpleSimulationLogger<E extends AbstractEntity, M> implements Simu
         fitEntityCount++;
       }
     }
-    
+
     if (bestEntity != null) {
       if(bestFitness > overallBestFitness) {
         overallBestFitness = bestFitness;

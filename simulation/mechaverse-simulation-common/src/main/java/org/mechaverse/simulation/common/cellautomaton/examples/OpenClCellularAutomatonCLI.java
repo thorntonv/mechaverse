@@ -12,6 +12,7 @@ import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomat
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorReader;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulationUtil;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
+import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulatorConfig;
 import org.mechaverse.simulation.common.cellautomaton.simulation.SimulatorCellularAutomaton;
 import org.mechaverse.simulation.common.cellautomaton.simulation.opencl.OpenClCellularAutomatonSimulator;
 import org.mechaverse.simulation.common.cellautomaton.ui.CellularAutomatonRenderer;
@@ -21,7 +22,7 @@ import com.google.common.base.Function;
 
 /**
  * A base class for OpenCL based cellular automata visualization command line applications.
- * 
+ *
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public abstract class OpenClCellularAutomatonCLI extends CellularAutomatonCLI {
@@ -42,21 +43,24 @@ public abstract class OpenClCellularAutomatonCLI extends CellularAutomatonCLI {
           return new Color(color, color, color);
         }
       };
-      
+
   protected static void main(String[] args, OpenClCellularAutomatonCLI cli) throws IOException {
     CellularAutomatonCLI.main(args, cli);
   }
-  
+
   protected abstract InputStream getDescriptorInputStream();
 
   protected abstract Function<Cell, Color> getCellColorProvider();
 
   @Override
-  protected SimulatorCellularAutomaton createCellularAutomaton() throws IOException {    
+  protected SimulatorCellularAutomaton createCellularAutomaton() throws IOException {
     CellularAutomatonDescriptor descriptor =
         CellularAutomatonDescriptorReader.read(getDescriptorInputStream());
-    CellularAutomatonSimulator simulator =
-        new OpenClCellularAutomatonSimulator(1, 1, 1, descriptor);
+
+    CellularAutomatonSimulator simulator = new OpenClCellularAutomatonSimulator(
+        new CellularAutomatonSimulatorConfig.Builder()
+            .setDescriptor(descriptor)
+            .build());
     SimulatorCellularAutomaton cells = new SimulatorCellularAutomaton(descriptor, simulator);
     int[] state = CellularAutomatonSimulationUtil.randomState(
         simulator.getAutomatonStateSize(), new Well19937c());

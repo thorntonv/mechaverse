@@ -17,6 +17,7 @@ import org.apache.commons.math3.random.Well19937c;
 import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorReader;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulationUtil;
+import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulatorConfig;
 import org.mechaverse.simulation.common.cellautomaton.simulation.opencl.OpenClCellularAutomatonSimulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,7 @@ public class CellularAutomatonAnalysisCLI {
     private CellularAutomatonDescriptor descriptor;
     private PrintStream out;
 
-    public AnalysisTask(int sampleSize, int maxIterationCount, 
+    public AnalysisTask(int sampleSize, int maxIterationCount,
         CellularAutomatonDescriptor descriptor, PrintStream out) {
       this.sampleSize = sampleSize;
       this.maxIterationCount = maxIterationCount;
@@ -50,8 +51,11 @@ public class CellularAutomatonAnalysisCLI {
     @Override
     public void run() {
       logger.debug("%s - Started", Thread.currentThread().getName());
+      CellularAutomatonSimulatorConfig config = new CellularAutomatonSimulatorConfig.Builder()
+          .setDescriptor(descriptor)
+          .build();
       try (OpenClCellularAutomatonSimulator simulator =
-          new OpenClCellularAutomatonSimulator(1, 1, 1, descriptor)) {
+          new OpenClCellularAutomatonSimulator(config)) {
         for (int cnt = 1; cnt <= sampleSize; cnt++) {
           CellularAutomatonAnalyzer analyzer = new CellularAutomatonAnalyzer(descriptor);
           int[] state = CellularAutomatonSimulationUtil.randomState(
@@ -123,7 +127,7 @@ public class CellularAutomatonAnalysisCLI {
       }
 
       service.shutdown();
-      while(!service.awaitTermination(1, TimeUnit.SECONDS));
+      while(!service.awaitTermination(1, TimeUnit.SECONDS)) {}
 
       out.close();
     } catch (NumberFormatException | ParseException ex) {

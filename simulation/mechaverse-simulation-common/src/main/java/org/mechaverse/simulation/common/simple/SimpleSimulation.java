@@ -1,6 +1,5 @@
 package org.mechaverse.simulation.common.simple;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -8,25 +7,21 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
 import org.apache.commons.math3.util.Pair;
-import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
 import org.mechaverse.simulation.common.AbstractEntity;
 import org.mechaverse.simulation.common.Simulation;
 import org.mechaverse.simulation.common.SimulationLogger;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator;
-import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorDataSource;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel;
-import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModelBuilder;
-import org.mechaverse.simulation.common.cellautomaton.simulation.opencl.OpenClCellularAutomatonSimulator;
 import org.mechaverse.simulation.common.datastore.SimulationDataStore;
-import org.mechaverse.simulation.common.genetic.CutAndSpliceCrossoverGeneticRecombinator;
 import org.mechaverse.simulation.common.genetic.GeneticData;
 import org.mechaverse.simulation.common.genetic.GeneticDataStore;
 import org.mechaverse.simulation.common.genetic.GeneticRecombinator;
+import org.mechaverse.simulation.common.genetic.SelectionStrategy;
+import org.mechaverse.simulation.common.genetic.SelectionStrategy.EntitySelectionInfo;
 import org.mechaverse.simulation.common.util.ArrayUtil;
 
 import com.google.common.base.Function;
@@ -34,9 +29,9 @@ import com.google.common.base.Supplier;
 
 /**
  * A base class for simple simulations.
- * 
+ *
  * @author Vance Thornton (thorntonv@mechaverse.org)
- * 
+ *
  * @param <E> the entity type
  * @param <M> the model type
  */
@@ -49,7 +44,9 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
   private final CellularAutomatonSimulator simulator;
   private final Supplier<E> entitySupplier;
   private final Function<E, Double> entityFitnessFunction;
+  private final SelectionStrategy<E> selectionStrategy;
   private final GeneticRecombinator geneticRecombinator;
+  private final int updatesPerIteration;
 
   private final CellularAutomatonGeneticDataGenerator geneticDataGenerator =
       new CellularAutomatonGeneticDataGenerator();
@@ -59,54 +56,19 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
   private final RandomGenerator random = new Well19937c();
   private final SimpleSimulationState<M> state;
   private final SimulationLogger<E, M> simulationLogger;
-  private boolean geneticAlgorithmEnabled = true; 
-  
-  public SimpleSimulation(SimpleSimulationState<M> state, Supplier<E> entitySupplier, 
-      Function<E, Double> entityFitnessFunction, int populationSize, int inputSize, int outputSize,
-      CellularAutomatonDescriptorDataSource descriptorDataSource, 
-      SimulationLogger<E, M> simulationLogger) {
-    this(state, entitySupplier, entityFitnessFunction, populationSize, inputSize, outputSize,
-        descriptorDataSource.getDescriptor(), simulationLogger);
-  }
 
-  public SimpleSimulation(SimpleSimulationState<M> state, Supplier<E> entitySupplier, 
-      Function<E, Double> entityFitnessFunction, int populationSize, int inputSize, int outputSize, 
-          CellularAutomatonDescriptor descriptor, SimulationLogger<E, M> simulationLogger) {
-    this(state, entitySupplier, entityFitnessFunction, 
-        CellularAutomatonSimulationModelBuilder.build(descriptor), 
-        new OpenClCellularAutomatonSimulator(populationSize, inputSize, outputSize, descriptor), 
-        new CutAndSpliceCrossoverGeneticRecombinator(), simulationLogger);
-  }
-
-  public SimpleSimulation(SimpleSimulationState<M> state, Supplier<E> entitySupplier, 
-      Function<E, Double> entityFitnessFunction, 
-      CellularAutomatonSimulationModel cellularAutomatonModel,
-      CellularAutomatonSimulator simulator, SimulationLogger<E, M> simulationLogger,
-      boolean geneticAlgorithmEnabled) {
-    this(state, entitySupplier, entityFitnessFunction, cellularAutomatonModel, simulator, 
-        new CutAndSpliceCrossoverGeneticRecombinator(), simulationLogger);
-  }
-
-  public SimpleSimulation(SimpleSimulationState<M> state, 
-      Supplier<E> entitySupplier, 
-      Function<E, Double> entityFitnessFunction, 
-      CellularAutomatonSimulationModel cellularAutomatonModel, 
-      CellularAutomatonSimulator simulator, 
-      GeneticRecombinator geneticRecombinator,
-      SimulationLogger<E, M> simulationLogger) {
-    this.cellularAutomatonModel = cellularAutomatonModel;
-    this.simulator = simulator;
-    this.entitySupplier = entitySupplier;
-    this.entityFitnessFunction = entityFitnessFunction;
-    this.geneticRecombinator = geneticRecombinator;
+  public SimpleSimulation(SimpleSimulationState<M> state, SimpleSimulationConfig<E, M> config) {
     this.state = state;
-    this.simulationLogger = simulationLogger;
+    this.cellularAutomatonModel = config.getCellularAutomatonModel();
+    this.simulator = config.getSimulator();
+    this.entitySupplier = config.getEntitySupplier();
+    this.entityFitnessFunction = config.getEntityFitnessFunction();
+    this.selectionStrategy = config.getSelectionStrategy();
+    this.geneticRecombinator = config.getGeneticRecombinator();
+    this.updatesPerIteration = config.getUpdatesPerIteration();
+    this.simulationLogger = config.getSimulationLogger();
   }
-  
-  public void setGeneticAlgorithmEnabled(boolean geneticAlgorithmEnabled) {
-    this.geneticAlgorithmEnabled = geneticAlgorithmEnabled;
-  }
-  
+
   @Override
   public SimulationDataStore getState() throws Exception {
     return state;
@@ -128,41 +90,47 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
       step();
     }
   }
-  
+
   public void step() throws Exception {
-    if (simulator.getAllocator().getAvailableCount() > 0) {
-      EnumeratedDistribution<E> fitnessDistribution = getFitnessDistribution();
-      while (simulator.getAllocator().getAvailableCount() > 0) {
-        generateEntity(fitnessDistribution);
+    while (simulator.getAllocator().getAvailableCount() > 0) {
+      generateRandomEntity();
+    }
+
+    for(int cnt = 1; cnt <= updatesPerIteration; cnt++) {
+      for (E entity : entities) {
+        simulator.setAutomatonInput(entityIndexMap.get(entity), entity.getInput());
+      }
+
+      simulator.update();
+      int[] output = new int[simulator.getAutomatonOutputSize()];
+
+      for(E entity : entities) {
+        simulator.getAutomatonOutput(entityIndexMap.get(entity), output);
+        entity.processOutput(output);
       }
     }
 
-    for (E entity : entities) {
-      simulator.setAutomatonInput(entityIndexMap.get(entity), entity.getInput());
-    }
-
-    simulator.update();
-
-    int[] output = new int[simulator.getAutomatonOutputSize()];
-    Iterator<E> entityIt = entities.iterator();
-    while(entityIt.hasNext()) {
-      E entity = entityIt.next();
-      int entityIndex = entityIndexMap.get(entity);
-      simulator.getAutomatonOutput(entityIndex, output);
-      entity.processOutput(output);
-
-      if (!entity.isAlive()) {
-        simulator.getAllocator().deallocate(entityIndex);
-        entityIt.remove();
-        entityIndexMap.remove(entity);
-        state.getEntityDataStore(entity).clear();
-        state.getEntityGeneticDataStore(entity).clear();
-      }
-    }
-    
-    state.setIteration(state.getIteration() + 1);
-    
     simulationLogger.log(state.getIteration(), state.getModel(), entities);
+
+    EntitySelectionInfo<E> selectionInfo = selectionStrategy.selectEntities(
+        entities, entityFitnessFunction, random);
+
+    for(E entity : selectionInfo.getEntitiesNotSelected()) {
+      simulator.getAllocator().deallocate(entityIndexMap.get(entity));
+      entities.remove(entity);
+      entityIndexMap.remove(entity);
+    }
+
+    for (Pair<E, E> pair : selectionInfo.getSelectedPairs()) {
+      generateEntity(pair);
+    }
+
+    for(E entity : selectionInfo.getEntitiesNotSelected()) {
+      state.getEntityDataStore(entity).clear();
+      state.getEntityGeneticDataStore(entity).clear();
+    }
+
+    state.setIteration(state.getIteration() + 1);
   }
 
   @Override
@@ -173,7 +141,7 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
   public List<E> getEntities() {
     return Collections.unmodifiableList(entities);
   }
-  
+
   private E generateRandomEntity() {
     E entity = entitySupplier.get();
     entities.add(entity);
@@ -182,24 +150,14 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
     initializeCellularAutomaton(entity);
     return entity;
   }
-  
-  private E generateEntity(EnumeratedDistribution<E> fitnessDistribution) {
-    if (!geneticAlgorithmEnabled || fitnessDistribution == null 
-        || fitnessDistribution.getPmf().size() < 2) {
-      return generateRandomEntity();
-    }
 
+  private E generateEntity(Pair<E, E> parents) {
     E entity = entitySupplier.get();
     entities.add(entity);
     entityIndexMap.put(entity, simulator.getAllocator().allocate());
 
-    E parent1 = fitnessDistribution.sample();
-    E parent2 = fitnessDistribution.sample();
-
-    // Ensure that parent1 != parent2.
-    while (entities.size() > 1 && parent2 == parent1) {
-      parent2 = fitnessDistribution.sample();
-    }
+    E parent1 = parents.getFirst();
+    E parent2 = parents.getSecond();
 
     // Get the parents genetic information.
     GeneticDataStore parent1GeneticDataStore = state.getEntityGeneticDataStore(parent1);
@@ -215,10 +173,10 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
     }
 
     initializeCellularAutomaton(entity);
-    
+
     return entity;
   }
-  
+
   private void generateGeneticData(E entity) {
     GeneticDataStore geneticDataStore = state.getEntityGeneticDataStore(entity);
     geneticDataGenerator.generateGeneticData(geneticDataStore, cellularAutomatonModel,
@@ -229,7 +187,7 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
     SimulationDataStore dataStore = state.getEntityDataStore(entity);
     GeneticDataStore geneticDataStore = state.getEntityGeneticDataStore(entity);
     int automatonIndex = entityIndexMap.get(entity);
-    
+
     // Cellular automaton state.
     int[] automatonState = geneticDataGenerator.getCellularAutomatonState(geneticDataStore);
     simulator.setAutomatonState(automatonIndex, automatonState);
@@ -239,46 +197,5 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
     int[] outputMap = geneticDataGenerator.getOutputMap(geneticDataStore);
     simulator.setAutomatonOutputMap(automatonIndex, outputMap);
     dataStore.put(AUTOMATON_OUTPUT_MAP_KEY, ArrayUtil.toByteArray(outputMap));
-  }
-
-  private IdentityHashMap<E, Double> getEntityFitnessMap() {
-    IdentityHashMap<E, Double> entityFitnessMap = new IdentityHashMap<>(entities.size());
-    for (E entity : entities) {
-      if (entity.isAlive()) {
-        double fitness = entityFitnessFunction.apply(entity);
-        if (fitness > 0) {
-          entityFitnessMap.put(entity, fitness);
-        }
-      }
-    }
-    return entityFitnessMap;
-  }
-
-  private EnumeratedDistribution<E> getFitnessDistribution() {
-    return getFitnessDistribution(getEntityFitnessMap());
-  }
-  
-  private EnumeratedDistribution<E> getFitnessDistribution(
-      IdentityHashMap<E, Double> entityFitnessMap) {
-    if (entities.isEmpty() || entityFitnessMap.isEmpty()) {
-      return null;
-    }
-    
-    double fitnessSum = 0;
-    for (Double fitness : entityFitnessMap.values()) {
-      fitnessSum += fitness;
-    }
-    
-    List<Pair<E, Double>> pmf = new ArrayList<>();
-    for (Map.Entry<E, Double> entry : entityFitnessMap.entrySet()) {
-      E entity = entry.getKey();
-      if (fitnessSum != 0) {
-        pmf.add(new Pair<E, Double>(entity, entry.getValue()));
-      } else {
-        pmf.add(new Pair<E, Double>(entity, 1.0D / entities.size()));
-      }
-    }
-
-    return new EnumeratedDistribution<E>(random, pmf);
   }
 }
