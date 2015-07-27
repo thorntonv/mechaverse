@@ -3,9 +3,9 @@ package org.mechaverse.simulation.common.datastore;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeMap;
 
 import com.google.common.base.Supplier;
 
@@ -47,15 +47,14 @@ public class MemorySimulationDataStore extends AbstractSimulationDataStore {
     }
   }
 
-  private final Map<String, byte[]> dataStore;
-
+  private final TreeMap<String, byte[]> dataStore;
 
   public MemorySimulationDataStore() {
-    this.dataStore = new LinkedHashMap<>();
+    this.dataStore = new TreeMap<>();
   }
 
   public MemorySimulationDataStore(SimulationDataStore dataStore) {
-    this.dataStore = new LinkedHashMap<>();
+    this.dataStore = new TreeMap<>();
     merge(dataStore);
   }
 
@@ -96,5 +95,21 @@ public class MemorySimulationDataStore extends AbstractSimulationDataStore {
   @Override
   public int size() {
     return dataStore.size();
+  }
+
+  @Override
+  public Set<String> keysWithPrefix(final String prefix) {
+    Set<String> keysWithPrefix = new HashSet<>();
+
+    String key = dataStore.ceilingKey(prefix);
+    while (key != null) {
+      if (key.startsWith(prefix)) {
+        keysWithPrefix.add(key);
+        key = dataStore.higherKey(key);
+      } else {
+        key = null;
+      }
+    }
+    return keysWithPrefix;
   }
 }

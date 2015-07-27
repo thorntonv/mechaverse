@@ -58,6 +58,11 @@ public interface SimulationDataStore {
   public Set<String> keySet();
 
   /**
+   * Returns the set of keys that start with the given prefix.
+   */
+  public Set<String> keysWithPrefix(String prefix);
+
+  /**
    * Returns the total number of key/value pairs.
    */
   public int size();

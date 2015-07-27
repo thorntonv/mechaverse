@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -103,8 +104,9 @@ public class SimulationDataStoreViewTest {
 
   @Test
   public void clear() {
-    when(mockDataStore.keySet()).thenReturn(
-        ImmutableSet.of("key1", "key2", "key3", getAbsoluteKey("key1"), getAbsoluteKey("key2")));
+    String rootPrefix = ROOT_KEY + SimulationDataStore.KEY_SEPARATOR;
+    when(mockDataStore.keysWithPrefix(rootPrefix)).thenReturn(
+        ImmutableSet.of(getAbsoluteKey("key1"), getAbsoluteKey("key2")));
     when(mockVisibleKeyPredicate.apply(getAbsoluteKey("key1"))).thenReturn(true);
     when(mockVisibleKeyPredicate.apply(getAbsoluteKey("key2"))).thenReturn(true);
 
@@ -137,9 +139,10 @@ public class SimulationDataStoreViewTest {
 
   @Test
   public void keySet() throws IOException {
-    when(mockDataStore.keySet()).thenReturn(ImmutableSet.of(
-      getAbsoluteKey("visibleKey1"), getAbsoluteKey("visibleKey2.subKey"),
-      getAbsoluteKey("notVisibleKey"), "otherRootKey", "otherRootKey." + ROOT_KEY));
+    String rootPrefix = ROOT_KEY + SimulationDataStore.KEY_SEPARATOR;
+    when(mockDataStore.keysWithPrefix(eq(rootPrefix))).thenReturn(ImmutableSet.of(
+        getAbsoluteKey("visibleKey1"), getAbsoluteKey("visibleKey2.subKey"),
+            getAbsoluteKey("notVisibleKey")));
     when(mockVisibleKeyPredicate.apply(getAbsoluteKey("visibleKey1"))).thenReturn(true);
     when(mockVisibleKeyPredicate.apply(getAbsoluteKey("visibleKey2.subKey"))).thenReturn(true);
     assertEquals(ImmutableSet.of("visibleKey1", "visibleKey2.subKey"), dataStoreView.keySet());

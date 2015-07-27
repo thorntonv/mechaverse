@@ -1,10 +1,10 @@
 package org.mechaverse.simulation.common.datastore;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.common.collect.ImmutableSet;
 
 /**
  * Provides a relative and filtered view of a {@link SimulationDataStore}.
@@ -98,14 +98,13 @@ public final class SimulationDataStoreView implements SimulationDataStore {
 
   @Override
   public Set<String> keySet() {
-    ImmutableSet.Builder<String> keySetBuilder = ImmutableSet.builder();
-    for (String absoluteKey : dataStore.keySet()) {
-      if (absoluteKey.startsWith(rootKeyPrefix) && visibleKeyPredicate.apply(absoluteKey)) {
-        String relativeKey = absoluteKey.substring(rootKeyPrefix.length());
-        keySetBuilder.add(relativeKey);
+    Set<String> keys = new HashSet<>();
+    for (String key : dataStore.keysWithPrefix(rootKeyPrefix)) {
+      if (isVisible(key)) {
+        keys.add(getRelativeKey(key));
       }
     }
-    return keySetBuilder.build();
+    return keys;
   }
 
   @Override
@@ -121,5 +120,29 @@ public final class SimulationDataStoreView implements SimulationDataStore {
   @Override
   public int hashCode() {
     return dataStore.hashCode();
+  }
+
+  @Override
+  public Set<String> keysWithPrefix(String prefix) {
+    Set<String> keys = new HashSet<String>();
+    for (String key : dataStore.keysWithPrefix(getAbsoluteKey(prefix))) {
+      if (isVisible(key)) {
+        keys.add(getRelativeKey(key));
+      }
+    }
+
+    return keys;
+  }
+
+  private boolean isVisible(String absoluteKey) {
+    return absoluteKey.startsWith(rootKeyPrefix) && visibleKeyPredicate.apply(absoluteKey);
+  }
+
+  private String getAbsoluteKey(String relativeKey) {
+    return rootKeyPrefix + relativeKey;
+  }
+
+  private String getRelativeKey(String absoluteKey) {
+    return absoluteKey.substring(rootKeyPrefix.length());
   }
 }

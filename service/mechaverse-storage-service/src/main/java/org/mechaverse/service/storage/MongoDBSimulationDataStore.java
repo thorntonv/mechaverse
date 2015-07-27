@@ -25,28 +25,28 @@ import com.mongodb.MongoException;
  * key, and value. A unique index exists for simulation Id, instance Id, iteration, and key, which
  * not only provides performance optimizations, but all ensure that duplicate entries are not
  * allowed.
- * 
+ *
  * Useful queries when working with the MongoDB database directly:
- * 
+ *
  * <pre>
  * Find all unique stores:
  * > db.SimulationDataStores.find({"key": {$exists: false}})
- * 
+ *
  * Find all keys for given simulation Id, instance Id, and iteration:
- * > db.SimulationDataStores.find({"simulationId" : "0249baa9-f38f-4435-add8-da988d217fbb", 
- *                                 "instanceId" : "719912d5-809b-462f-a9c4-b9748d5a8f95", 
- *                                 "iteration" : 0, 
+ * > db.SimulationDataStores.find({"simulationId" : "0249baa9-f38f-4435-add8-da988d217fbb",
+ *                                 "instanceId" : "719912d5-809b-462f-a9c4-b9748d5a8f95",
+ *                                 "iteration" : 0,
  *                                 "key": {$exists: true}})
  *
  * Find all keys with a given prefix for given simulation Id, instance Id, and iteration:
- * > db.SimulationDataStores.find({"simulationId" : "0249baa9-f38f-4435-add8-da988d217fbb", 
+ * > db.SimulationDataStores.find({"simulationId" : "0249baa9-f38f-4435-add8-da988d217fbb",
  *                                 "instanceId" : "719912d5-809b-462f-a9c4-b9748d5a8f95",
  *                                 "iteration" : 100,
- *                                 "key": {$regex: "entity"}} 
+ *                                 "key": {$regex: "entity"}}
  * </pre>
- * 
- * 
- * 
+ *
+ *
+ *
  * @author Dusty Hendrickson (dhendrickson@mechaverse.org)
  */
 public class MongoDBSimulationDataStore extends AbstractSimulationDataStore {
@@ -127,7 +127,7 @@ public class MongoDBSimulationDataStore extends AbstractSimulationDataStore {
 
   /**
    * Deletes one or more MongoDB stores based on the given parameters.
-   * 
+   *
    * @param mongoDatabase MongoDB database connection
    * @param simulationId If not null, add simulation Id to query of stores to be deleted
    * @param instanceId If not null, add instance Id to query of stores to be deleted
@@ -152,7 +152,7 @@ public class MongoDBSimulationDataStore extends AbstractSimulationDataStore {
   /**
    * Instantiates a store object tied to the given database and store parameters. An exception will
    * be thrown if the store object does not exist in the database.
-   * 
+   *
    * @param mongoDatabase
    * @param simulationId
    * @param instanceId
@@ -281,5 +281,10 @@ public class MongoDBSimulationDataStore extends AbstractSimulationDataStore {
     long count = mongoDatabase.getCollection(mongoCollectionName).getCount(query);
 
     return (int) count;
+  }
+
+  @Override
+  public Set<String> keysWithPrefix(String prefix) {
+    throw new UnsupportedOperationException();
   }
 }
