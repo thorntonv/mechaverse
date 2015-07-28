@@ -1,11 +1,15 @@
 package org.mechaverse.simulation.common.cellautomaton.genetic;
 
+import java.math.RoundingMode;
+
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticData.CellGeneticData;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel;
 import org.mechaverse.simulation.common.genetic.GeneticData;
 import org.mechaverse.simulation.common.genetic.GeneticDataStore;
 import org.mechaverse.simulation.common.util.ArrayUtil;
+
+import com.google.common.math.IntMath;
 
 /**
  * Generates cellular automaton genetic data.
@@ -31,6 +35,10 @@ public class CellularAutomatonGeneticDataGenerator {
     CellGeneticData[][] cellData = new CellGeneticData[rowCount][colCount];
     int[][] cellGroups = new int[rowCount][colCount];
 
+    int groupWidth =
+        IntMath.sqrt(IntMath.sqrt(rowCount * colCount, RoundingMode.HALF_DOWN), RoundingMode.DOWN);
+    int groupHeight = groupWidth;
+
     for (int row = 0; row < rowCount; row++) {
       for (int col = 0; col < colCount; col++) {
         int[] values = new int[model.getCell(row, col).getStateSize()];
@@ -39,9 +47,9 @@ public class CellularAutomatonGeneticDataGenerator {
         }
         cellData[row][col] = new CellGeneticData(values);
 
-        int groupRow = row / model.getLogicalUnitInfo().getHeight();
-        int groupCol = col / model.getLogicalUnitInfo().getWidth();
-        cellGroups[row][col] = groupRow * model.getWidth() + groupCol;
+        int groupRow = row / groupHeight;
+        int groupCol = col / groupWidth;
+        cellGroups[row][col] = groupRow * (colCount / groupWidth) + groupCol;
       }
     }
 

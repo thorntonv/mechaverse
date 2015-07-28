@@ -24,12 +24,12 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class CellularAutomatonGeneticDataGeneratorTest {
 
   private static final int[][] TEST_GROUPS = new int[][] {
-      {0, 0, 0, 1, 1, 1},
-      {0, 0, 0, 1, 1, 1},
-      {0, 0, 0, 1, 1, 1},
-      {2, 2, 2, 3, 3, 3},
-      {2, 2, 2, 3, 3, 3},
-      {2, 2, 2, 3, 3, 3}};
+      {0, 0, 1, 1, 2, 2},
+      {0, 0, 1, 1, 2, 2},
+      {3, 3, 4, 4, 5, 5},
+      {3, 3, 4, 4, 5, 5},
+      {6, 6, 7, 7, 8, 8},
+      {6, 6, 7, 7, 8, 8}};
 
   @Mock private RandomGenerator mockRandom;
 
@@ -54,7 +54,7 @@ public class CellularAutomatonGeneticDataGeneratorTest {
     assertArrayEquals(TEST_GENETIC_DATA, geneticData.getData());
     for (int row = 0; row < geneticData.getRowCount(); row++) {
       for (int col = 0; col < geneticData.getColumnCount(); col++) {
-        assertArrayEquals(TEST_CELL_DATA[row][col].getData(), 
+        assertArrayEquals(TEST_CELL_DATA[row][col].getData(),
             geneticData.getCellData(row, col).getData());
       }
     }

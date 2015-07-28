@@ -52,6 +52,7 @@ public class CellularAutomatonGeneticData extends GeneticData {
   private final int colCount;
   private final CellGeneticData[][] cellData;
   private final int[][] cellGroups;
+  private final int[][] cellGroupIndices;
 
   public CellularAutomatonGeneticData(CellGeneticData[][] cellData, int[][] cellGroups) {
     super(toGeneticData(cellData, cellGroups));
@@ -60,6 +61,12 @@ public class CellularAutomatonGeneticData extends GeneticData {
     this.colCount = cellData[0].length;
     this.cellData = cellData;
     this.cellGroups = cellGroups;
+    this.cellGroupIndices = buildCellGroupIndices();
+  }
+
+  public CellularAutomatonGeneticData(GeneticData geneticData,
+      CellularAutomatonSimulationModel model) {
+    this(geneticData.getData(), geneticData.getCrossoverGroups(), model);
   }
 
   public CellularAutomatonGeneticData(byte[] dataBytes, int[] crossoverData,
@@ -70,11 +77,11 @@ public class CellularAutomatonGeneticData extends GeneticData {
   private CellularAutomatonGeneticData(CellularAutomatonGeneticData geneticData) {
     super(geneticData.getData(), geneticData.getCrossoverGroups(),
         geneticData.getCrossoverSplitPoints());
-
     this.rowCount = geneticData.rowCount;
     this.colCount = geneticData.colCount;
     this.cellData = geneticData.cellData;
     this.cellGroups = geneticData.cellGroups;
+    this.cellGroupIndices = buildCellGroupIndices();
   }
 
   public int getRowCount() {
@@ -93,6 +100,11 @@ public class CellularAutomatonGeneticData extends GeneticData {
     return cellGroups[row][column];
   }
 
+  public void setCrossoverGroup(int group, int row, int column) {
+    cellGroups[row][column] = group;
+    crossoverGroups[cellGroupIndices[row][column]] = group;
+  }
+
   private static GeneticData toGeneticData(CellGeneticData[][] cellData, int[][] cellGroups) {
     GeneticData.Builder builder = GeneticData.newBuilder();
     for (int row = 0; row < cellGroups.length; row++) {
@@ -108,9 +120,9 @@ public class CellularAutomatonGeneticData extends GeneticData {
   }
 
   private static CellularAutomatonGeneticData toCellGeneticData(
-      byte[] dataBytes, int[] crossoverData, CellularAutomatonSimulationModel model) {
+      byte[] dataBytes, int[] crossoverGroupData, CellularAutomatonSimulationModel model) {
     Preconditions.checkArgument(dataBytes.length == model.getStateSize() * BYTES_PER_INT);
-    Preconditions.checkArgument(crossoverData.length == dataBytes.length);
+    Preconditions.checkArgument(crossoverGroupData.length == dataBytes.length);
 
     int rowCount = model.getHeight() * model.getLogicalUnitInfo().getHeight();
     int colCount = model.getWidth() * model.getLogicalUnitInfo().getWidth();
@@ -129,10 +141,22 @@ public class CellularAutomatonGeneticData extends GeneticData {
           cellState[idx] = data[dataIdx++];
         }
         cellData[row][col] = new CellGeneticData(cellState);
-        cellGroups[row][col] = crossoverData[crossoverDataIdx];
+        cellGroups[row][col] = crossoverGroupData[crossoverDataIdx];
         crossoverDataIdx += cellState.length * BYTES_PER_INT;
       }
     }
     return new CellularAutomatonGeneticData(cellData, cellGroups);
+  }
+
+  private int[][] buildCellGroupIndices() {
+    int[][] cellGroupIndices = new int[rowCount][colCount];
+    int idx = 0;
+    for (int row = 0; row < rowCount; row++) {
+      for (int col = 0; col < colCount; col++) {
+        cellGroupIndices[row][col] = idx;
+        idx += cellData[row][col].data.length * BYTES_PER_INT;
+      }
+    }
+    return cellGroupIndices;
   }
 }
