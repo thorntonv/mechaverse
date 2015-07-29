@@ -1,11 +1,11 @@
 package org.mechaverse.simulation.bool.majority;
 
+import org.mechaverse.simulation.common.SimulationConfig;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulatorConfig;
 import org.mechaverse.simulation.common.genetic.selection.ElitistSelectionStrategy;
 import org.mechaverse.simulation.common.genetic.selection.SelectionStrategy;
 import org.mechaverse.simulation.common.genetic.selection.TournamentSelectionStrategy;
 import org.mechaverse.simulation.common.simple.SimpleSimulation;
-import org.mechaverse.simulation.common.simple.SimpleSimulationConfig;
 import org.mechaverse.simulation.common.simple.SimpleSimulationModel;
 import org.mechaverse.simulation.common.simple.SimpleSimulationState;
 
@@ -35,14 +35,14 @@ public class MajorityFunctionSimulation
   };
 
   public MajorityFunctionSimulation(
-      SimpleSimulationConfig<MajorityFunctionEntity, SimpleSimulationModel> config) {
+      SimulationConfig<MajorityFunctionEntity, SimpleSimulationModel> config) {
     super(new SimpleSimulationState<>(
         new SimpleSimulationModel(), SimpleSimulationModel.SERIALIZER), config);
   }
 
   public static void main(String[] args) throws Exception {
-    SimpleSimulationConfig.Builder<MajorityFunctionEntity, SimpleSimulationModel> configBuilder =
-        new SimpleSimulationConfig.Builder<MajorityFunctionEntity, SimpleSimulationModel>();
+    SimulationConfig.Builder<MajorityFunctionEntity, SimpleSimulationModel> configBuilder =
+        new SimulationConfig.Builder<MajorityFunctionEntity, SimpleSimulationModel>();
 
     SelectionStrategy<MajorityFunctionEntity> selectionStrategy = new ElitistSelectionStrategy<>(
         RETAIN_TOP_ENTITY_COUNT, REMOVE_BOTTOM_ENTITY_COUNT,

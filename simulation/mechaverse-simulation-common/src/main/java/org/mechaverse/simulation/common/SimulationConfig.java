@@ -1,11 +1,9 @@
-package org.mechaverse.simulation.common.simple;
+package org.mechaverse.simulation.common;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
-import org.mechaverse.simulation.common.AbstractEntity;
-import org.mechaverse.simulation.common.SimulationLogger;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulatorConfig;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel;
@@ -15,11 +13,12 @@ import org.mechaverse.simulation.common.genetic.CutAndSpliceCrossoverGeneticReco
 import org.mechaverse.simulation.common.genetic.GeneticRecombinator;
 import org.mechaverse.simulation.common.genetic.selection.FitnessProportionalSelectionStrategy;
 import org.mechaverse.simulation.common.genetic.selection.SelectionStrategy;
+import org.mechaverse.simulation.common.simple.SimpleSimulationLogger;
 
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 
-public class SimpleSimulationConfig<E extends AbstractEntity, M> {
+public class SimulationConfig<E extends AbstractEntity, M> {
 
   public static class Builder<E extends AbstractEntity, M> {
 
@@ -81,7 +80,7 @@ public class SimpleSimulationConfig<E extends AbstractEntity, M> {
       return this;
     }
 
-    public SimpleSimulationConfig<E, M> build() {
+    public SimulationConfig<E, M> build() {
       if (simulationLogger == null) {
         try {
           setSimulationLogger("results.csv", entityFitnessFunction);
@@ -91,7 +90,7 @@ public class SimpleSimulationConfig<E extends AbstractEntity, M> {
       }
       simulationLogger.setMinimize(minimize);
       selectionStrategy.setMinimize(minimize);
-      return new SimpleSimulationConfig<E, M>(entitySupplier, entityFitnessFunction,
+      return new SimulationConfig<E, M>(entitySupplier, entityFitnessFunction,
           cellularAutomatonModel,simulator, selectionStrategy, geneticRecombinator,
               simulationLogger, updatesPerIteration);
     }
@@ -106,7 +105,7 @@ public class SimpleSimulationConfig<E extends AbstractEntity, M> {
   private final SimulationLogger<E, M> simulationLogger;
   private final int updatesPerIteration;
 
-  public SimpleSimulationConfig(Supplier<E> entitySupplier,
+  public SimulationConfig(Supplier<E> entitySupplier,
       Function<E, Double> entityFitnessFunction,
       CellularAutomatonSimulationModel cellularAutomatonModel, CellularAutomatonSimulator simulator,
       SelectionStrategy<E> selectionStrategy, GeneticRecombinator geneticRecombinator,

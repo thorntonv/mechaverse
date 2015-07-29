@@ -145,6 +145,11 @@ public final class AntSimulationImpl implements Simulation {
   }
 
   @Override
+  public void step(int stepCount, double targetFitness) throws Exception {
+    step(stepCount);
+  }
+
+  @Override
   public String getDeviceInfo() {
     return DeviceUtil.getDeviceInfo();
   }

@@ -12,6 +12,7 @@ import org.apache.commons.math3.random.Well19937c;
 import org.apache.commons.math3.util.Pair;
 import org.mechaverse.simulation.common.AbstractEntity;
 import org.mechaverse.simulation.common.Simulation;
+import org.mechaverse.simulation.common.SimulationConfig;
 import org.mechaverse.simulation.common.SimulationLogger;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticRecombinator;
@@ -52,7 +53,7 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
   private final SelectionStrategy<E> selectionStrategy;
   private final GeneticRecombinator geneticRecombinator;
   private final GeneticRecombinator cellularAutomatonGeneticRecombinator;
-  
+
   private final int updatesPerIteration;
 
   private final CellularAutomatonGeneticDataGenerator geneticDataGenerator =
@@ -64,7 +65,7 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
   private final SimpleSimulationState<M> state;
   private final SimulationLogger<E, M> simulationLogger;
 
-  public SimpleSimulation(SimpleSimulationState<M> state, SimpleSimulationConfig<E, M> config) {
+  public SimpleSimulation(SimpleSimulationState<M> state, SimulationConfig<E, M> config) {
     this.state = state;
     this.cellularAutomatonModel = config.getCellularAutomatonModel();
     this.simulator = config.getSimulator();
@@ -98,6 +99,20 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
   public void step(int stepCount) throws Exception {
     for (int cnt = 1; cnt <= stepCount; cnt++) {
       step();
+    }
+  }
+
+  @Override
+  public void step(int stepCount, double targetFitness) throws Exception {
+    for (int cnt = 1; cnt <= stepCount; cnt++) {
+      step();
+      if (simulationLogger.getMinimize()) {
+        if (simulationLogger.getOverallBestEntity().getValue() <= targetFitness) {
+          return;
+        }
+      } else if (simulationLogger.getOverallBestEntity().getValue() >= targetFitness) {
+        return;
+      }
     }
   }
 
@@ -219,8 +234,8 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
     simulator.setAutomatonOutputMap(automatonIndex, outputMap);
     dataStore.put(AUTOMATON_OUTPUT_MAP_KEY, ArrayUtil.toByteArray(outputMap));
 
-    entity.setGeneticDataStore(geneticDataStore);
     entity.setCellularAutomatonModel(cellularAutomatonModel);
+    entity.setGeneticDataStore(geneticDataStore);
     entity.setCellularAutomaton(new SimulatorCellularAutomaton(
         cellularAutomatonModel, simulator, automatonIndex));
   }

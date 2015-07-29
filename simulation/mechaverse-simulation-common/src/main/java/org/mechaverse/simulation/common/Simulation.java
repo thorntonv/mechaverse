@@ -28,6 +28,11 @@ public interface Simulation {
   void step(int stepCount) throws Exception;
 
   /**
+   * Performs one or more iterations until the target fitness is reached.
+   */
+  void step(int stepCount, double targetFitness) throws Exception;
+
+  /**
    * Returns a string with information about the device used by the simulation.
    */
   String getDeviceInfo();
