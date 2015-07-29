@@ -1,8 +1,8 @@
 package org.mechaverse.simulation.common.simple;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -14,18 +14,23 @@ import org.mechaverse.simulation.common.AbstractEntity;
 import org.mechaverse.simulation.common.Simulation;
 import org.mechaverse.simulation.common.SimulationLogger;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator;
+import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticRecombinator;
+import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonMutator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
+import org.mechaverse.simulation.common.cellautomaton.simulation.SimulatorCellularAutomaton;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel;
 import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 import org.mechaverse.simulation.common.genetic.GeneticData;
 import org.mechaverse.simulation.common.genetic.GeneticDataStore;
 import org.mechaverse.simulation.common.genetic.GeneticRecombinator;
-import org.mechaverse.simulation.common.genetic.SelectionStrategy;
-import org.mechaverse.simulation.common.genetic.SelectionStrategy.EntitySelectionInfo;
+import org.mechaverse.simulation.common.genetic.selection.SelectionStrategy;
+import org.mechaverse.simulation.common.genetic.selection.SelectionUtil;
 import org.mechaverse.simulation.common.util.ArrayUtil;
 
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
+
+import gnu.trove.map.TObjectDoubleMap;
 
 /**
  * A base class for simple simulations.
@@ -46,6 +51,8 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
   private final Function<E, Double> entityFitnessFunction;
   private final SelectionStrategy<E> selectionStrategy;
   private final GeneticRecombinator geneticRecombinator;
+  private final GeneticRecombinator cellularAutomatonGeneticRecombinator;
+  
   private final int updatesPerIteration;
 
   private final CellularAutomatonGeneticDataGenerator geneticDataGenerator =
@@ -65,6 +72,9 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
     this.entityFitnessFunction = config.getEntityFitnessFunction();
     this.selectionStrategy = config.getSelectionStrategy();
     this.geneticRecombinator = config.getGeneticRecombinator();
+    this.cellularAutomatonGeneticRecombinator = new CellularAutomatonGeneticRecombinator(
+      geneticRecombinator, new CellularAutomatonMutator(.001), cellularAutomatonModel);
+
     this.updatesPerIteration = config.getUpdatesPerIteration();
     this.simulationLogger = config.getSimulationLogger();
   }
@@ -112,20 +122,23 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
 
     simulationLogger.log(state.getIteration(), state.getModel(), entities);
 
-    EntitySelectionInfo<E> selectionInfo = selectionStrategy.selectEntities(
-        entities, entityFitnessFunction, random);
+    TObjectDoubleMap<E> entityFitnessMap =
+        SelectionUtil.buildEntityFitnessMap(entities, entityFitnessFunction);
+    List<Pair<E, E>> selectedPairs =
+        selectionStrategy.selectEntities(entityFitnessMap, entities.size(), random);
 
-    for(E entity : selectionInfo.getEntitiesNotSelected()) {
+    List<E> previousGeneration = new ArrayList<E>(entities);
+    for(E entity : entities) {
       simulator.getAllocator().deallocate(entityIndexMap.get(entity));
-      entities.remove(entity);
-      entityIndexMap.remove(entity);
     }
+    entities.clear();
+    entityIndexMap.clear();
 
-    for (Pair<E, E> pair : selectionInfo.getSelectedPairs()) {
+    for (Pair<E, E> pair : selectedPairs) {
       generateEntity(pair);
     }
 
-    for(E entity : selectionInfo.getEntitiesNotSelected()) {
+    for(E entity : previousGeneration) {
       state.getEntityDataStore(entity).clear();
       state.getEntityGeneticDataStore(entity).clear();
     }
@@ -161,14 +174,22 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
 
     // Get the parents genetic information.
     GeneticDataStore parent1GeneticDataStore = state.getEntityGeneticDataStore(parent1);
-    GeneticDataStore parent2GeneticDataStore = state.getEntityGeneticDataStore(parent2);
+    GeneticDataStore parent2GeneticDataStore =
+        (parent2 != null) ? state.getEntityGeneticDataStore(parent2) : null;
 
     GeneticDataStore childGeneticDataStore = state.getEntityGeneticDataStore(entity);
     for (String key : parent1GeneticDataStore.keySet()) {
       GeneticData parent1GeneticData = parent1GeneticDataStore.get(key);
-      GeneticData parent2GeneticData = parent2GeneticDataStore.get(key);
-      GeneticData childData = geneticRecombinator.recombine(
-          parent1GeneticData, parent2GeneticData, random);
+      GeneticData childData = parent1GeneticData;
+      if (parent2 != null) {
+        GeneticData parent2GeneticData = parent2GeneticDataStore.get(key);
+        if(AUTOMATON_STATE_KEY.equals(key)) {
+          childData = cellularAutomatonGeneticRecombinator.recombine(
+              parent1GeneticData, parent2GeneticData, random);
+        } else {
+          childData = geneticRecombinator.recombine(parent1GeneticData, parent2GeneticData, random);
+        }
+      }
       childGeneticDataStore.put(key, childData);
     }
 
@@ -197,5 +218,10 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
     int[] outputMap = geneticDataGenerator.getOutputMap(geneticDataStore);
     simulator.setAutomatonOutputMap(automatonIndex, outputMap);
     dataStore.put(AUTOMATON_OUTPUT_MAP_KEY, ArrayUtil.toByteArray(outputMap));
+
+    entity.setGeneticDataStore(geneticDataStore);
+    entity.setCellularAutomatonModel(cellularAutomatonModel);
+    entity.setCellularAutomaton(new SimulatorCellularAutomaton(
+        cellularAutomatonModel, simulator, automatonIndex));
   }
 }

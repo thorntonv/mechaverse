@@ -1,6 +1,9 @@
 package org.mechaverse.simulation.bool.majority;
 
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulatorConfig;
+import org.mechaverse.simulation.common.genetic.selection.ElitistSelectionStrategy;
+import org.mechaverse.simulation.common.genetic.selection.SelectionStrategy;
+import org.mechaverse.simulation.common.genetic.selection.TournamentSelectionStrategy;
 import org.mechaverse.simulation.common.simple.SimpleSimulation;
 import org.mechaverse.simulation.common.simple.SimpleSimulationConfig;
 import org.mechaverse.simulation.common.simple.SimpleSimulationModel;
@@ -19,7 +22,9 @@ public class MajorityFunctionSimulation
     extends SimpleSimulation<MajorityFunctionEntity, SimpleSimulationModel> {
 
   private static final int NUM_ENTITIES = 1000;
-  private static final int NUM_ITERATIONS = 100000;
+  private static final int RETAIN_TOP_ENTITY_COUNT = 20;
+  private static final int REMOVE_BOTTOM_ENTITY_COUNT = 0;
+  private static final int NUM_ITERATIONS = 500;
 
   private static class MajorityFunctionEntitySupplier implements Supplier<MajorityFunctionEntity> {
 
@@ -39,6 +44,10 @@ public class MajorityFunctionSimulation
     SimpleSimulationConfig.Builder<MajorityFunctionEntity, SimpleSimulationModel> configBuilder =
         new SimpleSimulationConfig.Builder<MajorityFunctionEntity, SimpleSimulationModel>();
 
+    SelectionStrategy<MajorityFunctionEntity> selectionStrategy = new ElitistSelectionStrategy<>(
+        RETAIN_TOP_ENTITY_COUNT, REMOVE_BOTTOM_ENTITY_COUNT,
+            new TournamentSelectionStrategy<MajorityFunctionEntity>());
+
     MajorityFunctionSimulation simulation = new MajorityFunctionSimulation(configBuilder
         .setEntitySupplier(new MajorityFunctionEntitySupplier())
         .setEntityFitnessFunction(MajorityFunctionFitnessCalculator.INSTANCE)
@@ -48,6 +57,7 @@ public class MajorityFunctionSimulation
             .setAutomatonOutputSize(MajorityFunctionEntity.ENTITY_OUTPUT_SIZE)
             .setDescriptorResource("boolean4-small.xml")
             .build())
+        .setSelectionStrategy(selectionStrategy)
         .build());
 
     simulation.step(NUM_ITERATIONS);

@@ -12,9 +12,9 @@ import org.mechaverse.simulation.common.cellautomaton.simulation.generator.Cellu
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModelBuilder;
 import org.mechaverse.simulation.common.cellautomaton.simulation.opencl.OpenClCellularAutomatonSimulator;
 import org.mechaverse.simulation.common.genetic.CutAndSpliceCrossoverGeneticRecombinator;
-import org.mechaverse.simulation.common.genetic.FitnessProportionalSelectionStrategy;
 import org.mechaverse.simulation.common.genetic.GeneticRecombinator;
-import org.mechaverse.simulation.common.genetic.SelectionStrategy;
+import org.mechaverse.simulation.common.genetic.selection.FitnessProportionalSelectionStrategy;
+import org.mechaverse.simulation.common.genetic.selection.SelectionStrategy;
 
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
@@ -31,6 +31,7 @@ public class SimpleSimulationConfig<E extends AbstractEntity, M> {
     private GeneticRecombinator geneticRecombinator = new CutAndSpliceCrossoverGeneticRecombinator();
     private int updatesPerIteration = 100;
     private SimulationLogger<E, M> simulationLogger;
+    private boolean minimize = false;
 
     public Builder<E, M> setEntitySupplier(Supplier<E> entitySupplier) {
       this.entitySupplier = entitySupplier;
@@ -39,6 +40,11 @@ public class SimpleSimulationConfig<E extends AbstractEntity, M> {
 
     public Builder<E, M> setEntityFitnessFunction(Function<E, Double> entityFitnessFunction) {
       this.entityFitnessFunction = entityFitnessFunction;
+      return this;
+    }
+
+    public Builder<E, M> setMinimize(boolean minimize) {
+      this.minimize = minimize;
       return this;
     }
 
@@ -83,6 +89,8 @@ public class SimpleSimulationConfig<E extends AbstractEntity, M> {
           throw new RuntimeException(e);
         }
       }
+      simulationLogger.setMinimize(minimize);
+      selectionStrategy.setMinimize(minimize);
       return new SimpleSimulationConfig<E, M>(entitySupplier, entityFitnessFunction,
           cellularAutomatonModel,simulator, selectionStrategy, geneticRecombinator,
               simulationLogger, updatesPerIteration);

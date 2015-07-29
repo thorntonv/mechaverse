@@ -12,7 +12,7 @@ import com.google.common.base.Preconditions;
 /**
  * Provides a {@link CellularAutomaton} interface to a cellular automaton simulated using
  * {@link CellularAutomatonSimulator}.
- * 
+ *
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class SimulatorCellularAutomaton implements CellularAutomaton {
@@ -21,18 +21,18 @@ public class SimulatorCellularAutomaton implements CellularAutomaton {
 
     private CellInfo cellInfo;
     private int luIndex;
-    
+
     public SimulatorCellularAutomatonCell(CellInfo cellInfo, int luIndex) {
       this.cellInfo = cellInfo;
       this.luIndex = luIndex;
     }
-    
+
     @Override
     public int getOutput(int idx) {
       String varName = cellInfo.getOutputVarName(cellInfo.getOutputs().get(idx));
       return state[getStateIndex(varName)];
     }
-        
+
     @Override
     public void setOutput(int idx, int value) {
       String varName = cellInfo.getOutputVarName(cellInfo.getOutputs().get(idx));
@@ -60,9 +60,9 @@ public class SimulatorCellularAutomaton implements CellularAutomaton {
     @Override
     public void setOutputParam(String name, int outputIndex, int value) {
       String varName = cellInfo.getOutputParamVarName(cellInfo.getOutputs().get(outputIndex), name);
-      state[getStateIndex(varName)] = value;      
+      state[getStateIndex(varName)] = value;
     }
-    
+
     private int getStateIndex(String varName) {
       int stateIndex = model.getLogicalUnitInfo().getStateIndex(varName);
       return index * model.getStateSize() + luIndex + stateIndex * model.getLogicalUnitCount();
@@ -83,7 +83,7 @@ public class SimulatorCellularAutomaton implements CellularAutomaton {
       return cellInfo.getOutputParamVarNames(cellInfo.getOutputs().get(outputIndex));
     }
   }
-  
+
   private final CellularAutomatonSimulationModel model;
   private final int index;
   private final CellularAutomatonSimulator simulator;
@@ -97,19 +97,24 @@ public class SimulatorCellularAutomaton implements CellularAutomaton {
 
   public SimulatorCellularAutomaton(CellularAutomatonDescriptor descriptor,
       CellularAutomatonSimulator simulator, int index) {
-    this.model = CellularAutomatonSimulationModelBuilder.build(descriptor);
+    this(CellularAutomatonSimulationModelBuilder.build(descriptor), simulator, index);
+  }
+
+  public SimulatorCellularAutomaton(CellularAutomatonSimulationModel model,
+      CellularAutomatonSimulator simulator, int index) {
+    this.model = model;
     this.simulator = simulator;
     this.index = index;
     this.state = new int[simulator.getAutomatonStateSize()];
-    
+
     // TODO(thorntonv): Handle case where width does not match for all rows.
-    int luWidth = descriptor.getLogicalUnit().getRows().get(0).getCells().size();
-    int luHeight = descriptor.getLogicalUnit().getRows().size();
-    
-    cells = new Cell[descriptor.getHeight() * luHeight][descriptor.getWidth() * luWidth];
-    for (int luRow = 0; luRow < descriptor.getHeight(); luRow++) {
-      for (int luCol = 0; luCol < descriptor.getWidth(); luCol++) {
-        int luIndex = luRow * descriptor.getHeight() + luCol;
+    int luWidth = model.getLogicalUnitInfo().getWidth();
+    int luHeight = model.getLogicalUnitInfo().getHeight();
+
+    cells = new Cell[model.getHeight() * luHeight][model.getWidth() * luWidth];
+    for (int luRow = 0; luRow < model.getHeight(); luRow++) {
+      for (int luCol = 0; luCol < model.getWidth(); luCol++) {
+        int luIndex = luRow * model.getHeight() + luCol;
         for (int row = 0; row < luHeight; row++) {
           for (int col = 0; col < luWidth; col++) {
             CellInfo cellInfo = model.getLogicalUnitInfo().getCells().get(row * luHeight + col);
@@ -124,11 +129,11 @@ public class SimulatorCellularAutomaton implements CellularAutomaton {
   public CellularAutomatonSimulator getSimulator() {
     return simulator;
   }
-  
+
   public void setState(int[] state) {
     this.state = state;
   }
-  
+
   @Override
   public int getWidth() {
     return cells[0].length;
@@ -145,7 +150,16 @@ public class SimulatorCellularAutomaton implements CellularAutomaton {
     Preconditions.checkElementIndex(column, cells[row].length);
     return cells[row][column];
   }
-  
+
+  public void refresh() {
+    simulator.getAutomatonState(index, state);
+  }
+
+  public void updateState() {
+    simulator.setAutomatonState(index, state);
+  }
+
+  @Override
   public void update() {
     simulator.setAutomatonState(index, state);
     simulator.update();

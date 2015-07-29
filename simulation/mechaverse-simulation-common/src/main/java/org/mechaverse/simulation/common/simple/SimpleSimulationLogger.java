@@ -3,12 +3,16 @@ package org.mechaverse.simulation.common.simple;
 import java.io.PrintWriter;
 import java.util.List;
 
+import org.apache.commons.math3.util.Pair;
 import org.mechaverse.simulation.common.AbstractEntity;
 import org.mechaverse.simulation.common.SimulationLogger;
+import org.mechaverse.simulation.common.genetic.selection.SelectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
+
+import gnu.trove.map.TObjectDoubleMap;
 
 /**
  * A simple {@link SimulationLogger} that logs the best and average entity fitness.
@@ -25,7 +29,8 @@ public class SimpleSimulationLogger<E extends AbstractEntity, M> implements Simu
   private final PrintWriter results;
   private final Function<E, Double> entityFitnessFunction;
   private int iterationsPerLog = 1;
-  private double overallBestFitness = 0;
+  private boolean minimize = false;
+  private Pair<E, Double> overallBestEntity;
 
   public SimpleSimulationLogger(PrintWriter results, Function<E, Double> entityFitnessFunction) {
     super();
@@ -39,34 +44,45 @@ public class SimpleSimulationLogger<E extends AbstractEntity, M> implements Simu
       return;
     }
 
-    double bestFitness = 0;
-    E bestEntity = null;
+    TObjectDoubleMap<E> entityFitnessMap =
+        SelectionUtil.buildEntityFitnessMap(entities, entityFitnessFunction);
+    entities = SelectionUtil.getEntitiesSortedByFitness(entityFitnessMap, minimize);
+
+    E bestEntity = entities.get(0);
+    double bestFitness = entityFitnessMap.get(bestEntity);
 
     double fitnessSum = 0;
-    int fitEntityCount = 0;
     for (E entity : entities) {
-      double fitness = entityFitnessFunction.apply(entity);
-
-      if (fitness > 0) {
-        if (fitness > bestFitness) {
-          bestEntity = entity;
-          bestFitness = fitness;
-        }
-        fitnessSum += fitness;
-        fitEntityCount++;
-      }
+      fitnessSum += entityFitnessFunction.apply(entity);
     }
 
     if (bestEntity != null) {
-      if(bestFitness > overallBestFitness) {
-        overallBestFitness = bestFitness;
+      if (overallBestEntity == null || (!minimize && bestFitness > overallBestEntity.getValue())
+          || (minimize && bestFitness < overallBestEntity.getValue())) {
+        overallBestEntity = new Pair<>(bestEntity, bestFitness);
       }
-      double averageFitness = fitnessSum / fitEntityCount;
-      String result = String.format("%d,%f,%f", iteration, bestFitness, averageFitness);
-      logger.info("Iteration {}: {}, best: {}", iteration, result, overallBestFitness);
 
+      double averageFitness = fitnessSum / entities.size();
+      String result = String.format("%d,%f,%f", iteration, bestFitness, averageFitness);
+      logger.info("Iteration {}: {}, best: {}", iteration, result, overallBestEntity.getValue());
+      logger.info(bestEntity.toString());
       results.println(result);
       results.flush();
     }
+  }
+
+  @Override
+  public boolean getMinimize() {
+    return minimize;
+  }
+
+  @Override
+  public void setMinimize(boolean minimize) {
+    this.minimize = minimize;
+  }
+
+  @Override
+  public Pair<E, Double> getOverallBestEntity() {
+    return overallBestEntity;
   }
 }
