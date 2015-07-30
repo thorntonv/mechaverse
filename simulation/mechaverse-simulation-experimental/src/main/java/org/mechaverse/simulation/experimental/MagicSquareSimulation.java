@@ -18,6 +18,11 @@ import org.mechaverse.simulation.common.simple.SimpleSimulationState;
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 
+/**
+ * A simulation to find magic squares.
+ *
+ * https://en.wikipedia.org/wiki/Magic_square
+ */
 public class MagicSquareSimulation {
 
   private static final int NUM_ENTITIES = 10000;
