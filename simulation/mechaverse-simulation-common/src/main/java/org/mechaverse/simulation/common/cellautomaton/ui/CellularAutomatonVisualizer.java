@@ -49,7 +49,7 @@ public class CellularAutomatonVisualizer extends JFrame {
         update();
         Thread.sleep(1000 / framesPerSecond);
       }
-    } catch (InterruptedException e) {}
+    } catch (InterruptedException ignored) {}
   }
   
   public void update() {

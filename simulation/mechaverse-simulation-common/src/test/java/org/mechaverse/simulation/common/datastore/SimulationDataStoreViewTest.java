@@ -53,7 +53,7 @@ public class SimulationDataStoreViewTest {
 
   @Test
   public void get_notVisible() throws IOException {
-    when(mockVisibleKeyPredicate.apply(getAbsoluteKey("notVisbleKey"))).thenReturn(false);
+    when(mockVisibleKeyPredicate.apply(getAbsoluteKey("notVisibleKey"))).thenReturn(false);
     assertNull(dataStoreView.get("notVisibleKey"));
   }
 

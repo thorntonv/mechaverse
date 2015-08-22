@@ -27,7 +27,7 @@ public class AntOutputDataStreamTest {
   @Test
   public void writeAndRead() throws IOException {
     AntOutputDataOutputStream out = new AntOutputDataOutputStream();
-    List<AntOutput> expectedOutputs = new ArrayList<AntOutput>();
+    List<AntOutput> expectedOutputs = new ArrayList<>();
     for (int cnt = 1; cnt <= 100; cnt++) {
       AntOutput output = AntSimulationTestUtil.randomAntOutput(random);
       out.writeAntOutput(output);

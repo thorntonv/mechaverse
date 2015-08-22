@@ -26,8 +26,8 @@ public final class AntOutputDataOutputStream extends DataOutputStream {
 
   public void writeAntOutput(AntOutput antOutput) throws IOException {
     int[] antOutputData = antOutput.getData();
-    for (int idx = 0; idx < antOutputData.length; idx++) {
-      writeShort(antOutputData[idx]);
+    for (int anAntOutputData : antOutputData) {
+      writeShort(anAntOutputData);
     }
   }
 

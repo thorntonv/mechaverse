@@ -13,13 +13,13 @@ import com.google.gwt.user.cellview.client.CellTable;
  */
 public interface WebConsoleResourceBundle extends ClientBundle {
 
-  public static final WebConsoleResourceBundle INSTANCE =
+  WebConsoleResourceBundle INSTANCE =
       GWT.create(WebConsoleResourceBundle.class);
 
   @Source("images/refresh.png")
   ImageResource refresh();
 
-  public static interface Style extends CssResource {
+  interface Style extends CssResource {
 
     String actionButton();
     String menuLink();
@@ -27,9 +27,9 @@ public interface WebConsoleResourceBundle extends ClientBundle {
     String notificationErrorText();
   }
 
-  public interface TableResources extends CellTable.Resources {
+  interface TableResources extends CellTable.Resources {
 
-    public static final TableResources INSTANCE = GWT.create(TableResources.class);
+    TableResources INSTANCE = GWT.create(TableResources.class);
 
     interface TableStyle extends CellTable.Style {}
 
@@ -39,5 +39,5 @@ public interface WebConsoleResourceBundle extends ClientBundle {
   }
 
   @Source("webconsole.css")
-  public Style css();
+  Style css();
 }

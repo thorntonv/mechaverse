@@ -44,7 +44,7 @@ public class AntReproductionModule implements AntSimulationModule {
   /**
    * Calculates the fitness of a set of ants.
    */
-  public static interface AntFitnessCalculator {
+  public interface AntFitnessCalculator {
 
     EnumeratedDistribution<Ant> getAntFitnessDistribution(
         Collection<Ant> ants, RandomGenerator random);
@@ -76,13 +76,13 @@ public class AntReproductionModule implements AntSimulationModule {
       for (Ant ant : ants) {
         if (ageSum != 0 && energySum != 0) {
           double fitness = .7 * ant.getAge() / ageSum + .3 * ant.getEnergy() / energySum;
-          pmf.add(new Pair<Ant, Double>(ant, fitness));
+          pmf.add(new Pair<>(ant, fitness));
         } else {
-          pmf.add(new Pair<Ant, Double>(ant, 1.0D / ants.size()));
+          pmf.add(new Pair<>(ant, 1.0D / ants.size()));
         }
       }
 
-      return new EnumeratedDistribution<Ant>(random, pmf);
+      return new EnumeratedDistribution<>(random, pmf);
     }
   }
 

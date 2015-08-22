@@ -30,7 +30,7 @@ public final class CompositeOpenClCellularAutomatonSimulatorFactory {
     this.descriptorDataSource = descriptorDataSource;
   }
 
-  public CompositeCellularAutomatonSimulator getObject() throws Exception {
+  public CompositeCellularAutomatonSimulator getObject() {
     List<CellularAutomatonSimulator> componentSimulators = new ArrayList<>();
     for (int groupIdx = 0; groupIdx < numAutomatonGroups; groupIdx++) {
       componentSimulators.add(new OpenClCellularAutomatonSimulator(

@@ -130,7 +130,7 @@ public final class CompositeCellularAutomatonSimulator implements CellularAutoma
     }
     if (exceptions.size() > 0) {
       throw new CompositeCellularAutomatonSimulatorCloseException(
-          "An error occured while closing a composite cellular automaton simulator: "
+          "An error occurred while closing a composite cellular automaton simulator: "
               + exceptions.get(0).getMessage(), exceptions);
     }
   }

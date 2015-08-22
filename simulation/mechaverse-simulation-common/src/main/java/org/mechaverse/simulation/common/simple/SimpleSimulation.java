@@ -116,7 +116,7 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
     }
   }
 
-  public void step() throws Exception {
+  public void step() {
     while (simulator.getAllocator().getAvailableCount() > 0) {
       generateRandomEntity();
     }
@@ -142,7 +142,7 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
     List<Pair<E, E>> selectedPairs =
         selectionStrategy.selectEntities(entityFitnessMap, entities.size(), random);
 
-    List<E> previousGeneration = new ArrayList<E>(entities);
+    List<E> previousGeneration = new ArrayList<>(entities);
     for(E entity : entities) {
       simulator.getAllocator().deallocate(entityIndexMap.get(entity));
     }

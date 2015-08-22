@@ -78,7 +78,7 @@ public abstract class CellularAutomatonCLI {
   protected abstract CellularAutomatonVisualizer createVisualizer(int width, int height,
       int framesPerSecond) throws IOException;
   
-  private static final Options buildOptions() {
+  private static Options buildOptions() {
     Options options = new Options();
     options.addOption(new Option("v", "visualize", false, "Cellular automaton visualization"));
     options.addOption(new Option("a", "analyze", false, "Analyze cellular automaton"));

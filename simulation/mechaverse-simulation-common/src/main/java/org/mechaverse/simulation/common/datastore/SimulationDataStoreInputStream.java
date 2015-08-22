@@ -33,10 +33,10 @@ public class SimulationDataStoreInputStream extends DataInputStream {
         } finally {
           try {
             dataStoreOut.close();
-          } catch (IOException e) {}
+          } catch (IOException ignored) {}
           try {
             out.close();
-          } catch (IOException e) {}
+          } catch (IOException ignored) {}
         }
       }
     }).start();

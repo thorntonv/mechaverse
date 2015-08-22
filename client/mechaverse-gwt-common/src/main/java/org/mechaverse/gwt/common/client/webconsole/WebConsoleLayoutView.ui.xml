@@ -7,7 +7,7 @@
     vertical-align: middle;
     margin-left: 10px;
     color: #606060;
-    font-family: seif;
+    font-family: serif;
   }
   .pageNameLabel {
     color: #DD4B39;

@@ -7,11 +7,11 @@ package org.mechaverse.simulation.common.cellautomaton.simulation.generator.java
  */
 public interface JavaCellularAutomatonSimulation {
 
-  public int getStateSize();
-  public void getState(int state[]);
-  public void setState(int state[]);
-  public void setInput(int input[]);
-  public void setOutputMap(int outputMap[]);
-  public void getOutput(int output[]);
-  public void update();
+  int getStateSize();
+  void getState(int state[]);
+  void setState(int state[]);
+  void setInput(int input[]);
+  void setOutputMap(int outputMap[]);
+  void getOutput(int output[]);
+  void update();
 }

@@ -186,7 +186,7 @@ public class MechaverseClient {
   private void sleep() {
     try {
       Thread.sleep(60 * 1000);
-    } catch (InterruptedException e1) {}
+    } catch (InterruptedException ignored) {}
   }
 
   private void printErrorMessage(Throwable ex) {

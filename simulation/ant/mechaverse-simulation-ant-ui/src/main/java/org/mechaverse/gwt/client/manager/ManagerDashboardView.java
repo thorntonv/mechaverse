@@ -36,7 +36,7 @@ import com.google.gwt.view.client.ListDataProvider;
  */
 public class ManagerDashboardView extends Composite {
 
-  public static interface Observer {
+  public interface Observer {
 
     void onCreateSimulation();
     void onRefresh();
@@ -100,7 +100,7 @@ public class ManagerDashboardView extends Composite {
       };
 
   @UiField(provided = true) CellTable<SimulationInfo> simulationInfoTable =
-      new CellTable<SimulationInfo>(DEFAULT_PAGE_SIZE, TableResources.INSTANCE);
+      new CellTable<>(DEFAULT_PAGE_SIZE, TableResources.INSTANCE);
 
   private final ListDataProvider<SimulationInfo> dataProvider = new ListDataProvider<>();
   private final Button createSimulationButton = new ActionButton("CREATE SIMULATION");

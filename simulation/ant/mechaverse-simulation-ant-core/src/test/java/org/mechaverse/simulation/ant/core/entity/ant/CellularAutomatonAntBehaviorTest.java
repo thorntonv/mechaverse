@@ -199,7 +199,7 @@ public class CellularAutomatonAntBehaviorTest {
     otherEntity.setId("100");
     createGeneticDataStore(state.getEntityGeneticDataStore(otherEntity));
 
-    Set<String> expectedKeySet = new HashSet<String>(state.keySet());
+    Set<String> expectedKeySet = new HashSet<>(state.keySet());
 
     GeneticDataStore geneticData = state.getEntityGeneticDataStore(ant);
     createGeneticDataStore(geneticData);

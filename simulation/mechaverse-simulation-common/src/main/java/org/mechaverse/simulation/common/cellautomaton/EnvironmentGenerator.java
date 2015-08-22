@@ -21,7 +21,7 @@ public interface EnvironmentGenerator<E, T> {
    *
    * @param <T> the entity type
    */
-  public static interface LocalGenerator<T> {
+  interface LocalGenerator<T> {
 
     int getWidth();
     int getHeight();

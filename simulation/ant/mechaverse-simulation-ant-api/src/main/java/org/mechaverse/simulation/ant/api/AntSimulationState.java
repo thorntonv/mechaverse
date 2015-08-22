@@ -51,7 +51,7 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
     if(key.equals(MODEL_KEY)) {
       try {
         put(MODEL_KEY, SimulationModelUtil.serialize(model));
-      } catch (IOException e) {}
+      } catch (IOException ignored) {}
     }
     return super.get(key);
   }

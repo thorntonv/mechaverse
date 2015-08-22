@@ -11,11 +11,11 @@ public interface CellularAutomatonDescriptorDataSource {
   /**
    * Returns the cellular automaton descriptor provided by this data source.
    */
-  public CellularAutomatonDescriptor getDescriptor();
+  CellularAutomatonDescriptor getDescriptor();
 
   /**
    * Returns the {@link CellularAutomatonSimulationModel} for the cellular automaton provided by
    * this data source.
    */
-  public CellularAutomatonSimulationModel getSimulationModel();
+  CellularAutomatonSimulationModel getSimulationModel();
 }

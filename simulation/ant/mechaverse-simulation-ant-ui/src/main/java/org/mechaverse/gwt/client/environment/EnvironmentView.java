@@ -31,7 +31,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
  */
 public class EnvironmentView extends SimplePanel {
 
-  public static interface Observer {
+  public interface Observer {
 
     void onCellClick(int row, int column);
     void onCellAltClick(int row, int column);

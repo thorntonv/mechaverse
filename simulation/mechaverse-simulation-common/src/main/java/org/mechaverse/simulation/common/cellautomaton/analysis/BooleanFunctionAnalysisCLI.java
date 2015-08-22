@@ -32,11 +32,6 @@ public class BooleanFunctionAnalysisCLI {
     for (int c = 0; c < pow2numParams; c++) {
       int value = (c + offset) % pow2numParams;
       for (int x = 0; x < pow2numVariables; x++) {
-        String formatString = String.format("%%%ds%%%ds", numVariables, pow2numVariables);
-        String row = String.format(formatString, 
-            Integer.toBinaryString(x), Integer.toBinaryString(c));
-        row = row.replace(' ', '0');
-
         int rowIndex = (x << pow2numVariables) | c;
         table[rowIndex] = value & 0b1;
         value >>= 1;

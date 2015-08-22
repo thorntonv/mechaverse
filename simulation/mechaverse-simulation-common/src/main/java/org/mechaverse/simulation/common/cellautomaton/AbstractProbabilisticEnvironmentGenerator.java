@@ -50,7 +50,7 @@ public abstract class AbstractProbabilisticEnvironmentGenerator<E, T>
 
     public static <T> EntityDistribution<T> of(
           T entity, double probability, RandomGenerator random) {
-      return new EntityDistribution<T>(ImmutableList.of(new Pair<>(entity, probability)), random);
+      return new EntityDistribution<>(ImmutableList.of(new Pair<>(entity, probability)), random);
     }
   }
 
@@ -131,7 +131,7 @@ public abstract class AbstractProbabilisticEnvironmentGenerator<E, T>
   @Override
   public List<T> apply(LocalGenerator<T> localGenerator,
       E env, int originRow, int originCol, RandomGenerator random) {
-    List<T> generatedEntities = new ArrayList<T>();
+    List<T> generatedEntities = new ArrayList<>();
     int rowOffset = originRow - localGenerator.getHeight() / 2;
     int colOffset = originCol - localGenerator.getWidth() / 2;
 

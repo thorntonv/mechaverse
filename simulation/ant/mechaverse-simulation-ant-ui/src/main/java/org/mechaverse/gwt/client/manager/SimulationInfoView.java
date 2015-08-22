@@ -35,7 +35,7 @@ import com.google.gwt.view.client.ListDataProvider;
  */
 public class SimulationInfoView extends Composite {
 
-  public static interface Observer {
+  public interface Observer {
 
     void updateConfig(SimulationConfig config);
     void onSelectInstance(InstanceInfo instance);
@@ -43,7 +43,8 @@ public class SimulationInfoView extends Composite {
   }
 
 
-  interface MyUiBinder extends UiBinder<Widget, SimulationInfoView> {};
+  interface MyUiBinder extends UiBinder<Widget, SimulationInfoView> {}
+
 
   private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
@@ -83,8 +84,7 @@ public class SimulationInfoView extends Composite {
   @UiField Label simulationIdLabel;
 
   @UiField(provided = true)
-  CellTable<InstanceInfo> instanceTable = new CellTable<InstanceInfo>(DEFAULT_PAGE_SIZE,
-      TableResources.INSTANCE);
+  CellTable<InstanceInfo> instanceTable = new CellTable<>(DEFAULT_PAGE_SIZE, TableResources.INSTANCE);
 
   @UiField(provided = true)
   EditSimulationConfigView editConfigView = new EditSimulationConfigView();

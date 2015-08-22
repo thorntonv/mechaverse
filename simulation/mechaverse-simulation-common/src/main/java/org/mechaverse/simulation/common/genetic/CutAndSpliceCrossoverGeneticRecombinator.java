@@ -86,7 +86,7 @@ public class CutAndSpliceCrossoverGeneticRecombinator implements GeneticRecombin
 
     GeneticData.Builder child = GeneticData.newBuilder();
 
-    TIntObjectHashMap<GeneticData> groupParentMap = new TIntObjectHashMap<GeneticData>();
+    TIntObjectHashMap<GeneticData> groupParentMap = new TIntObjectHashMap<>();
     for (int idx = 0; idx < parent1Data.length; idx++) {
       int parent1Group = parent1Groups[idx];
       int parent2Group = parent2Groups[idx];
@@ -126,7 +126,7 @@ public class CutAndSpliceCrossoverGeneticRecombinator implements GeneticRecombin
         if (!splitPointReached) {
           idx++;
         }
-      };
+      }
 
       if (idx < selectedParentData.length) {
         child.markSplitPoint();

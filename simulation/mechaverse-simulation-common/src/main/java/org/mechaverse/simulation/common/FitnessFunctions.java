@@ -6,8 +6,6 @@ import com.google.common.base.Function;
  * Fitness function utility methods.
  *  
  * @author Vance Thornton (thorntonv@mechaverse.org)
- *
- * @param <E> the entity type
  */
 public final class FitnessFunctions {
 

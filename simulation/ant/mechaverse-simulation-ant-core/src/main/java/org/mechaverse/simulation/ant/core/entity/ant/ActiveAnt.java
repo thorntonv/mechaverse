@@ -31,7 +31,7 @@ public final class ActiveAnt implements ActiveEntity {
   /**
    * Determines the action an ant should take based on the input.
    */
-  public static interface AntBehavior {
+  public interface AntBehavior {
 
     void setEntity(Ant entity);
 
@@ -172,7 +172,7 @@ public final class ActiveAnt implements ActiveEntity {
     try {
       outputReplayDataOutputStream.writeAntOutput(output);
       logger.trace("Recorded output {} for ant {}", Arrays.toString(output.getData()), entity.getId());
-    } catch (IOException e) {}
+    } catch (IOException ignored) {}
 
     Cell cell = env.getCell(entity);
     Cell frontCell = env.getCellInDirection(cell, entity.getDirection());

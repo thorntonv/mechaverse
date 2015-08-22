@@ -39,12 +39,7 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
   private DB mongoDatabase;
 
   /**
-   * Returns an instance of a MongoDB database.
-   *
-   * @param mongoHost hostname or IP address of the MongoDB server
-   * @param mongoPort port of the MongoDB server
-   * @param mongoDatabaseName database name on the MongoDB server
-   * @return MongoDB database
+   * Sets the instance of the MongoDB database.
    */
   private void ensureDatabaseSetup() throws IOException {
     // TODO(dhendrickson): look into thread safety issues of MongoDB driver

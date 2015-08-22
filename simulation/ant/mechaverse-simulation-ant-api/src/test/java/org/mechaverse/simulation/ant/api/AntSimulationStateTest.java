@@ -87,7 +87,7 @@ public class AntSimulationStateTest {
   }
 
   private Set<String> keySetWithEntityKeys(String... entityKeys) {
-    HashSet<String> keySet = new HashSet<String>(Arrays.asList(entityKeys));
+    HashSet<String> keySet = new HashSet<>(Arrays.asList(entityKeys));
     keySet.add(AntSimulationState.MODEL_KEY);
     return keySet;
   }

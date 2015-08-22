@@ -16,7 +16,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class CellEnvironmentTest {
 
-  // TODO(vthornton): Implement additional tests.
+  // TODO(thorntonv): Implement additional tests.
 
   @Mock Environment mockEnvironmentModel;
 

@@ -38,7 +38,7 @@ public class CellularAutomatonAnalysisCLI {
     private int sampleSize;
     private int maxIterationCount;
     private CellularAutomatonDescriptor descriptor;
-    private PrintStream out;
+    private final PrintStream out;
 
     public AnalysisTask(int sampleSize, int maxIterationCount,
         CellularAutomatonDescriptor descriptor, PrintStream out) {
@@ -138,7 +138,7 @@ public class CellularAutomatonAnalysisCLI {
     }
   }
 
-  private static final Options buildOptions() {
+  private static Options buildOptions() {
     Options options = new Options();
 
     Option inputOption =

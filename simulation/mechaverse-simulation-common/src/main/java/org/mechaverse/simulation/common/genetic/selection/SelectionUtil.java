@@ -55,7 +55,7 @@ public class SelectionUtil {
 
   public static <E> List<E> getEntitiesSortedByFitness(
       final TObjectDoubleMap<E> entityFitnessMap, boolean minimize) {
-    List<E> entities = new ArrayList<E>(entityFitnessMap.keySet());
+    List<E> entities = new ArrayList<>(entityFitnessMap.keySet());
     Collections.sort(entities, newEntityComparator(entityFitnessMap, minimize));
     return entities;
   }

@@ -90,7 +90,7 @@ public class SimulationEditorPresenter {
     Preconditions.checkNotNull(state);
 
     final Environment newEnvironment = new Environment();
-    newEnvironment.setId(UUID.uuid().toString().toLowerCase());
+    newEnvironment.setId(UUID.uuid().toLowerCase());
     newEnvironment.setWidth(25);
     newEnvironment.setHeight(25);
     state.getSubEnvironments().add(newEnvironment);

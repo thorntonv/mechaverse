@@ -23,7 +23,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class SimulationEditorView extends ResizeComposite {
 
-  public static interface Observer {
+  public interface Observer {
 
     void onNew();
     void onSave();

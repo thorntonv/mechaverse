@@ -16,6 +16,6 @@ public class NoSelectionStrategy<E> extends AbstractSelectionStrategy<E> {
   @Override
   public List<Pair<E, E>> selectEntities(TObjectDoubleMap<E> entityFitnessMap, int count,
       RandomGenerator random) {
-    return new ArrayList<Pair<E, E>>();
+    return new ArrayList<>();
   }
 }

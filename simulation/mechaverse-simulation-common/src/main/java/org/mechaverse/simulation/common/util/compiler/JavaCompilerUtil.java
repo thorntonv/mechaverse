@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.security.SecureClassLoader;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.tools.Diagnostic;
@@ -137,9 +137,9 @@ public final class JavaCompilerUtil {
     JavaFileObject file = new JavaSourceFromString(implClass, sourceStr);
 
     JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-    DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
+    DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
 
-    Iterable<? extends JavaFileObject> compilationUnits = Arrays.asList(file);
+    Iterable<? extends JavaFileObject> compilationUnits = Collections.singletonList(file);
 
     JavaFileManager fileManager =
         new ClassFileManager(compiler.getStandardFileManager(null, null, null));

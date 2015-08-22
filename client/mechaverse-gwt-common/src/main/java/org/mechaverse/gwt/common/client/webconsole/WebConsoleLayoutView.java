@@ -18,7 +18,8 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class WebConsoleLayoutView extends ResizeComposite implements AcceptsOneWidget {
 
-  interface MyUiBinder extends UiBinder<Widget, WebConsoleLayoutView> {};
+  interface MyUiBinder extends UiBinder<Widget, WebConsoleLayoutView> {}
+
 
   private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 

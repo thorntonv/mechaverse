@@ -153,10 +153,6 @@ public class MongoDBSimulationDataStore extends AbstractSimulationDataStore {
    * Instantiates a store object tied to the given database and store parameters. An exception will
    * be thrown if the store object does not exist in the database.
    *
-   * @param mongoDatabase
-   * @param simulationId
-   * @param instanceId
-   * @param iteration
    * @throws IOException
    */
   public MongoDBSimulationDataStore(DB mongoDatabase, String simulationId, String instanceId,
@@ -259,7 +255,7 @@ public class MongoDBSimulationDataStore extends AbstractSimulationDataStore {
     DBObject filter = new BasicDBObject();
     filter.put(keyKey, 1);
 
-    Set<String> keySet = new HashSet<String>();
+    Set<String> keySet = new HashSet<>();
     DBCursor cursor = mongoDatabase.getCollection(mongoCollectionName).find(query, filter);
     while (cursor.hasNext()) {
       DBObject entry = cursor.next();

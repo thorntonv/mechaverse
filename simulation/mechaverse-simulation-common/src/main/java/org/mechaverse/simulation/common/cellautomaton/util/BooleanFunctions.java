@@ -12,7 +12,7 @@ import com.google.common.math.IntMath;
  */
 public final class BooleanFunctions {
 
-  public static interface ParameterizedBooleanFunction {
+  public interface ParameterizedBooleanFunction {
 
     int getValue(int[] input, int[] params);
   }
@@ -21,7 +21,7 @@ public final class BooleanFunctions {
    * X1  X2 X3 A + X1  X2 X3' B + X1  X2' X3 C + X1  X2' X3' D + 
    * X1' X2 X3 E + X1' X2 X3' F + X1' X2' X3 G + X1' X2' X3' H
    */
-  public static final ParameterizedBooleanFunction BOOLEAN_FUCNTION_3INPUT =
+  public static final ParameterizedBooleanFunction BOOLEAN_FUNCTION_3INPUT =
       new ParameterizedBooleanFunction() {
         @Override
         public int getValue(int[] input, int[] params) {
@@ -43,7 +43,7 @@ public final class BooleanFunctions {
         }
       };
 
-  public static final ParameterizedBooleanFunction BOOLEAN_FUCNTION_4INPUT =
+  public static final ParameterizedBooleanFunction BOOLEAN_FUNCTION_4INPUT =
       new ParameterizedBooleanFunction() {
         @Override
         public int getValue(int[] input, int[] params) {
@@ -126,9 +126,9 @@ public final class BooleanFunctions {
    */
   public static int getIntFromBitIntArray(int[] value) {
     int result = 0;
-    for (int idx = 0; idx < value.length; idx++) {
+    for (int aValue : value) {
       result <<= 1;
-      result |= (value[idx] & 0b1);
+      result |= (aValue & 0b1);
     }
     return result;
   }

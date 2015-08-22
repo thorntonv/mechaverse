@@ -120,7 +120,7 @@ public class MagicSquareSimulation {
 
   public static void main(String[] args) throws Exception {
     SimulationConfig.Builder<MagicSquareEntity, SimpleSimulationModel> configBuilder =
-        new SimulationConfig.Builder<MagicSquareEntity, SimpleSimulationModel>();
+        new SimulationConfig.Builder<>();
     SelectionStrategy<MagicSquareEntity> selectionStrategy =
         new ElitistSelectionStrategy<>(RETAIN_TOP_ENTITY_COUNT, REMOVE_BOTTOM_ENTITY_COUNT,
             new TournamentSelectionStrategy<MagicSquareEntity>());

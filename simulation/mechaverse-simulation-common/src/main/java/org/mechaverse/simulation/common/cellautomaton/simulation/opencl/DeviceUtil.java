@@ -15,7 +15,7 @@ public final class DeviceUtil {
   /**
    * Returns a string containing device information.
    */
-  public static final String getDeviceInfo() {
+  public static String getDeviceInfo() {
     StringBuilder out = new StringBuilder();
 
     for (CLPlatform platform : CLPlatform.listCLPlatforms()) {

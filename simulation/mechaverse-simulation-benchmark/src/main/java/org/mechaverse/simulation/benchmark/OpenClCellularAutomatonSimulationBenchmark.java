@@ -76,7 +76,7 @@ public class OpenClCellularAutomatonSimulationBenchmark extends Benchmark {
     simulator.close();
   }
 
-  public int timeUpdate(int reps) throws Exception {
+  public int timeUpdate(int reps) {
     int dummy = 0;
     for (int i = 0; i < reps; i++) {
       for (int idx = 0; idx < numAutomata; idx++) {

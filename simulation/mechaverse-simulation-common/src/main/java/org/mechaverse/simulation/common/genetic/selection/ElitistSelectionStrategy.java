@@ -29,12 +29,12 @@ public class ElitistSelectionStrategy<E> implements SelectionStrategy<E> {
     }
 
     int retainCount = Math.min(retainTopEntityCount, count);
-    List<E> eliteEntites = SelectionUtil.filterAndSelectEliteEntities(
+    List<E> eliteEntities = SelectionUtil.filterAndSelectEliteEntities(
       retainCount, removeBottomEntityCount, entityFitnessMap, getMinimize());
 
     List<Pair<E, E>> selectedPairs = new ArrayList<>();
 
-    for (E entity : eliteEntites) {
+    for (E entity : eliteEntities) {
       selectedPairs.add(new Pair<E, E>(entity, null));
     }
 

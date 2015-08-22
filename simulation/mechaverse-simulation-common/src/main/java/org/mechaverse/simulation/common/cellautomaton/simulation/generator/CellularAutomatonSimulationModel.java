@@ -5,12 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.mechaverse.cellautomaton.model.Cell;
-import org.mechaverse.cellautomaton.model.CellType;
-import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
-import org.mechaverse.cellautomaton.model.Output;
-import org.mechaverse.cellautomaton.model.Param;
-import org.mechaverse.cellautomaton.model.Var;
+import org.mechaverse.cellautomaton.model.*;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.ExternalCell.ExternalCellType;
 
 import com.google.common.collect.ImmutableBiMap;
@@ -231,7 +226,7 @@ public class CellularAutomatonSimulationModel {
   }
 
   /**
-   * Information about a {@link LogicalUnit).
+   * Information about a {@link LogicalUnit}.
    */
   public static class LogicalUnitInfo {
 

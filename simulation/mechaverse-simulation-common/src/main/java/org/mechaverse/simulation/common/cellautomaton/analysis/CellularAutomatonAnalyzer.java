@@ -68,7 +68,7 @@ public class CellularAutomatonAnalyzer {
     int hashCode = Arrays.hashCode(state);
     ArrayList<CellularAutomatonStateRecord> previousStatesWithHash = previousStatesMap.get(hashCode);
     if (previousStatesWithHash == null) {
-      previousStatesWithHash = new ArrayList<CellularAutomatonStateRecord>();
+      previousStatesWithHash = new ArrayList<>();
       previousStatesMap.put(hashCode, previousStatesWithHash);
     }
 
@@ -132,8 +132,8 @@ public class CellularAutomatonAnalyzer {
 
   public static BigInteger getSetBitCount(int[] array) {
     BigInteger setBitCount = BigInteger.ZERO;
-    for (int idx = 0; idx < array.length; idx++) {
-      setBitCount = setBitCount.add(BigInteger.valueOf(getSetBitCount(array[idx])));
+    for (int value : array) {
+      setBitCount = setBitCount.add(BigInteger.valueOf(getSetBitCount(value)));
     }
     return setBitCount;
   }

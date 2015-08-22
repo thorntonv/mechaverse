@@ -202,7 +202,7 @@ public class SimulatorCellularAutomaton implements CellularAutomaton {
     StringBuilder builder = new StringBuilder();
     for (int row = 0; row < cells.length; row++) {
       for (int col = 0; col < cells[row].length; col++) {
-        builder.append(cells[row][col].getOutput(0) + "\t");
+        builder.append(cells[row][col].getOutput(0)).append("\t");
       }
       builder.append("\n");
     }

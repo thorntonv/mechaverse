@@ -114,13 +114,8 @@ public class GeneticData {
     if (!Arrays.equals(crossoverGroups, other.crossoverGroups)) {
       return false;
     }
-    if (!Arrays.equals(crossoverSplitPoints, other.crossoverSplitPoints)) {
-      return false;
-    }
-    if (!Arrays.equals(data, other.data)) {
-      return false;
-    }
-    return true;
+    return Arrays.equals(crossoverSplitPoints, other.crossoverSplitPoints)
+        && Arrays.equals(data, other.data);
   }
 
   @Override

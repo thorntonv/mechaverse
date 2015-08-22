@@ -18,9 +18,9 @@
 
   <!-- An element for routing data from one part of the circuit to another. -->
   <CellType id="interplaneRouting">
-    <output id="1">
+    <Output id="1">
       <UpdateExpression><![CDATA[({input1} << 1)]]></UpdateExpression>
-    </output>
+    </Output>
   </CellType>
 
   <!-- An element for routing data from one part of the circuit to another. -->

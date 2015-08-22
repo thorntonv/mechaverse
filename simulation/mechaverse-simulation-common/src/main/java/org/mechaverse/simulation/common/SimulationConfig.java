@@ -90,9 +90,7 @@ public class SimulationConfig<E extends AbstractEntity, M> {
       }
       simulationLogger.setMinimize(minimize);
       selectionStrategy.setMinimize(minimize);
-      return new SimulationConfig<E, M>(entitySupplier, entityFitnessFunction,
-          cellularAutomatonModel,simulator, selectionStrategy, geneticRecombinator,
-              simulationLogger, updatesPerIteration);
+      return new SimulationConfig<>(entitySupplier, entityFitnessFunction, cellularAutomatonModel, simulator, selectionStrategy, geneticRecombinator, simulationLogger, updatesPerIteration);
     }
   }
 

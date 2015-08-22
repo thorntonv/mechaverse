@@ -9,7 +9,7 @@ import java.util.Set;
  */
 public class CellularAutomatonAllocator {
 
-  private final Set<Integer> availableInstances = new HashSet<Integer>();
+  private final Set<Integer> availableInstances = new HashSet<>();
 
   public CellularAutomatonAllocator(int numInstances) {
     for (int idx = 0; idx < numInstances; idx++) {

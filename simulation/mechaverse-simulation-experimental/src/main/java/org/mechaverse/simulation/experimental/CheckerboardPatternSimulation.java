@@ -38,11 +38,11 @@ public class CheckerboardPatternSimulation {
     }
   }
 
-  public static class CheckerboardPatternFitnessFuction
+  public static class CheckerboardPatternFitnessFunction
       implements Function<CheckerboardPatternEntity, Double> {
 
-    public static final CheckerboardPatternFitnessFuction INSTANCE =
-        new CheckerboardPatternFitnessFuction();
+    public static final CheckerboardPatternFitnessFunction INSTANCE =
+        new CheckerboardPatternFitnessFunction();
 
     @Override
     public Double apply(CheckerboardPatternEntity entity) {
@@ -69,14 +69,14 @@ public class CheckerboardPatternSimulation {
 
   public static void main(String[] args) throws Exception {
     SimulationConfig.Builder<CheckerboardPatternEntity, SimpleSimulationModel> configBuilder =
-        new SimulationConfig.Builder<CheckerboardPatternEntity, SimpleSimulationModel>();
+        new SimulationConfig.Builder<>();
     SelectionStrategy<CheckerboardPatternEntity> selectionStrategy = new ElitistSelectionStrategy<>(
         RETAIN_TOP_ENTITY_COUNT, REMOVE_BOTTOM_ENTITY_COUNT,
             new TournamentSelectionStrategy<CheckerboardPatternEntity>());
 
     Simulation simulation = new Simulation(configBuilder
         .setEntitySupplier(new CheckerboardPatternEntitySupplier())
-        .setEntityFitnessFunction(CheckerboardPatternFitnessFuction.INSTANCE)
+        .setEntityFitnessFunction(CheckerboardPatternFitnessFunction.INSTANCE)
         .setUpdatesPerIteration(0)
         .setOpenCLSimulator(new CellularAutomatonSimulatorConfig.Builder()
             .setNumAutomata(NUM_ENTITIES)

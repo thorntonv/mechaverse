@@ -13,7 +13,8 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class NotificationBar extends Composite {
 
-  interface MyUiBinder extends UiBinder<Widget, NotificationBar> {};
+  interface MyUiBinder extends UiBinder<Widget, NotificationBar> {}
+
 
   private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 

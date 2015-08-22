@@ -37,7 +37,7 @@ public class MemorySimulationDataStore extends AbstractSimulationDataStore {
   }
 
   /**
-   * Deserializes a {@link MemorySimulationDataStore} from the data in the given byte array.
+   * Deserialize a {@link MemorySimulationDataStore} from the data in the given byte array.
    */
   public static SimulationDataStore fromByteArray(byte[] data) throws IOException {
     ByteArrayInputStream byteIn = new ByteArrayInputStream(data);

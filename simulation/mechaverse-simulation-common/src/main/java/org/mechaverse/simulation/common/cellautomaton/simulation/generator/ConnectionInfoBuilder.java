@@ -9,5 +9,5 @@ import org.mechaverse.simulation.common.cellautomaton.simulation.generator.Cellu
  */
 public interface ConnectionInfoBuilder {
 
-  public ConnectionInfo build();
+  ConnectionInfo build();
 }

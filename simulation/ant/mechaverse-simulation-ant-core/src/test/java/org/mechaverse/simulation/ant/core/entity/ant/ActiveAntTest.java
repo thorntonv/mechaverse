@@ -648,7 +648,7 @@ public class ActiveAntTest {
   @Test
   public void outputReplayData() throws IOException {
     AntOutputDataOutputStream out = new AntOutputDataOutputStream();
-    List<AntOutput> expectedOutputs = new ArrayList<AntOutput>();
+    List<AntOutput> expectedOutputs = new ArrayList<>();
     for (int cnt = 1; cnt <= 100; cnt++) {
       AntOutput antOutput = AntSimulationTestUtil.randomAntOutput(random);
       out.writeAntOutput(antOutput);

@@ -8,7 +8,7 @@ import org.mechaverse.simulation.ant.api.model.Entity;
  */
 public interface EntityManager {
 
-  public static interface Observer {
+  interface Observer {
 
     void onAddEntity(Entity entity, AntSimulationState state);
     void onRemoveEntity(Entity entity, AntSimulationState state);

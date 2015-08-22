@@ -7,15 +7,15 @@ package org.mechaverse.simulation.common.cellautomaton.simulation;
  */
 public interface CellularAutomatonSimulator extends AutoCloseable {
 
-  public CellularAutomatonAllocator getAllocator();
-  public int size();
-  public int getAutomatonInputSize();
-  public int getAutomatonStateSize();
-  public int getAutomatonOutputSize();
+  CellularAutomatonAllocator getAllocator();
+  int size();
+  int getAutomatonInputSize();
+  int getAutomatonStateSize();
+  int getAutomatonOutputSize();
   
-  public void getAutomatonState(int index, int[] state);
-  public void setAutomatonState(int index, int[] state);
-  public void setAutomatonInput(int index, int[] input);
+  void getAutomatonState(int index, int[] state);
+  void setAutomatonState(int index, int[] state);
+  void setAutomatonInput(int index, int[] input);
 
   /**
    * Sets the output map.
@@ -24,7 +24,7 @@ public interface CellularAutomatonSimulator extends AutoCloseable {
    * @param outputMap An array where the value at each index i is the index of the state value that
    *        should be output to output index i.
    */
-  public void setAutomatonOutputMap(int index, int[] outputMap);
-  public void getAutomatonOutput(int index, int[] output);
-  public void update();
+  void setAutomatonOutputMap(int index, int[] outputMap);
+  void getAutomatonOutput(int index, int[] output);
+  void update();
 }

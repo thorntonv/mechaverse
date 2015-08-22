@@ -34,7 +34,7 @@ public class TournamentSelectionStrategy<E> extends AbstractSelectionStrategy<E>
     Preconditions.checkNotNull(entityFitnessMap);
     Preconditions.checkNotNull(random);
 
-    List<E> entities = new ArrayList<E>(entityFitnessMap.keySet());
+    List<E> entities = new ArrayList<>(entityFitnessMap.keySet());
 
     List<Pair<E, E>> selectedPairs = new ArrayList<>();
     while (selectedPairs.size() < entityCount) {

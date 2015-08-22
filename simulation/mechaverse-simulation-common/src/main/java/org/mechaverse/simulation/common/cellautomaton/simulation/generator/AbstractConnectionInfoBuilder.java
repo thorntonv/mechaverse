@@ -30,8 +30,7 @@ public abstract class AbstractConnectionInfoBuilder implements ConnectionInfoBui
       Cell cell, int outputIdx, List<ExternalCell> externalCells) {
     ExternalCell externalCell =
         createExternalCell(relativeUnitRow, relativeUnitCol, cell, outputIdx, externalCells);
-    Input input = new Input(externalCell, ExternalCellType.INSTANCE.getOutput());
-    return input;
+    return new Input(externalCell, ExternalCellType.INSTANCE.getOutput());
   }
 
   protected ExternalCell createExternalCell(int relativeUnitRow, int relativeUnitCol,

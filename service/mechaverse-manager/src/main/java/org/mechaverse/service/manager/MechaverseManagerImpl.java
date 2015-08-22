@@ -148,9 +148,8 @@ public class MechaverseManagerImpl implements MechaverseManager {
 
     Criteria criteria = session.createCriteria(SimulationInfo.class);
     criteria.add(Restrictions.eq("simulationId", simulationId));
-    SimulationInfo simulationInfo = (SimulationInfo) criteria.uniqueResult();
 
-    return simulationInfo;
+    return (SimulationInfo) criteria.uniqueResult();
   }
 
   @Override

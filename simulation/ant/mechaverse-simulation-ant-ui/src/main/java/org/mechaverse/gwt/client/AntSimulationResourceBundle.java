@@ -18,43 +18,43 @@ import com.google.gwt.resources.client.ImageResource;
  */
 public interface AntSimulationResourceBundle extends ClientBundle {
 
-  public static final AntSimulationResourceBundle INSTANCE =
+  AntSimulationResourceBundle INSTANCE =
       GWT.create(AntSimulationResourceBundle.class);
 
-  public static final ImageElement BARRIER_IMAGE_ELEMENT =
+  ImageElement BARRIER_IMAGE_ELEMENT =
       ImageUtil.asImageElement(INSTANCE.barrier());
-  public static final ImageElement BLACK_ANT_EAST_IMAGE_ELEMENT =
+  ImageElement BLACK_ANT_EAST_IMAGE_ELEMENT =
       ImageUtil.asImageElement(INSTANCE.blackAntEast());
-  public static final ImageElement BLACK_ANT_NORTH_EAST_IMAGE_ELEMENT =
+  ImageElement BLACK_ANT_NORTH_EAST_IMAGE_ELEMENT =
       ImageUtil.asImageElement(INSTANCE.blackAntNorthEast());
-  public static final ImageElement BLACK_ANT_NORTH_IMAGE_ELEMENT =
+  ImageElement BLACK_ANT_NORTH_IMAGE_ELEMENT =
       ImageUtil.asImageElement(INSTANCE.blackAntNorth());
-  public static final ImageElement BLACK_ANT_NORTH_WEST_IMAGE_ELEMENT =
+  ImageElement BLACK_ANT_NORTH_WEST_IMAGE_ELEMENT =
       ImageUtil.asImageElement(INSTANCE.blackAntNorthWest());
-  public static final ImageElement BLACK_ANT_WEST_IMAGE_ELEMENT =
+  ImageElement BLACK_ANT_WEST_IMAGE_ELEMENT =
       ImageUtil.asImageElement(INSTANCE.blackAntWest());
-  public static final ImageElement BLACK_ANT_SOUTH_WEST_IMAGE_ELEMENT =
+  ImageElement BLACK_ANT_SOUTH_WEST_IMAGE_ELEMENT =
       ImageUtil.asImageElement(INSTANCE.blackAntSouthWest());
-  public static final ImageElement BLACK_ANT_SOUTH_IMAGE_ELEMENT =
+  ImageElement BLACK_ANT_SOUTH_IMAGE_ELEMENT =
       ImageUtil.asImageElement(INSTANCE.blackAntSouth());
-  public static final ImageElement BLACK_ANT_SOUTH_EAST_IMAGE_ELEMENT =
+  ImageElement BLACK_ANT_SOUTH_EAST_IMAGE_ELEMENT =
       ImageUtil.asImageElement(INSTANCE.blackAntSouthEast());
-  public static final ImageElement CONDUIT_IMAGE_ELEMENT =
+  ImageElement CONDUIT_IMAGE_ELEMENT =
       ImageUtil.asImageElement(INSTANCE.conduit());
-  public static final ImageElement DIRT_IMAGE_ELEMENT =
+  ImageElement DIRT_IMAGE_ELEMENT =
       ImageUtil.asImageElement(INSTANCE.dirt());
-  public static final ImageElement FOOD_IMAGE_ELEMENT =
+  ImageElement FOOD_IMAGE_ELEMENT =
       ImageUtil.asImageElement(INSTANCE.food());
-  public static final ImageElement NEST_IMAGE_ELEMENT =
+  ImageElement NEST_IMAGE_ELEMENT =
       ImageUtil.asImageElement(INSTANCE.nest());
-  public static final ImageElement PHEROMONE_IMAGE_ELEMENT =
+  ImageElement PHEROMONE_IMAGE_ELEMENT =
       ImageUtil.asImageElement(INSTANCE.pheromone());
-  public static final ImageElement RED_ANT_IMAGE_ELEMENT =
+  ImageElement RED_ANT_IMAGE_ELEMENT =
       ImageUtil.asImageElement(INSTANCE.redAntEast());
-  public static final ImageElement ROCK_IMAGE_ELEMENT =
+  ImageElement ROCK_IMAGE_ELEMENT =
       ImageUtil.asImageElement(INSTANCE.rock());
 
-  public static final ImmutableMap<EntityType, ImageResource> ENTITY_IMAGES =
+  ImmutableMap<EntityType, ImageResource> ENTITY_IMAGES =
       ImmutableMap.<EntityType, ImageResource>builder()
           .put(EntityType.ANT, INSTANCE.blackAntEast())
           .put(EntityType.BARRIER, INSTANCE.barrier())
@@ -66,7 +66,7 @@ public interface AntSimulationResourceBundle extends ClientBundle {
           .put(EntityType.ROCK, INSTANCE.rock())
           .build();
 
-  public static final ImmutableMap<EntityType, ImageElement> ENTITY_IMAGE_ELEMENTS =
+  ImmutableMap<EntityType, ImageElement> ENTITY_IMAGE_ELEMENTS =
       ImmutableMap.<EntityType, ImageElement>builder()
           .put(EntityType.ANT, BLACK_ANT_EAST_IMAGE_ELEMENT)
           .put(EntityType.BARRIER, BARRIER_IMAGE_ELEMENT)
@@ -78,7 +78,7 @@ public interface AntSimulationResourceBundle extends ClientBundle {
           .put(EntityType.ROCK, ROCK_IMAGE_ELEMENT)
           .build();
 
-  public static final ImmutableMap<Direction, ImageElement> BLACK_ANT_IMAGE_ELEMENTS =
+  ImmutableMap<Direction, ImageElement> BLACK_ANT_IMAGE_ELEMENTS =
       ImmutableMap.<Direction, ImageElement>builder()
           .put(Direction.EAST, BLACK_ANT_EAST_IMAGE_ELEMENT)
           .put(Direction.NORTH_EAST, BLACK_ANT_NORTH_EAST_IMAGE_ELEMENT)
@@ -138,7 +138,7 @@ public interface AntSimulationResourceBundle extends ClientBundle {
   @Source("images/rock.png")
   ImageResource rock();
 
-  public static interface Style extends CssResource {
+  interface Style extends CssResource {
 
     String entityToolbar();
     String entityButton();
@@ -148,5 +148,5 @@ public interface AntSimulationResourceBundle extends ClientBundle {
   }
 
   @Source("mechaverse.css")
-  public Style css();
+  Style css();
 }

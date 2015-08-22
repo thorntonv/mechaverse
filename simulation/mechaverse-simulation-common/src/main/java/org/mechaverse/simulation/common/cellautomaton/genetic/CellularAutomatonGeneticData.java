@@ -41,10 +41,7 @@ public class CellularAutomatonGeneticData extends GeneticData {
         return false;
       }
       CellGeneticData other = (CellGeneticData) obj;
-      if (!Arrays.equals(data, other.data)) {
-        return false;
-      }
-      return true;
+      return Arrays.equals(data, other.data);
     }
   }
 

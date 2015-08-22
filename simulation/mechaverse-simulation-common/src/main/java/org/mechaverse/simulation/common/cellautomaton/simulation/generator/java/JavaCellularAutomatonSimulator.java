@@ -106,8 +106,8 @@ public final class JavaCellularAutomatonSimulator implements CellularAutomatonSi
 
   @Override
   public void update() {
-    for (int idx = 0; idx < simulations.length; idx++) {
-      simulations[idx].update();
+    for (JavaCellularAutomatonSimulation simulation : simulations) {
+      simulation.update();
     }
   }
 

@@ -9,7 +9,7 @@ import java.util.Collection;
  */
 public interface CellularAutomaton {
 
-  public static interface Cell {
+  interface Cell {
 
     int getOutput(int idx);
     void setOutput(int idx, int value);

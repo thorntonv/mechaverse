@@ -61,14 +61,14 @@ public class FitnessProportionalSelectionStrategy<E> extends AbstractSelectionSt
       @Override
       public boolean execute(E entity, double value) {
         if (fitnessSum != 0) {
-          pmf.add(new Pair<E, Double>(entity, value));
+          pmf.add(new Pair<>(entity, value));
         } else {
-          pmf.add(new Pair<E, Double>(entity, 1.0D / entityFitnessMap.size()));
+          pmf.add(new Pair<>(entity, 1.0D / entityFitnessMap.size()));
         }
         return true;
       }
     });
 
-    return new EnumeratedDistribution<E>(random, pmf);
+    return new EnumeratedDistribution<>(random, pmf);
   }
 }

@@ -17,7 +17,7 @@ public class BooleanFunctionsTest {
   public void testThreeInputBooleanFunctionCoverage() {
     int expectedFunctionCount = 256;
     Map<Integer, int[]> booleanFunctionParamsMap = BooleanFunctions.getBooleanFunctionParamsMap(
-        3, 8, BooleanFunctions.BOOLEAN_FUCNTION_3INPUT);
+        3, 8, BooleanFunctions.BOOLEAN_FUNCTION_3INPUT);
     assertEquals(expectedFunctionCount, booleanFunctionParamsMap.size());
     for (int value = 0; value < expectedFunctionCount; value++) {
       assertTrue(booleanFunctionParamsMap.containsKey(value));
@@ -28,7 +28,7 @@ public class BooleanFunctionsTest {
   public void testFourInputBooleanFunctionCoverage() {
     int expectedFunctionCount = 65536;
     Map<Integer, int[]> booleanFunctionParamsMap = BooleanFunctions.getBooleanFunctionParamsMap(
-        4, 16, BooleanFunctions.BOOLEAN_FUCNTION_4INPUT);
+        4, 16, BooleanFunctions.BOOLEAN_FUNCTION_4INPUT);
     assertEquals(expectedFunctionCount, booleanFunctionParamsMap.size());
     for (int value = 0; value < expectedFunctionCount; value++) {
       assertTrue(booleanFunctionParamsMap.containsKey(value));

@@ -48,7 +48,7 @@ public abstract class AbstractCellularAutomaton implements CellularAutomaton {
   
   private final AbstractCell[][] cells;
 
-  public AbstractCellularAutomaton(int width, int height,
+  protected AbstractCellularAutomaton(int width, int height,
       Supplier<? extends AbstractCell> cellSupplier, CellConnector cellConnector) {
     cells = new AbstractCell[height][width];
 

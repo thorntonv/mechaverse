@@ -4,7 +4,6 @@ import java.util.UUID;
 
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticData;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticData.CellGeneticData;
-import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomaton;
 import org.mechaverse.simulation.common.cellautomaton.simulation.SimulatorCellularAutomaton;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel;
 import org.mechaverse.simulation.common.genetic.GeneticDataStore;
@@ -84,7 +83,7 @@ public abstract class AbstractEntity {
     for (int row = 0; row < cellularAutomatonGeneticData.getRowCount(); row++) {
       for (int col = 0; col < cellularAutomatonGeneticData.getColumnCount(); col++) {
         CellGeneticData cellData = cellularAutomatonGeneticData.getCellData(row, col);
-        str.append(cellValueToString(cellData.getData()[0]) + "\t");
+        str.append(cellValueToString(cellData.getData()[0])).append("\t");
       }
       str.append("\n");
     }

@@ -39,12 +39,13 @@ public class Coordinate {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     Coordinate other = (Coordinate) obj;
-    if (column != other.column) return false;
-    if (row != other.row) return false;
-    return true;
+    return column == other.column && row == other.row;
   }
 }

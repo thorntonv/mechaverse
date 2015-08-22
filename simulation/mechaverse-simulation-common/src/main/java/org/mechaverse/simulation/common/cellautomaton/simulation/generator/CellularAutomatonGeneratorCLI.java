@@ -54,7 +54,7 @@ public class CellularAutomatonGeneratorCLI {
     }
   }
 
-  private static final Options buildOptions() {
+  private static Options buildOptions() {
     Options options = new Options();
 
     OptionGroup group = new OptionGroup();

@@ -93,7 +93,7 @@ public final class SimulationDataStoreView implements SimulationDataStore {
   @Override
   public boolean containsKey(String key) {
     String absoluteKey = rootKeyPrefix + key;
-    return visibleKeyPredicate.apply(absoluteKey) ? dataStore.containsKey(absoluteKey) : false;
+    return visibleKeyPredicate.apply(absoluteKey) && dataStore.containsKey(absoluteKey);
   }
 
   @Override
@@ -124,7 +124,7 @@ public final class SimulationDataStoreView implements SimulationDataStore {
 
   @Override
   public Set<String> keysWithPrefix(String prefix) {
-    Set<String> keys = new HashSet<String>();
+    Set<String> keys = new HashSet<>();
     for (String key : dataStore.keysWithPrefix(getAbsoluteKey(prefix))) {
       if (isVisible(key)) {
         keys.add(getRelativeKey(key));

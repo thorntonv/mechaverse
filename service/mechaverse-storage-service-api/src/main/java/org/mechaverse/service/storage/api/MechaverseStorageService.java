@@ -21,7 +21,7 @@ public interface MechaverseStorageService {
   /**
    * Returns the state of the specified instance.
    *
-   * @throws Exception if an error occurs while processing the request
+   * @throws IOException if an error occurs while processing the request
    */
   @GET
   @Path("/simulation/{simulationId}/{instanceId}/{iteration}")
@@ -33,7 +33,7 @@ public interface MechaverseStorageService {
   /**
    * Returns the state of the specified instance.
    *
-   * @throws Exception if an error occurs while processing the request
+   * @throws IOException if an error occurs while processing the request
    */
   @GET
   @Path("/simulation/{simulationId}/{instanceId}/{iteration}/{key}")
@@ -46,7 +46,7 @@ public interface MechaverseStorageService {
   /**
    * Sets the state of the specified instance.
    *
-   * @throws Exception if an error occurs while processing the request
+   * @throws IOException if an error occurs while processing the request
    */
   @POST
   @Path("/simulation/{simulationId}/{instanceId}/{iteration}")
@@ -59,7 +59,7 @@ public interface MechaverseStorageService {
   /**
    * Sets the state of the specified instance.
    *
-   * @throws Exception if an error occurs while processing the request
+   * @throws IOException if an error occurs while processing the request
    */
   @POST
   @Path("/simulation/{simulationId}/{instanceId}/{iteration}/{key}")

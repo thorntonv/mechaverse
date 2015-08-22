@@ -29,18 +29,7 @@ public class AntSimulationEnvironmentGenerator
   private final Function<EntityType, Entity> entityFactory;
 
   public static ProbabilisticLocalGenerator<EntityType> newRockGenerator(RandomGenerator random) {
-    return new ProbabilisticLocalGenerator<EntityType>(.01,
-        ImmutableTable.<Integer, Integer, EntityDistribution<EntityType>>builder()
-            .put(0, 0, EntityDistribution.of(EntityType.ROCK, .50, random))
-            .put(0, 1, EntityDistribution.of(EntityType.ROCK, .75, random))
-            .put(0, 2, EntityDistribution.of(EntityType.ROCK, .50, random))
-            .put(1, 0, EntityDistribution.of(EntityType.ROCK, .75, random))
-            .put(1, 1, EntityDistribution.of(EntityType.ROCK, .90, random))
-            .put(1, 2, EntityDistribution.of(EntityType.ROCK, .75, random))
-            .put(2, 0, EntityDistribution.of(EntityType.ROCK, .50, random))
-            .put(2, 1, EntityDistribution.of(EntityType.ROCK, .75, random))
-            .put(2, 2, EntityDistribution.of(EntityType.ROCK, .50, random))
-            .build());
+    return new ProbabilisticLocalGenerator<>(.01, ImmutableTable.<Integer, Integer, EntityDistribution<EntityType>>builder().put(0, 0, EntityDistribution.of(EntityType.ROCK, .50, random)).put(0, 1, EntityDistribution.of(EntityType.ROCK, .75, random)).put(0, 2, EntityDistribution.of(EntityType.ROCK, .50, random)).put(1, 0, EntityDistribution.of(EntityType.ROCK, .75, random)).put(1, 1, EntityDistribution.of(EntityType.ROCK, .90, random)).put(1, 2, EntityDistribution.of(EntityType.ROCK, .75, random)).put(2, 0, EntityDistribution.of(EntityType.ROCK, .50, random)).put(2, 1, EntityDistribution.of(EntityType.ROCK, .75, random)).put(2, 2, EntityDistribution.of(EntityType.ROCK, .50, random)).build());
   }
 
   public AntSimulationEnvironmentGenerator() {

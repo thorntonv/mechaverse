@@ -38,11 +38,8 @@ public final class RandomUtil {
   public static boolean nextEvent(double p, RandomGenerator random) {
     if (p == 1) {
       return true;
-    } else if (p == 0) {
-      return false;
-    } else {
-      return random.nextDouble() <= p;
-    }
+    } else
+      return p != 0 && random.nextDouble() <= p;
   }
 
   /**

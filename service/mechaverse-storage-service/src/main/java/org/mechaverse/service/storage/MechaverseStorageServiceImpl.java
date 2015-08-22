@@ -43,11 +43,8 @@ public class MechaverseStorageServiceImpl implements MechaverseStorageService {
     String tempPrefix = String.format("%s-%s-%s", simulationId, instanceId, iteration);
     File tempFile = File.createTempFile(tempPrefix, null, tempDirectory);
     tempFile.deleteOnExit();
-    OutputStream out = new FileOutputStream(tempFile);
-    try {
+    try (OutputStream out = new FileOutputStream(tempFile)) {
       IOUtils.copy(stateInput, out);
-    } finally {
-      out.close();
     }
 
     // Move the temporary file to the proper location.

@@ -10,7 +10,6 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mechaverse.cellautomaton.model.CellType;
 import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonBuilder.CellularAutomatonStateBuilder;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonBuilder.InputCellType;
@@ -112,7 +111,7 @@ public abstract class AbstractCellularAutomatonSimulatorTest {
   }
 
   @Test
-  public void update_routingAutomaton_luUpperRightBoundryCell() throws Exception {
+  public void update_routingAutomaton_luUpperRightBoundaryCell() throws Exception {
     CellularAutomatonStateBuilder stateBuilder =
         CellularAutomatonStateBuilder.of(routingAutomaton, 1);
     stateBuilder.setAll(0b111);
@@ -134,7 +133,7 @@ public abstract class AbstractCellularAutomatonSimulatorTest {
   }
 
   @Test
-  public void update_routingAutomaton_luLowerRightBoundryCell() throws Exception {
+  public void update_routingAutomaton_luLowerRightBoundaryCell() throws Exception {
     CellularAutomatonStateBuilder stateBuilder =
         CellularAutomatonStateBuilder.of(routingAutomaton, 1);
     stateBuilder.setAll(0b111);
@@ -156,7 +155,7 @@ public abstract class AbstractCellularAutomatonSimulatorTest {
   }
 
   @Test
-  public void update_routingAutomaton_upperLeftBoundryCell() throws Exception {
+  public void update_routingAutomaton_upperLeftBoundaryCell() throws Exception {
     CellularAutomatonStateBuilder stateBuilder =
         CellularAutomatonStateBuilder.of(routingAutomaton, 1);
     stateBuilder.setAll(0b111);
@@ -178,7 +177,7 @@ public abstract class AbstractCellularAutomatonSimulatorTest {
   }
 
   @Test
-  public void update_routingAutomaton_leftBoundryCell() throws Exception {
+  public void update_routingAutomaton_leftBoundaryCell() throws Exception {
     CellularAutomatonStateBuilder stateBuilder =
         CellularAutomatonStateBuilder.of(routingAutomaton, 1);
     stateBuilder.setAll(0b111);
@@ -204,8 +203,7 @@ public abstract class AbstractCellularAutomatonSimulatorTest {
     String[][] cellTypeIds =
         {{CellularAutomatonBuilder.INPUT_TYPE, CellularAutomatonBuilder.ROUTING_3IN3OUT_TYPE}};
     CellularAutomatonDescriptor descriptor = CellularAutomatonBuilder.newCellularAutomaton(
-        3, 3, ImmutableList.<CellType>of(InputCellType.newInstance(), 
-            Routing3In3OutCellType.newInstance()), cellTypeIds);
+        3, 3, ImmutableList.of(InputCellType.newInstance(), Routing3In3OutCellType.newInstance()), cellTypeIds);
     CellularAutomatonSimulator simulator = newSimulator(descriptor, 1);
 
     int[] input = new int[simulator.getAutomatonInputSize()];
@@ -343,7 +341,7 @@ public abstract class AbstractCellularAutomatonSimulatorTest {
     CellularAutomatonSimulator simulator = newSimulator(descriptor1, 10);
     assertEquals(10, simulator.getAllocator().getAvailableCount());
 
-    Set<Integer> allocatedAutomata = new HashSet<Integer>();
+    Set<Integer> allocatedAutomata = new HashSet<>();
     for (int cnt = 1; cnt <= 10; cnt++) {
       allocatedAutomata.add(simulator.getAllocator().allocate());
     }

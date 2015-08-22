@@ -15,7 +15,8 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class EnvironmentEditorView extends ResizeComposite {
 
-  interface MyUiBinder extends UiBinder<Widget, EnvironmentEditorView> {};
+  interface MyUiBinder extends UiBinder<Widget, EnvironmentEditorView> {}
+
 
   private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 

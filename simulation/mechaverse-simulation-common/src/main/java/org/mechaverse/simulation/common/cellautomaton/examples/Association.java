@@ -125,22 +125,22 @@ public class Association extends AbstractCellularAutomaton {
             }
           }
           
-          boolean associationConstraintSatisifed = entity.getAssociationId() == null;
-          if (!associationConstraintSatisifed) {
-            associationConstraintSatisifed = true;
+          boolean associationConstraintSatisfied = entity.getAssociationId() == null;
+          if (!associationConstraintSatisfied) {
+            associationConstraintSatisfied = true;
             for (Cell neighborCell : neighbors) {
               if (neighborCell != null && neighborCell != targetNeighborCell
                   && neighborCell instanceof AssociationCell
                   && cellEntityMap.containsKey(neighborCell)) {
                 if (!((AssociationCell) neighborCell).isConnected(
                     targetNeighborCell, entity.getAssociationId())) {
-                  associationConstraintSatisifed = false;
+                  associationConstraintSatisfied = false;
                 }
               }
             }
           }
 
-          if (associationConstraintSatisifed) {
+          if (associationConstraintSatisfied) {
             cellEntityMap.put(targetNeighborCell, entity);
           } else {
             // Undo the move.

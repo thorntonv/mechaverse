@@ -92,7 +92,7 @@ public class SequentialPatternSimulation {
 
   public static void main(String[] args) throws Exception {
     SimulationConfig.Builder<SequentialPatternEntity, SimpleSimulationModel> configBuilder =
-        new SimulationConfig.Builder<SequentialPatternEntity, SimpleSimulationModel>();
+        new SimulationConfig.Builder<>();
     SelectionStrategy<SequentialPatternEntity> selectionStrategy =
         new ElitistSelectionStrategy<>(RETAIN_TOP_ENTITY_COUNT, REMOVE_BOTTOM_ENTITY_COUNT,
             new TournamentSelectionStrategy<SequentialPatternEntity>());
