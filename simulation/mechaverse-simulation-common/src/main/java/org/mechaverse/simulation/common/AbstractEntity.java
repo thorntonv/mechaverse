@@ -57,7 +57,7 @@ public abstract class AbstractEntity {
     return cellularAutomatonGeneticData;
   }
 
-  public CellularAutomaton getCellularAutomaton() {
+  public SimulatorCellularAutomaton getCellularAutomaton() {
     return cellularAutomaton;
   }
 

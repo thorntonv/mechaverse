@@ -9,6 +9,9 @@ import org.mechaverse.simulation.common.cellautomaton.simulation.generator.Cellu
 
 import com.google.common.base.Preconditions;
 
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TIntArrayList;
+
 /**
  * Provides a {@link CellularAutomaton} interface to a cellular automaton simulated using
  * {@link CellularAutomatonSimulator}.
@@ -17,7 +20,7 @@ import com.google.common.base.Preconditions;
  */
 public class SimulatorCellularAutomaton implements CellularAutomaton {
 
-  private final class SimulatorCellularAutomatonCell implements CellularAutomaton.Cell {
+  public final class SimulatorCellularAutomatonCell implements CellularAutomaton.Cell {
 
     private CellInfo cellInfo;
     private int luIndex;
@@ -37,6 +40,19 @@ public class SimulatorCellularAutomaton implements CellularAutomaton {
     public void setOutput(int idx, int value) {
       String varName = cellInfo.getOutputVarName(cellInfo.getOutputs().get(idx));
       state[getStateIndex(varName)] = value;
+    }
+
+    public void addOutputToOutputMap(int idx) {
+      String varName = cellInfo.getOutputVarName(cellInfo.getOutputs().get(idx));
+      int stateIdx = getStateIndex(varName);
+      if (!outputMap.contains(stateIdx)) {
+        outputMap.add(stateIdx);
+      }
+    }
+
+    public void removeOutputFromOutputMap(int idx) {
+      String varName = cellInfo.getOutputVarName(cellInfo.getOutputs().get(idx));
+      outputMap.remove(getStateIndex(varName));
     }
 
     @Override
@@ -65,7 +81,7 @@ public class SimulatorCellularAutomaton implements CellularAutomaton {
 
     private int getStateIndex(String varName) {
       int stateIndex = model.getLogicalUnitInfo().getStateIndex(varName);
-      return index * model.getStateSize() + luIndex + stateIndex * model.getLogicalUnitCount();
+      return luIndex + stateIndex * model.getLogicalUnitCount();
     }
 
     @Override
@@ -87,8 +103,10 @@ public class SimulatorCellularAutomaton implements CellularAutomaton {
   private final CellularAutomatonSimulationModel model;
   private final int index;
   private final CellularAutomatonSimulator simulator;
-  private final Cell[][] cells;
+  private final SimulatorCellularAutomatonCell[][] cells;
   private int[] state;
+  private int[] output;
+  private TIntList outputMap = new TIntArrayList();
 
   public SimulatorCellularAutomaton(CellularAutomatonDescriptor descriptor,
       CellularAutomatonSimulator simulator) {
@@ -106,18 +124,20 @@ public class SimulatorCellularAutomaton implements CellularAutomaton {
     this.simulator = simulator;
     this.index = index;
     this.state = new int[simulator.getAutomatonStateSize()];
+    this.output = new int[simulator.getAutomatonOutputSize()];
 
     // TODO(thorntonv): Handle case where width does not match for all rows.
     int luWidth = model.getLogicalUnitInfo().getWidth();
     int luHeight = model.getLogicalUnitInfo().getHeight();
 
-    cells = new Cell[model.getHeight() * luHeight][model.getWidth() * luWidth];
+    cells = new SimulatorCellularAutomatonCell[model.getHeight() * luHeight][model.getWidth() * luWidth];
     for (int luRow = 0; luRow < model.getHeight(); luRow++) {
       for (int luCol = 0; luCol < model.getWidth(); luCol++) {
-        int luIndex = luRow * model.getHeight() + luCol;
+        int luIndex = luRow * model.getWidth() + luCol;
         for (int row = 0; row < luHeight; row++) {
           for (int col = 0; col < luWidth; col++) {
-            CellInfo cellInfo = model.getLogicalUnitInfo().getCells().get(row * luHeight + col);
+            int cellIdx = row * luWidth + col;
+            CellInfo cellInfo = model.getLogicalUnitInfo().getCells().get(cellIdx);
             cells[luRow * luHeight + row][luCol * luWidth + col] =
                 new SimulatorCellularAutomatonCell(cellInfo, luIndex);
           }
@@ -145,7 +165,7 @@ public class SimulatorCellularAutomaton implements CellularAutomaton {
   }
 
   @Override
-  public Cell getCell(int row, int column) {
+  public SimulatorCellularAutomatonCell getCell(int row, int column) {
     Preconditions.checkElementIndex(row, cells.length);
     Preconditions.checkElementIndex(column, cells[row].length);
     return cells[row][column];
@@ -155,8 +175,19 @@ public class SimulatorCellularAutomaton implements CellularAutomaton {
     simulator.getAutomatonState(index, state);
   }
 
+  public void refreshOutputs() {
+    simulator.getAutomatonOutput(index, output);
+    for (int idx = 0; idx < outputMap.size(); idx++) {
+      state[outputMap.get(idx)] = output[idx];
+    }
+  }
+
   public void updateState() {
     simulator.setAutomatonState(index, state);
+  }
+
+  public void updateOutputMap() {
+    simulator.setAutomatonOutputMap(index, outputMap.toArray());
   }
 
   @Override
@@ -164,5 +195,17 @@ public class SimulatorCellularAutomaton implements CellularAutomaton {
     simulator.setAutomatonState(index, state);
     simulator.update();
     simulator.getAutomatonState(index, state);
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    for (int row = 0; row < cells.length; row++) {
+      for (int col = 0; col < cells[row].length; col++) {
+        builder.append(cells[row][col].getOutput(0) + "\t");
+      }
+      builder.append("\n");
+    }
+    return builder.toString();
   }
 }
