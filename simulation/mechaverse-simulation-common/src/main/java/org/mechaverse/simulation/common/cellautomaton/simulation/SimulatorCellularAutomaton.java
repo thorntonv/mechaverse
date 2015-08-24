@@ -42,6 +42,19 @@ public class SimulatorCellularAutomaton implements CellularAutomaton {
       state[getStateIndex(varName)] = value;
     }
 
+    public void addOutputToInputMap(int idx) {
+      String varName = cellInfo.getOutputVarName(cellInfo.getOutputs().get(idx));
+      int stateIdx = getStateIndex(varName);
+      if (!inputMap.contains(stateIdx)) {
+        inputMap.add(stateIdx);
+      }
+    }
+
+    public void removeOutputFromInputMap(int idx) {
+      String varName = cellInfo.getOutputVarName(cellInfo.getOutputs().get(idx));
+      inputMap.remove(getStateIndex(varName));
+    }
+
     public void addOutputToOutputMap(int idx) {
       String varName = cellInfo.getOutputVarName(cellInfo.getOutputs().get(idx));
       int stateIdx = getStateIndex(varName);
@@ -105,8 +118,10 @@ public class SimulatorCellularAutomaton implements CellularAutomaton {
   private final CellularAutomatonSimulator simulator;
   private final SimulatorCellularAutomatonCell[][] cells;
   private int[] state;
-  private int[] output;
-  private TIntList outputMap = new TIntArrayList();
+  private final int[] input;
+  private final TIntList inputMap = new TIntArrayList();
+  private final int[] output;
+  private final TIntList outputMap = new TIntArrayList();
 
   public SimulatorCellularAutomaton(CellularAutomatonDescriptor descriptor,
       CellularAutomatonSimulator simulator) {
@@ -124,6 +139,7 @@ public class SimulatorCellularAutomaton implements CellularAutomaton {
     this.simulator = simulator;
     this.index = index;
     this.state = new int[simulator.getAutomatonStateSize()];
+    this.input = new int[simulator.getAutomatonInputSize()];
     this.output = new int[simulator.getAutomatonOutputSize()];
 
     // TODO(thorntonv): Handle case where width does not match for all rows.
@@ -150,6 +166,10 @@ public class SimulatorCellularAutomaton implements CellularAutomaton {
     return simulator;
   }
 
+  public int[] getState() {
+    return state;
+  }
+
   public void setState(int[] state) {
     this.state = state;
   }
@@ -169,6 +189,17 @@ public class SimulatorCellularAutomaton implements CellularAutomaton {
     Preconditions.checkElementIndex(row, cells.length);
     Preconditions.checkElementIndex(column, cells[row].length);
     return cells[row][column];
+  }
+
+  public void updateInputs() {
+    for (int idx = 0; idx < inputMap.size(); idx++) {
+      input[idx] = state[inputMap.get(idx)];
+    }
+    simulator.setAutomatonInput(index, input);
+  }
+
+  public void updateInputMap() {
+    simulator.setAutomatonInputMap(index, inputMap.toArray());
   }
 
   public void refresh() {

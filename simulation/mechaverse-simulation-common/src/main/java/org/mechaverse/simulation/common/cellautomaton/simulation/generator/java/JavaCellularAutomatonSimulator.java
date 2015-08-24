@@ -87,6 +87,14 @@ public final class JavaCellularAutomatonSimulator implements CellularAutomatonSi
   }
 
   @Override
+  public void setAutomatonInputMap(int index, int[] inputMap) {
+    for (int idx = 0; idx < inputMap.length; idx++) {
+      inputMap[idx] = Math.abs(inputMap[idx]) % getAutomatonStateSize();
+    }
+    simulations[index].setInputMap(inputMap);
+  }
+
+  @Override
   public void setAutomatonInput(int index, int[] input) {
     simulations[index].setInput(input);
   }

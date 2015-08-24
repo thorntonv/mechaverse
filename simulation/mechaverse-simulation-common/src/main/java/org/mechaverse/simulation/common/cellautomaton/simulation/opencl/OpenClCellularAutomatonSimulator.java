@@ -45,12 +45,14 @@ public final class OpenClCellularAutomatonSimulator implements CellularAutomaton
   private final CLContext context;
   private final CLCommandQueue queue;
   private final CLKernel kernel;
+  private final CLBuffer<IntBuffer> inputMapBuffer;
   private final CLBuffer<IntBuffer> inputBuffer;
   private final CLBuffer<IntBuffer> stateBuffer;
   private final CLBuffer<IntBuffer> outputMapBuffer;
   private final CLBuffer<IntBuffer> outputBuffer;
   private boolean finished = true;
   private boolean automatonStateUpdated = false;
+  private boolean inputMapUpdated = true;
   private boolean outputMapUpdated = false;
 
   public OpenClCellularAutomatonSimulator(CellularAutomatonSimulatorConfig config) {
@@ -99,22 +101,28 @@ public final class OpenClCellularAutomatonSimulator implements CellularAutomaton
     this.queue = device.createCommandQueue();
 
     // Allocate buffers.
-    this.inputBuffer = context.createIntBuffer(numAutomata * automatonInputSize, Mem.READ_ONLY);
+    this.inputMapBuffer =
+        context.createIntBuffer(numAutomata * Math.max(automatonInputSize, 1), Mem.READ_ONLY);
+    this.inputBuffer =
+        context.createIntBuffer(numAutomata * Math.max(automatonInputSize, 1), Mem.READ_ONLY);
     this.stateBuffer = context.createIntBuffer(numAutomata * automatonStateSize, Mem.READ_WRITE);
     this.outputMapBuffer =
         context.createIntBuffer(numAutomata * automatonOutputSize, Mem.READ_WRITE);
     this.outputBuffer = context.createIntBuffer(numAutomata * automatonOutputSize, Mem.WRITE_ONLY);
 
-    kernel.putArg(inputBuffer)
-      .putArg(stateBuffer)
-      .putArg(outputMapBuffer)
-      .putArg(outputBuffer)
-      .putArg(automatonInputSize)
-      .putArg(automatonOutputSize);
+    kernel.putArg(inputMapBuffer)
+        .putArg(inputBuffer)
+        .putArg(stateBuffer)
+        .putArg(outputMapBuffer)
+        .putArg(outputBuffer)
+        .putArg(automatonInputSize)
+        .putArg(automatonOutputSize);
 
-    // Initialize the output maps.
+    // Initialize the input/output maps.
+    int[] inputMap = new int[automatonInputSize];
     int[] outputMap = new int[automatonOutputSize];
     for (int idx = 0; idx < numAutomata; idx++) {
+      setAutomatonInputMap(idx, inputMap);
       setAutomatonOutputMap(idx, outputMap);
     }
   }
@@ -174,6 +182,21 @@ public final class OpenClCellularAutomatonSimulator implements CellularAutomaton
   }
 
   @Override
+  public void setAutomatonInputMap(int index, int[] inputMap) {
+    for (int idx = 0; idx < inputMap.length; idx++) {
+      inputMap[idx] = Math.abs(inputMap[idx]) % automatonStateSize;
+    }
+    if (!finished) {
+      queue.finish();
+      finished = true;
+    }
+    inputMapBuffer.getBuffer().position(index * automatonInputSize);
+    inputMapBuffer.getBuffer().put(inputMap);
+    inputMapBuffer.getBuffer().rewind();
+    inputMapUpdated = true;
+  }
+
+  @Override
   public void setAutomatonInput(int index, int[] input) {
     if (!finished) {
       queue.finish();
@@ -215,6 +238,10 @@ public final class OpenClCellularAutomatonSimulator implements CellularAutomaton
     if (automatonStateUpdated) {
       queue.putWriteBuffer(stateBuffer, false);
       automatonStateUpdated = false;
+    }
+    if (inputMapUpdated) {
+      queue.putWriteBuffer(inputMapBuffer, false);
+      inputMapUpdated = false;
     }
     if (outputMapUpdated) {
       queue.putWriteBuffer(outputMapBuffer, false);

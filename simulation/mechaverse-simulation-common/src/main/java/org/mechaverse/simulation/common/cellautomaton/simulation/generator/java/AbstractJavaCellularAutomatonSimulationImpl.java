@@ -10,6 +10,7 @@ public abstract class AbstractJavaCellularAutomatonSimulationImpl
 
   protected final int numLogicalUnits;
   protected final int[] automatonState;
+  protected final int[] automatonInputMap;
   protected final int[] automatonInput;
   protected final int[] automatonOutputMap;
   protected final int[] automatonOutput;
@@ -22,6 +23,7 @@ public abstract class AbstractJavaCellularAutomatonSimulationImpl
        int stateSize, int inputSize, int outputSize, int iterationsPerUpdate) {
     this.numLogicalUnits = numLogicalUnits;
     this.automatonState = new int[stateSize];
+    this.automatonInputMap = new int[inputSize];
     this.automatonInput = new int[inputSize];
     this.automatonOutputMap = new int[outputSize];
     this.automatonOutput = new int[outputSize];
@@ -34,6 +36,10 @@ public abstract class AbstractJavaCellularAutomatonSimulationImpl
   @Override
   public int getStateSize() {
     return automatonState.length;
+  }
+
+  public void setInputMap(int[] inputMap) {
+    System.arraycopy(inputMap, 0, this.automatonInputMap, 0, this.automatonInputMap.length);
   }
 
   @Override
@@ -63,6 +69,11 @@ public abstract class AbstractJavaCellularAutomatonSimulationImpl
 
   @Override
   public void update() {
+    // Copy input to state.
+    for (int idx = 0; idx < automatonInputLength; idx++) {
+      automatonState[automatonInputMap[idx]] = automatonInput[idx];
+    }
+
     for (int iteration = 0; iteration < iterationsPerUpdate; iteration++) {
       for (int luIndex = 0; luIndex < numLogicalUnits; luIndex++) {
         updateExternalInputs(luIndex);

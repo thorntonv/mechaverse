@@ -94,6 +94,12 @@ public final class CompositeCellularAutomatonSimulator implements CellularAutoma
   }
 
   @Override
+  public void setAutomatonInputMap(int index, int[] inputMap) {
+    MappedCellularAutomatonInfo automaton = mappedCellularAutomatonInfo[index];
+    automaton.simulator.setAutomatonInputMap(automaton.index, inputMap);
+  }
+
+  @Override
   public void setAutomatonInput(int index, int[] input) {
     MappedCellularAutomatonInfo automaton = mappedCellularAutomatonInfo[index];
     automaton.simulator.setAutomatonInput(automaton.index, input);

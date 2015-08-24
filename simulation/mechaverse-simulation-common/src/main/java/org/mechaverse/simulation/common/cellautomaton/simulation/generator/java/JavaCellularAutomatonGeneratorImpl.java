@@ -10,6 +10,7 @@ import org.mechaverse.simulation.common.cellautomaton.simulation.generator.Cellu
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel.Input;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel.LogicalUnitInfo;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModelBuilder;
+import org.mechaverse.simulation.common.util.IndentPrintWriter;
 
 /**
  * A generator that creates Java source code for executing a cellular automaton simulation.
@@ -47,42 +48,44 @@ public class JavaCellularAutomatonGeneratorImpl extends AbstractCStyleSimulation
   }
 
   @Override
-  public void generate(PrintWriter out) {
-    // TODO(thorntonv): Properly indent the generated code.
+  public void generate(final PrintWriter printWriter) {
+    final IndentPrintWriter out = new IndentPrintWriter(printWriter);
 
     LogicalUnitInfo logicalUnitInfo = model.getLogicalUnitInfo();
 
     out.printf("package %s;%n", IMPL_PACKAGE);
     out.println("public class CellularAutomatonSimulationImpl extends "
-        + "AbstractJavaCellularAutomatonSimulationImpl {");
+        + "AbstractJavaCellularAutomatonSimulationImpl {").indent();
     generateConstructor(logicalUnitInfo, out);
     generateUpdateExternalInputs(logicalUnitInfo, out);
     generateLogicalUnitUpdateMethod(logicalUnitInfo, out);
-    out.println("}");
+    out.unindent().println("}");
     out.flush();
   }
 
-  private void generateConstructor(LogicalUnitInfo logicalUnitInfo, PrintWriter out) {
-    out.println("public CellularAutomatonSimulationImpl() {");
+  private void generateConstructor(LogicalUnitInfo logicalUnitInfo, IndentPrintWriter out) {
+    out.println("public CellularAutomatonSimulationImpl() {").indent();
     out.printf("super(%d, %d, %d, %d, %d, %d);%n", model.getLogicalUnitCount(), numExternalCells,
         model.getStateSize(), inputSize, outputSize,
             model.getIterationsPerUpdate());
-    out.println("}");
+    out.unindent().println("}");
   }
 
-  private void generateUpdateExternalInputs(LogicalUnitInfo logicalUnitInfo, PrintWriter out) {
+  private void generateUpdateExternalInputs(LogicalUnitInfo logicalUnitInfo,
+                                            IndentPrintWriter out) {
     out.println("@Override");
-    out.printf("public void updateExternalInputs(int %s) {%n", luIndexExpr);
+    out.printf("public void updateExternalInputs(int %s) {%n", luIndexExpr).indent();
     
     generateCopyStateValuesToVariables(logicalUnitInfo, out);
     generateCopyExternalInputsToState("external", logicalUnitInfo, out);
 
-    out.println("}");
+    out.unindent().println("}");
   }
   
-  private void generateLogicalUnitUpdateMethod(LogicalUnitInfo logicalUnitInfo, PrintWriter out) {
+  private void generateLogicalUnitUpdateMethod(LogicalUnitInfo logicalUnitInfo,
+                                               IndentPrintWriter out) {
     out.println("@Override");
-    out.printf("public void update(int %s) {%n", luIndexExpr);
+    out.printf("public void update(int %s) {%n", luIndexExpr).indent();
 
     out.printf("int luRow = %s / %d;%n", luIndexExpr, model.getHeight());
     out.printf("int luCol = %s %% %d;%n", luIndexExpr, model.getHeight());
@@ -108,19 +111,19 @@ public class JavaCellularAutomatonGeneratorImpl extends AbstractCStyleSimulation
     // Copy output values from variables back to state array.
     generateCopyVariablesToState(logicalUnitInfo, out);
 
-    out.println("}");
+    out.unindent().println("}");
   }
 
   @Override
   protected void printExternalCellDebugInfo(
-      String outputVarName, String stateIndexExpr, PrintWriter out) {
+      String outputVarName, String stateIndexExpr, IndentPrintWriter out) {
     out.printf("System.out.println(\"%s: %s = \" + (%s));",
         outputVarName, stateIndexExpr, outputVarName);
   }
 
   @Override
   protected void printUpdateDebugInfo(CellInfo cell, Output output, String updateExpr,
-      LogicalUnitInfo logicalUnitInfo, PrintWriter out) {
+      LogicalUnitInfo logicalUnitInfo, IndentPrintWriter out) {
     out.printf("System.out.println(\"lu\" + luIndex + \":%s=\" + %s + \" %s\");%n",
         cell.getOutputVarName(output), cell.getOutputVarName(output), updateExpr);
     for (Input input : cell.getInputs()) {

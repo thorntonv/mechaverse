@@ -15,6 +15,15 @@ public interface CellularAutomatonSimulator extends AutoCloseable {
   
   void getAutomatonState(int index, int[] state);
   void setAutomatonState(int index, int[] state);
+
+  /**
+   * Sets the input map.
+   *
+   * @param index the index of the automaton to set the input map of
+   * @param inputMap an array where the value at each index i is the index of the state value that
+   *        should be set to input index i
+   */
+  void setAutomatonInputMap(int index, int[] inputMap);
   void setAutomatonInput(int index, int[] input);
 
   /**

@@ -229,6 +229,29 @@ public abstract class AbstractCellularAutomatonSimulatorTest {
   }
 
   @Test
+  public void inputMap() throws Exception {
+    CellularAutomatonStateBuilder stateBuilder =
+        CellularAutomatonStateBuilder.of(routingAutomaton, 1);
+    stateBuilder.setAll(0b111);
+
+    LogicalUnitStateBuilder luStateBuilder = stateBuilder.luStateBuilder(0, 0);
+    luStateBuilder.set("cell_2_out1_input2Mask", 0b000);
+    luStateBuilder.set("cell_2_out1_input3Mask", 0b111);
+
+    CellularAutomatonSimulator simulator = newSimulator(routingAutomaton, 1);
+    simulator.setAutomatonState(0, stateBuilder.getState());
+    int[] inputMap = new int[simulator.getAutomatonInputSize()];
+    inputMap[0] = luStateBuilder.getStateIndex("cell_3_out1");
+    simulator.setAutomatonInputMap(0, inputMap);
+    int[] input = new int[simulator.getAutomatonInputSize()];
+    input[0] = 0b010;
+    simulator.setAutomatonInput(0, input);
+    simulator.update();
+    simulator.getAutomatonState(0, stateBuilder.getState());
+    assertEquals(0b010, luStateBuilder.get("cell_2_out1"));
+  }
+
+  @Test
   public void outputMap() throws Exception {
     CellularAutomatonStateBuilder stateBuilder =
         CellularAutomatonStateBuilder.of(routingAutomaton, 1);

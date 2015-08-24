@@ -17,8 +17,9 @@ public class OpenClCellularAutomatonSimulatorTest extends AbstractCellularAutoma
 
   private static final String KERNAL_SOURCE =
       "void kernel " + OpenClCellularAutomatonSimulator.KERNEL_NAME + "(" +
-      "    global const int* input, global int* state, global int* outMap, global int* output, " +
-      "        const unsigned int inputLength, const unsigned int outputLength) {" +
+      "    global const int* inputMap, global const int* input, global int* state, " +
+      "    global int* outMap, global int* output, const unsigned int inputLength, " +
+      "    const unsigned int outputLength) {" +
       "  output[get_global_id(0)] = state[get_global_id(0)] + input[get_global_id(0)];" +
       "  state[get_global_id(0)]++;" +
       "}";
@@ -30,15 +31,15 @@ public class OpenClCellularAutomatonSimulatorTest extends AbstractCellularAutoma
     int output[] = {0};
 
     try (OpenClCellularAutomatonSimulator simulator = new OpenClCellularAutomatonSimulator(
-      1, 1, 1, 1, 1, 1, CLPlatform.getDefault().getMaxFlopsDevice(), KERNAL_SOURCE)) {
-        simulator.setAutomatonInput(0, input);
-        simulator.setAutomatonState(0, state);
-        simulator.update();
-        simulator.getAutomatonOutput(0, output);
-        simulator.getAutomatonState(0, state);
+        1, 1, 1, 1, 1, 1, CLPlatform.getDefault().getMaxFlopsDevice(), KERNAL_SOURCE)) {
+      simulator.setAutomatonInput(0, input);
+      simulator.setAutomatonState(0, state);
+      simulator.update();
+      simulator.getAutomatonOutput(0, output);
+      simulator.getAutomatonState(0, state);
 
-        assertEquals(15, output[0]);
-        assertEquals(6, state[0]);
+      assertEquals(15, output[0]);
+      assertEquals(6, state[0]);
     }
   }
 
@@ -144,6 +145,6 @@ public class OpenClCellularAutomatonSimulatorTest extends AbstractCellularAutoma
   protected CellularAutomatonSimulator newSimulator(
       CellularAutomatonDescriptor descriptor, int automatonCount) throws Exception {
     return new OpenClCellularAutomatonSimulator(
-      automatonCount, 16, 16, CLPlatform.getDefault().getMaxFlopsDevice(), descriptor);
+        automatonCount, 16, 16, CLPlatform.getDefault().getMaxFlopsDevice(), descriptor);
   }
 }

@@ -2,7 +2,6 @@ package org.mechaverse.simulation.experimental;
 
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
-import gnu.trove.map.hash.TIntIntHashMap;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
 import org.mechaverse.simulation.common.AbstractEntity;
@@ -18,8 +17,8 @@ import org.mechaverse.simulation.common.simple.SimpleSimulationState;
 
 /**
  * A simulation to create a cellular automaton that calculates the majority function. If a majority
- * of bits are set in the top row, then after updating the automaton a majority of bits should be
- * set in the bottom row.
+ * of bits are set in the top row, then after updating the automaton all bits in the bottom row
+ * should be set to the majority value.
  */
 public class MajoritySimulation {
 
@@ -52,57 +51,62 @@ public class MajoritySimulation {
     private double fitness = 0.0;
     private int majority;
     private final RandomGenerator random = new Well19937c();
+    private int[] input;
 
     @Override
     public int[] getInput() {
-      TIntIntHashMap valueCountMap = new TIntIntHashMap();
-      SimulatorCellularAutomaton cellularAutomaton = getCellularAutomaton();
-      for (int row = 0; row < cellularAutomaton.getHeight(); row++) {
-        for (int col = 0; col < cellularAutomaton.getWidth(); col++) {
-          if (row == 0) {
-            int value = random.nextInt() & 1;
-            valueCountMap.putIfAbsent(value, 0);
-            valueCountMap.increment(value);
-            cellularAutomaton.getCell(0, col).setOutput(0, value);
-          } else {
-            cellularAutomaton.getCell(row, col).setOutput(0, 0);
-          }
+      for (int idx = 0; idx < input.length; idx++) {
+        input[idx] = 0;
+      }
+
+      int zeroCount = 0;
+      int oneCount = 0;
+      for (int idx = 0; idx < getCellularAutomaton().getWidth(); idx++) {
+        int value = random.nextInt() & 1;
+        input[idx] = value;
+        if (value == 0) {
+          zeroCount++;
+        } else {
+          oneCount++;
         }
       }
 
-      cellularAutomaton.updateState();
+      majority = zeroCount > oneCount ? 0 : 1;
 
-      majority = valueCountMap.get(0) > valueCountMap.get(1) ? 0 : 1;
-
-      return super.getInput();
+      return input;
     }
 
     @Override
     public void processOutput(int[] output) {
       super.processOutput(output);
-      SimulatorCellularAutomaton cellularAutomaton = getCellularAutomaton();
-      cellularAutomaton.refreshOutputs();
 
-      double matchCount = 0;
-      int lastRowIdx = cellularAutomaton.getHeight() - 1;
-      for(int col = 0; col < cellularAutomaton.getWidth(); col++) {
-        if ((cellularAutomaton.getCell(lastRowIdx, col).getOutput(0) & 1) == majority) {
+      int matchCount = 0;
+      for (int outputValue : output) {
+        if ((outputValue & 1) == majority) {
           matchCount++;
         }
       }
 
-      fitness += matchCount == cellularAutomaton.getWidth() ? 1.0 : 0.0;
+      fitness += matchCount == output.length ? 1.0 : 0.0;
     }
 
     @Override
     public void setCellularAutomaton(SimulatorCellularAutomaton cellularAutomaton) {
       super.setCellularAutomaton(cellularAutomaton);
-      cellularAutomaton.refresh();
+
+      this.input = new int[cellularAutomaton.getSimulator().getAutomatonInputSize()];
+
+      for (int row = 0; row < cellularAutomaton.getHeight(); row++) {
+        for (int col = 0; col < cellularAutomaton.getWidth(); col++) {
+          cellularAutomaton.getCell(row, col).addOutputToInputMap(0);
+        }
+      }
 
       int lastRowIndex = cellularAutomaton.getHeight() - 1;
       for (int col = 0; col < cellularAutomaton.getWidth(); col++) {
         cellularAutomaton.getCell(lastRowIndex, col).addOutputToOutputMap(0);
       }
+      cellularAutomaton.updateInputMap();
       cellularAutomaton.updateOutputMap();
     }
 
@@ -113,11 +117,17 @@ public class MajoritySimulation {
     @Override
     public String toString() {
       SimulatorCellularAutomaton cellularAutomaton = getCellularAutomaton();
-
+      cellularAutomaton.refresh();
       StringBuilder builder = new StringBuilder(getId() + " majority: " + majority + "\n");
       for (int row = 0; row < cellularAutomaton.getHeight(); row++) {
         for (int col = 0; col < cellularAutomaton.getWidth(); col++) {
-          builder.append(cellularAutomaton.getCell(row, col).getOutput(0) & 1).append(" ");
+          SimulatorCellularAutomaton.SimulatorCellularAutomatonCell cell =
+              cellularAutomaton.getCell(row, col);
+          int value = cell.getOutput(0) & 1;
+          if (row == 0) {
+            value = input[col] & 1;
+          }
+          builder.append(value).append(" ");
         }
         builder.append("\n");
       }
@@ -147,12 +157,12 @@ public class MajoritySimulation {
         .setEntityFitnessFunction(MajorityFitnessCalculator.INSTANCE)
         .setUpdatesPerIteration(UPDATES_PER_ITERATION)
         .setOpenCLSimulator(new CellularAutomatonSimulatorConfig.Builder()
-            .setNumAutomata(NUM_ENTITIES)
-            .setDescriptorResource("boolean4-5x3-noinput.xml")
+            .setNumAutomata(NUM_ENTITIES).setDescriptorResource("boolean4-5x3-noinput.xml")
+            .setAutomatonInputSize(15)
             .setAutomatonOutputSize(5)
             .build())
         .setSelectionStrategy(selectionStrategy).build());
 
-    simulation.step(MAX_ITERATIONS, Integer.MAX_VALUE);
+    simulation.step(MAX_ITERATIONS, 1.0);
   }
 }
