@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <CellularAutomatonDescriptor xmlns="http://www.mechaverse.org/cellautomaton/model" 
-    width="16" height="16" iterationsPerUpdate="175">
+    width="8" height="8" iterationsPerUpdate="175">
 
   <!-- An element that outputs either an external input value or the bit from an adjacent plane. -->
-  <CellType id="input">
+  <CellType id="shift">
     <Output id="1" >
-      <Param id="selector" />
-      <Param id="idx" />
       <UpdateExpression><![CDATA[
-        {selector} & (({input1} >> 1) | ({input1} << 31)) 
-            | ~{selector} & (automatonInput[{idx} % automatonInputLength])
+        ({input1} >> 1) | ({input1} << 31)
 	  ]]></UpdateExpression>
     </Output>
   </CellType>
@@ -67,7 +64,7 @@
     </row>
     <row>
       <Cell type="boolean4" />
-      <Cell type="input" />
+      <Cell type="shift" />
       <Cell type="boolean4" />
     </row>
     <row>
