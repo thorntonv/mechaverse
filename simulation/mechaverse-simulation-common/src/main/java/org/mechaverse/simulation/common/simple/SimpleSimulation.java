@@ -170,6 +170,10 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
     return Collections.unmodifiableList(entities);
   }
 
+  public SimulationLogger<E, M> getLogger() {
+    return simulationLogger;
+  }
+
   private E generateRandomEntity() {
     E entity = entitySupplier.get();
     entities.add(entity);

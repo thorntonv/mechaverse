@@ -15,6 +15,9 @@ import org.mechaverse.simulation.common.simple.SimpleSimulation;
 import org.mechaverse.simulation.common.simple.SimpleSimulationModel;
 import org.mechaverse.simulation.common.simple.SimpleSimulationState;
 
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+
 /**
  * A simulation to create a cellular automaton that calculates the majority function. If a majority
  * of bits are set in the top row, then after updating the automaton all bits in the bottom row
@@ -135,8 +138,7 @@ public class MajoritySimulation {
     }
   }
 
-  private static class Simulation
-      extends SimpleSimulation<MajorityEntity, SimpleSimulationModel> {
+  private static class Simulation extends SimpleSimulation<MajorityEntity, SimpleSimulationModel> {
 
     public Simulation(SimulationConfig<MajorityEntity, SimpleSimulationModel> config) {
       super(new SimpleSimulationState<>(new SimpleSimulationModel(),
@@ -161,8 +163,14 @@ public class MajoritySimulation {
             .setAutomatonInputSize(15)
             .setAutomatonOutputSize(5)
             .build())
-        .setSelectionStrategy(selectionStrategy).build());
+        .setSelectionStrategy(selectionStrategy)
+        .build());
 
     simulation.step(MAX_ITERATIONS, 1.0);
+
+    MajorityEntity bestEntity = simulation.getLogger().getOverallBestEntity().getFirst();
+    try(OutputStream out = new FileOutputStream("entity.out")) {
+      out.write(bestEntity.getCellularAutomatonGeneticData().getData());
+    }
   }
 }
