@@ -2,8 +2,6 @@ package org.mechaverse.simulation.experimental;
 
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
-import org.apache.commons.math3.random.RandomGenerator;
-import org.apache.commons.math3.random.Well19937c;
 import org.mechaverse.simulation.common.AbstractEntity;
 import org.mechaverse.simulation.common.SimulationConfig;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulatorConfig;
@@ -25,11 +23,11 @@ import java.io.OutputStream;
  */
 public class MajoritySimulation {
 
-  private static final int NUM_ENTITIES = 1000;
+  private static final int NUM_ENTITIES = 2500;
   private static final int RETAIN_TOP_ENTITY_COUNT = 100;
   private static final int REMOVE_BOTTOM_ENTITY_COUNT = 100;
   private static final int MAX_ITERATIONS = Integer.MAX_VALUE;
-  private static final int UPDATES_PER_ITERATION = 150;
+  private static final int UPDATES_PER_ITERATION = 32;
 
   public static class MajorityFitnessCalculator implements Function<MajorityEntity, Double> {
 
@@ -53,8 +51,8 @@ public class MajoritySimulation {
 
     private double fitness = 0.0;
     private int majority;
-    private final RandomGenerator random = new Well19937c();
     private int[] input;
+    private int nextValue = 0;
 
     @Override
     public int[] getInput() {
@@ -64,10 +62,11 @@ public class MajoritySimulation {
 
       int zeroCount = 0;
       int oneCount = 0;
+      int value = nextValue++;
       for (int idx = 0; idx < getCellularAutomaton().getWidth(); idx++) {
-        int value = random.nextInt() & 1;
-        input[idx] = value;
-        if (value == 0) {
+        input[idx] = value & 1;
+        value >>= 1;
+        if (input[idx] == 0) {
           zeroCount++;
         } else {
           oneCount++;
