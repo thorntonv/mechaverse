@@ -54,8 +54,7 @@ public abstract class OpenClCellularAutomatonCLI extends CellularAutomatonCLI {
 
   @Override
   protected SimulatorCellularAutomaton createCellularAutomaton() throws IOException {
-    CellularAutomatonDescriptor descriptor =
-        CellularAutomatonDescriptorReader.read(getDescriptorInputStream());
+    CellularAutomatonDescriptor descriptor = getDescriptor();
 
     CellularAutomatonSimulator simulator = new OpenClCellularAutomatonSimulator(
         new CellularAutomatonSimulatorConfig.Builder()
@@ -66,6 +65,10 @@ public abstract class OpenClCellularAutomatonCLI extends CellularAutomatonCLI {
         simulator.getAutomatonStateSize(), new Well19937c());
     cells.setState(state);
     return cells;
+  }
+
+  protected CellularAutomatonDescriptor getDescriptor() throws IOException {
+    return CellularAutomatonDescriptorReader.read(getDescriptorInputStream());
   }
 
   @Override

@@ -1,13 +1,17 @@
 package org.mechaverse.simulation.experimental;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
 import org.mechaverse.simulation.common.AbstractEntity;
 import org.mechaverse.simulation.common.SimulationConfig;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticData;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticData.CellGeneticData;
+import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorBuilder;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulatorConfig;
+import org.mechaverse.simulation.common.cellautomaton.simulation.LogicalUnitBuilder;
 import org.mechaverse.simulation.common.genetic.selection.ElitistSelectionStrategy;
 import org.mechaverse.simulation.common.genetic.selection.SelectionStrategy;
 import org.mechaverse.simulation.common.genetic.selection.TournamentSelectionStrategy;
@@ -104,10 +108,24 @@ public class SequentialPatternSimulation {
         .setMinimize(true)
         .setOpenCLSimulator(new CellularAutomatonSimulatorConfig.Builder()
             .setNumAutomata(NUM_ENTITIES)
-            .setDescriptorResource("boolean4-4x4-noinput.xml")
+            .setDescriptor(getDescriptor())
             .build())
         .setSelectionStrategy(selectionStrategy).build());
 
     simulation.step(MAX_ITERATIONS, 0.0);
+  }
+
+  private static CellularAutomatonDescriptor getDescriptor() throws IOException {
+    return CellularAutomatonDescriptorBuilder.newBuilderFromResource("boolean4.xml")
+        .setWidth(1)
+        .setHeight(1)
+        .setIterationsPerUpdate(1)
+        .setLogicalUnit(new LogicalUnitBuilder()
+            .setWidth(4)
+            .setHeight(4)
+            .setNeighborConnections(4)
+            .setDefaultCellType("boolean4")
+            .build())
+        .build();
   }
 }

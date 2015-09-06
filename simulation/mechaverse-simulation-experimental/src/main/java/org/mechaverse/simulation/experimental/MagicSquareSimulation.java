@@ -1,13 +1,15 @@
 package org.mechaverse.simulation.experimental;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import com.google.common.base.Function;
+import com.google.common.base.Supplier;
+import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
 import org.mechaverse.simulation.common.AbstractEntity;
 import org.mechaverse.simulation.common.SimulationConfig;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticData;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticData.CellGeneticData;
+import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorBuilder;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulatorConfig;
+import org.mechaverse.simulation.common.cellautomaton.simulation.LogicalUnitBuilder;
 import org.mechaverse.simulation.common.genetic.selection.ElitistSelectionStrategy;
 import org.mechaverse.simulation.common.genetic.selection.SelectionStrategy;
 import org.mechaverse.simulation.common.genetic.selection.TournamentSelectionStrategy;
@@ -15,8 +17,9 @@ import org.mechaverse.simulation.common.simple.SimpleSimulation;
 import org.mechaverse.simulation.common.simple.SimpleSimulationModel;
 import org.mechaverse.simulation.common.simple.SimpleSimulationState;
 
-import com.google.common.base.Function;
-import com.google.common.base.Supplier;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A simulation to find magic squares.
@@ -132,10 +135,25 @@ public class MagicSquareSimulation {
         .setMinimize(true)
         .setOpenCLSimulator(new CellularAutomatonSimulatorConfig.Builder()
             .setNumAutomata(NUM_ENTITIES)
-            .setDescriptorResource("boolean4-3x3-noinput.xml")
+            .setDescriptor(getDescriptor())
             .build())
-        .setSelectionStrategy(selectionStrategy).build());
+        .setSelectionStrategy(selectionStrategy)
+        .build());
 
     simulation.step(MAX_ITERATIONS, 0.0);
+  }
+
+  private static CellularAutomatonDescriptor getDescriptor() throws IOException {
+    return CellularAutomatonDescriptorBuilder.newBuilderFromResource("boolean4.xml")
+        .setWidth(1)
+        .setHeight(1)
+        .setIterationsPerUpdate(1)
+        .setLogicalUnit(new LogicalUnitBuilder()
+            .setWidth(3)
+            .setHeight(3)
+            .setNeighborConnections(4)
+            .setDefaultCellType("boolean4")
+            .build())
+        .build();
   }
 }

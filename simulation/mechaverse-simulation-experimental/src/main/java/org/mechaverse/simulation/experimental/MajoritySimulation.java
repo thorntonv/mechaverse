@@ -2,9 +2,12 @@ package org.mechaverse.simulation.experimental;
 
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
+import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
 import org.mechaverse.simulation.common.AbstractEntity;
 import org.mechaverse.simulation.common.SimulationConfig;
+import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorBuilder;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulatorConfig;
+import org.mechaverse.simulation.common.cellautomaton.simulation.LogicalUnitBuilder;
 import org.mechaverse.simulation.common.cellautomaton.simulation.SimulatorCellularAutomaton;
 import org.mechaverse.simulation.common.genetic.selection.ElitistSelectionStrategy;
 import org.mechaverse.simulation.common.genetic.selection.SelectionStrategy;
@@ -14,6 +17,7 @@ import org.mechaverse.simulation.common.simple.SimpleSimulationModel;
 import org.mechaverse.simulation.common.simple.SimpleSimulationState;
 
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 
 /**
@@ -24,9 +28,11 @@ import java.io.OutputStream;
 public class MajoritySimulation {
 
   private static final int NUM_ENTITIES = 2500;
-  private static final int RETAIN_TOP_ENTITY_COUNT = 100;
-  private static final int REMOVE_BOTTOM_ENTITY_COUNT = 100;
+  private static final int RETAIN_TOP_ENTITY_COUNT = 125;
+  private static final int REMOVE_BOTTOM_ENTITY_COUNT = 125;
   private static final int MAX_ITERATIONS = Integer.MAX_VALUE;
+  private static final int WIDTH = 5;
+  private static final int HEIGHT = 3;
   private static final int UPDATES_PER_ITERATION = 32;
 
   public static class MajorityFitnessCalculator implements Function<MajorityEntity, Double> {
@@ -157,10 +163,10 @@ public class MajoritySimulation {
         .setEntitySupplier(new MagicSquareEntitySupplier())
         .setEntityFitnessFunction(MajorityFitnessCalculator.INSTANCE)
         .setUpdatesPerIteration(UPDATES_PER_ITERATION)
-        .setOpenCLSimulator(new CellularAutomatonSimulatorConfig.Builder()
-            .setNumAutomata(NUM_ENTITIES).setDescriptorResource("boolean4-5x3-noinput.xml")
-            .setAutomatonInputSize(15)
-            .setAutomatonOutputSize(5)
+        .setOpenCLSimulator(new CellularAutomatonSimulatorConfig.Builder().setNumAutomata(NUM_ENTITIES)
+            .setDescriptor(getDescriptor())
+            .setAutomatonInputSize(WIDTH * HEIGHT)
+            .setAutomatonOutputSize(WIDTH)
             .build())
         .setSelectionStrategy(selectionStrategy)
         .build());
@@ -171,5 +177,19 @@ public class MajoritySimulation {
     try(OutputStream out = new FileOutputStream("entity.out")) {
       out.write(bestEntity.getCellularAutomatonGeneticData().getData());
     }
+  }
+
+  public static final CellularAutomatonDescriptor getDescriptor() throws IOException {
+    return CellularAutomatonDescriptorBuilder.newBuilderFromResource("boolean4.xml")
+        .setWidth(1)
+        .setHeight(1)
+        .setIterationsPerUpdate(50)
+        .setLogicalUnit(new LogicalUnitBuilder()
+            .setWidth(WIDTH)
+            .setHeight(HEIGHT)
+            .setNeighborConnections(4)
+            .setDefaultCellType("boolean4")
+            .build())
+        .build();
   }
 }

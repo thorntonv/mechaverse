@@ -1,9 +1,14 @@
 package org.mechaverse.simulation.experimental;
 
+import com.google.common.base.Function;
+import com.google.common.base.Supplier;
+import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
 import org.mechaverse.simulation.common.AbstractEntity;
 import org.mechaverse.simulation.common.SimulationConfig;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticData;
+import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorBuilder;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulatorConfig;
+import org.mechaverse.simulation.common.cellautomaton.simulation.LogicalUnitBuilder;
 import org.mechaverse.simulation.common.genetic.selection.ElitistSelectionStrategy;
 import org.mechaverse.simulation.common.genetic.selection.SelectionStrategy;
 import org.mechaverse.simulation.common.genetic.selection.TournamentSelectionStrategy;
@@ -11,8 +16,7 @@ import org.mechaverse.simulation.common.simple.SimpleSimulation;
 import org.mechaverse.simulation.common.simple.SimpleSimulationModel;
 import org.mechaverse.simulation.common.simple.SimpleSimulationState;
 
-import com.google.common.base.Function;
-import com.google.common.base.Supplier;
+import java.io.IOException;
 
 public class CheckerboardPatternSimulation {
 
@@ -80,11 +84,25 @@ public class CheckerboardPatternSimulation {
         .setUpdatesPerIteration(0)
         .setOpenCLSimulator(new CellularAutomatonSimulatorConfig.Builder()
             .setNumAutomata(NUM_ENTITIES)
-            .setDescriptorResource("boolean4-8x8-noinput.xml")
+            .setDescriptor(getDescriptor())
             .build())
         .setSelectionStrategy(selectionStrategy)
         .build());
 
     simulation.step(MAX_ITERATIONS, 64);
+  }
+
+  private static CellularAutomatonDescriptor getDescriptor() throws IOException {
+    return CellularAutomatonDescriptorBuilder.newBuilderFromResource("boolean4.xml")
+        .setWidth(2)
+        .setHeight(2)
+        .setIterationsPerUpdate(1)
+        .setLogicalUnit(new LogicalUnitBuilder()
+            .setWidth(4)
+            .setHeight(4)
+            .setNeighborConnections(4)
+            .setDefaultCellType(CellularAutomatonDescriptorBuilder.BOOLEAN_4INPUT_CELL_TYPE)
+            .build())
+        .build();
   }
 }
