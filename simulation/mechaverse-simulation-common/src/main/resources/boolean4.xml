@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <CellularAutomatonDescriptor xmlns="http://www.mechaverse.org/cellautomaton/model" 
-    width="8" height="8" iterationsPerUpdate="175">
+    width="4" height="4" iterationsPerUpdate="175">
 
   <!-- An element that outputs either an external input value or the bit from an adjacent plane. -->
   <CellType id="shift">
@@ -64,7 +64,7 @@
     </row>
     <row>
       <Cell type="boolean4" />
-      <Cell type="shift" />
+      <Cell type="boolean4" />
       <Cell type="boolean4" />
     </row>
     <row>

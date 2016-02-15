@@ -18,6 +18,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.mechaverse.simulation.ant</groupId>
+      <artifactId>mechaverse-simulation-ant-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
