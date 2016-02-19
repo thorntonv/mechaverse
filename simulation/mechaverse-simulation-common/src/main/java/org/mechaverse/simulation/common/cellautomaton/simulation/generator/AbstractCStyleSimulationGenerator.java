@@ -1,7 +1,5 @@
 package org.mechaverse.simulation.common.cellautomaton.simulation.generator;
 
-import java.io.PrintWriter;
-
 import org.mechaverse.cellautomaton.model.Output;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel.CellInfo;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel.ExternalCellInfo;

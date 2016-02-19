@@ -44,7 +44,7 @@ public class ManagerDashboardView extends Composite {
     void onSelectSimulation(SimulationInfo selectedSimulationInfo);
   }
 
-  interface MyUiBinder extends UiBinder<Widget, ManagerDashboardView> {};
+  interface MyUiBinder extends UiBinder<Widget, ManagerDashboardView> {}
 
   private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 

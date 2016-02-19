@@ -14,7 +14,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class EditSimulationConfigView extends Composite {
 
-  interface MyUiBinder extends UiBinder<Widget, EditSimulationConfigView> {};
+  interface MyUiBinder extends UiBinder<Widget, EditSimulationConfigView> {}
 
   private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 

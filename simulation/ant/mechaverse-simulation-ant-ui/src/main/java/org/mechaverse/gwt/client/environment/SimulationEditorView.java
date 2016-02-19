@@ -31,7 +31,7 @@ public class SimulationEditorView extends ResizeComposite {
     void onEnvironmentSelected(String environmentId);
   }
 
-  interface MyUiBinder extends UiBinder<Widget, SimulationEditorView> {};
+  interface MyUiBinder extends UiBinder<Widget, SimulationEditorView> {}
   private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   @UiField EnvironmentDropDown environmentDropDown;

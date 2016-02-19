@@ -119,7 +119,7 @@ public class SimulationPresenter extends AbstractActivity {
         schedule(0);
       }
     }
-  };
+  }
 
   private final MechaverseGwtRpcServiceAsync service =
       MechaverseGwtRpcServiceAsync.Util.getInstance();

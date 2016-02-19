@@ -50,7 +50,7 @@ public class SimpleAnt extends OpenClCellularAutomatonCLI {
     // Front center food. No turn.
     cells.getCell(0, cells.getWidth() / 2).setOutput(0, 0);
     // Front right food. Turn clockwise.
-    cells.getCell(0, cells.getWidth() - 1).setOutput(0, 1);
+    cells.getCell(0, cells.getWidth() - 1).setOutput(0, 0);
     cells.updateInputs();
 
     return cells;
