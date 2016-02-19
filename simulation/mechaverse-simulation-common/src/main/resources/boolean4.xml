@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <CellularAutomatonDescriptor xmlns="http://www.mechaverse.org/cellautomaton/model" 
-    width="4" height="4" iterationsPerUpdate="175">
-
-  <!-- An element that outputs either an external input value or the bit from an adjacent plane. -->
-  <CellType id="shift">
-    <Output id="1" >
-      <UpdateExpression><![CDATA[
-        ({input1} >> 1) | ({input1} << 31)
-	  ]]></UpdateExpression>
-    </Output>
-  </CellType>
+    width="4" height="4" iterationsPerUpdate="25">
   
   <CellType id="boolean4">
     <Var id="nextOutput" />

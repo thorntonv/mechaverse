@@ -2,10 +2,12 @@ package org.mechaverse.simulation.experimental;
 
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
+import com.google.common.io.Files;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
 import org.mechaverse.simulation.common.AbstractEntity;
 import org.mechaverse.simulation.common.SimulationConfig;
+import org.mechaverse.simulation.common.cellautomaton.examples.SimpleAnt;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorReader;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulatorConfig;
 import org.mechaverse.simulation.common.cellautomaton.simulation.SimulatorCellularAutomaton;
@@ -18,6 +20,7 @@ import org.mechaverse.simulation.common.simple.SimpleSimulationModel;
 import org.mechaverse.simulation.common.simple.SimpleSimulationState;
 import org.mechaverse.simulation.common.util.RandomUtil;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -29,7 +32,7 @@ public class SimpleAntSimulation {
   private static final int RETAIN_TOP_ENTITY_COUNT = 50;
   private static final int REMOVE_BOTTOM_ENTITY_COUNT = 50;
   private static final int MAX_ITERATIONS = Integer.MAX_VALUE;
-  private static final int UPDATES_PER_ITERATION = 100;
+  private static final int UPDATES_PER_ITERATION = 150;
 
 
   public static class AntFitnessCalculator implements Function<AntEntity, Double> {
@@ -50,7 +53,7 @@ public class SimpleAntSimulation {
     }
   }
 
-  private static class AntEntity extends AbstractEntity {
+  public static class AntEntity extends AbstractEntity {
 
     private static final class Input {
 
@@ -85,9 +88,9 @@ public class SimpleAntSimulation {
         boolean clockwise = (data[1] & 0b1) == 1;
 
         if (counterClockwise && !clockwise) {
-          direction = TurnDirection.CLOCKWISE;
-        } else if (!counterClockwise && clockwise) {
           direction = TurnDirection.COUNTERCLOCKWISE;
+        } else if (!counterClockwise && clockwise) {
+          direction = TurnDirection.CLOCKWISE;
         } else {
           direction = TurnDirection.NONE;
         }
@@ -147,18 +150,7 @@ public class SimpleAntSimulation {
     @Override
     public void setCellularAutomaton(SimulatorCellularAutomaton cellularAutomaton) {
       super.setCellularAutomaton(cellularAutomaton);
-
-      cellularAutomaton.getCell(0, 0).addOutputToInputMap(0);
-      cellularAutomaton.getCell(0, cellularAutomaton.getWidth() / 2).addOutputToInputMap(0);
-      cellularAutomaton.getCell(0, cellularAutomaton.getWidth() - 1).addOutputToInputMap(0);
-
-      cellularAutomaton.getCell(cellularAutomaton.getHeight() - 1, 0)
-          .addOutputToOutputMap(0);
-      cellularAutomaton.getCell(cellularAutomaton.getHeight() - 1, cellularAutomaton.getWidth() - 1)
-          .addOutputToOutputMap(0);
-
-      cellularAutomaton.updateInputMap();
-      cellularAutomaton.updateOutputMap();
+      SimpleAnt.initCellularAutomaton(cellularAutomaton);
     }
 
     public String toString() {
@@ -195,7 +187,11 @@ public class SimpleAntSimulation {
         .setSelectionStrategy(selectionStrategy)
         .build());
 
-    simulation.step(MAX_ITERATIONS, 1.0);
+    simulation.step(MAX_ITERATIONS, .95);
+
+    final byte[] data = simulation.getLogger().getOverallBestEntity()
+        .getKey().getCellularAutomatonGeneticData().getData();
+    Files.write(data, new File("simple-ant.dat"));
   }
 
   public static CellularAutomatonDescriptor getDescriptor() throws IOException {

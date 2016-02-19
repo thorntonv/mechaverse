@@ -55,16 +55,19 @@ public abstract class OpenClCellularAutomatonCLI extends CellularAutomatonCLI {
   @Override
   protected SimulatorCellularAutomaton createCellularAutomaton() throws IOException {
     CellularAutomatonDescriptor descriptor = getDescriptor();
-
-    CellularAutomatonSimulator simulator = new OpenClCellularAutomatonSimulator(
-        new CellularAutomatonSimulatorConfig.Builder()
-            .setDescriptor(descriptor)
-            .build());
+    CellularAutomatonSimulator simulator = createSimulator(descriptor);
     SimulatorCellularAutomaton cells = new SimulatorCellularAutomaton(descriptor, simulator);
     int[] state = CellularAutomatonSimulationUtil.randomState(
         simulator.getAutomatonStateSize(), new Well19937c());
     cells.setState(state);
     return cells;
+  }
+
+  protected  CellularAutomatonSimulator createSimulator(CellularAutomatonDescriptor descriptor) {
+    return new OpenClCellularAutomatonSimulator(
+        new CellularAutomatonSimulatorConfig.Builder()
+            .setDescriptor(descriptor)
+            .build());
   }
 
   protected CellularAutomatonDescriptor getDescriptor() throws IOException {
@@ -78,9 +81,10 @@ public abstract class OpenClCellularAutomatonCLI extends CellularAutomatonCLI {
   }
 
   @Override
-  protected CellularAutomatonVisualizer createVisualizer(int width, int height, int framesPerSecond)
+  protected CellularAutomatonVisualizer createVisualizer(int width, int height, int framesPerSecond,
+                                                         int frameCount)
       throws IOException {
     return new CellularAutomatonVisualizer(createCellularAutomaton(), getCellColorProvider(),
-        width, height, framesPerSecond);
+        width, height, framesPerSecond, frameCount);
   }
 }

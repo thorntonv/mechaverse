@@ -124,9 +124,9 @@ public class BooleanFunction3 extends AbstractCellularAutomaton {
 
       @Override
       protected CellularAutomatonVisualizer createVisualizer(int width, int height,
-          int framesPerSecond) throws IOException {
+          int framesPerSecond, int frameCount) throws IOException {
         return new CellularAutomatonVisualizer(createCellularAutomaton(), CELL_COLOR_PROVIDER,
-            width, height, framesPerSecond);
+            width, height, framesPerSecond, frameCount);
       }
     };
     CellularAutomatonCLI.main(args, cli);

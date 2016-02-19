@@ -36,7 +36,8 @@ public abstract class CellularAutomatonCLI {
 
       if (cmd.hasOption('v')) {
         int framesPerSecond = Integer.parseInt(cmd.getOptionValue("frameRate", "60"));
-        cli.createVisualizer(width, height, framesPerSecond).start();
+        int frameCount = Integer.parseInt(cmd.getOptionValue("frameCount", "-1"));
+        cli.createVisualizer(width, height, framesPerSecond, frameCount).start();
       } else if (cmd.hasOption('f')) {
         int frameCount = Integer.parseInt(cmd.getOptionValue("frameCount", "1800"));
         CellularAutomaton cells = cli.createCellularAutomaton();
@@ -76,7 +77,7 @@ public abstract class CellularAutomatonCLI {
       CellularAutomaton cells, int width, int height);
 
   protected abstract CellularAutomatonVisualizer createVisualizer(int width, int height,
-      int framesPerSecond) throws IOException;
+      int framesPerSecond, int frameCount) throws IOException;
   
   private static Options buildOptions() {
     Options options = new Options();
