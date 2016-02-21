@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 
+import org.apache.commons.math3.util.Pair;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomaton;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomaton.Cell;
 
@@ -22,6 +23,7 @@ public class CellularAutomatonRenderer {
   private int scale;
   private Function<Cell, Color> cellColorProvider;
 
+  @SuppressWarnings("unused")
   public CellularAutomatonRenderer(
       CellularAutomaton cells, Function<Cell, Color> cellColorProvider) {
     this(cells, cellColorProvider, 
@@ -58,6 +60,10 @@ public class CellularAutomatonRenderer {
       }
     }
     return image;
+  }
+
+  public Pair<Integer, Integer> getCell(int x, int y) {
+    return new Pair<>(y / scale, x / scale);
   }
 
   public Dimension getPreferredSize() {

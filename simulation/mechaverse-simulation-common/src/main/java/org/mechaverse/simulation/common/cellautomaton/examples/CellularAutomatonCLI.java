@@ -37,7 +37,7 @@ public abstract class CellularAutomatonCLI {
       if (cmd.hasOption('v')) {
         int framesPerSecond = Integer.parseInt(cmd.getOptionValue("frameRate", "60"));
         int frameCount = Integer.parseInt(cmd.getOptionValue("frameCount", "-1"));
-        cli.createVisualizer(width, height, framesPerSecond, frameCount).start();
+        cli.createVisualizer(width, height, framesPerSecond, frameCount);
       } else if (cmd.hasOption('f')) {
         int frameCount = Integer.parseInt(cmd.getOptionValue("frameCount", "1800"));
         CellularAutomaton cells = cli.createCellularAutomaton();

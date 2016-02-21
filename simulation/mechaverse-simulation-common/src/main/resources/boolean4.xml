@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <CellularAutomatonDescriptor xmlns="http://www.mechaverse.org/cellautomaton/model" 
-    width="4" height="4" iterationsPerUpdate="25">
+    width="2" height="2" iterationsPerUpdate="20">
   
   <CellType id="boolean4">
     <Var id="nextOutput" />

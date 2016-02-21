@@ -29,4 +29,6 @@ public interface CellularAutomaton {
   Cell getCell(int row, int column);
   
   void update();
+  void updateInputs();
+
 }

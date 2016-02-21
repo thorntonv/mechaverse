@@ -96,4 +96,6 @@ public abstract class AbstractCellularAutomaton implements CellularAutomaton {
       }
     }
   }
+
+  public void updateInputs() {}
 }

@@ -1,18 +1,23 @@
 package org.mechaverse.simulation.common.cellautomaton.ui;
 
-import java.awt.Color;
-
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-
+import com.google.common.base.Function;
+import org.apache.commons.math3.util.Pair;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomaton;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomaton.Cell;
 
-import com.google.common.base.Function;
+import javax.swing.*;
+import javax.swing.event.MouseInputAdapter;
+import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A {@link CellularAutomaton} visualizer.
- * 
+ *
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class CellularAutomatonVisualizer extends JFrame {
@@ -25,7 +30,9 @@ public class CellularAutomatonVisualizer extends JFrame {
   private final BufferedImageView imageView;
   private final int framesPerSecond;
   private final int frameCount;
+  private final AtomicBoolean running = new AtomicBoolean(false);
 
+  @SuppressWarnings("unused")
   public CellularAutomatonVisualizer(CellularAutomaton cellularAutomaton,
       Function<Cell, Color> cellColorProvider, int width, int height, int framesPerSecond) {
     this(cellularAutomaton, cellColorProvider, width, height, framesPerSecond, -1);
@@ -41,7 +48,7 @@ public class CellularAutomatonVisualizer extends JFrame {
     this.frameCount = frameCount;
 
     initUI();
-    
+
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
@@ -49,24 +56,33 @@ public class CellularAutomatonVisualizer extends JFrame {
       }
     });
   }
-  
+
   public void start() {
-    try {
-      int cnt = 1;
-      while (frameCount == -1 || cnt <= frameCount) {
-        update();
-        Thread.sleep(1000 / framesPerSecond);
-        cnt++;
-      }
-    } catch (InterruptedException ignored) {}
+    if (running.compareAndSet(false, true)) {
+      try {
+        int cnt = 1;
+        while (frameCount == -1 || cnt <= frameCount) {
+          update();
+          Thread.sleep(1000 / framesPerSecond);
+          cnt++;
+        }
+      } catch (InterruptedException ignored) {}
+      running.set(false);
+    }
   }
-  
+
   public void update() {
+    cellularAutomaton.update();
+    cellularAutomaton.updateInputs();
+
+    repaintUI();
+  }
+
+  private void repaintUI() {
     imageView.setImage(renderer.draw());
     imageView.repaint();
-    cellularAutomaton.update();
   }
-  
+
   private void initUI() {
     setTitle(TITLE);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -75,5 +91,41 @@ public class CellularAutomatonVisualizer extends JFrame {
     imageView.setPreferredSize(renderer.getPreferredSize());
     pack();
     setLocationRelativeTo(null);
+    repaintUI();
+
+    this.addMouseListener(new MouseInputAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        Pair<Integer, Integer> coord = renderer.getCell(e.getX(), e.getY());
+        Cell cell = cellularAutomaton.getCell(coord.getFirst(), coord.getSecond());
+        cell.setOutput(0, ~cell.getOutput(0));
+        imageView.setImage(renderer.draw());
+        imageView.repaint();
+      }
+    });
+
+    this.addKeyListener(new KeyAdapter() {
+      @Override
+      public void keyPressed(KeyEvent e) {
+        switch(e.getKeyCode()) {
+          case KeyEvent.VK_ENTER:
+            // Start performing updates.
+            new Timer().schedule(new TimerTask() {
+              @Override
+              public void run() {
+                start();
+              }
+            }, 0);
+            break;
+          case KeyEvent.VK_SPACE:
+            // Perform a single update.
+            if (running.compareAndSet(false, true)) {
+              update();
+              running.set(false);
+            }
+            break;
+        }
+      }
+    });
   }
 }

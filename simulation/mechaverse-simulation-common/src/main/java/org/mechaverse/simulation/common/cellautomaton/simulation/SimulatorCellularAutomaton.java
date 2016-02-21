@@ -40,6 +40,7 @@ public class SimulatorCellularAutomaton implements CellularAutomaton {
     public void setOutput(int idx, int value) {
       String varName = cellInfo.getOutputVarName(cellInfo.getOutputs().get(idx));
       state[getStateIndex(varName)] = value;
+      updateState();
     }
 
     public void addOutputToInputMap(int idx) {
@@ -174,6 +175,10 @@ public class SimulatorCellularAutomaton implements CellularAutomaton {
     this.state = state;
   }
 
+  public int[] getOutputs() {
+    return output;
+  }
+
   @Override
   public int getWidth() {
     return cells[0].length;
@@ -215,6 +220,7 @@ public class SimulatorCellularAutomaton implements CellularAutomaton {
 
   public void updateState() {
     simulator.setAutomatonState(index, state);
+    updateInputs();
   }
 
   public void updateOutputMap() {
