@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CellularAutomatonDescriptor xmlns="http://www.mechaverse.org/cellautomaton/model" 
+    width="2" height="2" iterationsPerUpdate="1" valueType="float">
+  
+  <CellType id="weightedavg4">
+    <Var id="nextOutput" />
+
+    <Output id="1">
+      <Param id="inputWeight1" />
+      <Param id="inputWeight2" />
+      <Param id="inputWeight3" />
+      <Param id="inputWeight4" />
+
+      <BeforeUpdate><![CDATA[
+          float {nextOutput} = ({input1} * {inputWeight1} + {input2} * {inputWeight2} +
+              {input3} * {inputWeight3} + {input4} * {inputWeight4})  /
+                  ({inputWeight1} + {inputWeight2} + {inputWeight3} + {inputWeight4});
+      ]]></BeforeUpdate>
+      <UpdateExpression><![CDATA[{nextOutput}]]></UpdateExpression>
+    </Output>
+  </CellType>
+
+  <LogicalUnit neighborConnections="4" >
+    <row>
+      <Cell type="weightedavg4" />
+      <Cell type="weightedavg4" />
+      <Cell type="weightedavg4" />
+    </row>
+    <row>
+      <Cell type="weightedavg4" />
+      <Cell type="weightedavg4" />
+      <Cell type="weightedavg4" />
+    </row>
+    <row>
+      <Cell type="weightedavg4" />
+      <Cell type="weightedavg4" />
+      <Cell type="weightedavg4" />
+    </row>
+  </LogicalUnit>
+</CellularAutomatonDescriptor>

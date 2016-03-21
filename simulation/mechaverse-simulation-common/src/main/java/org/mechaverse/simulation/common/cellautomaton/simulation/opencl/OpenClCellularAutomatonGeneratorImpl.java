@@ -40,33 +40,35 @@ public class OpenClCellularAutomatonGeneratorImpl extends AbstractCStyleSimulati
     LogicalUnitInfo logicalUnitInfo = model.getLogicalUnitInfo();
     int numExternalCells = logicalUnitInfo.getExternalCells().size();
 
+    final String valueType = model.getValueType();
     out.println("void kernel " + OpenClCellularAutomatonSimulator.KERNEL_NAME + "(");
-    out.println("global const int* automatonInputMaps, global const int* automatonInputs, " +
-        "global int* automatonStates, global int* automatonOutputMaps, " +
-        "global int* automatonOutputs, const unsigned int automatonInputLength, " +
+    out.println("global const int* automatonInputMaps, " +
+        "global const " + valueType + "* automatonInputs, " +
+        "global " + valueType + "* automatonStates, global int* automatonOutputMaps, " +
+        "global " + valueType + "* automatonOutputs, const unsigned int automatonInputLength, " +
         "const unsigned int automatonOutputLength) {").indent();
 
     String automatonIdxExpr = "get_global_id(0) / get_local_size(0)";
 
     // State is arranged as an array of automaton states. The state of each automaton is arranged as
     // an array of logical unit states. The automaton index is get_global_id(0) / get_local_size(0)
-    out.printf("__global int* automatonState = &automatonStates[%s * %d];%n",
-        automatonIdxExpr, model.getStateSize());
+    out.printf("__global %s* automatonState = &automatonStates[%s * %d];%n",
+        valueType, automatonIdxExpr, model.getStateSize());
 
     out.printf(
         "__global int* automatonInputMap = &automatonInputMaps[%s * automatonInputLength];%n",
         automatonIdxExpr);
 
     out.printf(
-        "__global int* automatonInput = &automatonInputs[%s * automatonInputLength];%n",
-            automatonIdxExpr);
+        "__global %s* automatonInput = &automatonInputs[%s * automatonInputLength];%n",
+            valueType, automatonIdxExpr);
 
     out.printf(
         "__global int* automatonOutputMap = &automatonOutputMaps[%s * automatonOutputLength];%n",
             automatonIdxExpr);
 
-    out.printf("__global int* automatonOutput = &automatonOutputs[%s * automatonOutputLength];%n",
-        automatonIdxExpr);
+    out.printf("__global %s* automatonOutput = &automatonOutputs[%s * automatonOutputLength];%n",
+        valueType, automatonIdxExpr);
 
     out.println();
 
@@ -81,10 +83,10 @@ public class OpenClCellularAutomatonGeneratorImpl extends AbstractCStyleSimulati
     generateCopyStateValuesToVariables(logicalUnitInfo, out);
     out.println();
 
-    out.printf("__local int external[%d];%n", model.getLogicalUnitCount() * numExternalCells);
+    out.printf("__local %s external[%d];%n", valueType, model.getLogicalUnitCount() * numExternalCells);
 
     // Declare temporary variables.
-    out.println("int tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7, tmp8;");
+    out.println(valueType + " tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7, tmp8;");
 
     // Copy external cells to shared memory.
     generateCopyExternalInputsToState("external", logicalUnitInfo, out);

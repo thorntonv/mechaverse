@@ -353,6 +353,10 @@ public class CellularAutomatonSimulationModel {
     return descriptor.getIterationsPerUpdate() != null ? descriptor.getIterationsPerUpdate() : 1;
   }
 
+  public String getValueType() {
+    return descriptor.getValueType() != null ? descriptor.getValueType() : "int";
+  }
+
   /**
    * Returns the number of state values.
    */

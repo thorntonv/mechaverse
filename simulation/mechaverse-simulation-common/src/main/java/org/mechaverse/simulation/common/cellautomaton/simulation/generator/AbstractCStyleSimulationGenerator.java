@@ -65,7 +65,8 @@ public abstract class AbstractCStyleSimulationGenerator
     for (int idx = 0; idx < logicalUnitInfo.getExternalCells().size(); idx++) {
       ExternalCellInfo externalCellInfo = logicalUnitInfo.getExternalCells().get(idx);
       for (String outputVarName : externalCellInfo.getOutputVarNames()) {
-        out.printf("int %s = %s[%s_idx];%n", outputVarName, stateArrayVarName, outputVarName);
+        out.printf("%s %s = %s[%s_idx];%n",
+            model.getValueType(), outputVarName, stateArrayVarName, outputVarName);
       }
     }
   }
@@ -179,8 +180,8 @@ public abstract class AbstractCStyleSimulationGenerator
   }
 
   private String loadStateToVarStatement(String varName, int stateIndex) {
-    return String.format("int %s = automatonState[%s];", varName,
-        getStateIndexExpr(getLogicalUnitIndexExpr(), stateIndex));
+    return String.format("%s %s = automatonState[%s];",
+        model.getValueType(), varName, getStateIndexExpr(getLogicalUnitIndexExpr(), stateIndex));
   }
 
   private String saveVarToStateStatement(String varName, int stateIndex) {

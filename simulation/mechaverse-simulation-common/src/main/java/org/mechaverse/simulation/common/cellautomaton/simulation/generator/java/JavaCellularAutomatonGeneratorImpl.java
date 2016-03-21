@@ -38,6 +38,9 @@ public class JavaCellularAutomatonGeneratorImpl extends AbstractCStyleSimulation
   public JavaCellularAutomatonGeneratorImpl(CellularAutomatonSimulationModel model, int inputSize,
       int outputSize) {
     super(model);
+    if (!"int".equalsIgnoreCase(model.getValueType())) {
+      throw new RuntimeException("Unsupported value type " + model.getValueType());
+    }
     this.inputSize = inputSize;
     this.outputSize = outputSize;
   }
