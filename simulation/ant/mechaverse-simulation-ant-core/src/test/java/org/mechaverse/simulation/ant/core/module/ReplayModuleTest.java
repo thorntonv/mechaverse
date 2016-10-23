@@ -1,7 +1,6 @@
 package org.mechaverse.simulation.ant.core.module;
 
 import static org.junit.Assert.assertEquals;
-import static org.mechaverse.simulation.ant.api.SimulationModelUtil.serialize;
 import static org.mechaverse.simulation.ant.core.AntSimulationTestUtil.assertModelsEqual;
 
 import java.io.ByteArrayOutputStream;
@@ -11,8 +10,9 @@ import java.io.IOException;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.Before;
 import org.junit.Test;
-import org.mechaverse.simulation.ant.api.AntSimulationState;
-import org.mechaverse.simulation.ant.api.model.SimulationModel;
+import org.mechaverse.simulation.ant.core.AntSimulationState;
+import org.mechaverse.simulation.ant.core.util.AntSimulationModelUtil;
+import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.ant.core.AntSimulationEnvironmentGenerator;
 import org.mechaverse.simulation.ant.core.AntSimulationImpl;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
@@ -41,7 +41,7 @@ public class ReplayModuleTest {
   @Test
   public void replayInitialState() throws IOException {
     SimulationModel expectedModel = AntSimulationImpl.randomState().getModel();
-    byte[] expectedModelBytes = serialize(expectedModel);
+    byte[] expectedModelBytes = AntSimulationModelUtil.serialize(expectedModel);
     state.getReplayDataStore().put(ReplayModule.INITIAL_MODEL_KEY, expectedModelBytes);
     state.getReplayDataStore().put(ReplayModule.RANDOM_SEED_DATA_KEY, new byte[0]);
     replayModule.setState(state, environment, entityManager);

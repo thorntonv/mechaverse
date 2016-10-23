@@ -9,9 +9,8 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Test;
-import org.mechaverse.simulation.ant.api.AntSimulationState;
-import org.mechaverse.simulation.ant.api.model.Ant;
-import org.mechaverse.simulation.ant.api.model.Entity;
+import org.mechaverse.simulation.ant.core.model.Ant;
+import org.mechaverse.simulation.common.model.Entity;
 import org.mechaverse.simulation.ant.core.entity.ant.CellularAutomatonAntBehavior;
 import org.mechaverse.simulation.common.Simulation;
 import org.mechaverse.simulation.common.datastore.SimulationDataStore;

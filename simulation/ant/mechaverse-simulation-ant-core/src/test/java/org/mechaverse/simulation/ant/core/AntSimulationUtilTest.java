@@ -3,8 +3,8 @@ package org.mechaverse.simulation.ant.core;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.mechaverse.simulation.ant.api.model.Ant;
-import org.mechaverse.simulation.ant.api.model.Direction;
+import org.mechaverse.simulation.ant.core.model.Ant;
+import org.mechaverse.simulation.common.model.Direction;
 
 /**
  * Unit tests for {@link AntSimulationUtil}.

@@ -7,10 +7,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.mechaverse.simulation.ant.api.AntSimulationState;
-import org.mechaverse.simulation.ant.api.SimulationModelUtil;
-import org.mechaverse.simulation.ant.api.model.Entity;
-import org.mechaverse.simulation.ant.api.model.Environment;
+import org.mechaverse.simulation.common.util.SimulationModelUtil;
+import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.Environment;
 import org.mechaverse.simulation.ant.core.module.AntSimulationModule;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;

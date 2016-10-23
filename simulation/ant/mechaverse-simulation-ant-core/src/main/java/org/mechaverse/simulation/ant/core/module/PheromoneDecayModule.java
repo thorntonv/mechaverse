@@ -1,9 +1,9 @@
 package org.mechaverse.simulation.ant.core.module;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.mechaverse.simulation.ant.api.AntSimulationState;
-import org.mechaverse.simulation.ant.api.model.Entity;
-import org.mechaverse.simulation.ant.api.model.EntityType;
+import org.mechaverse.simulation.ant.core.AntSimulationState;
+import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.Cell;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
 import org.mechaverse.simulation.ant.core.EntityManager;

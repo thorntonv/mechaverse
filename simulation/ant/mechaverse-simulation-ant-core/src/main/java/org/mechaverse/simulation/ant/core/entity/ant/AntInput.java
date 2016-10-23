@@ -1,8 +1,8 @@
 package org.mechaverse.simulation.ant.core.entity.ant;
 
-import org.mechaverse.simulation.ant.api.model.Direction;
-import org.mechaverse.simulation.ant.api.model.EntityType;
-import org.mechaverse.simulation.ant.api.util.EntityUtil;
+import org.mechaverse.simulation.common.model.Direction;
+import org.mechaverse.simulation.ant.core.model.EntityType;
+import org.mechaverse.simulation.ant.core.entity.EntityUtil;
 
 /**
  * Encodes and decodes input for an ant.

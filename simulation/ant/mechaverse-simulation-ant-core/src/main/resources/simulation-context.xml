@@ -51,7 +51,7 @@
   <bean class="org.mechaverse.simulation.ant.core.EnvironmentSimulator.Factory" scope="prototype" />
   <bean class="org.mechaverse.simulation.ant.core.ActiveEntityProviders" scope="prototype">
     <constructor-arg>
-      <map key-type="org.mechaverse.simulation.ant.api.model.EntityType">
+      <map key-type="org.mechaverse.simulation.ant.core.model.EntityType">
         <entry key="ANT" value-ref="activeAntProvider" />
       </map>
     </constructor-arg>

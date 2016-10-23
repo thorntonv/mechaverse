@@ -3,7 +3,7 @@ package org.mechaverse.gwt.client.environment;
 import org.mechaverse.gwt.client.manager.ManagerClientFactory;
 import org.mechaverse.gwt.common.client.webconsole.NotificationBar;
 import org.mechaverse.gwt.shared.MechaverseGwtRpcServiceAsync;
-import org.mechaverse.simulation.ant.api.model.SimulationModel;
+import org.mechaverse.simulation.common.model.SimulationModel;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.dom.client.ScrollEvent;

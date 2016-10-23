@@ -1,7 +1,6 @@
 package org.mechaverse.simulation.ant.core;
 
-import org.mechaverse.simulation.ant.api.AntSimulationState;
-import org.mechaverse.simulation.ant.api.model.Entity;
+import org.mechaverse.simulation.common.model.Entity;
 
 /**
  * An interface for managing the addition and removal of entities from an environment.

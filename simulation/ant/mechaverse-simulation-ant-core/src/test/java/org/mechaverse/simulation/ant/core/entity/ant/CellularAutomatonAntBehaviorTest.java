@@ -16,9 +16,9 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mechaverse.simulation.ant.api.AntSimulationState;
-import org.mechaverse.simulation.ant.api.model.Ant;
-import org.mechaverse.simulation.ant.api.model.Entity;
+import org.mechaverse.simulation.ant.core.AntSimulationState;
+import org.mechaverse.simulation.ant.core.model.Ant;
+import org.mechaverse.simulation.common.model.Entity;
 import org.mechaverse.simulation.common.SimulationStateCellularAutomatonDescriptor;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonAllocator;
@@ -195,7 +195,7 @@ public class CellularAutomatonAntBehaviorTest {
 
   @Test
   public void onRemoveEntity() {
-    Entity otherEntity = new Entity();
+    Entity otherEntity = new Ant();
     otherEntity.setId("100");
     createGeneticDataStore(state.getEntityGeneticDataStore(otherEntity));
 

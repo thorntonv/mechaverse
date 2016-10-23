@@ -1,6 +1,6 @@
 package org.mechaverse.gwt.client.util.renderer;
 
-import org.mechaverse.simulation.ant.api.model.Environment;
+import org.mechaverse.simulation.common.model.Environment;
 
 import com.google.gwt.text.shared.AbstractRenderer;
 

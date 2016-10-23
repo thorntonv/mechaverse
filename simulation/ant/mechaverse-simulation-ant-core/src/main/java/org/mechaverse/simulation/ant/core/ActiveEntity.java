@@ -1,9 +1,8 @@
 package org.mechaverse.simulation.ant.core;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.mechaverse.simulation.ant.api.AntSimulationState;
-import org.mechaverse.simulation.ant.api.model.Entity;
-import org.mechaverse.simulation.ant.api.model.EntityType;
+import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.ant.core.model.EntityType;
 
 /**
  * An entity that is active in the environment.

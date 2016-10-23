@@ -1,11 +1,11 @@
 package org.mechaverse.simulation.ant.core.module;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.mechaverse.simulation.ant.api.AntSimulationState;
-import org.mechaverse.simulation.ant.api.model.Entity;
-import org.mechaverse.simulation.ant.api.model.EntityType;
-import org.mechaverse.simulation.ant.api.model.Food;
-import org.mechaverse.simulation.ant.api.util.EntityUtil;
+import org.mechaverse.simulation.ant.core.AntSimulationState;
+import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.ant.core.model.EntityType;
+import org.mechaverse.simulation.ant.core.model.Food;
+import org.mechaverse.simulation.ant.core.entity.EntityUtil;
 import org.mechaverse.simulation.ant.core.AntSimulationEnvironmentGenerator;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
 import org.mechaverse.simulation.ant.core.EntityManager;

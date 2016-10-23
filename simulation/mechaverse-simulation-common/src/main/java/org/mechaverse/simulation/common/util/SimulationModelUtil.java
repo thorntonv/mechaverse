@@ -1,4 +1,4 @@
-package org.mechaverse.simulation.ant.api;
+package org.mechaverse.simulation.common.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -13,8 +13,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import org.mechaverse.simulation.ant.api.model.Environment;
-import org.mechaverse.simulation.ant.api.model.SimulationModel;
+import org.mechaverse.simulation.common.model.Environment;
+import org.mechaverse.simulation.common.model.SimulationModel;
 
 import com.google.common.collect.Lists;
 
@@ -56,9 +56,10 @@ public final class SimulationModelUtil {
    * @param model the model to serialize
    * @param out the output stream to which serialized data will be written
    */
-  public static void serialize(SimulationModel model, OutputStream out) throws IOException {
+  public static void serialize(SimulationModel model, Class[] classesToBeBound, OutputStream out)
+      throws IOException {
     try {
-      JAXBContext jaxbContext = JAXBContext.newInstance(SimulationModel.class);
+      JAXBContext jaxbContext = JAXBContext.newInstance(classesToBeBound);
       Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
       jaxbMarshaller.marshal(model, out);
     } catch (JAXBException e) {
@@ -71,12 +72,12 @@ public final class SimulationModelUtil {
    *
    * @param in the input stream from which xml will be read
    */
-  public static SimulationModel deserialize(InputStream in) throws IOException {
+  public static SimulationModel deserialize(InputStream in, Class[] classesToBeBound) throws IOException {
     if (in == null) {
       return new SimulationModel();
     }
     try {
-      JAXBContext jaxbContext = JAXBContext.newInstance(SimulationModel.class);
+      JAXBContext jaxbContext = JAXBContext.newInstance(classesToBeBound);
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
       return (SimulationModel) jaxbUnmarshaller.unmarshal(in);
     } catch (JAXBException e) {
@@ -88,10 +89,10 @@ public final class SimulationModelUtil {
    * Serializes a {@link SimulationModel} to a byte array that contains the compressed xml
    * representation of the model.
    */
-  public static byte[] serialize(SimulationModel model) throws IOException {
+  public static byte[] serialize(SimulationModel model, Class[] classesToBeBound) throws IOException {
     ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
     try (OutputStream out = new GZIPOutputStream(byteOut, DEFAULT_GZIP_BUFFER_SIZE)) {
-      SimulationModelUtil.serialize(model, out);
+      SimulationModelUtil.serialize(model, classesToBeBound, out);
     }
     return byteOut.toByteArray();
   }

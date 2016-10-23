@@ -1,7 +1,7 @@
 package org.mechaverse.simulation.ant.core.entity.ant;
 
-import org.mechaverse.simulation.ant.api.model.Ant;
-import org.mechaverse.simulation.ant.api.model.Entity;
+import org.mechaverse.simulation.ant.core.model.Ant;
+import org.mechaverse.simulation.common.model.Entity;
 import org.mechaverse.simulation.ant.core.ActiveEntity;
 import org.mechaverse.simulation.ant.core.ActiveEntityProvider;
 import org.mechaverse.simulation.ant.core.entity.ant.ActiveAnt.AntBehavior;

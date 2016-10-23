@@ -3,7 +3,7 @@ package org.mechaverse.gwt.client.environment;
 import java.util.Map;
 
 import org.mechaverse.gwt.client.AntSimulationResourceBundle;
-import org.mechaverse.simulation.ant.api.model.EntityType;
+import org.mechaverse.simulation.ant.core.model.EntityType;
 
 import com.google.common.collect.Maps;
 import com.google.gwt.event.dom.client.ClickEvent;

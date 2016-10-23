@@ -6,9 +6,9 @@ import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.mechaverse.simulation.ant.api.AntSimulationState;
-import org.mechaverse.simulation.ant.api.SimulationModelUtil;
-import org.mechaverse.simulation.ant.api.model.Entity;
+import org.mechaverse.simulation.ant.core.AntSimulationState;
+import org.mechaverse.simulation.ant.core.util.AntSimulationModelUtil;
+import org.mechaverse.simulation.common.model.Entity;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
 import org.mechaverse.simulation.ant.core.EntityManager;
 
@@ -35,7 +35,7 @@ public class ReplayModule implements AntSimulationModule {
     try {
       // Load the model from the initial state.
       byte[] modelData = state.getReplayDataStore().get(INITIAL_MODEL_KEY);
-      state.setModel(SimulationModelUtil.deserialize(
+      state.setModel(AntSimulationModelUtil.deserialize(
           new GZIPInputStream(new ByteArrayInputStream(modelData))));
 
       // Load the seed data.

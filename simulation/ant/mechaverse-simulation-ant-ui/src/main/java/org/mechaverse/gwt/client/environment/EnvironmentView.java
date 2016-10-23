@@ -6,13 +6,13 @@ import java.util.Set;
 
 import org.mechaverse.gwt.client.AntSimulationResourceBundle;
 import org.mechaverse.gwt.common.client.util.Coordinate;
-import org.mechaverse.simulation.ant.api.model.Ant;
-import org.mechaverse.simulation.ant.api.model.Direction;
-import org.mechaverse.simulation.ant.api.model.Entity;
-import org.mechaverse.simulation.ant.api.model.EntityType;
-import org.mechaverse.simulation.ant.api.model.Environment;
-import org.mechaverse.simulation.ant.api.model.Rock;
-import org.mechaverse.simulation.ant.api.util.EntityUtil;
+import org.mechaverse.simulation.ant.core.model.Ant;
+import org.mechaverse.simulation.common.model.Direction;
+import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.ant.core.model.EntityType;
+import org.mechaverse.simulation.common.model.Environment;
+import org.mechaverse.simulation.ant.core.model.Rock;
+import org.mechaverse.simulation.ant.core.entity.EntityUtil;
 
 import com.google.common.collect.Sets;
 import com.google.gwt.canvas.client.Canvas;

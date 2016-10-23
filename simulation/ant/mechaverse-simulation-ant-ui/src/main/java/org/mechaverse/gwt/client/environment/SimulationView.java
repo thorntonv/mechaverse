@@ -3,7 +3,7 @@ package org.mechaverse.gwt.client.environment;
 import org.mechaverse.gwt.client.manager.ManagerDashboardPresenter.ManagerDashboardPlace;
 import org.mechaverse.gwt.common.client.webconsole.BasicNavMenu;
 import org.mechaverse.gwt.common.client.webconsole.WebConsoleLayoutView;
-import org.mechaverse.simulation.ant.api.model.Environment;
+import org.mechaverse.simulation.common.model.Environment;
 
 import com.google.gwt.place.shared.PlaceHistoryMapper;
 import com.google.gwt.user.client.ui.ScrollPanel;

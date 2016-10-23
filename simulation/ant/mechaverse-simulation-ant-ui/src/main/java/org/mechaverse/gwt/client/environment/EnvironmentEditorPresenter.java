@@ -1,13 +1,13 @@
 package org.mechaverse.gwt.client.environment;
 
 import org.mechaverse.gwt.common.client.util.UUID;
-import org.mechaverse.simulation.ant.api.model.Ant;
-import org.mechaverse.simulation.ant.api.model.Barrier;
-import org.mechaverse.simulation.ant.api.model.Direction;
-import org.mechaverse.simulation.ant.api.model.Entity;
-import org.mechaverse.simulation.ant.api.model.Environment;
-import org.mechaverse.simulation.ant.api.model.Food;
-import org.mechaverse.simulation.ant.api.model.Rock;
+import org.mechaverse.simulation.ant.core.model.Ant;
+import org.mechaverse.simulation.ant.core.model.Barrier;
+import org.mechaverse.simulation.common.model.Direction;
+import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.Environment;
+import org.mechaverse.simulation.ant.core.model.Food;
+import org.mechaverse.simulation.ant.core.model.Rock;
 import org.mechaverse.simulation.ant.core.Cell;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
 

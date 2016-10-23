@@ -6,9 +6,8 @@ import java.util.Random;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mechaverse.simulation.ant.api.model.Direction;
-import org.mechaverse.simulation.ant.api.model.EntityType;
-import org.mechaverse.simulation.ant.core.entity.ant.AntInput;
+import org.mechaverse.simulation.common.model.Direction;
+import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.entity.ant.AntInput.SensorInfo;
 
 /**

@@ -11,14 +11,14 @@ import java.util.Collections;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.mechaverse.simulation.ant.api.AntSimulationState;
-import org.mechaverse.simulation.ant.api.SimulationModelUtil;
-import org.mechaverse.simulation.ant.api.model.Direction;
-import org.mechaverse.simulation.ant.api.model.Entity;
-import org.mechaverse.simulation.ant.api.model.EntityType;
-import org.mechaverse.simulation.ant.api.model.Environment;
-import org.mechaverse.simulation.ant.api.model.SimulationModel;
-import org.mechaverse.simulation.ant.api.util.EntityUtil;
+import org.mechaverse.simulation.ant.core.util.AntSimulationModelUtil;
+import org.mechaverse.simulation.common.util.SimulationModelUtil;
+import org.mechaverse.simulation.common.model.Direction;
+import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.ant.core.model.EntityType;
+import org.mechaverse.simulation.common.model.Environment;
+import org.mechaverse.simulation.common.model.SimulationModel;
+import org.mechaverse.simulation.ant.core.entity.EntityUtil;
 import org.mechaverse.simulation.ant.core.entity.ant.AntOutput;
 
 import com.google.common.io.ByteStreams;
@@ -76,8 +76,8 @@ public class AntSimulationTestUtil {
     ByteArrayOutputStream model1ByteOut = new ByteArrayOutputStream(16 * 1024);
     ByteArrayOutputStream model2ByteOut = new ByteArrayOutputStream(16 * 1024);
 
-    SimulationModelUtil.serialize(expected, model1ByteOut);
-    SimulationModelUtil.serialize(actual, model2ByteOut);
+    AntSimulationModelUtil.serialize(expected, model1ByteOut);
+    AntSimulationModelUtil.serialize(actual, model2ByteOut);
 
     assertEquals(model1ByteOut.toString(), model2ByteOut.toString());
   }

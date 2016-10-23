@@ -1,6 +1,6 @@
 package org.mechaverse.gwt.client.environment;
 
-import org.mechaverse.simulation.ant.api.model.Environment;
+import org.mechaverse.simulation.common.model.Environment;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;

@@ -6,11 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.mechaverse.simulation.ant.api.AntSimulationState;
-import org.mechaverse.simulation.ant.api.SimulationModelUtil;
-import org.mechaverse.simulation.ant.api.model.EntityType;
-import org.mechaverse.simulation.ant.api.model.Environment;
-import org.mechaverse.simulation.ant.api.model.SimulationModel;
+import org.mechaverse.simulation.common.util.SimulationModelUtil;
+import org.mechaverse.simulation.ant.core.model.EntityType;
+import org.mechaverse.simulation.common.model.Environment;
+import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.common.Simulation;
 import org.mechaverse.simulation.common.cellautomaton.EnvironmentGenerator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.opencl.DeviceUtil;

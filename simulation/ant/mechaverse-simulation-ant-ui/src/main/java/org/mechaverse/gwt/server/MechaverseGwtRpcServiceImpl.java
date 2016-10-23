@@ -12,9 +12,9 @@ import javax.servlet.http.HttpSessionListener;
 
 import org.mechaverse.gwt.shared.MechaverseGwtRpcService;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
-import org.mechaverse.simulation.ant.api.AntSimulationState;
-import org.mechaverse.simulation.ant.api.SimulationModelUtil;
-import org.mechaverse.simulation.ant.api.model.SimulationModel;
+import org.mechaverse.simulation.ant.core.AntSimulationState;
+import org.mechaverse.simulation.ant.core.util.AntSimulationModelUtil;
+import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.common.Simulation;
 import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore.MemorySimulationDataStoreInputStream;
 import org.slf4j.Logger;
@@ -84,7 +84,7 @@ public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
     Simulation service = getSimulation();
     synchronized (service) {
       byte[] modelData = service.getState().get(AntSimulationState.MODEL_KEY);
-      return SimulationModelUtil.deserialize(new GZIPInputStream(
+      return AntSimulationModelUtil.deserialize(new GZIPInputStream(
           new ByteArrayInputStream(modelData)));
     }
   }

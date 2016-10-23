@@ -1,16 +1,16 @@
-package org.mechaverse.simulation.ant.api.util;
+package org.mechaverse.simulation.ant.core.entity;
 
-import org.mechaverse.simulation.ant.api.model.Ant;
-import org.mechaverse.simulation.ant.api.model.Barrier;
-import org.mechaverse.simulation.ant.api.model.Conduit;
-import org.mechaverse.simulation.ant.api.model.Direction;
-import org.mechaverse.simulation.ant.api.model.Dirt;
-import org.mechaverse.simulation.ant.api.model.Entity;
-import org.mechaverse.simulation.ant.api.model.EntityType;
-import org.mechaverse.simulation.ant.api.model.Food;
-import org.mechaverse.simulation.ant.api.model.Nest;
-import org.mechaverse.simulation.ant.api.model.Pheromone;
-import org.mechaverse.simulation.ant.api.model.Rock;
+import org.mechaverse.simulation.ant.core.model.Ant;
+import org.mechaverse.simulation.ant.core.model.Barrier;
+import org.mechaverse.simulation.ant.core.model.Conduit;
+import org.mechaverse.simulation.common.model.Direction;
+import org.mechaverse.simulation.ant.core.model.Dirt;
+import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.ant.core.model.EntityType;
+import org.mechaverse.simulation.ant.core.model.Food;
+import org.mechaverse.simulation.ant.core.model.Nest;
+import org.mechaverse.simulation.ant.core.model.Pheromone;
+import org.mechaverse.simulation.ant.core.model.Rock;
 
 import com.google.common.collect.Ordering;
 

@@ -5,9 +5,9 @@
   <inherits name='com.google.gwt.junit.JUnit' />
 
   <inherits name="org.mechaverse.gwt.common"/>
-  <inherits name="org.mechaverse.simulation.ant.api"/>
   <inherits name="org.mechaverse.simulation.ant.core"/>
-  
+  <inherits name="org.mechaverse.simulation.common.model"/>
+
   <entry-point class='org.mechaverse.gwt.client.MechaverseClient' />
 
   <source path='client' />

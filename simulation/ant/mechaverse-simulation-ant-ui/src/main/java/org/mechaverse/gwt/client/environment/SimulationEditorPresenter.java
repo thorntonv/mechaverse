@@ -4,9 +4,9 @@ import java.util.Iterator;
 
 import org.mechaverse.gwt.common.client.util.UUID;
 import org.mechaverse.gwt.shared.MechaverseGwtRpcServiceAsync;
-import org.mechaverse.simulation.ant.api.SimulationModelUtil;
-import org.mechaverse.simulation.ant.api.model.Environment;
-import org.mechaverse.simulation.ant.api.model.SimulationModel;
+import org.mechaverse.simulation.common.util.SimulationModelUtil;
+import org.mechaverse.simulation.common.model.Environment;
+import org.mechaverse.simulation.common.model.SimulationModel;
 
 import com.google.common.base.Preconditions;
 import com.google.gwt.user.client.rpc.AsyncCallback;

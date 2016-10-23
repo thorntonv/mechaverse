@@ -4,8 +4,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.mechaverse.simulation.ant.api.model.Entity;
-import org.mechaverse.simulation.ant.api.util.EntityUtil;
+import org.mechaverse.simulation.common.model.Entity;
 
 /**
  * A {@link DataOutputStream} for writing {@link Entity} instances.

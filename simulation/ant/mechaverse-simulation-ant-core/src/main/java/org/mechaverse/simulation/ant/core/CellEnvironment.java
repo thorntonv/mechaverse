@@ -1,11 +1,11 @@
 package org.mechaverse.simulation.ant.core;
 
-import org.mechaverse.simulation.ant.api.model.Direction;
-import org.mechaverse.simulation.ant.api.model.Entity;
-import org.mechaverse.simulation.ant.api.model.EntityType;
-import org.mechaverse.simulation.ant.api.model.Environment;
-import org.mechaverse.simulation.ant.api.model.Nest;
-import org.mechaverse.simulation.ant.api.util.EntityUtil;
+import org.mechaverse.simulation.common.model.Direction;
+import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.ant.core.model.EntityType;
+import org.mechaverse.simulation.common.model.Environment;
+import org.mechaverse.simulation.ant.core.model.Nest;
+import org.mechaverse.simulation.ant.core.entity.EntityUtil;
 
 public class CellEnvironment {
 

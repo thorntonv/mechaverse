@@ -1,11 +1,12 @@
-package org.mechaverse.simulation.ant.api;
+package org.mechaverse.simulation.ant.core;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 
-import org.mechaverse.simulation.ant.api.model.Entity;
-import org.mechaverse.simulation.ant.api.model.SimulationModel;
+import org.mechaverse.simulation.ant.core.util.AntSimulationModelUtil;
+import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.common.SimulationState;
 import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore;
 import org.mechaverse.simulation.common.datastore.SimulationDataStore;
@@ -29,7 +30,7 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
   }
 
   public AntSimulationState(SimulationDataStore dataStore) throws IOException {
-    super(SimulationModelUtil.deserialize(new GZIPInputStream(
+    super(AntSimulationModelUtil.deserialize(new GZIPInputStream(
         new ByteArrayInputStream(dataStore.get(MODEL_KEY)))), dataStore);
 
     // Add placeholder for the model. This will be serialized when requested.
@@ -50,7 +51,7 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
   public byte[] get(String key) {
     if(key.equals(MODEL_KEY)) {
       try {
-        put(MODEL_KEY, SimulationModelUtil.serialize(model));
+        put(MODEL_KEY, AntSimulationModelUtil.serialize(model));
       } catch (IOException ignored) {}
     }
     return super.get(key);

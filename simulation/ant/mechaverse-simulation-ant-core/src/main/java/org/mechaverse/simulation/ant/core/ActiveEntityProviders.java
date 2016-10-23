@@ -3,9 +3,9 @@ package org.mechaverse.simulation.ant.core;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.mechaverse.simulation.ant.api.model.Entity;
-import org.mechaverse.simulation.ant.api.model.EntityType;
-import org.mechaverse.simulation.ant.api.util.EntityUtil;
+import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.ant.core.model.EntityType;
+import org.mechaverse.simulation.ant.core.entity.EntityUtil;
 
 public final class ActiveEntityProviders {
 

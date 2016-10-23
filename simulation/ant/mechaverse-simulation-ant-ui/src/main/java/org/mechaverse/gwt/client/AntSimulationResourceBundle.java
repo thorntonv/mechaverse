@@ -1,8 +1,8 @@
 package org.mechaverse.gwt.client;
 
 import org.mechaverse.gwt.common.client.util.ImageUtil;
-import org.mechaverse.simulation.ant.api.model.Direction;
-import org.mechaverse.simulation.ant.api.model.EntityType;
+import org.mechaverse.simulation.common.model.Direction;
+import org.mechaverse.simulation.ant.core.model.EntityType;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gwt.core.shared.GWT;

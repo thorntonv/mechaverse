@@ -4,8 +4,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.mechaverse.simulation.ant.api.model.Entity;
-import org.mechaverse.simulation.ant.api.util.EntityUtil;
+import org.mechaverse.simulation.common.model.Entity;
 
 /**
  * A {@link DataInputStream} for reading {@link Entity} instances.
