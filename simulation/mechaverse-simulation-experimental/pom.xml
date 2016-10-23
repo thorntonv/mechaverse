@@ -18,17 +18,12 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.mechaverse.simulation.ant</groupId>
-      <artifactId>mechaverse-simulation-ant-core</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-math3</artifactId>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>

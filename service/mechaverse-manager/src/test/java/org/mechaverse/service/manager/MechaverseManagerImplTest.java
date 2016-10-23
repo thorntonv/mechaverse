@@ -15,7 +15,7 @@ import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.List;
 
-import org.apache.cxf.helpers.IOUtils;
+import com.google.common.io.ByteStreams;
 import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
@@ -195,7 +195,7 @@ public class MechaverseManagerImplTest {
       stateInputCaptor.capture());
 
     InputStream stateInput = stateInputCaptor.getValue();
-    assertArrayEquals(resultData, IOUtils.readStringFromStream(stateInput).getBytes());
+    assertArrayEquals(resultData, ByteStreams.toByteArray(stateInput));
   }
 
   @Test
