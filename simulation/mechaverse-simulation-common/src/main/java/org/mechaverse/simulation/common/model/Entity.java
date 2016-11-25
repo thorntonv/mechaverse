@@ -1,7 +1,5 @@
 package org.mechaverse.simulation.common.model;
 
-import org.mechaverse.simulation.common.model.Direction;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -27,6 +25,8 @@ public abstract class Entity implements Serializable {
   protected int maxEnergy;
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model")
   protected Direction direction;
+
+  public Entity() {}
 
   /**
    * Gets the value of the id property.

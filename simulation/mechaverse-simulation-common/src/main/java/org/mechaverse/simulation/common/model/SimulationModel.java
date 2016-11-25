@@ -24,6 +24,8 @@ public class SimulationModel implements Serializable {
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model", required = true)
   protected String seed;
 
+  public SimulationModel() {}
+
   /**
    * Gets the value of the id property.
    *

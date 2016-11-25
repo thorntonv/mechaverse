@@ -5,17 +5,17 @@ import java.util.Arrays;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.core.AntSimulationState;
+import org.mechaverse.simulation.ant.core.entity.ActiveEntity;
 import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.common.model.Entity;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.model.Pheromone;
 import org.mechaverse.simulation.ant.core.entity.EntityUtil;
-import org.mechaverse.simulation.ant.core.ActiveEntity;
 import org.mechaverse.simulation.ant.core.AntSimulationUtil;
 import org.mechaverse.simulation.ant.core.Cell;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
-import org.mechaverse.simulation.ant.core.EntityManager;
+import org.mechaverse.simulation.common.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
  * An ant that active in the simulation. An active ant receives sensory information about itself and
  * the environment and is able to perform actions.
  */
+
 public final class ActiveAnt implements ActiveEntity {
 
   public static final String OUTPUT_REPLAY_DATA_KEY = "outputReplayData";

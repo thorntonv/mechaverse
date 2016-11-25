@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.util.SimulationModelUtil;
 
 /**
  * A {@link DataInputStream} for reading {@link Entity} instances.
@@ -26,7 +27,7 @@ public class EntityDataInputStream extends DataInputStream {
     entity.setY(readInt());
     entity.setEnergy(readInt());
     entity.setMaxEnergy(readInt());
-    entity.setDirection(EntityUtil.DIRECTIONS[readShort()]);
+    entity.setDirection(SimulationModelUtil.DIRECTIONS[readShort()]);
     return entity;
   }
 }

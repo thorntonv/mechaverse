@@ -16,6 +16,8 @@ public class Pheromone extends Entity implements Serializable {
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/ant/api/model")
   protected int value;
 
+  public Pheromone() {}
+
   /**
    * Gets the value of the value property.
    */

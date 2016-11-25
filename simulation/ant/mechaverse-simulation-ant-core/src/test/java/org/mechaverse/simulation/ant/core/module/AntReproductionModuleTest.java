@@ -24,7 +24,7 @@ import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.common.model.Environment;
 import org.mechaverse.simulation.ant.core.model.Nest;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
-import org.mechaverse.simulation.ant.core.EntityManager;
+import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.ant.core.entity.EntityDataInputStream;
 import org.mechaverse.simulation.common.genetic.GeneticData;
 import org.mechaverse.simulation.common.genetic.GeneticDataStore;

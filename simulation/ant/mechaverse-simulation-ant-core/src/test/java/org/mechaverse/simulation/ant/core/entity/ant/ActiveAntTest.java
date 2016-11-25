@@ -29,7 +29,7 @@ import org.mechaverse.simulation.ant.core.model.Rock;
 import org.mechaverse.simulation.ant.core.AntSimulationTestUtil;
 import org.mechaverse.simulation.ant.core.Cell;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
-import org.mechaverse.simulation.ant.core.EntityManager;
+import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.ant.core.entity.ant.ActiveAnt.AntBehavior;
 import org.mechaverse.simulation.ant.core.entity.ant.AntInput.SensorInfo;
 import org.mechaverse.simulation.common.model.MoveDirection;

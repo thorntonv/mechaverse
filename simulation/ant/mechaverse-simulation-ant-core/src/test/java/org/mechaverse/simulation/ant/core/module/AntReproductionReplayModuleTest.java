@@ -20,7 +20,7 @@ import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.AntSimulationEnvironmentGenerator;
 import org.mechaverse.simulation.ant.core.AntSimulationImpl;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
-import org.mechaverse.simulation.ant.core.EntityManager;
+import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.ant.core.entity.EntityDataOutputStream;
 import org.mechaverse.simulation.common.util.RandomUtil;
 import org.mockito.ArgumentCaptor;

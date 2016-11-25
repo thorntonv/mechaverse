@@ -13,4 +13,5 @@ public class Dirt extends Entity implements Serializable {
 
   private final static long serialVersionUID = -1L;
 
+  public Dirt() {}
 }

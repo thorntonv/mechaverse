@@ -10,7 +10,7 @@ import org.mechaverse.simulation.ant.core.AntSimulationState;
 import org.mechaverse.simulation.ant.core.util.AntSimulationModelUtil;
 import org.mechaverse.simulation.common.model.Entity;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
-import org.mechaverse.simulation.ant.core.EntityManager;
+import org.mechaverse.simulation.common.EntityManager;
 
 /**
  * An {@link AntSimulationModule} that replays data recorded by the {@link ReplayRecorderModule}.

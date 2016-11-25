@@ -6,7 +6,7 @@ import org.mechaverse.simulation.common.model.Entity;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.Cell;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
-import org.mechaverse.simulation.ant.core.EntityManager;
+import org.mechaverse.simulation.common.EntityManager;
 import org.springframework.beans.factory.annotation.Value;
 
 /**

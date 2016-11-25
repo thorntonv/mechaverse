@@ -17,6 +17,8 @@ public class Conduit extends Entity implements Serializable {
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/ant/api/model", required = true)
   protected String targetEnvironmentId;
 
+  public Conduit() {}
+
   /**
    * Gets the value of the targetEnvironmentId property.
    *

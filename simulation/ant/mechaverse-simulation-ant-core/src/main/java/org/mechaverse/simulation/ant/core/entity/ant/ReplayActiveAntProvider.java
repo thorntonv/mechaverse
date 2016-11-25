@@ -1,17 +1,16 @@
 package org.mechaverse.simulation.ant.core.entity.ant;
 
-import java.io.IOException;
-
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.core.AntSimulationState;
-import org.mechaverse.simulation.ant.core.model.Ant;
-import org.mechaverse.simulation.common.model.Entity;
-import org.mechaverse.simulation.ant.core.model.EntityType;
-import org.mechaverse.simulation.ant.core.ActiveEntity;
-import org.mechaverse.simulation.ant.core.ActiveEntityProvider;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
-import org.mechaverse.simulation.ant.core.EntityManager;
+import org.mechaverse.simulation.ant.core.entity.ActiveEntity;
 import org.mechaverse.simulation.ant.core.entity.ant.ActiveAnt.AntBehavior;
+import org.mechaverse.simulation.ant.core.model.Ant;
+import org.mechaverse.simulation.ant.core.model.EntityType;
+import org.mechaverse.simulation.common.EntityManager;
+import org.mechaverse.simulation.common.model.Entity;
+
+import java.io.IOException;
 
 /**
  * An {@link ActiveEntityProvider} implementation that provides an ant implementation that replays

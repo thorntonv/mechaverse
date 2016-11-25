@@ -8,7 +8,7 @@ import org.mechaverse.simulation.ant.core.model.Food;
 import org.mechaverse.simulation.ant.core.entity.EntityUtil;
 import org.mechaverse.simulation.ant.core.AntSimulationEnvironmentGenerator;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
-import org.mechaverse.simulation.ant.core.EntityManager;
+import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.common.cellautomaton.AbstractProbabilisticEnvironmentGenerator.EntityDistribution;
 import org.mechaverse.simulation.common.cellautomaton.AbstractProbabilisticEnvironmentGenerator.ProbabilisticLocalGenerator;
 import org.slf4j.Logger;
