@@ -4,6 +4,7 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.common.model.Entity;
 import org.mechaverse.simulation.ant.core.entity.EntityUtil;
+import org.mechaverse.simulation.common.util.SimulationModelUtil;
 
 public final class AntSimulationUtil {
 
@@ -84,6 +85,6 @@ public final class AntSimulationUtil {
   }
 
   public static Direction randomDirection(RandomGenerator random) {
-    return EntityUtil.DIRECTIONS[random.nextInt(EntityUtil.DIRECTIONS.length)];
+    return SimulationModelUtil.DIRECTIONS[random.nextInt(SimulationModelUtil.DIRECTIONS.length)];
   }
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.math3.random.RandomGenerator;
+import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.common.model.Entity;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.common.model.Environment;

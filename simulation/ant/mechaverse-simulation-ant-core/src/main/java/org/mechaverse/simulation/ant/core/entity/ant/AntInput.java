@@ -3,6 +3,7 @@ package org.mechaverse.simulation.ant.core.entity.ant;
 import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.entity.EntityUtil;
+import org.mechaverse.simulation.common.util.SimulationModelUtil;
 
 /**
  * Encodes and decodes input for an ant.
@@ -140,7 +141,7 @@ public final class AntInput {
 
   public Direction getDirection() {
     int direction = (data[DIRECTION_IDX] & ~DIRECTION_MASK) >> DIRECTION_BIT_IDX;
-    return EntityUtil.DIRECTIONS[direction];
+    return SimulationModelUtil.DIRECTIONS[direction];
   }
 
   public void setNestDirection(Direction direction) {
@@ -151,7 +152,7 @@ public final class AntInput {
 
   public Direction getNestDirection() {
     int direction = (data[NEST_DIRECTION_IDX] & ~NEST_DIRECTION_MASK) >> NEST_DIRECTION_BIT_IDX;
-    return EntityUtil.DIRECTIONS[direction];
+    return SimulationModelUtil.DIRECTIONS[direction];
   }
 
   public void setCarriedEntityType(EntityType type) {
@@ -273,7 +274,7 @@ public final class AntInput {
     int direction = (dataValue & ~directionMask) >> directionBitIdx;
     EntityType type = entityType < EntityUtil.ENTITY_TYPES.length
         ? EntityUtil.ENTITY_TYPES[entityType] : null;
-    return new SensorInfo(type, EntityUtil.DIRECTIONS[direction & 0b111], 0);
+    return new SensorInfo(type, SimulationModelUtil.DIRECTIONS[direction & 0b111], 0);
   }
 
   private SensorInfo getSensorData(int dataIdx, int entityTypeMask, int entityTypeBitIdx,
@@ -284,7 +285,7 @@ public final class AntInput {
     int idHash = (dataValue & ~idMask) >> idBitIdx;
     EntityType type = entityType < EntityUtil.ENTITY_TYPES.length
         ? EntityUtil.ENTITY_TYPES[entityType] : null;
-    return new SensorInfo(type, EntityUtil.DIRECTIONS[direction & 0b111], idHash & 0b1111);
+    return new SensorInfo(type, SimulationModelUtil.DIRECTIONS[direction & 0b111], idHash & 0b1111);
   }
 
   private void setSensorData(EntityType entityType, Direction entityDirection, int dataIdx,

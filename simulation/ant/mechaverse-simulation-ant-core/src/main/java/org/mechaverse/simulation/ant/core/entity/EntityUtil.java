@@ -23,7 +23,6 @@ public class EntityUtil {
 
   public static final EntityType[] ENTITY_TYPES = EntityType.values();
 
-  public static final Direction[] DIRECTIONS = Direction.values();
 
   /**
    * An {@link Ordering} that uniquely orders entities. Entities are ordered first by cell with

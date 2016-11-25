@@ -13,6 +13,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.common.model.Environment;
 import org.mechaverse.simulation.common.model.SimulationModel;
 
@@ -22,6 +23,8 @@ import com.google.common.collect.Lists;
  * Utility methods for {@link SimulationModel}.
  */
 public final class SimulationModelUtil {
+
+  public static final Direction[] DIRECTIONS = Direction.values();
 
   private static final int DEFAULT_GZIP_BUFFER_SIZE = 128 * 1024;
 

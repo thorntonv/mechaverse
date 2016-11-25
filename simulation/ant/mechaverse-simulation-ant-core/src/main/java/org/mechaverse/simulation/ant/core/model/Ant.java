@@ -17,12 +17,15 @@ public class Ant extends Entity implements Serializable {
   protected long age;
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/ant/api/model")
   protected Entity carriedEntity;
+
   /**
    *
    *
    */
   @XmlAttribute(name = "type")
   public final static EntityType TYPE = EntityType.ANT;
+
+  public Ant() {}
 
   /**
    * Gets the value of the age property.

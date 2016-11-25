@@ -24,6 +24,8 @@ public class Environment implements Serializable {
   @XmlElement(name = "entity", namespace = "http://www.mechaverse.org/simulation/api/model")
   protected List<Entity> entities;
 
+  public Environment() {}
+
   /**
    * Gets the value of the id property.
    *

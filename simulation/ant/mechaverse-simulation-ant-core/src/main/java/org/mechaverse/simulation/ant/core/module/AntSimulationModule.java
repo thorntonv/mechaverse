@@ -2,14 +2,14 @@ package org.mechaverse.simulation.ant.core.module;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.core.AntSimulationState;
-import org.mechaverse.simulation.ant.core.ActiveEntity;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
-import org.mechaverse.simulation.ant.core.EntityManager;
+import org.mechaverse.simulation.common.EntityManager;
+import org.mechaverse.simulation.common.model.SimulationModel;
 
 /**
  * A module that can be added to an ant simulation.
  */
-public interface AntSimulationModule extends EntityManager.Observer {
+public interface AntSimulationModule extends EntityManager.Observer<SimulationModel, AntSimulationState> {
 
   /**
    * Sets the state of the module before iterations are performed.

@@ -13,6 +13,7 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.Before;
 import org.junit.Test;
 import org.mechaverse.simulation.ant.core.model.Ant;
+import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.common.model.Entity;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.common.model.SimulationModel;
@@ -47,7 +48,7 @@ public abstract class AbstractAntSimulationImplTest {
     }
   }
 
-  private static class EntityTypeCountObserver implements EntityManager.Observer {
+  private static class EntityTypeCountObserver implements EntityManager.Observer<SimulationModel, AntSimulationState> {
 
     private EntityTypeCounter entityTypeCounter = new EntityTypeCounter();
 

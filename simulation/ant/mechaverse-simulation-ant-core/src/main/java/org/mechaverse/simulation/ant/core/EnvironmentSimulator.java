@@ -1,12 +1,14 @@
 package org.mechaverse.simulation.ant.core;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.commons.math3.random.RandomGenerator;
+import org.mechaverse.simulation.ant.core.entity.ActiveEntity;
+import org.mechaverse.simulation.ant.core.entity.ActiveEntityProviders;
+import org.mechaverse.simulation.ant.core.entity.ant.ActiveEntityProvider;
+import org.mechaverse.simulation.ant.core.model.EntityType;
+import org.mechaverse.simulation.common.EntityManager;
+import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.common.util.SimulationModelUtil;
 import org.mechaverse.simulation.common.model.Entity;
 import org.mechaverse.simulation.common.model.Environment;
@@ -21,7 +23,8 @@ import com.google.common.collect.Sets;
 /**
  * Simulates an environment.
  */
-public final class EnvironmentSimulator implements EntityManager, AutoCloseable {
+public final class EnvironmentSimulator implements EntityManager<SimulationModel,
+    AntSimulationState, EntityType, Cell, CellEnvironment, ActiveEntity>, AutoCloseable {
 
   public static class Factory {
 
