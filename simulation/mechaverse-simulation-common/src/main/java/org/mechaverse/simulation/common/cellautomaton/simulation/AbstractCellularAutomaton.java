@@ -1,8 +1,11 @@
 package org.mechaverse.simulation.common.cellautomaton.simulation;
 
+import org.apache.commons.math3.util.Pair;
 import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
 
 import com.google.common.base.Supplier;
+
+import java.util.IdentityHashMap;
 
 /**
  * A base class for {@link CellularAutomaton} implementations that are not auto generated based on a
@@ -47,14 +50,17 @@ public abstract class AbstractCellularAutomaton implements CellularAutomaton {
   }
   
   private final AbstractCell[][] cells;
+  private final IdentityHashMap<Cell, Pair<Integer, Integer>> cellPositionMap;
 
   protected AbstractCellularAutomaton(int width, int height,
       Supplier<? extends AbstractCell> cellSupplier, CellConnector cellConnector) {
     cells = new AbstractCell[height][width];
+    this.cellPositionMap = new IdentityHashMap<>();
 
     for (int row = 0; row < height; row++) {
       for (int col = 0; col < width; col++) {
         cells[row][col] = cellSupplier.get();
+        cellPositionMap.put(cells[row][col], new Pair<>(row, col));
       }
     }
 
@@ -80,6 +86,10 @@ public abstract class AbstractCellularAutomaton implements CellularAutomaton {
     row = (row + getHeight()) % getHeight();
     column = (column + getWidth()) % getWidth();
     return cells[row][column];
+  }
+
+  public Pair<Integer, Integer> getCellPosition(Cell cell) {
+    return cellPositionMap.get(cell);
   }
 
   @Override
