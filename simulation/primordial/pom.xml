@@ -3,22 +3,19 @@
                              http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.mechaverse</groupId>
-  <artifactId>simulation</artifactId>
+  <groupId>org.mechaverse.simulation</groupId>
+  <artifactId>primordial</artifactId>
   <packaging>pom</packaging>
-  <name>Mechaverse Simulation</name>
+  <name>Mechaverse Primordial Simulation</name>
 
   <parent>
-    <artifactId>mechaverse</artifactId>
+    <artifactId>simulation</artifactId>
     <groupId>org.mechaverse</groupId>
     <version>0.1</version>
   </parent>
   
   <modules>
-    <module>mechaverse-simulation-common</module>
-    <module>mechaverse-simulation-benchmark</module>
-    <module>mechaverse-simulation-experimental</module>
-    <module>ant</module>
-    <module>primordial</module>
+    <module>mechaverse-simulation-primordial-core</module>
+    <module>mechaverse-simulation-primordial-client</module>
   </modules>
 </project>
