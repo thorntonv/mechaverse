@@ -24,7 +24,7 @@ import org.mechaverse.simulation.common.cellautomaton.ui.CellularAutomatonVisual
  */
 public abstract class CellularAutomatonCLI {
 
-  protected static void main(String[] args, CellularAutomatonCLI cli) throws IOException {
+  public static void main(String[] args, CellularAutomatonCLI cli) throws IOException {
     Options options = buildOptions();
 
     try {

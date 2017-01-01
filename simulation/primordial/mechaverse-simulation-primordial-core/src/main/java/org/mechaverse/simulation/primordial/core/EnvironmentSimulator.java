@@ -27,9 +27,12 @@ public final class EnvironmentSimulator implements EntityManager<SimulationModel
 
   public static class Factory {
 
-    @Autowired ApplicationContext context;
-    @Autowired private ActiveEntityProviders activeEntityProviders;
-    @Autowired private ObjectFactory<List<PrimordialSimulationModule>> modulesFactory;
+    @Autowired
+    ApplicationContext context;
+    @Autowired
+    private ActiveEntityProviders activeEntityProviders;
+    @Autowired
+    private ObjectFactory<List<PrimordialSimulationModule>> modulesFactory;
 
     public EnvironmentSimulator create(String environmentId) {
       EnvironmentSimulator environmentSimulator =
@@ -49,8 +52,7 @@ public final class EnvironmentSimulator implements EntityManager<SimulationModel
 
   private PrimordialSimulationState state;
 
-  private EnvironmentSimulator(String environmentId, ActiveEntityProviders activeEntityProviders,
-      List<PrimordialSimulationModule> modules) {
+  private EnvironmentSimulator(String environmentId, ActiveEntityProviders activeEntityProviders, List<PrimordialSimulationModule> modules) {
     this.environmentId = environmentId;
     this.activeEntityProviders = activeEntityProviders;
     this.modules = modules;
@@ -93,8 +95,8 @@ public final class EnvironmentSimulator implements EntityManager<SimulationModel
       module.setState(state, environment, this);
     }
 
-    Environment environmentModel = SimulationModelUtil.getEnvironment(
-        state.getModel(), environmentId);
+    Environment environmentModel =
+        SimulationModelUtil.getEnvironment(state.getModel(), environmentId);
     this.environment = new CellEnvironment(environmentModel);
     List<Entity> entities = new ArrayList<>(environmentModel.getEntities());
     for (Entity entity : entities) {
@@ -105,7 +107,7 @@ public final class EnvironmentSimulator implements EntityManager<SimulationModel
       activeEntity.setState(state);
     }
 
-    for(PrimordialSimulationModule module : modules) {
+    for (PrimordialSimulationModule module : modules) {
       addObserver(module);
     }
   }
@@ -170,6 +172,10 @@ public final class EnvironmentSimulator implements EntityManager<SimulationModel
   @Override
   public void removeObserver(Observer observer) {
     observers.remove(observer);
+  }
+
+  public CellEnvironment getEnvironment() {
+    return environment;
   }
 
   @Override

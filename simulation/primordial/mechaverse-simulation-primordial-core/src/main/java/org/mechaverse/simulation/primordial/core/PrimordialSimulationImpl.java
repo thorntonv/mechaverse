@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.annotations.VisibleForTesting;
 
+@SuppressWarnings("unused")
 public final class PrimordialSimulationImpl implements Simulation {
 
   private static final int DEFAULT_ENVIRONMENT_WIDTH = 200;
@@ -123,6 +124,10 @@ public final class PrimordialSimulationImpl implements Simulation {
     // Set the seed to be used for the next step.
     simulationModel.setSeed(String.valueOf(random.nextLong()));
     simulationModel.setIteration(simulationModel.getIteration()+1);
+  }
+
+  public List<EnvironmentSimulator> getEnvironmentSimulations() {
+    return environmentSimulations;
   }
 
   @VisibleForTesting

@@ -11,14 +11,12 @@
   <context:annotation-config />
 
   <util:properties id="properties">
-    <prop key="entityMaxCount">500</prop>
-    <prop key="entityInitialEnergy">36000</prop>
-    <prop key="entityMinReproductiveAge">6000</prop>
+    <prop key="entityMaxCount">1000</prop>
+    <prop key="entityInitialEnergy">600</prop>
+    <prop key="entityMinReproductiveAge">300</prop>
     <prop key="foodMinCount">1500</prop>
     <prop key="foodClusterRadius">15</prop>
-    <prop key="foodInitialEnergy">18000</prop>
-    <prop key="pheromoneInitialEnergy">3600</prop>
-    <prop key="pheromoneDecayInterval">3600</prop>
+    <prop key="foodInitialEnergy">600</prop>
   </util:properties>
 
   <bean class="org.mechaverse.simulation.primordial.core.PrimordialSimulationImpl" lazy-init="true" />
@@ -29,7 +27,7 @@
   <bean class="org.mechaverse.simulation.common.cellautomaton.simulation.opencl.CompositeOpenClCellularAutomatonSimulatorFactory" 
       name="CompositeCellularAutomatonSimulatorFactory">
     <constructor-arg index="0" value="4" />
-    <constructor-arg index="1" value="125" />
+    <constructor-arg index="1" value="250" />
     <constructor-arg index="2" >
       <util:constant static-field="org.mechaverse.simulation.primordial.core.entity.primordial.PrimordialEntityInput.DATA_SIZE" />
     </constructor-arg>
@@ -59,10 +57,12 @@
   </bean>
 
   <bean id="foodGenerationModule" class="org.mechaverse.simulation.primordial.core.module.FoodGenerationModule" scope="prototype" />
+  <bean id="entityReproductionModule" class="org.mechaverse.simulation.primordial.core.module.EntityReproductionModule" scope="prototype" />
   <bean id="cellularAutomatonModule" class="org.mechaverse.simulation.primordial.core.module.CellularAutomatonSimulationModule" lazy-init="true" />
 
   <util:list id="modules" value-type="org.mechaverse.simulation.primordial.core.module.PrimordialSimulationModule" scope="prototype">
     <ref bean="foodGenerationModule" />
+    <ref bean="entityReproductionModule" />
     <ref bean="cellularAutomatonModule" />
   </util:list>
 </beans>
