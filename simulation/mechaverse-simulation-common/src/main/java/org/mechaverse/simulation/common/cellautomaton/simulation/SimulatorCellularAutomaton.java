@@ -69,25 +69,21 @@ public class SimulatorCellularAutomaton implements CellularAutomaton {
       outputMap.remove(getStateIndex(varName));
     }
 
-    @Override
     public int getParam(String paramId) {
       String varName = cellInfo.getParamVarName(paramId);
       return state[getStateIndex(varName)];
     }
 
-    @Override
     public void setParam(String paramId, int value) {
       String varName = cellInfo.getParamVarName(paramId);
       state[getStateIndex(varName)] = value;
     }
 
-    @Override
     public int getOutputParam(String name, int outputIndex) {
       String varName = cellInfo.getOutputParamVarName(cellInfo.getOutputs().get(outputIndex), name);
       return state[getStateIndex(varName)];
     }
 
-    @Override
     public void setOutputParam(String name, int outputIndex, int value) {
       String varName = cellInfo.getOutputParamVarName(cellInfo.getOutputs().get(outputIndex), name);
       state[getStateIndex(varName)] = value;
@@ -103,12 +99,10 @@ public class SimulatorCellularAutomaton implements CellularAutomaton {
       return cellInfo.getOutputs().size();
     }
 
-    @Override
     public Collection<String> getParamNames() {
       return cellInfo.getParamVarNames();
     }
 
-    @Override
     public Collection<String> getOutputParamNames(int outputIndex) {
       return cellInfo.getOutputParamVarNames(cellInfo.getOutputs().get(outputIndex));
     }

@@ -14,14 +14,6 @@ public interface CellularAutomaton {
     int getOutput(int idx);
     void setOutput(int idx, int value);
     int getOutputCount();
-
-    int getParam(String name);
-    void setParam(String name, int value);
-    Collection<String> getParamNames();
-    
-    int getOutputParam(String name, int outputIndex);
-    void setOutputParam(String name, int outputIndex, int value);
-    Collection<String> getOutputParamNames(int outputIndex);
   }
 
   int getWidth();
