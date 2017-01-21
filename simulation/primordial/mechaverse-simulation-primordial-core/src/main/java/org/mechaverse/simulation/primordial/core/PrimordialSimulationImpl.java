@@ -25,8 +25,8 @@ import com.google.common.annotations.VisibleForTesting;
 @SuppressWarnings("unused")
 public final class PrimordialSimulationImpl implements Simulation {
 
-  private static final int DEFAULT_ENVIRONMENT_WIDTH = 200;
-  private static final int DEFAULT_ENVIRONMENT_HEIGHT = 200;
+  private static final int DEFAULT_ENVIRONMENT_WIDTH = 175;
+  private static final int DEFAULT_ENVIRONMENT_HEIGHT = 175;
 
   private static final Logger logger = LoggerFactory.getLogger(PrimordialSimulationImpl.class);
 

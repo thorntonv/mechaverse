@@ -1,6 +1,8 @@
 package org.mechaverse.simulation.primordial.core;
 
 import com.google.common.base.Function;
+import com.google.common.io.Resources;
+import org.mechaverse.simulation.common.SimulationStateCellularAutomatonDescriptor;
 import org.mechaverse.simulation.common.cellautomaton.examples.CellularAutomatonCLI;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomaton;
 import org.mechaverse.simulation.common.cellautomaton.ui.CellularAutomatonRenderer;
@@ -99,6 +101,10 @@ public class PrimordialCellularAutomaton implements CellularAutomaton {
              new ClassPathXmlApplicationContext("simulation-context.xml")) {
       simulation = context.getBean(PrimordialSimulationImpl.class);
       simulation.setState(simulation.generateRandomState());
+      byte[] descriptor = Resources.toByteArray(Thread.currentThread().getContextClassLoader()
+          .getResource("primordial-automaton-descriptor.xml"));
+      simulation.getState().put(SimulationStateCellularAutomatonDescriptor.DESCRIPTOR_XML_KEY,
+          descriptor);
 
       CellularAutomatonCLI cli = new CellularAutomatonCLI() {
 
@@ -116,11 +122,14 @@ public class PrimordialCellularAutomaton implements CellularAutomaton {
         @Override
         protected CellularAutomatonVisualizer createVisualizer(
             int width, int height, int framesPerSecond, int frameCount) throws IOException {
-          return new CellularAutomatonVisualizer(createCellularAutomaton(), CELL_COLOR_PROVIDER,
+          CellularAutomatonVisualizer visualizer = new CellularAutomatonVisualizer(createCellularAutomaton(), CELL_COLOR_PROVIDER,
               width, height, framesPerSecond, frameCount);
+          visualizer.start();
+          return visualizer;
         }
       };
       CellularAutomatonCLI.main(args, cli);
+      System.in.read();
     }
   }
 }

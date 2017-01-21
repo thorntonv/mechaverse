@@ -1,12 +1,16 @@
 package org.mechaverse.simulation.primordial.core.entity.primordial;
 
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator;
+import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomaton;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorDataSource;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
+import org.mechaverse.simulation.common.cellautomaton.simulation.SimulatorCellularAutomaton;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel;
+import org.mechaverse.simulation.common.cellautomaton.ui.CellularAutomatonVisualizer;
 import org.mechaverse.simulation.common.datastore.SimulationDataStore;
-import org.mechaverse.simulation.common.genetic.GeneticData;
 import org.mechaverse.simulation.common.genetic.GeneticDataStore;
 import org.mechaverse.simulation.common.util.ArrayUtil;
 import org.mechaverse.simulation.primordial.core.PrimordialSimulationState;
@@ -15,7 +19,10 @@ import org.mechaverse.simulation.primordial.core.model.PrimordialEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * A {@link PrimordialEntityBehavior} implementation that is based on a simulated cellular automaton.
@@ -23,8 +30,9 @@ import java.util.Arrays;
 public class CellularAutomatonPrimordialEntityBehavior implements PrimordialEntityBehavior {
 
   public static final String AUTOMATON_STATE_KEY = "cellularAutomatonState";
-  public static final String AUTOMATON_OUTPUT_MAP_KEY = "cellularAutomatonOutputMap";
-  public static final String AUTOMATON_BIT_OUTPUT_MAP_KEY = "cellularAutomatonBitOutputMap";
+
+  private static final Color DARK_BLUE = Color.BLUE.darker().darker();
+  private static final Color DARK_GREEN = Color.GREEN.darker().darker().darker();
 
   private static final Logger logger = LoggerFactory.getLogger(CellularAutomatonPrimordialEntityBehavior.class);
 
@@ -42,6 +50,9 @@ public class CellularAutomatonPrimordialEntityBehavior implements PrimordialEnti
   private final CellularAutomatonSimulator simulator;
   private CellularAutomatonGeneticDataGenerator geneticDataGenerator =
       new CellularAutomatonGeneticDataGenerator();
+
+  private static SimulatorCellularAutomaton cellularAutomaton;
+  private static CellularAutomatonVisualizer visualizer;
 
   public CellularAutomatonPrimordialEntityBehavior(
       CellularAutomatonDescriptorDataSource dataSource, CellularAutomatonSimulator simulator) {
@@ -77,6 +88,10 @@ public class CellularAutomatonPrimordialEntityBehavior implements PrimordialEnti
   @Override
   public PrimordialEntityOutput getOutput(RandomGenerator random) {
     updateEntityOutputData();
+    if(cellularAutomaton != null && visualizer != null) {
+      cellularAutomaton.refresh();
+      visualizer.repaintUI();
+    }
     output.setData(entityOutputData);
     return output;
   }
@@ -109,16 +124,6 @@ public class CellularAutomatonPrimordialEntityBehavior implements PrimordialEnti
       logger.trace("setState {} automatonState = {}", entity.getId(),
           Arrays.hashCode(automatonState));
     }
-
-    byte[] outputMapBytes = dataStore.get(AUTOMATON_OUTPUT_MAP_KEY);
-    if (outputMapBytes != null) {
-      simulator.setAutomatonOutputMap(automatonIndex, ArrayUtil.toIntArray(outputMapBytes));
-    }
-
-    byte[] bitOutputMapBytes = dataStore.get(AUTOMATON_BIT_OUTPUT_MAP_KEY);
-    if (bitOutputMapBytes != null) {
-      setBitOutputMap(ArrayUtil.toIntArray(bitOutputMapBytes));
-    }
   }
 
   @Override
@@ -135,9 +140,6 @@ public class CellularAutomatonPrimordialEntityBehavior implements PrimordialEnti
   private void generateGeneticData(RandomGenerator random) {
     geneticDataGenerator.generateGeneticData(geneticDataStore, model,
         simulator.getAutomatonOutputSize(), random);
-    GeneticData bitOutputMapData = geneticDataGenerator.generateOutputMapGeneticData(
-        simulator.getAutomatonOutputSize(), 32, random);
-    geneticDataStore.put(AUTOMATON_BIT_OUTPUT_MAP_KEY, bitOutputMapData);
   }
 
   private void initializeCellularAutomaton() {
@@ -148,15 +150,63 @@ public class CellularAutomatonPrimordialEntityBehavior implements PrimordialEnti
     logger.trace("initializeCellularAutomaton {} automatonState = {}", entity.getId(),
         Arrays.hashCode(automatonState));
 
-    // Cellular automaton output map.
-    int[] outputMap = geneticDataGenerator.getOutputMap(geneticDataStore);
-    simulator.setAutomatonOutputMap(automatonIndex, outputMap);
-    dataStore.put(AUTOMATON_OUTPUT_MAP_KEY, ArrayUtil.toByteArray(outputMap));
+    SimulatorCellularAutomaton cells = new SimulatorCellularAutomaton(model, simulator, automatonIndex);
+    // Cellular automaton input map.
+    final List<SimulatorCellularAutomaton.SimulatorCellularAutomatonCell> inputCells = ImmutableList.of(
+        cells.getCell(2, 2),
+        cells.getCell(2, 7),
+        cells.getCell(7, 2),
+        cells.getCell(7, 7)
+    );
+    for(SimulatorCellularAutomaton.SimulatorCellularAutomatonCell inputCell : inputCells) {
+      inputCell.addOutputToInputMap(0);
+    }
+    cells.updateInputMap();
 
-    // Bit output map.
-    byte[] bitOutputMapBytes = geneticDataStore.get(AUTOMATON_BIT_OUTPUT_MAP_KEY).getData();
-    setBitOutputMap(ArrayUtil.toIntArray(bitOutputMapBytes));
-    dataStore.put(AUTOMATON_BIT_OUTPUT_MAP_KEY, bitOutputMapBytes);
+    // Cellular automaton output map.
+    final List<SimulatorCellularAutomaton.SimulatorCellularAutomatonCell> outputCells = ImmutableList.of(
+        cells.getCell(0, 0),
+        cells.getCell(0, 9),
+        cells.getCell(9, 0),
+        cells.getCell(9, 9)
+    );
+    for(SimulatorCellularAutomaton.SimulatorCellularAutomatonCell outputCell : outputCells) {
+      outputCell.addOutputToOutputMap(0);
+    }
+    cells.updateOutputMap();
+
+    setBitOutputMap(new int[]{0, 0, 0, 0});
+
+    if(automatonIndex == 0) {
+      if(visualizer != null) {
+        visualizer.dispose();
+        visualizer = null;
+        cellularAutomaton = null;
+      }
+      cellularAutomaton = cells;
+      cellularAutomaton.refresh();
+
+      Function<CellularAutomaton.Cell, Color> CELL_COLOR_PROVIDER =
+          new Function<CellularAutomaton.Cell, Color>() {
+            @Override
+            public Color apply(CellularAutomaton.Cell cell) {
+              Color zeroColor = Color.BLACK;
+              Color oneColor = Color.WHITE;
+              if(inputCells.contains(cell)){
+                zeroColor = DARK_BLUE;
+                oneColor = Color.BLUE;
+              }
+              if(outputCells.contains(cell)) {
+                zeroColor = DARK_GREEN;
+                oneColor = Color.GREEN;
+              }
+              return (cell.getOutput(0) & 1) == 0 ? zeroColor : oneColor;
+            }
+          };
+      visualizer = new CellularAutomatonVisualizer(cellularAutomaton, CELL_COLOR_PROVIDER, 800, 600, 0);
+      visualizer.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+      visualizer.setLocation(0, 0);
+    }
   }
 
   private void updateEntityOutputData() {

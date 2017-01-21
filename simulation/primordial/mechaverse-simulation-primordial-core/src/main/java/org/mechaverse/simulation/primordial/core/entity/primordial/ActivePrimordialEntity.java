@@ -1,16 +1,17 @@
 package org.mechaverse.simulation.primordial.core.entity.primordial;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.mechaverse.simulation.common.util.SimulationUtil;
-import org.mechaverse.simulation.primordial.core.PrimordialSimulationState;
-import org.mechaverse.simulation.primordial.core.entity.ActiveEntity;
-import org.mechaverse.simulation.primordial.core.model.PrimordialEntity;
+import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.common.model.Entity;
-import org.mechaverse.simulation.primordial.core.model.EntityType;
+import org.mechaverse.simulation.common.util.SimulationModelUtil;
+import org.mechaverse.simulation.common.util.SimulationUtil;
 import org.mechaverse.simulation.primordial.core.Cell;
 import org.mechaverse.simulation.primordial.core.CellEnvironment;
-import org.mechaverse.simulation.common.EntityManager;
+import org.mechaverse.simulation.primordial.core.PrimordialSimulationState;
+import org.mechaverse.simulation.primordial.core.entity.ActiveEntity;
+import org.mechaverse.simulation.primordial.core.model.EntityType;
+import org.mechaverse.simulation.primordial.core.model.PrimordialEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,53 +76,26 @@ public final class ActivePrimordialEntity implements ActiveEntity {
       input.setFrontSensor(null, null, "");
     }
 
-    // Front left cell sensor.
-    Direction frontLeftDirection = SimulationUtil.directionCCW(entity.getDirection());
-    Cell frontLeftCell = env.getCellInDirection(cell, frontLeftDirection);
-    if (frontLeftCell != null) {
-      Entity frontLeftEntity = frontLeftCell.getEntity();
-      if (frontLeftEntity != null) {
-        input.setFrontLeftSensor(frontLeftCell.getEntityType(), frontLeftEntity.getDirection());
+    // Entity and food sensors.
+    boolean nearbyEntity = false;
+    boolean nearbyFood = false;
+    for (Direction direction : SimulationModelUtil.DIRECTIONS) {
+      if (nearbyEntity && nearbyFood) {
+        break;
       }
-    } else {
-      input.setFrontLeftSensor(null, null);
+      Cell neighborCell = env.getCellInDirection(cell, direction);
+      if (neighborCell != null) {
+        EntityType neighborEntityType = neighborCell.getEntityType();
+        if (neighborEntityType == EntityType.ENTITY) {
+          nearbyEntity = true;
+        } else if (neighborEntityType == EntityType.FOOD) {
+          nearbyFood = true;
+        }
+      }
     }
 
-    // Left cell sensor.
-    Cell leftCell =
-        env.getCellInDirection(cell, SimulationUtil.directionCCW(frontLeftDirection));
-    if (leftCell != null) {
-      Entity leftEntity = leftCell.getEntity();
-      if (leftEntity != null) {
-        input.setLeftSensor(leftCell.getEntityType(), leftEntity.getDirection());
-      }
-    } else {
-      input.setLeftSensor(null, null);
-    }
-
-    // Front right cell sensor.
-    Direction frontRightDirection = SimulationUtil.directionCW(entity.getDirection());
-    Cell frontRightCell = env.getCellInDirection(cell, frontRightDirection);
-    if (frontRightCell != null) {
-      Entity frontRightEntity = frontRightCell.getEntity();
-      if (frontRightEntity != null) {
-        input.setFrontRightSensor(frontRightCell.getEntityType(), frontRightEntity.getDirection());
-      }
-    } else {
-      input.setFrontRightSensor(null, null);
-    }
-
-    // Right cell sensor.
-    Cell rightCell =
-        env.getCellInDirection(cell, SimulationUtil.directionCW(frontRightDirection));
-    if (rightCell != null) {
-      Entity rightEntity = rightCell.getEntity();
-      if (rightEntity != null) {
-        input.setRightSensor(rightCell.getEntityType(), rightEntity.getDirection());
-      }
-    } else {
-      input.setRightSensor(null, null);
-    }
+    input.setEntitySensor(nearbyEntity);
+    input.setFoodSensor(nearbyFood);
 
     behavior.setInput(input, random);
   }
@@ -130,7 +104,6 @@ public final class ActivePrimordialEntity implements ActiveEntity {
   public void performAction(CellEnvironment env, EntityManager entityManager,
       RandomGenerator random) {
     PrimordialEntityOutput output = behavior.getOutput(random);
-
     Cell cell = env.getCell(entity);
     Cell frontCell = env.getCellInDirection(cell, entity.getDirection());
 
@@ -156,7 +129,7 @@ public final class ActivePrimordialEntity implements ActiveEntity {
         move(cell, frontCell, env);
         break;
       case BACKWARD:
-        move(cell, env.getCellInDirection(cell, 
+        move(cell, env.getCellInDirection(cell,
             SimulationUtil.oppositeDirection(entity.getDirection())), env);
         break;
     }
@@ -208,7 +181,7 @@ public final class ActivePrimordialEntity implements ActiveEntity {
   }
 
   private boolean canMoveToCell(Cell cell) {
-    // An an can move to the cell if it does not contain another entity or a barrier
+    // An entity can move to the cell if it does not contain another entity or a barrier
     return !cell.hasEntity(EntityType.ENTITY) && !cell.hasEntity(EntityType.BARRIER);
   }
 

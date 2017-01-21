@@ -6,24 +6,25 @@ import org.mechaverse.simulation.common.model.TurnDirection;
 /**
  * Encodes and decodes the output of a primordial entity.
  */
+@SuppressWarnings({"unused", "WeakerAccess"})
 public final class PrimordialEntityOutput {
 
   public static final MoveDirection[] MOVE_DIRECTIONS = MoveDirection.values();
   public static final TurnDirection[] TURN_DIRECTIONS = TurnDirection.values();
 
   public static final int DATA_SIZE = 1;
-  public static final int DATA_SIZE_BYTES = DATA_SIZE * 4;
 
   private static final int MOVE_DIRECTION_IDX = 0;
   private static final int MOVE_DIRECTION_MASK = 0b1;
 
+  private static final int CONSUME_IDX = 0;
+  private static final int CONSUME_BIT_IDX = 1;
+  private static final int CONSUME_MASK = 0b1 << CONSUME_BIT_IDX;
+
   private static final int TURN_DIRECTION_IDX = 0;
-  private static final int TURN_DIRECTION_BIT_IDX = 1;
+  private static final int TURN_DIRECTION_BIT_IDX = 2;
   private static final int TURN_DIRECTION_MASK = 0b11 << TURN_DIRECTION_BIT_IDX;
 
-  private static final int CONSUME_IDX = 0;
-  private static final int CONSUME_BIT_IDX = 8;
-  private static final int CONSUME_MASK = 0b1 << CONSUME_BIT_IDX;
 
   private int[] data;
 
