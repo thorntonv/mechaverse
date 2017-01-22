@@ -22,7 +22,11 @@
   <bean class="org.mechaverse.simulation.primordial.core.PrimordialSimulationImpl" lazy-init="true" />
 
   <bean id="cellularAutomatonDescriptorDataSource" lazy-init="true" 
-      class="org.mechaverse.simulation.common.SimulationStateCellularAutomatonDescriptor" />
+      class="org.mechaverse.simulation.common.SimulationStateCellularAutomatonDescriptor" >
+    <property name="defaultDescriptorResourceName">
+      <value>primordial-automaton-descriptor.xml</value>
+    </property>
+  </bean>
 
   <bean class="org.mechaverse.simulation.common.cellautomaton.simulation.opencl.CompositeOpenClCellularAutomatonSimulatorFactory" 
       name="CompositeCellularAutomatonSimulatorFactory">

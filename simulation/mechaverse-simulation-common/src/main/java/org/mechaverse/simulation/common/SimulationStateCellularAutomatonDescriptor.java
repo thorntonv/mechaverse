@@ -26,6 +26,11 @@ public class SimulationStateCellularAutomatonDescriptor
 
   private CellularAutomatonDescriptor descriptor;
   private CellularAutomatonSimulationModel model;
+  private String defaultDescriptorResourceName = "boolean4.xml";
+
+  public void setDefaultDescriptorResourceName(String defaultDescriptorResourceName) {
+      this.defaultDescriptorResourceName = defaultDescriptorResourceName;
+  }
 
   @Override
   public CellularAutomatonDescriptor getDescriptor() {
@@ -56,9 +61,8 @@ public class SimulationStateCellularAutomatonDescriptor
     if (descriptor == null) {
       // Attempt to load from xml on the classpath.
       try {
-        // TODO(thorntonv): Make this configurable.
         descriptor = CellularAutomatonDescriptorReader.read(
-            ClassLoader.getSystemResourceAsStream("boolean4.xml"));
+            ClassLoader.getSystemResourceAsStream(defaultDescriptorResourceName));
       } catch (Throwable t) {
         logger.warn("Unable to load cellular automaton descriptor xml.", t);
         throw new IllegalStateException("Unable to load cellular automaton descriptor xml.", t);

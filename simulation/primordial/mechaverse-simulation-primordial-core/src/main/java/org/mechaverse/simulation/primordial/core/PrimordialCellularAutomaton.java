@@ -101,10 +101,6 @@ public class PrimordialCellularAutomaton implements CellularAutomaton {
              new ClassPathXmlApplicationContext("simulation-context.xml")) {
       simulation = context.getBean(PrimordialSimulationImpl.class);
       simulation.setState(simulation.generateRandomState());
-      byte[] descriptor = Resources.toByteArray(Thread.currentThread().getContextClassLoader()
-          .getResource("primordial-automaton-descriptor.xml"));
-      simulation.getState().put(SimulationStateCellularAutomatonDescriptor.DESCRIPTOR_XML_KEY,
-          descriptor);
 
       CellularAutomatonCLI cli = new CellularAutomatonCLI() {
 
