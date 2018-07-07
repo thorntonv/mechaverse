@@ -8,11 +8,7 @@ import static org.junit.Assert.assertNull;
 import java.io.IOException;
 import java.util.Collections;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 
 import com.google.common.collect.ImmutableSet;
@@ -34,6 +30,7 @@ import de.flapdoodle.embed.mongo.distribution.Version;
  * @author Dusty Hendrickson (dhendrickson@mechaverse.org)
  */
 // TODO(dhendrickson): reintegrate with AbstractSimulationDataStoreTest
+@Ignore
 public class MongoDBSimulationDataStoreTest {
   private SimulationDataStore dataStore;
 

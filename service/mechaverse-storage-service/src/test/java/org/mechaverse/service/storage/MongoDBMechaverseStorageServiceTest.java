@@ -8,11 +8,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore;
 import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 import org.mechaverse.simulation.common.datastore.SimulationDataStoreInputStream;
@@ -32,6 +28,7 @@ import de.flapdoodle.embed.mongo.distribution.Version;
  * 
  * @author Dusty Hendrickson (dhendrickson@mechaverse.org)
  */
+@Ignore
 public class MongoDBMechaverseStorageServiceTest {
   // TODO(dhendrickson): move some of this to an interface test
 
