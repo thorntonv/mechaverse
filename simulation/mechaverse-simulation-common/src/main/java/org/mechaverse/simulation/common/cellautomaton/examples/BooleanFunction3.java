@@ -1,10 +1,7 @@
 package org.mechaverse.simulation.common.cellautomaton.examples;
 
-import java.awt.Color;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-
+import com.google.common.base.Function;
+import com.google.common.base.Supplier;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
 import org.mechaverse.simulation.common.cellautomaton.simulation.AbstractCellularAutomaton;
@@ -13,8 +10,8 @@ import org.mechaverse.simulation.common.cellautomaton.simulation.ThreeNeighborCe
 import org.mechaverse.simulation.common.cellautomaton.ui.CellularAutomatonRenderer;
 import org.mechaverse.simulation.common.cellautomaton.ui.CellularAutomatonVisualizer;
 
-import com.google.common.base.Function;
-import com.google.common.base.Supplier;
+import java.awt.*;
+import java.io.IOException;
 
 /**
  * A cellular automaton where the output of each cell is determined by computing a Boolean function 
@@ -39,32 +36,6 @@ public class BooleanFunction3 extends AbstractCellularAutomaton {
           function[outputIdx][idx] = random.nextInt(2);
         }
       }
-    }
-    
-    @Override
-    public int getParam(String name) {
-      return 0;
-    }
-
-    @Override
-    public void setParam(String name, int value) {}
-
-    @Override
-    public Collection<String> getParamNames() {
-      return Collections.emptyList();
-    }
-
-    @Override
-    public int getOutputParam(String name, int outputIndex) {
-      return 0;
-    }
-
-    @Override
-    public void setOutputParam(String name, int outputIndex, int value) {}
-
-    @Override
-    public Collection<String> getOutputParamNames(int outputIndex) {
-      return Collections.emptyList();
     }
 
     @Override

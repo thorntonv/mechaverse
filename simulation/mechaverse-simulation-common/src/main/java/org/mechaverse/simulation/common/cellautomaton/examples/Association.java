@@ -1,12 +1,8 @@
 package org.mechaverse.simulation.common.cellautomaton.examples;
 
-import java.awt.Color;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.IdentityHashMap;
-import java.util.Set;
-
+import com.google.common.base.Function;
+import com.google.common.base.Supplier;
+import com.google.common.collect.Sets;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
 import org.mechaverse.simulation.common.cellautomaton.simulation.AbstractCellularAutomaton;
@@ -17,9 +13,10 @@ import org.mechaverse.simulation.common.cellautomaton.ui.CellularAutomatonVisual
 import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.common.util.RandomUtil;
 
-import com.google.common.base.Function;
-import com.google.common.base.Supplier;
-import com.google.common.collect.Sets;
+import java.awt.*;
+import java.io.IOException;
+import java.util.IdentityHashMap;
+import java.util.Set;
 
 /**
  * A cellular automaton with a number of entities. An entity can be associated with other entities.
@@ -80,32 +77,6 @@ public class Association extends AbstractCellularAutomaton {
 
     public void setEntity(Entity entity) {
       cellEntityMap.put(this, entity);
-    }
-    
-    @Override
-    public int getParam(String name) {
-      return 0;
-    }
-
-    @Override
-    public void setParam(String name, int value) {}
-
-    @Override
-    public Collection<String> getParamNames() {
-      return Collections.emptyList();
-    }
-
-    @Override
-    public int getOutputParam(String name, int outputIndex) {
-      return 0;
-    }
-
-    @Override
-    public void setOutputParam(String name, int outputIndex, int value) {}
-
-    @Override
-    public Collection<String> getOutputParamNames(int outputIndex) {
-      return Collections.emptyList();
     }
 
     @Override

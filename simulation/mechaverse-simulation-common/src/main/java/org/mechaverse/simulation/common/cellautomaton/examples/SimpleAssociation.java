@@ -134,32 +134,6 @@ public class SimpleAssociation extends AbstractCellularAutomaton {
     }
 
     @Override
-    public int getParam(String name) {
-      return 0;
-    }
-
-    @Override
-    public void setParam(String name, int value) {}
-
-    @Override
-    public Collection<String> getParamNames() {
-      return Collections.emptyList();
-    }
-
-    @Override
-    public int getOutputParam(String name, int outputIndex) {
-      return 0;
-    }
-
-    @Override
-    public void setOutputParam(String name, int outputIndex, int value) {}
-
-    @Override
-    public Collection<String> getOutputParamNames(int outputIndex) {
-      return Collections.emptyList();
-    }
-
-    @Override
     public void beforeUpdate() {
       Entity entity = getEntity();
 
@@ -245,13 +219,6 @@ public class SimpleAssociation extends AbstractCellularAutomaton {
       double distance =
           Math.pow(targetRow - centroidRow, 2) + Math.pow(targetCol - centroidCol, 2);
 
-//      System.out.println("row:" + row +
-//          ", col: " + col +
-//          ", targetRow: " + targetRow +
-//          ", targetCol: " + targetCol +
-//          ", centroidRow: " + centroidRow +
-//          ", centroidCol: " + centroidCol +
-//          ", disance: " + distance);
       if(distance <= (centroid.getCellCount() * 2.5d) / 3.14159d) {
         return true;
       }

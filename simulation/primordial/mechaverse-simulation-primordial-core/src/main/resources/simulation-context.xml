@@ -1,0 +1,73 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:util="http://www.springframework.org/schema/util"
+  xsi:schemaLocation="
+  http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+  http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
+  ">
+
+  <context:annotation-config />
+
+  <util:properties id="properties">
+    <prop key="entityMaxCount">2000</prop>
+    <prop key="entityInitialEnergy">200</prop>
+    <prop key="entityMinReproductiveAge">300</prop>
+    <prop key="foodMinCount">2000</prop>
+    <prop key="foodClusterRadius">15</prop>
+    <prop key="foodInitialEnergy">200</prop>
+  </util:properties>
+
+  <bean class="org.mechaverse.simulation.primordial.core.PrimordialSimulationImpl" lazy-init="true" />
+
+  <bean id="cellularAutomatonDescriptorDataSource" lazy-init="true" 
+      class="org.mechaverse.simulation.common.SimulationStateCellularAutomatonDescriptor" >
+    <property name="defaultDescriptorResourceName">
+      <value>primordial-automaton-descriptor.xml</value>
+    </property>
+  </bean>
+
+  <bean class="org.mechaverse.simulation.common.cellautomaton.simulation.opencl.CompositeOpenClCellularAutomatonSimulatorFactory" 
+      name="CompositeCellularAutomatonSimulatorFactory">
+    <constructor-arg index="0" value="4" />
+    <constructor-arg index="1" value="500" />
+    <constructor-arg index="2">
+      <util:constant static-field="org.mechaverse.simulation.primordial.core.entity.primordial.PrimordialEntityInput.DATA_SIZE"/>
+    </constructor-arg>
+    <!-- One for each bit of output -->
+    <constructor-arg index="3" value="4" />
+    <constructor-arg index="4"><ref bean="cellularAutomatonDescriptorDataSource" /></constructor-arg>
+  </bean>
+    
+  <bean id="cellularAutomatonSimulator" lazy-init="true"
+      class="org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator" 
+          factory-bean="CompositeCellularAutomatonSimulatorFactory" factory-method="getObject" />
+
+  <bean id="activePrimordialEntityProvider" class="org.mechaverse.simulation.primordial.core.entity.primordial.ActivePrimordialEntityProvider" scope="prototype" />
+  
+  <bean id="primordialEntityBehavior"
+        class="org.mechaverse.simulation.primordial.core.entity.primordial.CellularAutomatonPrimordialEntityBehavior" scope="prototype" >
+      <constructor-arg><ref bean="cellularAutomatonDescriptorDataSource" /></constructor-arg>
+      <constructor-arg><ref bean="cellularAutomatonSimulator" /></constructor-arg>
+  </bean>  
+
+  <bean class="org.mechaverse.simulation.primordial.core.EnvironmentSimulator.Factory" scope="prototype" />
+  <bean class="org.mechaverse.simulation.primordial.core.entity.ActiveEntityProviders" scope="prototype">
+    <constructor-arg>
+      <map key-type="org.mechaverse.simulation.primordial.core.model.EntityType">
+        <entry key="ENTITY" value-ref="activePrimordialEntityProvider" />
+      </map>
+    </constructor-arg>
+  </bean>
+
+  <bean id="foodGenerationModule" class="org.mechaverse.simulation.primordial.core.module.FoodGenerationModule" scope="prototype" />
+  <bean id="entityReproductionModule" class="org.mechaverse.simulation.primordial.core.module.EntityReproductionModule" scope="prototype" />
+  <bean id="cellularAutomatonModule" class="org.mechaverse.simulation.primordial.core.module.CellularAutomatonSimulationModule" lazy-init="true" />
+
+  <util:list id="modules" value-type="org.mechaverse.simulation.primordial.core.module.PrimordialSimulationModule" scope="prototype">
+    <ref bean="foodGenerationModule" />
+    <ref bean="entityReproductionModule" />
+    <ref bean="cellularAutomatonModule" />
+  </util:list>
+</beans>

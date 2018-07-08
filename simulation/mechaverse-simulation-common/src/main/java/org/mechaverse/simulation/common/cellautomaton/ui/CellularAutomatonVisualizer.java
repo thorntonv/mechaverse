@@ -78,7 +78,7 @@ public class CellularAutomatonVisualizer extends JFrame {
     repaintUI();
   }
 
-  private void repaintUI() {
+  public void repaintUI() {
     imageView.setImage(renderer.draw());
     imageView.repaint();
   }
