@@ -1,4 +1,4 @@
-package org.mechaverse.simulation.common;
+package org.mechaverse.simulation.experimental.simple;
 
 import java.util.UUID;
 
@@ -7,14 +7,13 @@ import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonG
 import org.mechaverse.simulation.common.cellautomaton.simulation.SimulatorCellularAutomaton;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel;
 import org.mechaverse.simulation.common.genetic.GeneticDataStore;
-import org.mechaverse.simulation.common.simple.SimpleSimulation;
 
 /**
  * An entity base class.
  *
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
-public abstract class AbstractEntity {
+public abstract class SimpleCellularAutomatonEntity {
 
   private final String id;
   private GeneticDataStore geneticDataStore;
@@ -24,11 +23,11 @@ public abstract class AbstractEntity {
 
   private static final int[] EMPTY_INPUT = new int[0];
 
-  public AbstractEntity() {
+  public SimpleCellularAutomatonEntity() {
     this(UUID.randomUUID().toString());
   }
 
-  public AbstractEntity(String id) {
+  public SimpleCellularAutomatonEntity(String id) {
     this.id = id;
   }
 

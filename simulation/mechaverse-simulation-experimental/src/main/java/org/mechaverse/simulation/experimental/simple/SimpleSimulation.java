@@ -1,4 +1,4 @@
-package org.mechaverse.simulation.common.simple;
+package org.mechaverse.simulation.experimental.simple;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,10 +10,7 @@ import java.util.Map;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
 import org.apache.commons.math3.util.Pair;
-import org.mechaverse.simulation.common.AbstractEntity;
 import org.mechaverse.simulation.common.Simulation;
-import org.mechaverse.simulation.common.SimulationConfig;
-import org.mechaverse.simulation.common.SimulationLogger;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticRecombinator;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonMutator;
@@ -41,7 +38,7 @@ import gnu.trove.map.TObjectDoubleMap;
  * @param <E> the entity type
  * @param <M> the model type
  */
-public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation {
+public class SimpleSimulation<E extends SimpleCellularAutomatonEntity, M> implements Simulation {
 
   public static final String AUTOMATON_STATE_KEY = "cellularAutomatonState";
   public static final String AUTOMATON_OUTPUT_MAP_KEY = "cellularAutomatonOutputMap";
@@ -63,9 +60,9 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
   private final Map<E, Integer> entityIndexMap = new IdentityHashMap<>();
   private final RandomGenerator random = new Well19937c();
   private final SimpleSimulationState<M> state;
-  private final SimulationLogger<E, M> simulationLogger;
+  private final SimpleSimulationLogger<E, M> simulationLogger;
 
-  public SimpleSimulation(SimpleSimulationState<M> state, SimulationConfig<E, M> config) {
+  public SimpleSimulation(SimpleSimulationState<M> state, SimpleSimulationConfig<E, M> config) {
     this.state = state;
     this.cellularAutomatonModel = config.getCellularAutomatonModel();
     this.simulator = config.getSimulator();
@@ -170,7 +167,7 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
     return Collections.unmodifiableList(entities);
   }
 
-  public SimulationLogger<E, M> getLogger() {
+  public SimpleSimulationLogger<E, M> getLogger() {
     return simulationLogger;
   }
 

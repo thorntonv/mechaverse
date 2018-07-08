@@ -5,8 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
-import org.mechaverse.simulation.common.AbstractEntity;
-import org.mechaverse.simulation.common.SimulationConfig;
+import org.mechaverse.simulation.experimental.simple.SimpleCellularAutomatonEntity;
+import org.mechaverse.simulation.experimental.simple.SimpleSimulationConfig;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticData;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticData.CellGeneticData;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorBuilder;
@@ -15,9 +15,9 @@ import org.mechaverse.simulation.common.cellautomaton.simulation.LogicalUnitBuil
 import org.mechaverse.simulation.common.genetic.selection.ElitistSelectionStrategy;
 import org.mechaverse.simulation.common.genetic.selection.SelectionStrategy;
 import org.mechaverse.simulation.common.genetic.selection.TournamentSelectionStrategy;
-import org.mechaverse.simulation.common.simple.SimpleSimulation;
-import org.mechaverse.simulation.common.simple.SimpleSimulationModel;
-import org.mechaverse.simulation.common.simple.SimpleSimulationState;
+import org.mechaverse.simulation.experimental.simple.SimpleSimulation;
+import org.mechaverse.simulation.experimental.simple.SimpleSimulationModel;
+import org.mechaverse.simulation.experimental.simple.SimpleSimulationState;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -75,7 +75,7 @@ public class SequentialPatternSimulation {
     }
   }
 
-  public static class SequentialPatternEntity extends AbstractEntity {
+  public static class SequentialPatternEntity extends SimpleCellularAutomatonEntity {
 
     @Override
     protected String cellValueToString(int value) {
@@ -88,15 +88,15 @@ public class SequentialPatternSimulation {
   private static class Simulation
       extends SimpleSimulation<SequentialPatternEntity, SimpleSimulationModel> {
 
-    public Simulation(SimulationConfig<SequentialPatternEntity, SimpleSimulationModel> config) {
+    public Simulation(SimpleSimulationConfig<SequentialPatternEntity, SimpleSimulationModel> config) {
       super(new SimpleSimulationState<>(new SimpleSimulationModel(),
           SimpleSimulationModel.SERIALIZER), config);
     }
   }
 
   public static void main(String[] args) throws Exception {
-    SimulationConfig.Builder<SequentialPatternEntity, SimpleSimulationModel> configBuilder =
-        new SimulationConfig.Builder<>();
+    SimpleSimulationConfig.Builder<SequentialPatternEntity, SimpleSimulationModel> configBuilder =
+        new SimpleSimulationConfig.Builder<>();
     SelectionStrategy<SequentialPatternEntity> selectionStrategy =
         new ElitistSelectionStrategy<>(RETAIN_TOP_ENTITY_COUNT, REMOVE_BOTTOM_ENTITY_COUNT,
             new TournamentSelectionStrategy<>());

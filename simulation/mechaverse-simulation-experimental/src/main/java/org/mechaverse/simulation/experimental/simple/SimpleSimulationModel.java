@@ -1,4 +1,4 @@
-package org.mechaverse.simulation.common.simple;
+package org.mechaverse.simulation.experimental.simple;
 
 import java.util.function.Function;
 

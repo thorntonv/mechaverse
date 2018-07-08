@@ -3,8 +3,8 @@ package org.mechaverse.simulation.experimental;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
-import org.mechaverse.simulation.common.AbstractEntity;
-import org.mechaverse.simulation.common.SimulationConfig;
+import org.mechaverse.simulation.experimental.simple.SimpleCellularAutomatonEntity;
+import org.mechaverse.simulation.experimental.simple.SimpleSimulationConfig;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorBuilder;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulatorConfig;
 import org.mechaverse.simulation.common.cellautomaton.simulation.LogicalUnitBuilder;
@@ -12,9 +12,9 @@ import org.mechaverse.simulation.common.cellautomaton.simulation.SimulatorCellul
 import org.mechaverse.simulation.common.genetic.selection.ElitistSelectionStrategy;
 import org.mechaverse.simulation.common.genetic.selection.SelectionStrategy;
 import org.mechaverse.simulation.common.genetic.selection.TournamentSelectionStrategy;
-import org.mechaverse.simulation.common.simple.SimpleSimulation;
-import org.mechaverse.simulation.common.simple.SimpleSimulationModel;
-import org.mechaverse.simulation.common.simple.SimpleSimulationState;
+import org.mechaverse.simulation.experimental.simple.SimpleSimulation;
+import org.mechaverse.simulation.experimental.simple.SimpleSimulationModel;
+import org.mechaverse.simulation.experimental.simple.SimpleSimulationState;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -53,7 +53,7 @@ public class MajoritySimulation {
     }
   }
 
-  public static class MajorityEntity extends AbstractEntity {
+  public static class MajorityEntity extends SimpleCellularAutomatonEntity {
 
     private double fitness = 0.0;
     private int majority;
@@ -145,15 +145,15 @@ public class MajoritySimulation {
 
   private static class Simulation extends SimpleSimulation<MajorityEntity, SimpleSimulationModel> {
 
-    public Simulation(SimulationConfig<MajorityEntity, SimpleSimulationModel> config) {
+    public Simulation(SimpleSimulationConfig<MajorityEntity, SimpleSimulationModel> config) {
       super(new SimpleSimulationState<>(new SimpleSimulationModel(),
           SimpleSimulationModel.SERIALIZER), config);
     }
   }
 
   public static void main(String[] args) throws Exception {
-    SimulationConfig.Builder<MajorityEntity, SimpleSimulationModel> configBuilder =
-        new SimulationConfig.Builder<>();
+    SimpleSimulationConfig.Builder<MajorityEntity, SimpleSimulationModel> configBuilder =
+        new SimpleSimulationConfig.Builder<>();
     SelectionStrategy<MajorityEntity> selectionStrategy =
         new ElitistSelectionStrategy<>(RETAIN_TOP_ENTITY_COUNT, REMOVE_BOTTOM_ENTITY_COUNT,
             new TournamentSelectionStrategy<>());

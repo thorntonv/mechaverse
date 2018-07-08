@@ -1,11 +1,10 @@
-package org.mechaverse.simulation.common.simple;
+package org.mechaverse.simulation.experimental.simple;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 
-import org.mechaverse.simulation.common.AbstractEntity;
 import org.mechaverse.simulation.common.SimulationState;
 import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore;
 import org.mechaverse.simulation.common.datastore.SimulationDataStore;
@@ -69,16 +68,16 @@ public class SimpleSimulationState<M> extends SimulationState<M> {
     return super.get(key);
   }
 
-  public SimulationDataStore getEntityDataStore(AbstractEntity entity) {
+  public SimulationDataStore getEntityDataStore(SimpleCellularAutomatonEntity entity) {
     return new SimulationDataStoreView(getEntityRootKey(entity), this);
   }
 
-  public GeneticDataStore getEntityGeneticDataStore(AbstractEntity entity) {
+  public GeneticDataStore getEntityGeneticDataStore(SimpleCellularAutomatonEntity entity) {
     return new GeneticDataStore(
         new SimulationDataStoreView(GeneticDataStore.KEY, getEntityDataStore(entity)));
   }
 
-  private String getEntityRootKey(AbstractEntity entity) {
+  private String getEntityRootKey(SimpleCellularAutomatonEntity entity) {
     return ENTITY_DATA_ROOT_KEY + SimulationDataStore.KEY_SEPARATOR + entity.getId();
   }
 }

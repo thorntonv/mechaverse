@@ -1,4 +1,4 @@
-package org.mechaverse.simulation.common;
+package org.mechaverse.simulation.experimental.simple;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,15 +13,14 @@ import org.mechaverse.simulation.common.genetic.CutAndSpliceCrossoverGeneticReco
 import org.mechaverse.simulation.common.genetic.GeneticRecombinator;
 import org.mechaverse.simulation.common.genetic.selection.FitnessProportionalSelectionStrategy;
 import org.mechaverse.simulation.common.genetic.selection.SelectionStrategy;
-import org.mechaverse.simulation.common.simple.SimpleSimulationLogger;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
-public class SimulationConfig<E extends AbstractEntity, M> {
+public class SimpleSimulationConfig<E extends SimpleCellularAutomatonEntity, M> {
 
-  public static class Builder<E extends AbstractEntity, M> {
+  public static class Builder<E extends SimpleCellularAutomatonEntity, M> {
 
     private Supplier<E> entitySupplier;
     private Function<E, Double> entityFitnessFunction;
@@ -30,7 +29,7 @@ public class SimulationConfig<E extends AbstractEntity, M> {
     private SelectionStrategy<E> selectionStrategy = new FitnessProportionalSelectionStrategy<>();
     private GeneticRecombinator geneticRecombinator = new CutAndSpliceCrossoverGeneticRecombinator();
     private int updatesPerIteration = 100;
-    private SimulationLogger<E, M> simulationLogger;
+    private SimpleSimulationLogger<E, M> simulationLogger;
     private boolean minimize = false;
 
     public Builder<E, M> setEntitySupplier(Supplier<E> entitySupplier) {
@@ -71,7 +70,7 @@ public class SimulationConfig<E extends AbstractEntity, M> {
       return setSimulationLogger(new SimpleSimulationLogger<>(results, entityFitnessFunction));
     }
 
-    public Builder<E, M> setSimulationLogger(SimulationLogger<E, M> simulationLogger) {
+    public Builder<E, M> setSimulationLogger(SimpleSimulationLogger<E, M> simulationLogger) {
       this.simulationLogger = simulationLogger;
       return this;
     }
@@ -81,7 +80,7 @@ public class SimulationConfig<E extends AbstractEntity, M> {
       return this;
     }
 
-    public SimulationConfig<E, M> build() {
+    public SimpleSimulationConfig<E, M> build() {
       if (simulationLogger == null) {
         try {
           setSimulationLogger("results.csv", entityFitnessFunction);
@@ -91,7 +90,7 @@ public class SimulationConfig<E extends AbstractEntity, M> {
       }
       simulationLogger.setMinimize(minimize);
       selectionStrategy.setMinimize(minimize);
-      return new SimulationConfig<>(entitySupplier, entityFitnessFunction, cellularAutomatonModel, simulator, selectionStrategy, geneticRecombinator, simulationLogger, updatesPerIteration);
+      return new SimpleSimulationConfig<>(entitySupplier, entityFitnessFunction, cellularAutomatonModel, simulator, selectionStrategy, geneticRecombinator, simulationLogger, updatesPerIteration);
     }
   }
 
@@ -101,14 +100,14 @@ public class SimulationConfig<E extends AbstractEntity, M> {
   private final CellularAutomatonSimulator simulator;
   private final SelectionStrategy<E> selectionStrategy;
   private final GeneticRecombinator geneticRecombinator;
-  private final SimulationLogger<E, M> simulationLogger;
+  private final SimpleSimulationLogger simulationLogger;
   private final int updatesPerIteration;
 
-  public SimulationConfig(Supplier<E> entitySupplier,
+  public SimpleSimulationConfig(Supplier<E> entitySupplier,
       Function<E, Double> entityFitnessFunction,
       CellularAutomatonSimulationModel cellularAutomatonModel, CellularAutomatonSimulator simulator,
       SelectionStrategy<E> selectionStrategy, GeneticRecombinator geneticRecombinator,
-      SimulationLogger<E, M> simulationLogger, int updatesPerIteration) {
+      SimpleSimulationLogger simulationLogger, int updatesPerIteration) {
     this.entitySupplier = entitySupplier;
     this.entityFitnessFunction = entityFitnessFunction;
     this.cellularAutomatonModel = cellularAutomatonModel;
@@ -143,7 +142,7 @@ public class SimulationConfig<E extends AbstractEntity, M> {
     return geneticRecombinator;
   }
 
-  public SimulationLogger<E, M> getSimulationLogger() {
+  public SimpleSimulationLogger getSimulationLogger() {
     return simulationLogger;
   }
 

@@ -1,12 +1,12 @@
 package org.mechaverse.simulation.experimental.ant;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.mechaverse.simulation.common.AbstractEntity;
+import org.mechaverse.simulation.experimental.simple.SimpleCellularAutomatonEntity;
 import org.mechaverse.simulation.common.cellautomaton.simulation.SimulatorCellularAutomaton;
 import org.mechaverse.simulation.common.model.TurnDirection;
 import org.mechaverse.simulation.common.util.RandomUtil;
 
-public class AntEntity extends AbstractEntity {
+public class SimpleAntEntity extends SimpleCellularAutomatonEntity {
 
   public static final class Input {
 

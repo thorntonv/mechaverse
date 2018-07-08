@@ -1,11 +1,9 @@
-package org.mechaverse.simulation.common.simple;
+package org.mechaverse.simulation.experimental.simple;
 
 import java.io.PrintWriter;
 import java.util.List;
 
 import org.apache.commons.math3.util.Pair;
-import org.mechaverse.simulation.common.AbstractEntity;
-import org.mechaverse.simulation.common.SimulationLogger;
 import org.mechaverse.simulation.common.genetic.selection.SelectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,14 +13,14 @@ import java.util.function.Function;
 import gnu.trove.map.TObjectDoubleMap;
 
 /**
- * A simple {@link SimulationLogger} that logs the best and average entity fitness.
+ * A simple logger that logs the best and average entity fitness.
  *
  * @author Vance Thornton (thorntonv@mechaverse.org)
  *
  * @param <E> the entity type
  * @param <M> the simulation model type
  */
-public class SimpleSimulationLogger<E extends AbstractEntity, M> implements SimulationLogger<E, M> {
+public class SimpleSimulationLogger<E extends SimpleCellularAutomatonEntity, M> {
 
   private static final Logger logger = LoggerFactory.getLogger(SimpleSimulationLogger.class);
 
@@ -38,7 +36,6 @@ public class SimpleSimulationLogger<E extends AbstractEntity, M> implements Simu
     this.entityFitnessFunction = entityFitnessFunction;
   }
 
-  @Override
   public void log(long iteration, M model, List<E> entities) {
     if (iteration % iterationsPerLog != 0) {
       return;
@@ -71,17 +68,14 @@ public class SimpleSimulationLogger<E extends AbstractEntity, M> implements Simu
     }
   }
 
-  @Override
   public boolean getMinimize() {
     return minimize;
   }
 
-  @Override
   public void setMinimize(boolean minimize) {
     this.minimize = minimize;
   }
 
-  @Override
   public Pair<E, Double> getOverallBestEntity() {
     return overallBestEntity;
   }

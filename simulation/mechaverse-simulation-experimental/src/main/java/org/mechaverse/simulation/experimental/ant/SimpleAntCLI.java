@@ -32,12 +32,12 @@ public class SimpleAntCLI extends OpenClCellularAutomatonCLI {
       throw new IOException(String.format("Unexpected state size. expected: %d, actual: %d",
           cells.getSimulator().getAutomatonStateSize(), state.length));
     }
-    AntEntity.initCellularAutomaton(cells);
+    SimpleAntEntity.initCellularAutomaton(cells);
     cells.setState(state);
 
     init(cells);
 
-    final AntEntity.Output antOutput = new AntEntity.Output();
+    final SimpleAntEntity.Output antOutput = new SimpleAntEntity.Output();
     new Timer().schedule(new TimerTask() {
       @Override
       public void run() {
@@ -51,7 +51,7 @@ public class SimpleAntCLI extends OpenClCellularAutomatonCLI {
   }
 
   public static void init(SimulatorCellularAutomaton cells) {
-    AntEntity entity = new AntEntity();
+    SimpleAntEntity entity = new SimpleAntEntity();
     entity.setCellularAutomaton(cells);
 
     // Perform a number of updates to warm up.
@@ -82,8 +82,8 @@ public class SimpleAntCLI extends OpenClCellularAutomatonCLI {
     return new OpenClCellularAutomatonSimulator(
         new CellularAutomatonSimulatorConfig.Builder()
             .setDescriptor(descriptor)
-            .setAutomatonInputSize(AntEntity.Input.DATA_SIZE)
-            .setAutomatonOutputSize(AntEntity.Output.DATA_SIZE)
+            .setAutomatonInputSize(SimpleAntEntity.Input.DATA_SIZE)
+            .setAutomatonOutputSize(SimpleAntEntity.Output.DATA_SIZE)
             .build());
   }
 
