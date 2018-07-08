@@ -13,8 +13,4 @@ public enum EntityType {
     return name();
   }
 
-  public static EntityType fromValue(String v) {
-    return valueOf(v);
-  }
-
 }

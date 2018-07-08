@@ -14,7 +14,7 @@ public class Pheromone extends Entity implements Serializable {
 
   private final static long serialVersionUID = -1L;
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/ant/api/model")
-  protected int value;
+  private int value;
 
   public Pheromone() {}
 

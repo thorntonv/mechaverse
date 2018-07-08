@@ -9,12 +9,4 @@ public enum EntityType {
 
   NONE, ENTITY, BARRIER, FOOD;
 
-  public String value() {
-    return name();
-  }
-
-  public static EntityType fromValue(String v) {
-    return valueOf(v);
-  }
-
 }

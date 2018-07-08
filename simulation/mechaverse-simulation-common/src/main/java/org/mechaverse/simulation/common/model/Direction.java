@@ -14,8 +14,4 @@ public enum Direction {
     return name();
   }
 
-  public static Direction fromValue(String v) {
-    return valueOf(v);
-  }
-
 }

@@ -2,20 +2,19 @@ package org.mechaverse.simulation.ant.core.entity.ant;
 
 import java.io.IOException;
 import java.util.Arrays;
-
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.core.AntSimulationState;
-import org.mechaverse.simulation.ant.core.entity.ActiveEntity;
-import org.mechaverse.simulation.ant.core.model.Ant;
-import org.mechaverse.simulation.common.model.Direction;
-import org.mechaverse.simulation.common.model.Entity;
-import org.mechaverse.simulation.ant.core.model.EntityType;
-import org.mechaverse.simulation.ant.core.model.Pheromone;
-import org.mechaverse.simulation.ant.core.entity.EntityUtil;
-import org.mechaverse.simulation.ant.core.AntSimulationUtil;
 import org.mechaverse.simulation.ant.core.Cell;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
+import org.mechaverse.simulation.ant.core.entity.ActiveEntity;
+import org.mechaverse.simulation.ant.core.entity.EntityUtil;
+import org.mechaverse.simulation.ant.core.model.Ant;
+import org.mechaverse.simulation.ant.core.model.EntityType;
+import org.mechaverse.simulation.ant.core.model.Pheromone;
 import org.mechaverse.simulation.common.EntityManager;
+import org.mechaverse.simulation.common.model.Direction;
+import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.util.SimulationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -109,7 +108,7 @@ public final class ActiveAnt implements ActiveEntity {
     }
 
     // Front left cell sensor.
-    Direction frontLeftDirection = AntSimulationUtil.directionCCW(entity.getDirection());
+    Direction frontLeftDirection = SimulationUtil.directionCCW(entity.getDirection());
     Cell frontLeftCell = env.getCellInDirection(cell, frontLeftDirection);
     if (frontLeftCell != null) {
       Entity frontLeftEntity = frontLeftCell.getEntity();
@@ -122,7 +121,7 @@ public final class ActiveAnt implements ActiveEntity {
 
     // Left cell sensor.
     Cell leftCell =
-        env.getCellInDirection(cell, AntSimulationUtil.directionCCW(frontLeftDirection));
+        env.getCellInDirection(cell, SimulationUtil.directionCCW(frontLeftDirection));
     if (leftCell != null) {
       Entity leftEntity = leftCell.getEntity();
       if (leftEntity != null) {
@@ -133,7 +132,7 @@ public final class ActiveAnt implements ActiveEntity {
     }
 
     // Front right cell sensor.
-    Direction frontRightDirection = AntSimulationUtil.directionCW(entity.getDirection());
+    Direction frontRightDirection = SimulationUtil.directionCW(entity.getDirection());
     Cell frontRightCell = env.getCellInDirection(cell, frontRightDirection);
     if (frontRightCell != null) {
       Entity frontRightEntity = frontRightCell.getEntity();
@@ -146,7 +145,7 @@ public final class ActiveAnt implements ActiveEntity {
 
     // Right cell sensor.
     Cell rightCell =
-        env.getCellInDirection(cell, AntSimulationUtil.directionCW(frontRightDirection));
+        env.getCellInDirection(cell, SimulationUtil.directionCW(frontRightDirection));
     if (rightCell != null) {
       Entity rightEntity = rightCell.getEntity();
       if (rightEntity != null) {
@@ -231,8 +230,8 @@ public final class ActiveAnt implements ActiveEntity {
         move(cell, frontCell, env);
         break;
       case BACKWARD:
-        move(cell, env.getCellInDirection(cell, 
-            AntSimulationUtil.oppositeDirection(entity.getDirection())), env);
+        move(cell, env.getCellInDirection(cell,
+            SimulationUtil.oppositeDirection(entity.getDirection())), env);
         break;
     }
 
@@ -241,10 +240,10 @@ public final class ActiveAnt implements ActiveEntity {
       case NONE:
         break;
       case CLOCKWISE:
-        AntSimulationUtil.turnCW(entity);
+        SimulationUtil.turnCW(entity);
         break;
       case COUNTERCLOCKWISE:
-        AntSimulationUtil.turnCCW(entity);
+        SimulationUtil.turnCCW(entity);
         break;
     }
   }

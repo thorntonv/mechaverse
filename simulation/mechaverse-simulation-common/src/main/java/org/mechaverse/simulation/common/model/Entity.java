@@ -9,20 +9,22 @@ import java.io.Serializable;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Entity", namespace = "http://www.mechaverse.org/simulation/api/model",
-    propOrder = {"id", "x", "y", "energy", "maxEnergy", "direction"})
+    propOrder = {"id", "x", "y", "energy", "maxEnergy", "age", "direction"})
 public abstract class Entity implements Serializable {
 
   private final static long serialVersionUID = -1L;
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model")
   protected String id;
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model")
-  protected int x;
+  private int x;
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model")
-  protected int y;
+  private int y;
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model")
-  protected int energy;
+  private int energy;
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model")
-  protected int maxEnergy;
+  private int maxEnergy;
+  @XmlElement(namespace = "http://www.mechaverse.org/simulation/ant/api/model")
+  private long age;
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model")
   protected Direction direction;
 
@@ -102,6 +104,20 @@ public abstract class Entity implements Serializable {
    */
   public void setMaxEnergy(int value) {
     this.maxEnergy = value;
+  }
+
+  /**
+   * Gets the value of the age property.
+   */
+  public long getAge() {
+    return age;
+  }
+
+  /**
+   * Sets the value of the age property.
+   */
+  public void setAge(long value) {
+    this.age = value;
   }
 
   /**

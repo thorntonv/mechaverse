@@ -5,11 +5,11 @@ import org.mechaverse.simulation.ant.core.AntSimulationState;
 import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.ant.core.model.EntityType;
-import org.mechaverse.simulation.ant.core.AntSimulationUtil;
 import org.mechaverse.simulation.ant.core.entity.ant.ActiveAnt.AntBehavior;
 import org.mechaverse.simulation.common.model.MoveDirection;
 import org.mechaverse.simulation.common.model.TurnDirection;
 import org.mechaverse.simulation.common.util.RandomUtil;
+import org.mechaverse.simulation.common.util.SimulationUtil;
 
 /**
  * An ant behavior that is based on a simple algorithm.
@@ -140,13 +140,13 @@ public class SimpleAntBehavior implements AntBehavior {
     int cwCount = 0;
     Direction direction = currentDirection;
     while (direction != targetDirection) {
-      direction = AntSimulationUtil.directionCW(direction);
+      direction = SimulationUtil.directionCW(direction);
       cwCount++;
     }
     int ccwCount = 0;
     direction = currentDirection;
     while (direction != targetDirection) {
-      direction = AntSimulationUtil.directionCCW(direction);
+      direction = SimulationUtil.directionCCW(direction);
       ccwCount++;
     }
     if (cwCount < ccwCount) {

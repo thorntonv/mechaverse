@@ -17,7 +17,6 @@ import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.common.model.Entity;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.model.Nest;
-import org.mechaverse.simulation.ant.core.AntSimulationUtil;
 import org.mechaverse.simulation.ant.core.Cell;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
 import org.mechaverse.simulation.common.EntityManager;
@@ -26,6 +25,7 @@ import org.mechaverse.simulation.common.genetic.CutAndSpliceCrossoverGeneticReco
 import org.mechaverse.simulation.common.genetic.GeneticData;
 import org.mechaverse.simulation.common.genetic.GeneticDataStore;
 import org.mechaverse.simulation.common.genetic.GeneticRecombinator;
+import org.mechaverse.simulation.common.util.SimulationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,6 +39,7 @@ import com.google.common.collect.ImmutableList;
  *
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
+@SuppressWarnings("WeakerAccess")
 public class AntReproductionModule implements AntSimulationModule {
 
   /**
@@ -161,7 +162,7 @@ public class AntReproductionModule implements AntSimulationModule {
   public Ant generateRandomAnt(AntSimulationState state, RandomGenerator random) {
     Ant ant = new Ant();
     ant.setId(new UUID(random.nextLong(), random.nextLong()).toString());
-    ant.setDirection(AntSimulationUtil.randomDirection(random));
+    ant.setDirection(SimulationUtil.randomDirection(random));
     ant.setEnergy(antInitialEnergy);
     ant.setMaxEnergy(antInitialEnergy);
     return ant;
