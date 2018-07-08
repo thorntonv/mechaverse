@@ -1,6 +1,6 @@
 package org.mechaverse.simulation.common.cellautomaton.ui;
 
-import com.google.common.base.Function;
+import java.util.function.Function;
 import org.apache.commons.math3.util.Pair;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomaton;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomaton.Cell;
@@ -49,12 +49,7 @@ public class CellularAutomatonVisualizer extends JFrame {
 
     initUI();
 
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        setVisible(true);
-      }
-    });
+    SwingUtilities.invokeLater(() -> setVisible(true));
   }
 
   public void start() {
@@ -85,7 +80,7 @@ public class CellularAutomatonVisualizer extends JFrame {
 
   private void initUI() {
     setTitle(TITLE);
-    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     add(imageView);
     setResizable(false);
     imageView.setPreferredSize(renderer.getPreferredSize());

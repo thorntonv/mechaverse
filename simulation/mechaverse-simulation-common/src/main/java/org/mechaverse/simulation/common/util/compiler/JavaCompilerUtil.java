@@ -1,7 +1,6 @@
 package org.mechaverse.simulation.common.util.compiler;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.security.SecureClassLoader;
@@ -88,7 +87,7 @@ public final class JavaCompilerUtil {
     }
 
     @Override
-    public OutputStream openOutputStream() throws IOException {
+    public OutputStream openOutputStream() {
       return bos;
     }
   }
@@ -108,7 +107,7 @@ public final class JavaCompilerUtil {
     public ClassLoader getClassLoader(Location location) {
       return new SecureClassLoader() {
         @Override
-        protected Class<?> findClass(String name) throws ClassNotFoundException {
+        protected Class<?> findClass(String name) {
           byte[] b = jclassObject.getBytes();
           return super.defineClass(name, jclassObject.getBytes(), 0, b.length);
         }
@@ -117,7 +116,7 @@ public final class JavaCompilerUtil {
 
     @Override
     public JavaFileObject getJavaFileForOutput(Location location, String className, Kind kind,
-        FileObject sibling) throws IOException {
+        FileObject sibling) {
       jclassObject = new JavaClassObject(className, kind);
       return jclassObject;
     }

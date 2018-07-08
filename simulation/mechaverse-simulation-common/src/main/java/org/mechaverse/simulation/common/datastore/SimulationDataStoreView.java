@@ -2,9 +2,7 @@ package org.mechaverse.simulation.common.datastore;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
+import java.util.function.Predicate;
 
 /**
  * Provides a relative and filtered view of a {@link SimulationDataStore}.
@@ -35,7 +33,7 @@ public final class SimulationDataStoreView implements SimulationDataStore {
    * @param dataStore the {@link SimulationDataStore} this is a view of
    */
   public SimulationDataStoreView(String rootKey, SimulationDataStore dataStore) {
-    this(rootKey, Predicates.<String>alwaysTrue(), dataStore);
+    this(rootKey, s -> true, dataStore);
   }
 
   /**
@@ -55,13 +53,13 @@ public final class SimulationDataStoreView implements SimulationDataStore {
   @Override
   public byte[] get(String key) {
     String absoluteKey = rootKeyPrefix + key;
-    return visibleKeyPredicate.apply(absoluteKey) ? dataStore.get(absoluteKey) : null;
+    return visibleKeyPredicate.test(absoluteKey) ? dataStore.get(absoluteKey) : null;
   }
 
   @Override
   public void put(String key, byte[] value) {
     String absoluteKey = rootKeyPrefix + key;
-    if (visibleKeyPredicate.apply(absoluteKey)) {
+    if (visibleKeyPredicate.test(absoluteKey)) {
       dataStore.put(absoluteKey, value);
     } else {
       throw new IllegalArgumentException("The key " + key + " is not visible in this view.");
@@ -76,7 +74,7 @@ public final class SimulationDataStoreView implements SimulationDataStore {
   @Override
   public void remove(String key) {
     String absoluteKey = rootKeyPrefix + key;
-    if (visibleKeyPredicate.apply(absoluteKey)) {
+    if (visibleKeyPredicate.test(absoluteKey)) {
       dataStore.remove(absoluteKey);
     } else {
       throw new IllegalArgumentException("The key " + key + " is not visible in this view.");
@@ -93,7 +91,7 @@ public final class SimulationDataStoreView implements SimulationDataStore {
   @Override
   public boolean containsKey(String key) {
     String absoluteKey = rootKeyPrefix + key;
-    return visibleKeyPredicate.apply(absoluteKey) && dataStore.containsKey(absoluteKey);
+    return visibleKeyPredicate.test(absoluteKey) && dataStore.containsKey(absoluteKey);
   }
 
   @Override
@@ -135,7 +133,7 @@ public final class SimulationDataStoreView implements SimulationDataStore {
   }
 
   private boolean isVisible(String absoluteKey) {
-    return absoluteKey.startsWith(rootKeyPrefix) && visibleKeyPredicate.apply(absoluteKey);
+    return absoluteKey.startsWith(rootKeyPrefix) && visibleKeyPredicate.test(absoluteKey);
   }
 
   private String getAbsoluteKey(String relativeKey) {

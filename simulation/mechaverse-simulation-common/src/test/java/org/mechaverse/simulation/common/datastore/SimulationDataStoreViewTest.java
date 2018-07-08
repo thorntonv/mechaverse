@@ -14,27 +14,26 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
-
+import com.google.common.collect.ImmutableSet;
+import java.util.function.Predicate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableSet;
-
 /**
  * A unit test for {@link SimulationDataStoreView}.
  */
+@SuppressWarnings("WeakerAccess")
 @RunWith(MockitoJUnitRunner.class)
 public class SimulationDataStoreViewTest {
 
   private static final String ROOT_KEY = "test";
 
   @Mock SimulationDataStore mockDataStore;
-  @Mock Predicate<String> mockVisibleKeyPredicate;
+  @Mock
+  Predicate<String> mockVisibleKeyPredicate;
 
   private SimulationDataStoreView dataStoreView;
 
@@ -44,36 +43,36 @@ public class SimulationDataStoreViewTest {
   }
 
   @Test
-  public void get_existing() throws IOException {
+  public void get_existing() {
     byte[] expectedData = "data".getBytes();
-    when(mockVisibleKeyPredicate.apply(getAbsoluteKey("existingKey"))).thenReturn(true);
+    when(mockVisibleKeyPredicate.test(getAbsoluteKey("existingKey"))).thenReturn(true);
     when(mockDataStore.get(getAbsoluteKey("existingKey"))).thenReturn(expectedData);
     assertArrayEquals(expectedData, dataStoreView.get("existingKey"));
   }
 
   @Test
-  public void get_notVisible() throws IOException {
-    when(mockVisibleKeyPredicate.apply(getAbsoluteKey("notVisibleKey"))).thenReturn(false);
+  public void get_notVisible() {
+    when(mockVisibleKeyPredicate.test(getAbsoluteKey("notVisibleKey"))).thenReturn(false);
     assertNull(dataStoreView.get("notVisibleKey"));
   }
 
   @Test
-  public void get_notExistent() throws IOException {
-    when(mockVisibleKeyPredicate.apply(getAbsoluteKey("notExistentKey"))).thenReturn(true);
+  public void get_notExistent() {
+    when(mockVisibleKeyPredicate.test(getAbsoluteKey("notExistentKey"))).thenReturn(true);
     assertNull(dataStoreView.get("notExistentKey"));
   }
 
   @Test
-  public void put() throws IOException {
+  public void put() {
     byte[] data = "newData".getBytes();
-    when(mockVisibleKeyPredicate.apply(getAbsoluteKey("newKey"))).thenReturn(true);
+    when(mockVisibleKeyPredicate.test(getAbsoluteKey("newKey"))).thenReturn(true);
     dataStoreView.put("newKey", data);
     verify(mockDataStore).put(getAbsoluteKey("newKey"), data);
   }
 
   @Test
   public void put_notVisible() {
-    when(mockVisibleKeyPredicate.apply(getAbsoluteKey("newKey"))).thenReturn(false);
+    when(mockVisibleKeyPredicate.test(getAbsoluteKey("newKey"))).thenReturn(false);
     try {
       dataStoreView.put("newKey", "newData".getBytes());
       fail("Expected exception was not thrown.");
@@ -84,15 +83,15 @@ public class SimulationDataStoreViewTest {
   }
 
   @Test
-  public void remove() throws IOException {
-    when(mockVisibleKeyPredicate.apply(getAbsoluteKey("existingKey"))).thenReturn(true);
+  public void remove() {
+    when(mockVisibleKeyPredicate.test(getAbsoluteKey("existingKey"))).thenReturn(true);
     dataStoreView.remove("existingKey");
     verify(mockDataStore).remove(getAbsoluteKey("existingKey"));
   }
 
   @Test
   public void remove_notVisible() {
-    when(mockVisibleKeyPredicate.apply(getAbsoluteKey("existingKey"))).thenReturn(false);
+    when(mockVisibleKeyPredicate.test(getAbsoluteKey("existingKey"))).thenReturn(false);
     try {
       dataStoreView.remove("existingKey");
       fail("Expected exception was not thrown.");
@@ -107,8 +106,8 @@ public class SimulationDataStoreViewTest {
     String rootPrefix = ROOT_KEY + SimulationDataStore.KEY_SEPARATOR;
     when(mockDataStore.keysWithPrefix(rootPrefix)).thenReturn(
         ImmutableSet.of(getAbsoluteKey("key1"), getAbsoluteKey("key2")));
-    when(mockVisibleKeyPredicate.apply(getAbsoluteKey("key1"))).thenReturn(true);
-    when(mockVisibleKeyPredicate.apply(getAbsoluteKey("key2"))).thenReturn(true);
+    when(mockVisibleKeyPredicate.test(getAbsoluteKey("key1"))).thenReturn(true);
+    when(mockVisibleKeyPredicate.test(getAbsoluteKey("key2"))).thenReturn(true);
 
     dataStoreView.clear();
     verify(mockDataStore, times(2)).remove(any(String.class));
@@ -117,37 +116,37 @@ public class SimulationDataStoreViewTest {
   }
 
   @Test
-  public void containsKey_existing() throws IOException {
-    when(mockVisibleKeyPredicate.apply(getAbsoluteKey("existingKey"))).thenReturn(true);
+  public void containsKey_existing() {
+    when(mockVisibleKeyPredicate.test(getAbsoluteKey("existingKey"))).thenReturn(true);
     when(mockDataStore.containsKey(getAbsoluteKey("existingKey"))).thenReturn(true);
     assertTrue(dataStoreView.containsKey("existingKey"));
   }
 
   @Test
-  public void containsKey_notExistent() throws IOException {
-    when(mockVisibleKeyPredicate.apply(getAbsoluteKey("notExistentKey"))).thenReturn(true);
+  public void containsKey_notExistent() {
+    when(mockVisibleKeyPredicate.test(getAbsoluteKey("notExistentKey"))).thenReturn(true);
     when(mockDataStore.containsKey(getAbsoluteKey("notExistentKey"))).thenReturn(false);
     assertFalse(dataStoreView.containsKey(getAbsoluteKey("notExistentKey")));
   }
 
   @Test
-  public void containsKey_notVisible() throws IOException {
-    when(mockVisibleKeyPredicate.apply(getAbsoluteKey("notVisibleKey"))).thenReturn(false);
+  public void containsKey_notVisible() {
+    when(mockVisibleKeyPredicate.test(getAbsoluteKey("notVisibleKey"))).thenReturn(false);
     assertFalse(dataStoreView.containsKey(getAbsoluteKey("notVisibleKey")));
     verifyZeroInteractions(mockDataStore);
   }
 
   @Test
-  public void keySet() throws IOException {
+  public void keySet() {
     String rootPrefix = ROOT_KEY + SimulationDataStore.KEY_SEPARATOR;
     when(mockDataStore.keysWithPrefix(eq(rootPrefix))).thenReturn(ImmutableSet.of(
         getAbsoluteKey("visibleKey1"), getAbsoluteKey("visibleKey2.subKey"),
             getAbsoluteKey("notVisibleKey")));
-    when(mockVisibleKeyPredicate.apply(getAbsoluteKey("visibleKey1"))).thenReturn(true);
-    when(mockVisibleKeyPredicate.apply(getAbsoluteKey("visibleKey2.subKey"))).thenReturn(true);
+    when(mockVisibleKeyPredicate.test(getAbsoluteKey("visibleKey1"))).thenReturn(true);
+    when(mockVisibleKeyPredicate.test(getAbsoluteKey("visibleKey2.subKey"))).thenReturn(true);
     assertEquals(ImmutableSet.of("visibleKey1", "visibleKey2.subKey"), dataStoreView.keySet());
-    verify(mockVisibleKeyPredicate).apply(getAbsoluteKey("notVisibleKey"));
-    verify(mockVisibleKeyPredicate, never()).apply("otherRootKey");
+    verify(mockVisibleKeyPredicate).test(getAbsoluteKey("notVisibleKey"));
+    verify(mockVisibleKeyPredicate, never()).test("otherRootKey");
   }
 
   private String getAbsoluteKey(String key) {

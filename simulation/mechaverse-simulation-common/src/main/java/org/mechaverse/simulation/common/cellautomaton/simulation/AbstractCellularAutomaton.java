@@ -3,7 +3,7 @@ package org.mechaverse.simulation.common.cellautomaton.simulation;
 import org.apache.commons.math3.util.Pair;
 import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
 
-import com.google.common.base.Supplier;
+import java.util.function.Supplier;
 
 import java.util.IdentityHashMap;
 

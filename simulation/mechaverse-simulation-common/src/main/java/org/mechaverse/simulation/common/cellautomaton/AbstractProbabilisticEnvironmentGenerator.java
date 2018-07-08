@@ -3,12 +3,12 @@ package org.mechaverse.simulation.common.cellautomaton;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.Optional;
 import org.apache.commons.math3.distribution.BinomialDistribution;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.util.Pair;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
 
@@ -20,6 +20,7 @@ import com.google.common.collect.Table;
  *
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
+@SuppressWarnings("WeakerAccess")
 public abstract class AbstractProbabilisticEnvironmentGenerator<E, T>
     implements EnvironmentGenerator<E, T> {
 
@@ -40,7 +41,7 @@ public abstract class AbstractProbabilisticEnvironmentGenerator<E, T>
         absentProbability -= entityProbability.getSecond();
         pmf.add(new Pair<>(Optional.of(entityProbability.getKey()), entityProbability.getValue()));
       }
-      pmf.add(new Pair<>(Optional.<T>absent(), absentProbability));
+      pmf.add(new Pair<>(Optional.empty(), absentProbability));
       this.distribution = new EnumeratedDistribution<>(random, pmf);
     }
 
@@ -89,11 +90,11 @@ public abstract class AbstractProbabilisticEnvironmentGenerator<E, T>
     @Override
     public Optional<T> generateEntity(int row, int column) {
       EntityDistribution<T> entityDistribution = entityDistributions.get(row, column);
-      return entityDistribution != null ? entityDistribution.sample() : Optional.<T>absent();
+      return entityDistribution != null ? entityDistribution.sample() : Optional.empty();
     }
   }
 
-  private List<ProbabilisticLocalGenerator<T>> localGenerators = new ArrayList<>();
+  private List<ProbabilisticLocalGenerator<T>> localGenerators;
 
   /**
    * Creates a new environment with the given dimensions.

@@ -41,7 +41,7 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
   /**
    * Sets the instance of the MongoDB database.
    */
-  private void ensureDatabaseSetup() throws IOException {
+  private void ensureDatabaseSetup() {
     // TODO(dhendrickson): look into thread safety issues of MongoDB driver
     if (mongoDatabase == null) {
       logger.debug("Creating MongoDB database connection to {}:{}/{}", mongoHost, mongoPort,
@@ -55,7 +55,7 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
   /**
    * Removes the MongoDB database. Used primarily for testing purposes.
    */
-  protected void clear() throws IOException {
+  protected void clear() {
     ensureDatabaseSetup();
     mongoDatabase.dropDatabase();
   }
@@ -134,7 +134,7 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
 
   @Override
   public InputStream getStateValue(String simulationId, String instanceId, long iteration,
-      String key) throws IOException {
+      String key) {
     logger.debug("Get state value for /{}/{}/{}/{}", simulationId, instanceId, iteration, key);
     throw new UnsupportedOperationException();
   }
@@ -146,22 +146,16 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
 
     ensureDatabaseSetup();
 
-    MongoDBSimulationDataStoreInputStream stream = null;
-    try {
-      stream =
-          new MongoDBSimulationDataStoreInputStream(stateInput, mongoDatabase, simulationId,
-              instanceId, iteration);
+    try (MongoDBSimulationDataStoreInputStream stream = new MongoDBSimulationDataStoreInputStream(
+        stateInput, mongoDatabase, simulationId,
+        instanceId, iteration)) {
       stream.readDataStore();
-    } finally {
-      if (stream != null) {
-        stream.close();
-      }
     }
   }
 
   @Override
   public void setStateValue(String simulationId, String instanceId, long iteration, String key,
-      InputStream valueInput) throws IOException {
+      InputStream valueInput) {
     logger.debug("Get state value for /{}/{}/{}/{}", simulationId, instanceId, iteration, key);
     throw new UnsupportedOperationException();
   }

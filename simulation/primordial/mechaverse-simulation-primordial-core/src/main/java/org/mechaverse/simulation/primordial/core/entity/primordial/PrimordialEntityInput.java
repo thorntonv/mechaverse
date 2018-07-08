@@ -64,7 +64,7 @@ public final class PrimordialEntityInput {
    */
   public void setEnergy(int energyLevel, int maxEnergyLevel) {
     // Use a direct proportion to map the energy level on to the new range.
-    int value = 0;
+    int value;
     int energyPercent = energyLevel * 100 / maxEnergyLevel;
     value = (energyPercent < 33) ? 1 : 0;
     data[ENERGY_LEVEL_IDX] = (data[ENERGY_LEVEL_IDX] & ENERGY_LEVEL_MASK) | value;

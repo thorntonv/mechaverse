@@ -96,7 +96,7 @@ public class Environment implements Serializable {
    */
   public List<Entity> getEntities() {
     if (entities == null) {
-      entities = new ArrayList<Entity>();
+      entities = new ArrayList<>();
     }
     return this.entities;
   }

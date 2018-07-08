@@ -1,6 +1,6 @@
 package org.mechaverse.simulation.common.simple;
 
-import com.google.common.base.Function;
+import java.util.function.Function;
 
 /**
  * A base class for simple simulation models.

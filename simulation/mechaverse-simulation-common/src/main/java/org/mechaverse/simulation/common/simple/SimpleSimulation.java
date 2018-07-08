@@ -28,8 +28,8 @@ import org.mechaverse.simulation.common.genetic.selection.SelectionStrategy;
 import org.mechaverse.simulation.common.genetic.selection.SelectionUtil;
 import org.mechaverse.simulation.common.util.ArrayUtil;
 
-import com.google.common.base.Function;
-import com.google.common.base.Supplier;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import gnu.trove.map.TObjectDoubleMap;
 
@@ -81,29 +81,29 @@ public class SimpleSimulation<E extends AbstractEntity, M> implements Simulation
   }
 
   @Override
-  public SimulationDataStore getState() throws Exception {
+  public SimulationDataStore getState() {
     return state;
   }
 
   @Override
-  public void setState(SimulationDataStore stateDataStore) throws Exception {
+  public void setState(SimulationDataStore stateDataStore) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public SimulationDataStore generateRandomState() throws Exception {
+  public SimulationDataStore generateRandomState() {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public void step(int stepCount) throws Exception {
+  public void step(int stepCount) {
     for (int cnt = 1; cnt <= stepCount; cnt++) {
       step();
     }
   }
 
   @Override
-  public void step(int stepCount, double targetFitness) throws Exception {
+  public void step(int stepCount, double targetFitness) {
     for (int cnt = 1; cnt <= stepCount; cnt++) {
       step();
       if (simulationLogger.getMinimize()) {

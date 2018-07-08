@@ -1,6 +1,6 @@
 package org.mechaverse.simulation.primordial.core.entity.primordial;
 
-import com.google.common.base.Function;
+import java.util.function.Function;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator;
@@ -187,21 +187,18 @@ public class CellularAutomatonPrimordialEntityBehavior implements PrimordialEnti
       cellularAutomaton.refresh();
 
       Function<CellularAutomaton.Cell, Color> CELL_COLOR_PROVIDER =
-          new Function<CellularAutomaton.Cell, Color>() {
-            @Override
-            public Color apply(CellularAutomaton.Cell cell) {
-              Color zeroColor = Color.BLACK;
-              Color oneColor = Color.WHITE;
-              if(inputCells.contains(cell)){
-                zeroColor = DARK_BLUE;
-                oneColor = Color.BLUE;
-              }
-              if(outputCells.contains(cell)) {
-                zeroColor = DARK_GREEN;
-                oneColor = Color.GREEN;
-              }
-              return (cell.getOutput(0) & 1) == 0 ? zeroColor : oneColor;
+          cell -> {
+            Color zeroColor = Color.BLACK;
+            Color oneColor = Color.WHITE;
+            if(inputCells.contains(cell)){
+              zeroColor = DARK_BLUE;
+              oneColor = Color.BLUE;
             }
+            if(outputCells.contains(cell)) {
+              zeroColor = DARK_GREEN;
+              oneColor = Color.GREEN;
+            }
+            return (cell.getOutput(0) & 1) == 0 ? zeroColor : oneColor;
           };
       visualizer = new CellularAutomatonVisualizer(cellularAutomaton, CELL_COLOR_PROVIDER, 800, 600, 0);
       visualizer.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

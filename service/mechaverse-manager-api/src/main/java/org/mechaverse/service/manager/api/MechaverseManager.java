@@ -28,7 +28,7 @@ public interface MechaverseManager {
   @GET
   @Path("/task")
   @Produces(MediaType.APPLICATION_JSON)
-  Task getTask() throws Exception;
+  Task getTask();
 
   /**
    * Used to submit the result of a task.
@@ -44,7 +44,7 @@ public interface MechaverseManager {
   @GET
   @Path("/simulation")
   @Produces(MediaType.APPLICATION_JSON)
-  List<SimulationInfo> getSimulationInfo() throws Exception;
+  List<SimulationInfo> getSimulationInfo();
 
   /**
    * Creates a new simulation.
@@ -53,7 +53,7 @@ public interface MechaverseManager {
   @Path("/simulation")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
-  SimulationInfo createSimulation(String name) throws Exception;
+  SimulationInfo createSimulation(String name);
 
   /**
    * Activates or deactivates a simulation.
@@ -69,7 +69,7 @@ public interface MechaverseManager {
   @GET
   @Path("/simulation/{simulationId}")
   @Produces(MediaType.APPLICATION_JSON)
-  SimulationInfo getSimulationInfo(@PathParam("simulationId") String simulationId) throws Exception;
+  SimulationInfo getSimulationInfo(@PathParam("simulationId") String simulationId);
 
   /**
    * Updates the configuration for a simulation.
@@ -77,7 +77,7 @@ public interface MechaverseManager {
   @POST
   @Path("simulation/config")
   @Consumes(MediaType.APPLICATION_JSON)
-  void updateSimulationConfig(SimulationConfig config) throws Exception;
+  void updateSimulationConfig(SimulationConfig config);
 
   /**
    * Deletes a simulation.

@@ -3,14 +3,15 @@ package org.mechaverse.service.manager;
 import static org.mechaverse.service.manager.api.MechaverseManagerUtil.getInactiveTasks;
 import static org.mechaverse.service.manager.api.MechaverseManagerUtil.hasActiveTask;
 
+import com.google.common.collect.Iterables;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import javax.annotation.Resource;
-
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -25,9 +26,6 @@ import org.mechaverse.service.storage.api.MechaverseStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-
 /**
  * Implementation of {@link MechaverseManager}.
  */
@@ -36,24 +34,19 @@ public class MechaverseManagerImpl implements MechaverseManager {
   // TODO(thorntonv): Periodically remove inactive tasks.
 
   private static final Predicate<SimulationInfo> ACTIVE_SIMULATION_PREDICATE =
-      new Predicate<SimulationInfo>() {
-        @Override
-        public boolean apply(SimulationInfo simulationInfo) {
-          return simulationInfo.isActive();
-        }
-      };
+      SimulationInfo::isActive;
 
   @Autowired private SessionFactory sessionFactory;
   @Resource private MechaverseStorageService storageService;
 
   @Override
   @Transactional
-  public Task getTask() throws Exception {
+  public Task getTask() {
     // TODO(thorntonv): Get client id.
     String clientId = "test-client";
 
-    Iterable<SimulationInfo> activeSimulationInfoList = Iterables.filter(
-      getSimulationInfo(), ACTIVE_SIMULATION_PREDICATE);
+    Iterable<SimulationInfo> activeSimulationInfoList = getSimulationInfo().stream()
+        .filter(ACTIVE_SIMULATION_PREDICATE).collect(Collectors.toList());
 
     // Search for an instance that has no active tasks and prefers the client.
     for (SimulationInfo simulationInfo : activeSimulationInfoList) {
@@ -108,12 +101,8 @@ public class MechaverseManagerImpl implements MechaverseManager {
     }
     task.setCompletionTime(new Timestamp(new Date().getTime()));
 
-    Iterables.removeIf(instanceInfo.getExecutingTasks(), new Predicate<Task>() {
-      @Override
-      public boolean apply(Task otherTask) {
-        return task.getId().equals(otherTask.getId());
-      }
-    });
+    Iterables.removeIf(instanceInfo.getExecutingTasks(),
+        otherTask -> task.getId().equals(otherTask.getId()));
 
     if (instanceInfo.getIteration() >= 0) {
       instanceInfo.setIteration(instanceInfo.getIteration() + task.getIterationCount());
@@ -177,7 +166,7 @@ public class MechaverseManagerImpl implements MechaverseManager {
 
   @Override
   @Transactional
-  public void updateSimulationConfig(SimulationConfig updatedConfig) throws Exception {
+  public void updateSimulationConfig(SimulationConfig updatedConfig) {
     Session session = sessionFactory.getCurrentSession();
     SimulationConfig currentConfig =
         (SimulationConfig) session.get(SimulationConfig.class, updatedConfig.getId());

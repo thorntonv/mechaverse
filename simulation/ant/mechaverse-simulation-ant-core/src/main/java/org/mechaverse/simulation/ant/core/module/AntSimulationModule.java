@@ -28,7 +28,7 @@ public interface AntSimulationModule extends EntityManager.Observer<SimulationMo
       RandomGenerator random);
 
   /**
-   * Performs any actions that are appropriate before {@link ActiveEntity#performAction} is called.
+   * Performs any actions that are appropriate before {@link org.mechaverse.simulation.ant.core.entity.ActiveEntity#performAction} is called.
    */
   void beforePerformAction(AntSimulationState state, CellEnvironment env,
       EntityManager entityManager, RandomGenerator random);

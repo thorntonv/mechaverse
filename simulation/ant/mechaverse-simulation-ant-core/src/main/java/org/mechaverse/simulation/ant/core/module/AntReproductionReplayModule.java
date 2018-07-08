@@ -14,7 +14,6 @@ import org.mechaverse.simulation.ant.core.Cell;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
 import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.ant.core.entity.EntityDataInputStream;
-import org.mechaverse.simulation.common.model.SimulationModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 
-import java.io.IOException;
 import java.util.Collections;
 
 import org.junit.Before;
@@ -30,18 +29,18 @@ public abstract class AbstractSimulationDataStoreTest {
   }
 
   @Test
-  public void putAndGet() throws IOException {
+  public void putAndGet() {
     dataStore.put("testKey", "testValue".getBytes());
     assertArrayEquals("testValue".getBytes(), dataStore.get("testKey"));
   }
 
   @Test
-  public void remove() throws IOException {
+  public void remove() {
     dataStore.put("testKey", "testValue".getBytes());
     dataStore.remove("testKey");
     assertFalse(dataStore.containsKey("testKey"));
     assertEquals(0, dataStore.keySet().size());
-    assertEquals(null, dataStore.get("testKey"));
+    assertNull(dataStore.get("testKey"));
   }
 
   @Test

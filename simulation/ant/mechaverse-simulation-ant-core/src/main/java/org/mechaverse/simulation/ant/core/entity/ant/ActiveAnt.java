@@ -158,7 +158,7 @@ public final class ActiveAnt implements ActiveEntity {
 
     // Pheromone sensor.
     Entity pheromoneEntity = cell.getEntity(EntityType.PHEROMONE);
-    if (pheromoneEntity != null && pheromoneEntity instanceof Pheromone) {
+    if (pheromoneEntity instanceof Pheromone) {
       Pheromone pheromone = (Pheromone) pheromoneEntity;
       input.setPheromoneType(pheromone.getValue());
     }

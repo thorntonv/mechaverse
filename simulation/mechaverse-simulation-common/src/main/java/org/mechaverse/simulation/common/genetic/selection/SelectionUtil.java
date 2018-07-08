@@ -1,14 +1,11 @@
 package org.mechaverse.simulation.common.genetic.selection;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import com.google.common.base.Function;
-
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.Function;
 
 public class SelectionUtil {
 
@@ -56,18 +53,13 @@ public class SelectionUtil {
   public static <E> List<E> getEntitiesSortedByFitness(
       final TObjectDoubleMap<E> entityFitnessMap, boolean minimize) {
     List<E> entities = new ArrayList<>(entityFitnessMap.keySet());
-    Collections.sort(entities, newEntityComparator(entityFitnessMap, minimize));
+    entities.sort(newEntityComparator(entityFitnessMap, minimize));
     return entities;
   }
 
   public static <E> Comparator<E> newEntityComparator(
       final TObjectDoubleMap<E> fitnessMap, final boolean minimize) {
-    return new Comparator<E>() {
-      @Override
-      public int compare(E entity, E otherEntity) {
-        return minimize ? Double.compare(fitnessMap.get(entity), fitnessMap.get(otherEntity)) :
-            Double.compare(fitnessMap.get(otherEntity), fitnessMap.get(entity));
-      }
-    };
+    return (entity, otherEntity) -> minimize ? Double.compare(fitnessMap.get(entity), fitnessMap.get(otherEntity)) :
+        Double.compare(fitnessMap.get(otherEntity), fitnessMap.get(entity));
   }
 }

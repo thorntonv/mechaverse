@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeMap;
 
-import com.google.common.base.Supplier;
+import java.util.function.Supplier;
 
 /**
  * A {@link SimulationDataStore} implementation that stores data in memory.
@@ -16,13 +16,7 @@ import com.google.common.base.Supplier;
  */
 public class MemorySimulationDataStore extends AbstractSimulationDataStore {
 
-  private static final Supplier<SimulationDataStore> SUPPLIER =
-      new Supplier<SimulationDataStore>() {
-    @Override
-    public SimulationDataStore get() {
-      return new MemorySimulationDataStore();
-    }
-  };
+  private static final Supplier<SimulationDataStore> SUPPLIER = MemorySimulationDataStore::new;
 
   /**
    * A {@link SimulationDataStoreInputStream} for reading a {@link MemorySimulationDataStore} from

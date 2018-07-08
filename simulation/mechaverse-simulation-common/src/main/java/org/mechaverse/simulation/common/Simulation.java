@@ -10,7 +10,7 @@ public interface Simulation {
   /**
    * Returns the state of the simulation.
    */
-  SimulationDataStore getState() throws Exception;
+  SimulationDataStore getState();
 
   /**
    * Sets the state of the simulation.
@@ -20,17 +20,17 @@ public interface Simulation {
   /**
    * Generates a random state.
    */
-  SimulationDataStore generateRandomState() throws Exception;
+  SimulationDataStore generateRandomState();
 
   /**
    * Performs one or more iterations.
    */
-  void step(int stepCount) throws Exception;
+  void step(int stepCount);
 
   /**
    * Performs one or more iterations until the target fitness is reached.
    */
-  void step(int stepCount, double targetFitness) throws Exception;
+  void step(int stepCount, double targetFitness);
 
   /**
    * Returns a string with information about the device used by the simulation.

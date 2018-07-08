@@ -1,7 +1,7 @@
 package org.mechaverse.simulation.common.cellautomaton.examples;
 
-import com.google.common.base.Function;
-import com.google.common.base.Supplier;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
 import org.mechaverse.simulation.common.cellautomaton.simulation.AbstractCellularAutomaton;
@@ -19,6 +19,7 @@ import java.io.IOException;
  * 
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
+@SuppressWarnings("WeakerAccess")
 public class BooleanFunction3 extends AbstractCellularAutomaton {
 
   private static class Boolean3Cell extends AbstractCell {
@@ -58,32 +59,24 @@ public class BooleanFunction3 extends AbstractCellularAutomaton {
     }
   }
  
-  static final Function<Cell, Color> CELL_COLOR_PROVIDER = new Function<Cell, Color>() {
-    @Override
-    public Color apply(Cell cell) {
-      int colorValue = 0;
-      for (int outputIdx = 0; outputIdx < cell.getOutputCount(); outputIdx++) {
-        colorValue <<= 1;
-        colorValue |= cell.getOutput(outputIdx) & 0b1;
-      }
-      colorValue = colorValue * 32;
-      return new Color(colorValue % 256, colorValue % 256, colorValue % 256);
+  static final Function<Cell, Color> CELL_COLOR_PROVIDER = cell -> {
+    int colorValue = 0;
+    for (int outputIdx = 0; outputIdx < cell.getOutputCount(); outputIdx++) {
+      colorValue <<= 1;
+      colorValue |= cell.getOutput(outputIdx) & 0b1;
     }
+    colorValue = colorValue * 32;
+    return new Color(colorValue % 256, colorValue % 256, colorValue % 256);
   };
   
   public BooleanFunction3(int width, int height) {
-    super(width, height, new Supplier<Boolean3Cell>() {
-      @Override
-      public Boolean3Cell get() {
-        return new Boolean3Cell();
-      }
-    }, new ThreeNeighborCellConnector());
+    super(width, height, (Supplier<Boolean3Cell>) Boolean3Cell::new, new ThreeNeighborCellConnector());
   }
   
   public static void main(String[] args) throws IOException {
     CellularAutomatonCLI cli = new CellularAutomatonCLI() {
       @Override
-      protected CellularAutomaton createCellularAutomaton() throws IOException {
+      protected CellularAutomaton createCellularAutomaton() {
         return new BooleanFunction3(64, 64);
       }
 
@@ -95,7 +88,7 @@ public class BooleanFunction3 extends AbstractCellularAutomaton {
 
       @Override
       protected CellularAutomatonVisualizer createVisualizer(int width, int height,
-          int framesPerSecond, int frameCount) throws IOException {
+          int framesPerSecond, int frameCount) {
         return new CellularAutomatonVisualizer(createCellularAutomaton(), CELL_COLOR_PROVIDER,
             width, height, framesPerSecond, frameCount);
       }

@@ -76,6 +76,7 @@ public class GeneticData {
     return new Builder();
   }
 
+  @SuppressWarnings("CopyConstructorMissesField")
   protected GeneticData(GeneticData geneticData) {
     this(geneticData.getData(), geneticData.getCrossoverGroups(),
         geneticData.getCrossoverSplitPoints());

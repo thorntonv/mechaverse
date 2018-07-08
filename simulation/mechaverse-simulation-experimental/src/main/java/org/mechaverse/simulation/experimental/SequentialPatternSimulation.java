@@ -19,8 +19,8 @@ import org.mechaverse.simulation.common.simple.SimpleSimulation;
 import org.mechaverse.simulation.common.simple.SimpleSimulationModel;
 import org.mechaverse.simulation.common.simple.SimpleSimulationState;
 
-import com.google.common.base.Function;
-import com.google.common.base.Supplier;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class SequentialPatternSimulation {
 
@@ -99,7 +99,7 @@ public class SequentialPatternSimulation {
         new SimulationConfig.Builder<>();
     SelectionStrategy<SequentialPatternEntity> selectionStrategy =
         new ElitistSelectionStrategy<>(RETAIN_TOP_ENTITY_COUNT, REMOVE_BOTTOM_ENTITY_COUNT,
-            new TournamentSelectionStrategy<SequentialPatternEntity>());
+            new TournamentSelectionStrategy<>());
 
     Simulation simulation = new Simulation(configBuilder
         .setEntitySupplier(new SequentialPatternEntitySupplier())

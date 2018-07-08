@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
-import com.google.common.base.Function;
+import java.util.function.Function;
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Table;
 
@@ -81,16 +81,13 @@ public class FoodGenerationModule implements AntSimulationModule {
 
       logger.debug("Generating food at ({}, {})", row, col);
 
-      Function<EntityType, Entity> entityFactory = new Function<EntityType, Entity>() {
-        @Override
-        public Entity apply(EntityType entityType) {
-          Entity entity = EntityUtil.newEntity(entityType);
-          if (entityType == EntityType.FOOD) {
-            entity.setEnergy(foodInitialEnergy);
-            entity.setMaxEnergy(foodInitialEnergy);
-          }
-          return entity;
+      Function<EntityType, Entity> entityFactory = entityType -> {
+        Entity entity = EntityUtil.newEntity(entityType);
+        if (entityType == EntityType.FOOD) {
+          entity.setEnergy(foodInitialEnergy);
+          entity.setMaxEnergy(foodInitialEnergy);
         }
+        return entity;
       };
       new AntSimulationEnvironmentGenerator(entityFactory, entityManager, random).apply(
           FoodLocalGenerator.newInstance(1, foodClusterRadius, random), env, row, col, random);

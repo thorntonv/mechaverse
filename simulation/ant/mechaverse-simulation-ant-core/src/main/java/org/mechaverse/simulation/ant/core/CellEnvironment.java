@@ -8,7 +8,6 @@ import org.mechaverse.simulation.common.cellautomaton.environment.AbstractCellEn
 import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.common.model.Entity;
 import org.mechaverse.simulation.common.model.Environment;
-import org.mechaverse.simulation.common.util.SimulationModelUtil;
 
 public class CellEnvironment extends AbstractCellEnvironment<EntityType, Cell> {
 

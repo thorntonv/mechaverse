@@ -10,13 +10,14 @@ import org.apache.commons.math3.util.Pair;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomaton;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomaton.Cell;
 
-import com.google.common.base.Function;
+import java.util.function.Function;
 
 /**
  * Draws a {@link CellularAutomaton} to a {@link BufferedImage}.
  * 
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
+@SuppressWarnings("WeakerAccess")
 public class CellularAutomatonRenderer {
 
   private CellularAutomaton cells;

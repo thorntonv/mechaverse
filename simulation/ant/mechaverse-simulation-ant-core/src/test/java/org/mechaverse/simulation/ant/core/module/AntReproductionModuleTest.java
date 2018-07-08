@@ -83,7 +83,7 @@ public class AntReproductionModuleTest {
   }
 
   @Test
-  public void beforeUpdate_generateAnt() throws IOException {
+  public void beforeUpdate_generateAnt() {
     AntSimulationState state = new AntSimulationState();
     CellEnvironment env = newEnvironment();
     module.setAntMaxCount(5);
@@ -175,7 +175,7 @@ public class AntReproductionModuleTest {
     return new CellEnvironment(env);
   }
 
-  private GeneticDataStore randomGeneticDataStore(GeneticDataStore geneticData) throws IOException {
+  private GeneticDataStore randomGeneticDataStore(GeneticDataStore geneticData) {
     geneticData.put(TEST_GENETIC_DATA_KEY, new GeneticData(RandomUtil.randomBytes(100, random),
         ArrayUtil.toIntArray(RandomUtil.randomBytes(400, random)),
             ArrayUtil.toIntArray(RandomUtil.randomBytes(24, random))));

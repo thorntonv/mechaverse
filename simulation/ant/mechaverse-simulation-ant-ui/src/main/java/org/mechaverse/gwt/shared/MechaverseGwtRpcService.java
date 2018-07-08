@@ -14,9 +14,9 @@ public interface MechaverseGwtRpcService extends RemoteService {
   SimulationModel loadState(String simulationId, String instanceId, long iteration)
       throws Exception;
 
-  void saveState(String simulationId, String instanceId, long iteration) throws Exception;
+  void saveState(String simulationId, String instanceId, long iteration);
 
   SimulationModel getModel() throws Exception;
-  void setModel(SimulationModel model) throws Exception;
-  void step() throws Exception;
+  void setModel(SimulationModel model);
+  void step();
 }

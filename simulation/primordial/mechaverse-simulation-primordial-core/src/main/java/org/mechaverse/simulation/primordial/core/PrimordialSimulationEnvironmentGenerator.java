@@ -1,6 +1,6 @@
 package org.mechaverse.simulation.primordial.core;
 
-import com.google.common.base.Function;
+import java.util.function.Function;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.common.cellautomaton.AbstractProbabilisticEnvironmentGenerator;
@@ -18,6 +18,7 @@ import java.util.UUID;
  *
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
+@SuppressWarnings("Unused")
 public class PrimordialSimulationEnvironmentGenerator
     extends AbstractProbabilisticEnvironmentGenerator<CellEnvironment, EntityType> {
 
@@ -29,18 +30,12 @@ public class PrimordialSimulationEnvironmentGenerator
   }
 
   public PrimordialSimulationEnvironmentGenerator(EntityManager entityManager, RandomGenerator random) {
-    this(new Function<EntityType, Entity>() {
-
-      @Override
-      public Entity apply(EntityType entityType) {
-        return EntityUtil.newEntity(entityType);
-      }
-    }, entityManager, random);
+    this(EntityUtil::newEntity, entityManager, random);
   }
 
   public PrimordialSimulationEnvironmentGenerator(Function<EntityType, Entity> entityFactory,
                                                   EntityManager entityManager, RandomGenerator random) {
-    super(Collections.<ProbabilisticLocalGenerator<EntityType>>emptyList());
+    super(Collections.emptyList());
 
     this.entityFactory = entityFactory;
     this.entityManager = entityManager;
@@ -52,9 +47,7 @@ public class PrimordialSimulationEnvironmentGenerator
     env.setId(UUID.randomUUID().toString());
     env.setWidth(width);
     env.setHeight(height);
-
-    CellEnvironment cells = new CellEnvironment(env);
-    return cells;
+    return new CellEnvironment(env);
   }
 
   @Override

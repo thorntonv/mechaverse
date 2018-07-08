@@ -123,7 +123,7 @@ public class CellularAutomatonAnalysisCLI {
       for(int cnt = 1; cnt <= THREAD_COUNT; cnt++) {
         service.submit(new AnalysisTask(
             sampleSize / THREAD_COUNT, maxIterationCount, descriptor, out));
-        Thread.sleep(1*1000);
+        Thread.sleep(1000);
       }
 
       service.shutdown();

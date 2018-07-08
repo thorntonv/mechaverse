@@ -35,12 +35,12 @@ public class ManagerGwtRpcServiceImpl extends RemoteServiceServlet implements Ma
   }
 
   @Override
-  public List<SimulationInfo> getSimulationInfo() throws Exception {
+  public List<SimulationInfo> getSimulationInfo() {
     return manager.getSimulationInfo();
   }
 
   @Override
-  public SimulationInfo createSimulation(String name) throws Exception {
+  public SimulationInfo createSimulation(String name) {
     return manager.createSimulation(name);
   }
 
@@ -50,12 +50,12 @@ public class ManagerGwtRpcServiceImpl extends RemoteServiceServlet implements Ma
   }
 
   @Override
-  public SimulationInfo getSimulationInfo(String simulationId) throws Exception {
+  public SimulationInfo getSimulationInfo(String simulationId) {
     return manager.getSimulationInfo(simulationId);
   }
 
   @Override
-  public void updateSimulationConfig(SimulationConfig config) throws Exception {
+  public void updateSimulationConfig(SimulationConfig config) {
     manager.updateSimulationConfig(config);
   }
 

@@ -3,7 +3,6 @@ package org.mechaverse.simulation.primordial.core.util;
 import org.mechaverse.simulation.primordial.core.model.*;
 import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.common.util.SimulationModelUtil;
-import org.mechaverse.simulation.primordial.core.model.PrimordialEntity;
 
 import java.io.IOException;
 import java.io.InputStream;

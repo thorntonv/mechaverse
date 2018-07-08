@@ -7,7 +7,7 @@ import java.io.InputStream;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomaton.Cell;
 import org.mechaverse.simulation.common.cellautomaton.simulation.SimulatorCellularAutomaton;
 
-import com.google.common.base.Function;
+import java.util.function.Function;
 
 public class OpenClConway extends OpenClCellularAutomatonCLI {
 

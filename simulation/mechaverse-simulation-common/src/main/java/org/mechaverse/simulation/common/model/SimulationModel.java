@@ -88,7 +88,7 @@ public class SimulationModel implements Serializable {
    */
   public List<Environment> getSubEnvironments() {
     if (subEnvironments == null) {
-      subEnvironments = new ArrayList<Environment>();
+      subEnvironments = new ArrayList<>();
     }
     return this.subEnvironments;
   }

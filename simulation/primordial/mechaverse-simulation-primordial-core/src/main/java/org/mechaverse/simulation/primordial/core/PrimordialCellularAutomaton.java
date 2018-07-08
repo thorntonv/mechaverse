@@ -1,19 +1,19 @@
 package org.mechaverse.simulation.primordial.core;
 
-import com.google.common.base.Function;
-import com.google.common.io.Resources;
-import org.mechaverse.simulation.common.SimulationStateCellularAutomatonDescriptor;
+import java.awt.Color;
+import java.io.IOException;
+import java.util.List;
+import java.util.function.Function;
 import org.mechaverse.simulation.common.cellautomaton.examples.CellularAutomatonCLI;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomaton;
 import org.mechaverse.simulation.common.cellautomaton.ui.CellularAutomatonRenderer;
 import org.mechaverse.simulation.common.cellautomaton.ui.CellularAutomatonVisualizer;
+import org.mechaverse.simulation.common.model.Entity;
 import org.mechaverse.simulation.primordial.core.entity.EntityUtil;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.awt.*;
-import java.io.IOException;
-
+@SuppressWarnings("WeakerAccess")
 public class PrimordialCellularAutomaton implements CellularAutomaton {
 
   private static final class CellAdapter implements Cell {
@@ -26,10 +26,12 @@ public class PrimordialCellularAutomaton implements CellularAutomaton {
 
     @Override
     public int getOutput(int idx) {
-      if (primordialCell.getEntities().isEmpty() || primordialCell.getEntities().get(idx) == null) {
+      List<Entity> entities = primordialCell.getEntities();
+      if (entities.size() < idx || entities.get(idx) == null) {
         return -1;
       }
-      return EntityUtil.getType(primordialCell.getEntities().get(idx)).ordinal();
+      EntityType entityType = EntityUtil.getType(entities.get(idx));
+      return entityType != null ? entityType.ordinal() : -1;
     }
 
     @Override
@@ -81,17 +83,14 @@ public class PrimordialCellularAutomaton implements CellularAutomaton {
   public void updateInputs() {
   }
 
-  private static final Function<Cell, Color> CELL_COLOR_PROVIDER = new Function<Cell, Color>() {
-    @Override
-    public Color apply(Cell cell) {
-      if (cell.getOutput(0) == EntityType.ENTITY.ordinal()) {
-        return Color.WHITE;
-      }
-      if (cell.getOutput(0) == EntityType.FOOD.ordinal()) {
-        return Color.GREEN;
-      }
-      return Color.BLACK;
+  private static final Function<Cell, Color> CELL_COLOR_PROVIDER = cell -> {
+    if (cell.getOutput(0) == EntityType.ENTITY.ordinal()) {
+      return Color.WHITE;
     }
+    if (cell.getOutput(0) == EntityType.FOOD.ordinal()) {
+      return Color.GREEN;
+    }
+    return Color.BLACK;
   };
 
   public static void main(String[] args) throws IOException {
@@ -105,7 +104,7 @@ public class PrimordialCellularAutomaton implements CellularAutomaton {
       CellularAutomatonCLI cli = new CellularAutomatonCLI() {
 
         @Override
-        protected CellularAutomaton createCellularAutomaton() throws IOException {
+        protected CellularAutomaton createCellularAutomaton() {
           return new PrimordialCellularAutomaton(simulation);
         }
 
@@ -117,7 +116,7 @@ public class PrimordialCellularAutomaton implements CellularAutomaton {
 
         @Override
         protected CellularAutomatonVisualizer createVisualizer(
-            int width, int height, int framesPerSecond, int frameCount) throws IOException {
+            int width, int height, int framesPerSecond, int frameCount) {
           CellularAutomatonVisualizer visualizer = new CellularAutomatonVisualizer(createCellularAutomaton(), CELL_COLOR_PROVIDER,
               width, height, framesPerSecond, frameCount);
           visualizer.start();

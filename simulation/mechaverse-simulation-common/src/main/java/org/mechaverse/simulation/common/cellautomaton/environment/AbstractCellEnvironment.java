@@ -6,6 +6,7 @@ import org.mechaverse.simulation.common.model.Entity;
 import org.mechaverse.simulation.common.model.Environment;
 import org.mechaverse.simulation.common.util.SimulationModelUtil;
 
+@SuppressWarnings("WeakerAccess")
 public abstract class AbstractCellEnvironment<T extends Enum<T>, C extends AbstractCell<T>> {
 
     private static final double[] DIRECTION_ANGLES = {
@@ -137,9 +138,9 @@ public abstract class AbstractCellEnvironment<T extends Enum<T>, C extends Abstr
 
     public void updateModel() {
         env.getEntities().clear();
-        for (int row = 0; row < cells.length; row++) {
-            for (int col = 0; col < cells[row].length; col++) {
-                env.getEntities().addAll(cells[row][col].getEntities());
+        for (C[] row : cells) {
+            for (C cell : row) {
+                env.getEntities().addAll(cell.getEntities());
             }
         }
     }
@@ -161,10 +162,10 @@ public abstract class AbstractCellEnvironment<T extends Enum<T>, C extends Abstr
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (int row = 0; row < cells.length; row++) {
-            for (int col = 0; col < cells[row].length; col++) {
+        for (C[] row : cells) {
+            for (C cell : row) {
                 for (T type : entityFactory.getTypeValues()) {
-                    if (cells[row][col].hasEntity(type)) {
+                    if (cell.hasEntity(type)) {
                         sb.append(type.name().charAt(0));
                     } else {
                         sb.append("-");

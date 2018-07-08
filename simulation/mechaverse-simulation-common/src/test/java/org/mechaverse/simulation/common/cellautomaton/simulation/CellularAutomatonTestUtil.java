@@ -3,14 +3,12 @@ package org.mechaverse.simulation.common.cellautomaton.simulation;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Random;
-
 import org.mechaverse.cellautomaton.model.Output;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel.CellInfo;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel.ExternalCellInfo;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel.Input;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.ExternalCell;
 import org.mockito.ArgumentCaptor;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 public class CellularAutomatonTestUtil {
@@ -90,9 +88,9 @@ public class CellularAutomatonTestUtil {
     }
 
     public CellInfoVerifier verifyOutputParamVarNames(int outputIdx, String[][] matrix) {
-      for (int idx = 0; idx < matrix.length; idx++) {
-        assertEquals(matrix[idx][1], cellInfo.getOutputParamVarName(
-            cellInfo.getOutputs().get(outputIdx), matrix[idx][0]));
+      for (String[] row : matrix) {
+        assertEquals(row[1], cellInfo.getOutputParamVarName(
+            cellInfo.getOutputs().get(outputIdx), row[0]));
       }
       return this;
     }
@@ -150,12 +148,9 @@ public class CellularAutomatonTestUtil {
    */
   public static Answer<Void> mockIntArrayAnswer(
       final int[] data, final ArgumentCaptor<int[]> argCaptor) {
-    return new Answer<Void>() {
-      @Override
-      public Void answer(InvocationOnMock invocation) throws Throwable {
-        System.arraycopy(data, 0, argCaptor.getValue(), 0, data.length);
-        return null;
-      }
+    return invocation -> {
+      System.arraycopy(data, 0, argCaptor.getValue(), 0, data.length);
+      return null;
     };
   }
 }

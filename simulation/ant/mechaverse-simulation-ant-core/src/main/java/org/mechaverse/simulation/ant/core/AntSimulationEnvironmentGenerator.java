@@ -14,7 +14,7 @@ import org.mechaverse.simulation.ant.core.entity.EntityUtil;
 import org.mechaverse.simulation.common.cellautomaton.AbstractProbabilisticEnvironmentGenerator;
 import org.mechaverse.simulation.common.util.RandomUtil;
 
-import com.google.common.base.Function;
+import java.util.function.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableTable;
 
@@ -38,13 +38,7 @@ public class AntSimulationEnvironmentGenerator
   }
 
   public AntSimulationEnvironmentGenerator(EntityManager entityManager, RandomGenerator random) {
-    this(new Function<EntityType, Entity>() {
-
-      @Override
-      public Entity apply(EntityType entityType) {
-        return EntityUtil.newEntity(entityType);
-      }
-    }, entityManager, random);
+    this(EntityUtil::newEntity, entityManager, random);
   }
 
   public AntSimulationEnvironmentGenerator(Function<EntityType, Entity> entityFactory,

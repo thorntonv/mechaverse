@@ -4,24 +4,21 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import com.google.common.io.ByteStreams;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.zip.GZIPInputStream;
-
 import org.apache.commons.math3.random.RandomGenerator;
-import org.mechaverse.simulation.ant.core.util.AntSimulationModelUtil;
-import org.mechaverse.simulation.common.util.SimulationModelUtil;
-import org.mechaverse.simulation.common.model.Direction;
-import org.mechaverse.simulation.common.model.Entity;
-import org.mechaverse.simulation.ant.core.model.EntityType;
-import org.mechaverse.simulation.common.model.Environment;
-import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.ant.core.entity.EntityUtil;
 import org.mechaverse.simulation.ant.core.entity.ant.AntOutput;
-
-import com.google.common.io.ByteStreams;
+import org.mechaverse.simulation.ant.core.model.EntityType;
+import org.mechaverse.simulation.ant.core.util.AntSimulationModelUtil;
+import org.mechaverse.simulation.common.model.Direction;
+import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.Environment;
+import org.mechaverse.simulation.common.model.SimulationModel;
+import org.mechaverse.simulation.common.util.SimulationModelUtil;
 
 /**
  * Common ant simulation test utility methods.
@@ -67,10 +64,10 @@ public class AntSimulationTestUtil {
 
     // Sort the entities so that order will not cause the comparison to fail.
     for (Environment env : SimulationModelUtil.getEnvironments(expected)) {
-      Collections.sort(env.getEntities(), EntityUtil.ENTITY_ORDERING);
+      env.getEntities().sort(EntityUtil.ENTITY_ORDERING);
     }
     for (Environment env : SimulationModelUtil.getEnvironments(actual)) {
-      Collections.sort(env.getEntities(), EntityUtil.ENTITY_ORDERING);
+      env.getEntities().sort(EntityUtil.ENTITY_ORDERING);
     }
 
     ByteArrayOutputStream model1ByteOut = new ByteArrayOutputStream(16 * 1024);
