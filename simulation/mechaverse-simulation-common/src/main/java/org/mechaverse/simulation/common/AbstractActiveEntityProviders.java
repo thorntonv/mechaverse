@@ -9,7 +9,7 @@ import org.mechaverse.simulation.common.model.Entity;
 
 public abstract class AbstractActiveEntityProviders<M, S extends SimulationState<M>, T extends Enum<T>,
     C extends AbstractCell<T>, E extends AbstractCellEnvironment<T, C>,
-    A extends AbstractActiveEntity<M, S, T, C, E>, P extends AbstractActiveEntityProvider<M, S, T, C, E, A>> {
+    A extends ActiveEntity<M, S, T, C, E>, P extends AbstractActiveEntityProvider<M, S, T, C, E, A>> {
 
     private final P[] activeEntityProviders;
     private final EntityFactory<T> entityFactory;

@@ -60,7 +60,7 @@ public class Environment implements Serializable {
     this.width = value;
   }
 
-  /**
+  /**<SimulationModel, AntSimulationState>
    * Gets the value of the height property.
    */
   public int getHeight() {

@@ -182,7 +182,7 @@ public final class ActiveAnt implements ActiveEntity {
     entity.setEnergy(entity.getEnergy() - 1);
     if (entity.getEnergy() <= 0) {
       behavior.onRemoveEntity();
-      entityManager.removeEntity(this);
+      entityManager.removeEntity(this.getEntity());
 
       // Attempt to drop the carried entity.
       if (entity.getCarriedEntity() != null) {

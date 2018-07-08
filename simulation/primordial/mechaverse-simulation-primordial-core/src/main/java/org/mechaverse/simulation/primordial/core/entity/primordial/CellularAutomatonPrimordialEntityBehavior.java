@@ -1,10 +1,10 @@
 package org.mechaverse.simulation.primordial.core.entity.primordial;
 
-import java.util.function.Function;
 import com.google.common.collect.ImmutableList;
+import java.util.Arrays;
+import java.util.List;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator;
-import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomaton;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorDataSource;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.SimulatorCellularAutomaton;
@@ -19,11 +19,6 @@ import org.mechaverse.simulation.primordial.core.model.PrimordialEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.Arrays;
-import java.util.List;
-
 /**
  * A {@link PrimordialEntityBehavior} implementation that is based on a simulated cellular automaton.
  */
@@ -31,8 +26,8 @@ public class CellularAutomatonPrimordialEntityBehavior implements PrimordialEnti
 
   public static final String AUTOMATON_STATE_KEY = "cellularAutomatonState";
 
-  private static final Color DARK_BLUE = Color.BLUE.darker().darker();
-  private static final Color DARK_GREEN = Color.GREEN.darker().darker().darker();
+//  private static final Color DARK_BLUE = Color.BLUE.darker().darker();
+//  private static final Color DARK_GREEN = Color.GREEN.darker().darker().darker();
 
   private static final Logger logger = LoggerFactory.getLogger(CellularAutomatonPrimordialEntityBehavior.class);
 
@@ -186,23 +181,23 @@ public class CellularAutomatonPrimordialEntityBehavior implements PrimordialEnti
       cellularAutomaton = cells;
       cellularAutomaton.refresh();
 
-      Function<CellularAutomaton.Cell, Color> CELL_COLOR_PROVIDER =
-          cell -> {
-            Color zeroColor = Color.BLACK;
-            Color oneColor = Color.WHITE;
-            if(inputCells.contains(cell)){
-              zeroColor = DARK_BLUE;
-              oneColor = Color.BLUE;
-            }
-            if(outputCells.contains(cell)) {
-              zeroColor = DARK_GREEN;
-              oneColor = Color.GREEN;
-            }
-            return (cell.getOutput(0) & 1) == 0 ? zeroColor : oneColor;
-          };
-      visualizer = new CellularAutomatonVisualizer(cellularAutomaton, CELL_COLOR_PROVIDER, 800, 600, 0);
-      visualizer.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-      visualizer.setLocation(0, 0);
+//      Function<CellularAutomaton.Cell, Color> CELL_COLOR_PROVIDER =
+//          cell -> {
+//            Color zeroColor = Color.BLACK;
+//            Color oneColor = Color.WHITE;
+//            if(inputCells.contains(cell)){
+//              zeroColor = DARK_BLUE;
+//              oneColor = Color.BLUE;
+//            }
+//            if(outputCells.contains(cell)) {
+//              zeroColor = DARK_GREEN;
+//              oneColor = Color.GREEN;
+//            }
+//            return (cell.getOutput(0) & 1) == 0 ? zeroColor : oneColor;
+//          };
+//      visualizer = new CellularAutomatonVisualizer(cellularAutomaton, CELL_COLOR_PROVIDER, 800, 600, 0);
+//      visualizer.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//      visualizer.setLocation(0, 0);
     }
   }
 

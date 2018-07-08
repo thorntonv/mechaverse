@@ -1,34 +1,37 @@
-package org.mechaverse.simulation.ant.core;
+package org.mechaverse.simulation.common.util;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Assert;
 import org.junit.Test;
-import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.common.model.Direction;
-import org.mechaverse.simulation.common.util.SimulationUtil;
+import org.mechaverse.simulation.common.model.Entity;
 
 /**
- * Unit tests for {@link AntSimulationUtil}.
+ * Unit tests for {@link SimulationUtil}.
  */
-public class AntSimulationUtilTest {
+public class SimulationUtilTest {
+
+  private static class TestEntity extends Entity {
+  }
 
   @Test
   public void testTurnCW() {
-    Ant ant = new Ant();
+    Entity entity = new TestEntity();
     for(Direction direction : Direction.values()) {
-      ant.setDirection(direction);
-      SimulationUtil.turnCW(ant);
-      assertEquals(SimulationUtil.directionCW(direction), ant.getDirection());
+      entity.setDirection(direction);
+      SimulationUtil.turnCW(entity);
+      Assert.assertEquals(SimulationUtil.directionCW(direction), entity.getDirection());
     }
   }
 
   @Test
   public void testTurnCCW() {
-    Ant ant = new Ant();
+    Entity entity = new TestEntity();
     for(Direction direction : Direction.values()) {
-      ant.setDirection(direction);
-      SimulationUtil.turnCCW(ant);
-      assertEquals(SimulationUtil.directionCCW(direction), ant.getDirection());
+      entity.setDirection(direction);
+      SimulationUtil.turnCCW(entity);
+      Assert.assertEquals(SimulationUtil.directionCCW(direction), entity.getDirection());
     }
   }
 

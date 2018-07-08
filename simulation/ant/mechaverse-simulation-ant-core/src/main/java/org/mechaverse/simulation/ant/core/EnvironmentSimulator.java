@@ -1,30 +1,31 @@
 package org.mechaverse.simulation.ant.core;
 
-import java.util.*;
-
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.core.entity.ActiveEntity;
 import org.mechaverse.simulation.ant.core.entity.ActiveEntityProviders;
 import org.mechaverse.simulation.ant.core.entity.ant.ActiveEntityProvider;
-import org.mechaverse.simulation.ant.core.model.EntityType;
+import org.mechaverse.simulation.ant.core.module.AntSimulationModule;
 import org.mechaverse.simulation.common.EntityManager;
-import org.mechaverse.simulation.common.model.SimulationModel;
-import org.mechaverse.simulation.common.util.SimulationModelUtil;
 import org.mechaverse.simulation.common.model.Entity;
 import org.mechaverse.simulation.common.model.Environment;
-import org.mechaverse.simulation.ant.core.module.AntSimulationModule;
+import org.mechaverse.simulation.common.model.SimulationModel;
+import org.mechaverse.simulation.common.util.SimulationModelUtil;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
-
 /**
  * Simulates an environment.
  */
-public final class EnvironmentSimulator implements EntityManager<SimulationModel,
-    AntSimulationState, EntityType, Cell, CellEnvironment, ActiveEntity>, AutoCloseable {
+public final class EnvironmentSimulator
+    implements EntityManager<SimulationModel, AntSimulationState>, AutoCloseable {
 
   public static class Factory {
 
@@ -44,7 +45,8 @@ public final class EnvironmentSimulator implements EntityManager<SimulationModel
   private final String environmentId;
   private CellEnvironment environment;
   private final Map<Entity, ActiveEntity> activeEntities = new LinkedHashMap<>();
-  private final Set<EntityManager.Observer> observers = Sets.newLinkedHashSet();
+  private final Set<EntityManager.Observer<SimulationModel, AntSimulationState>> observers =
+      Sets.newLinkedHashSet();
   private final ActiveEntityProviders activeEntityProviders;
   private final List<AntSimulationModule> modules;
 
@@ -131,27 +133,20 @@ public final class EnvironmentSimulator implements EntityManager<SimulationModel
       }
       activeEntities.put(activeEntity.getEntity(), activeEntity);
     }
-    for (EntityManager.Observer observer : observers) {
+    for (EntityManager.Observer<SimulationModel, AntSimulationState> observer : observers) {
       observer.onAddEntity(entity, state);
     }
   }
 
   @Override
   public void removeEntity(Entity entity) {
-    activeEntities.remove(entity);
+    ActiveEntity activeEntity = activeEntities.remove(entity);
     environment.getCell(entity).removeEntity(entity);
-    for (EntityManager.Observer observer : observers) {
-      observer.onRemoveEntity(entity, state);
+    if(activeEntity != null) {
+      activeEntity.updateState(state);
     }
-  }
-
-  @Override
-  public void removeEntity(ActiveEntity activeEntity) {
-    activeEntities.remove(activeEntity.getEntity());
-    environment.getCell(activeEntity.getEntity()).removeEntity(activeEntity.getType());
-    activeEntity.updateState(state);
-    for (EntityManager.Observer observer : observers) {
-      observer.onRemoveEntity(activeEntity.getEntity(), state);
+    for (EntityManager.Observer<SimulationModel, AntSimulationState> observer : observers) {
+      observer.onRemoveEntity(entity, state);
     }
   }
 
@@ -160,7 +155,7 @@ public final class EnvironmentSimulator implements EntityManager<SimulationModel
   }
 
   @Override
-  public void addObserver(Observer observer) {
+  public void addObserver(Observer<SimulationModel, AntSimulationState> observer) {
     observers.add(observer);
 
     for (Entity entity : environment.getEnvironment().getEntities()) {

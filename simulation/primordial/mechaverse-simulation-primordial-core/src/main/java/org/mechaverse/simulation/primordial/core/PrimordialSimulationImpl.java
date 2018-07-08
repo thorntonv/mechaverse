@@ -131,7 +131,7 @@ public final class PrimordialSimulationImpl implements Simulation {
   }
 
   @VisibleForTesting
-  void addObserver(EntityManager.Observer observer) {
+  void addObserver(EntityManager.Observer<SimulationModel, PrimordialSimulationState> observer) {
     for (EnvironmentSimulator environmentSimulator : environmentSimulations) {
       environmentSimulator.addObserver(observer);
     }

@@ -126,7 +126,7 @@ public final class AntSimulationImpl implements Simulation {
   }
 
   @VisibleForTesting
-  void addObserver(EntityManager.Observer observer) {
+  void addObserver(EntityManager.Observer<SimulationModel, AntSimulationState> observer) {
     for (EnvironmentSimulator environmentSimulator : environmentSimulations) {
       environmentSimulator.addObserver(observer);
     }

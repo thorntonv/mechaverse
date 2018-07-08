@@ -47,20 +47,33 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ActiveAntTest {
 
-  @Mock Ant mockAntEntity;
-  @Mock AntBehavior mockAntBehavior;
-  @Mock CellEnvironment mockEnvironment;
-  @Mock Cell mockCell;
-  @Mock Cell mockFrontCell;
-  @Mock Cell mockOtherCell;
-  @Mock Ant mockAnt;
-  @Mock Food mockFood;
-  @Mock Nest mockNest;
-  @Mock Pheromone mockPheromone;
-  @Mock Rock mockRock;
-  @Mock EntityManager mockEntityManager;
+  @Mock
+  private Ant mockAntEntity;
+  @Mock
+  private AntBehavior mockAntBehavior;
+  @Mock
+  private CellEnvironment mockEnvironment;
+  @Mock
+  private Cell mockCell;
+  @Mock
+  private Cell mockFrontCell;
+  @Mock
+  private Cell mockOtherCell;
+  @Mock
+  private Ant mockAnt;
+  @Mock
+  private Food mockFood;
+  @Mock
+  private Nest mockNest;
+  @Mock
+  private Pheromone mockPheromone;
+  @Mock
+  private Rock mockRock;
+  @Mock
+  private EntityManager mockEntityManager;
 
-  @Captor ArgumentCaptor<AntInput> inputCaptor;
+  @Captor
+  private ArgumentCaptor<AntInput> inputCaptor;
 
   private ActiveAnt activeAnt;
   private RandomGenerator random;
@@ -118,7 +131,7 @@ public class ActiveAntTest {
     when(mockAntEntity.getEnergy()).thenReturn(1).thenReturn(0);
     activeAnt.performAction(mockEnvironment, mockEntityManager, random);
     verify(mockAntEntity).setEnergy(0);
-    verify(mockEntityManager).removeEntity(activeAnt);
+    verify(mockEntityManager).removeEntity(activeAnt.getEntity());
     verify(mockAntBehavior).onRemoveEntity();
   }
 
@@ -131,7 +144,7 @@ public class ActiveAntTest {
     activeAnt = new ActiveAnt(mockAntEntity, mockAntBehavior);
     activeAnt.performAction(mockEnvironment, mockEntityManager, random);
     verify(mockAntEntity).setEnergy(0);
-    verify(mockEntityManager).removeEntity(activeAnt);
+    verify(mockEntityManager).removeEntity(activeAnt.getEntity());
     verify(mockAntBehavior).onRemoveEntity();
     verify(mockCell).setEntity(mockRock, EntityType.ROCK);
   }

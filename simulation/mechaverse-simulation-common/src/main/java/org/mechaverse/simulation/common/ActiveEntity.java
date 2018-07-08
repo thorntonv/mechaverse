@@ -8,7 +8,7 @@ import org.mechaverse.simulation.common.model.Entity;
 /**
  * An entity that is active in the environment.
  */
-public interface AbstractActiveEntity<M, S extends SimulationState<M>, T extends Enum<T>, C extends AbstractCell<T>,
+public interface ActiveEntity<M, S extends SimulationState<M>, T extends Enum<T>, C extends AbstractCell<T>,
         E extends AbstractCellEnvironment<T, C>> {
 
   void updateInput(E env, RandomGenerator random);

@@ -12,8 +12,6 @@ import org.mechaverse.simulation.primordial.core.PrimordialSimulationState;
 import org.mechaverse.simulation.primordial.core.entity.ActiveEntity;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
 import org.mechaverse.simulation.primordial.core.model.PrimordialEntity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An primordial that active in the simulation. An active primordial receives sensory information about itself and
@@ -44,8 +42,6 @@ public final class ActivePrimordialEntity implements ActiveEntity {
     void setState(PrimordialSimulationState state);
     void updateState(PrimordialSimulationState state);
   }
-
-  private static final Logger logger = LoggerFactory.getLogger(ActivePrimordialEntity.class);
 
   private final PrimordialEntity entity;
   private final PrimordialEntityBehavior behavior;
@@ -112,7 +108,7 @@ public final class ActivePrimordialEntity implements ActiveEntity {
     entity.setEnergy(entity.getEnergy() - 1);
     if (entity.getEnergy() <= 0) {
       behavior.onRemoveEntity();
-      entityManager.removeEntity(this);
+      entityManager.removeEntity(this.getEntity());
       return;
     }
 
