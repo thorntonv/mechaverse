@@ -5,7 +5,7 @@ import java.util.Iterator;
 import org.mechaverse.gwt.common.client.util.UUID;
 import org.mechaverse.gwt.shared.MechaverseGwtRpcServiceAsync;
 import org.mechaverse.simulation.common.util.SimulationModelUtil;
-import org.mechaverse.simulation.common.model.Environment;
+import org.mechaverse.simulation.common.model.EnvironmentModel;
 import org.mechaverse.simulation.common.model.SimulationModel;
 
 import com.google.common.base.Preconditions;
@@ -89,7 +89,7 @@ public class SimulationEditorPresenter {
   public void createNewEnvironment() {
     Preconditions.checkNotNull(state);
 
-    final Environment newEnvironment = new Environment();
+    final EnvironmentModel newEnvironment = new EnvironmentModel();
     newEnvironment.setId(UUID.uuid().toLowerCase());
     newEnvironment.setWidth(25);
     newEnvironment.setHeight(25);
@@ -132,9 +132,9 @@ public class SimulationEditorPresenter {
   public void deleteEnvironment() {
     Preconditions.checkNotNull(state);
 
-    Iterator<Environment> environmentIt = state.getSubEnvironments().iterator();
+    Iterator<EnvironmentModel> environmentIt = state.getSubEnvironments().iterator();
     while (environmentIt.hasNext()) {
-      Environment env = environmentIt.next();
+      EnvironmentModel env = environmentIt.next();
       if (env.getId().equalsIgnoreCase(environmentId)) {
         environmentIt.remove();
         save(new AsyncCallback<Void>() {
@@ -155,7 +155,7 @@ public class SimulationEditorPresenter {
     Preconditions.checkNotNull(state);
 
     this.environmentId = environmentId;
-    Environment env = state.getEnvironment();
+    EnvironmentModel env = state.getEnvironment();
     if (environmentId != null) {
       env = SimulationModelUtil.getEnvironment(state, environmentId);
       if (env == null) {

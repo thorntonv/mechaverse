@@ -1,15 +1,15 @@
 package org.mechaverse.simulation.common;
 
-import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.EntityModel;
 
 /**
  * Interface for entity creation.
  */
 public interface EntityFactory<T extends Enum<T>> {
 
-    Entity newEntity(T entityType);
+    EntityModel newEntity(T entityType);
 
-    T getType(Entity entity);
+    T getType(EntityModel entity);
 
     T[] getTypeValues();
 }

@@ -3,7 +3,7 @@ package org.mechaverse.simulation.common.cellautomaton.environment;
 import java.util.List;
 
 import org.mechaverse.simulation.common.EntityFactory;
-import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.EntityModel;
 import com.google.common.collect.ImmutableList;
 
 public abstract class AbstractCell<T extends Enum<T>> {
@@ -11,17 +11,17 @@ public abstract class AbstractCell<T extends Enum<T>> {
   private final int row;
   private final int column;
 
-  private Entity primaryEntity;
+  private EntityModel primaryEntity;
   private T primaryEntityType;
   private final EntityFactory<T> entityFactory;
 
-  private final Entity[] entities;
+  private final EntityModel[] entities;
 
   public AbstractCell(int row, int column, EntityFactory<T> entityFactory) {
     this.row = row;
     this.column = column;
     this.entityFactory = entityFactory;
-    this.entities = new Entity[entityFactory.getTypeValues().length];
+    this.entities = new EntityModel[entityFactory.getTypeValues().length];
   }
 
   public int getRow() {
@@ -36,11 +36,11 @@ public abstract class AbstractCell<T extends Enum<T>> {
     return primaryEntity == null;
   }
 
-  public void setEntity(Entity entity) {
+  public void setEntity(EntityModel entity) {
     setEntity(entity, entityFactory.getType(entity));
   }
 
-  public void setEntity(Entity entity, T type) {
+  public void setEntity(EntityModel entity, T type) {
     entity.setX(column);
     entity.setY(row);
     entities[type.ordinal()] = entity;
@@ -51,7 +51,7 @@ public abstract class AbstractCell<T extends Enum<T>> {
     }
   }
 
-  public Entity getEntity() {
+  public EntityModel getEntity() {
     return primaryEntity;
   }
 
@@ -63,17 +63,17 @@ public abstract class AbstractCell<T extends Enum<T>> {
     return entities[type.ordinal()] != null;
   }
 
-  public Entity getEntity(T type) {
+  public EntityModel getEntity(T type) {
     return entities[type.ordinal()];
   }
 
-  public Entity removeEntity(Entity entity) {
+  public EntityModel removeEntity(EntityModel entity) {
     T type = entityFactory.getType(entity);
     return entities[type.ordinal()] == entity ? removeEntity(type) : null;
   }
 
-  public Entity removeEntity(T type) {
-    Entity removedEntity = entities[type.ordinal()];
+  public EntityModel removeEntity(T type) {
+    EntityModel removedEntity = entities[type.ordinal()];
     entities[type.ordinal()] = null;
     if (primaryEntityType == type) {
       for (int idx = type.ordinal() + 1; idx < entities.length; idx++) {
@@ -89,9 +89,9 @@ public abstract class AbstractCell<T extends Enum<T>> {
     return removedEntity;
   }
 
-  public List<Entity> getEntities() {
-    ImmutableList.Builder<Entity> builder = ImmutableList.builder();
-    for (Entity entity : entities) {
+  public List<EntityModel> getEntities() {
+    ImmutableList.Builder<EntityModel> builder = ImmutableList.builder();
+    for (EntityModel entity : entities) {
       if (entity != null) {
         builder.add(entity);
       }

@@ -6,9 +6,9 @@ import java.util.UUID;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.EntityManager;
-import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.ant.core.model.EntityType;
-import org.mechaverse.simulation.common.model.Environment;
+import org.mechaverse.simulation.common.model.EnvironmentModel;
 import org.mechaverse.simulation.ant.core.model.Nest;
 import org.mechaverse.simulation.ant.core.entity.EntityUtil;
 import org.mechaverse.simulation.common.cellautomaton.AbstractProbabilisticEnvironmentGenerator;
@@ -27,7 +27,7 @@ public class AntSimulationEnvironmentGenerator
     extends AbstractProbabilisticEnvironmentGenerator<CellEnvironment, EntityType> {
 
   private final EntityManager entityManager;
-  private final Function<EntityType, Entity> entityFactory;
+  private final Function<EntityType, EntityModel> entityFactory;
 
   public static ProbabilisticLocalGenerator<EntityType> newRockGenerator(RandomGenerator random) {
     return new ProbabilisticLocalGenerator<>(.01, ImmutableTable.<Integer, Integer, EntityDistribution<EntityType>>builder().put(0, 0, EntityDistribution.of(EntityType.ROCK, .50, random)).put(0, 1, EntityDistribution.of(EntityType.ROCK, .75, random)).put(0, 2, EntityDistribution.of(EntityType.ROCK, .50, random)).put(1, 0, EntityDistribution.of(EntityType.ROCK, .75, random)).put(1, 1, EntityDistribution.of(EntityType.ROCK, .90, random)).put(1, 2, EntityDistribution.of(EntityType.ROCK, .75, random)).put(2, 0, EntityDistribution.of(EntityType.ROCK, .50, random)).put(2, 1, EntityDistribution.of(EntityType.ROCK, .75, random)).put(2, 2, EntityDistribution.of(EntityType.ROCK, .50, random)).build());
@@ -41,7 +41,7 @@ public class AntSimulationEnvironmentGenerator
     this(EntityUtil::newEntity, entityManager, random);
   }
 
-  public AntSimulationEnvironmentGenerator(Function<EntityType, Entity> entityFactory,
+  public AntSimulationEnvironmentGenerator(Function<EntityType, EntityModel> entityFactory,
       EntityManager entityManager, RandomGenerator random) {
     super(ImmutableList.of(newRockGenerator(random)));
 
@@ -51,7 +51,7 @@ public class AntSimulationEnvironmentGenerator
 
   @Override
   protected CellEnvironment createEnvironment(int width, int height, RandomGenerator random) {
-    Environment env = new Environment();
+    EnvironmentModel env = new EnvironmentModel();
     env.setId(UUID.randomUUID().toString());
     env.setWidth(width);
     env.setHeight(height);
@@ -73,7 +73,7 @@ public class AntSimulationEnvironmentGenerator
       Cell cell = env.getCell(row, column);
 
       if (cell.isEmpty()) {
-        Entity entity = entityFactory.apply(entityType);
+        EntityModel entity = entityFactory.apply(entityType);
         env.addEntity(entity, cell);
         if (entityManager != null) {
           entityManager.addEntity(entity);

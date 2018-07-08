@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.EntityManager;
-import org.mechaverse.simulation.common.model.Entity;
-import org.mechaverse.simulation.common.model.Environment;
+import org.mechaverse.simulation.common.model.EntityModel;
+import org.mechaverse.simulation.common.model.EnvironmentModel;
 import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.common.util.SimulationModelUtil;
 import org.mechaverse.simulation.primordial.core.entity.ActiveEntity;
@@ -46,7 +46,7 @@ public final class EnvironmentSimulator implements EntityManager<SimulationModel
 
   private final String environmentId;
   private CellEnvironment environment;
-  private final Map<Entity, ActiveEntity> activeEntities = new LinkedHashMap<>();
+  private final Map<EntityModel, ActiveEntity> activeEntities = new LinkedHashMap<>();
   private final Set<EntityManager.Observer<SimulationModel, PrimordialSimulationState>> observers =
       Sets.newLinkedHashSet();
   private final ActiveEntityProviders activeEntityProviders;
@@ -97,11 +97,11 @@ public final class EnvironmentSimulator implements EntityManager<SimulationModel
       module.setState(state, environment, this);
     }
 
-    Environment environmentModel =
+    EnvironmentModel environmentModel =
         SimulationModelUtil.getEnvironment(state.getModel(), environmentId);
     this.environment = new CellEnvironment(environmentModel);
-    List<Entity> entities = new ArrayList<>(environmentModel.getEntities());
-    for (Entity entity : entities) {
+    List<EntityModel> entities = new ArrayList<>(environmentModel.getEntities());
+    for (EntityModel entity : entities) {
       addEntity(entity);
     }
 
@@ -125,7 +125,7 @@ public final class EnvironmentSimulator implements EntityManager<SimulationModel
   }
 
   @Override
-  public void addEntity(Entity entity) {
+  public void addEntity(EntityModel entity) {
     ActiveEntityProvider activeEntityProvider = activeEntityProviders.get(entity);
     if (activeEntityProvider != null) {
       ActiveEntity activeEntity = activeEntityProvider.getActiveEntity(entity);
@@ -140,7 +140,7 @@ public final class EnvironmentSimulator implements EntityManager<SimulationModel
   }
 
   @Override
-  public void removeEntity(Entity entity) {
+  public void removeEntity(EntityModel entity) {
     ActiveEntity activeEntity = activeEntities.remove(entity);
     environment.getCell(entity).removeEntity(entity);
     if(activeEntity!=null) {
@@ -159,7 +159,7 @@ public final class EnvironmentSimulator implements EntityManager<SimulationModel
   public void addObserver(Observer<SimulationModel, PrimordialSimulationState> observer) {
     observers.add(observer);
 
-    for (Entity entity : environment.getEnvironment().getEntities()) {
+    for (EntityModel entity : environment.getEnvironment().getEntities()) {
       observer.onAddEntity(entity, state);
     }
   }

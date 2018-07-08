@@ -8,7 +8,7 @@ import org.mechaverse.simulation.ant.core.entity.ant.ActiveAnt.AntBehavior;
 import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.common.EntityManager;
-import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.EntityModel;
 
 import java.io.IOException;
 
@@ -42,7 +42,7 @@ public class ReplayActiveAntProvider implements ActiveEntityProvider {
     }
 
     @Override
-    public Entity getEntity() {
+    public EntityModel getEntity() {
       return ant.getEntity();
     }
 
@@ -99,7 +99,7 @@ public class ReplayActiveAntProvider implements ActiveEntityProvider {
   }
 
   @Override
-  public ActiveEntity getActiveEntity(Entity entity) {
+  public ActiveEntity getActiveEntity(EntityModel entity) {
     return new ReplayActiveAnt((Ant) entity, new ReplayAntBehavior());
   }
 }

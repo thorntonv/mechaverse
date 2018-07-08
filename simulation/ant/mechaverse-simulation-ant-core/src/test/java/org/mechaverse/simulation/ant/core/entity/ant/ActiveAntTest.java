@@ -21,7 +21,7 @@ import org.junit.runner.RunWith;
 import org.mechaverse.simulation.ant.core.AntSimulationState;
 import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.common.model.Direction;
-import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.model.Food;
 import org.mechaverse.simulation.ant.core.model.Nest;
@@ -465,7 +465,7 @@ public class ActiveAntTest {
     activeAnt.performAction(mockEnvironment, mockEntityManager, random);
 
     verify(mockCell, never()).removeEntity(any(EntityType.class));
-    verify(mockAntEntity, never()).setCarriedEntity(any(Entity.class));
+    verify(mockAntEntity, never()).setCarriedEntity(any(EntityModel.class));
   }
 
   @Test
@@ -478,7 +478,7 @@ public class ActiveAntTest {
     activeAnt.performAction(mockEnvironment, mockEntityManager, random);
 
     verify(mockCell, never()).removeEntity(any(EntityType.class));
-    verify(mockAntEntity, never()).setCarriedEntity(any(Entity.class));
+    verify(mockAntEntity, never()).setCarriedEntity(any(EntityModel.class));
   }
 
   @Test
@@ -489,8 +489,8 @@ public class ActiveAntTest {
 
     activeAnt.performAction(mockEnvironment, mockEntityManager, random);
 
-    verify(mockCell, never()).setEntity(any(Entity.class), any(EntityType.class));
-    verify(mockAntEntity, never()).setCarriedEntity(any(Entity.class));
+    verify(mockCell, never()).setEntity(any(EntityModel.class), any(EntityType.class));
+    verify(mockAntEntity, never()).setCarriedEntity(any(EntityModel.class));
   }
 
   @Test
@@ -533,8 +533,8 @@ public class ActiveAntTest {
 
     activeAnt.performAction(mockEnvironment, mockEntityManager, random);
 
-    verify(mockCell, never()).setEntity(any(Entity.class), any(EntityType.class));
-    verify(mockAntEntity, never()).setCarriedEntity(any(Entity.class));
+    verify(mockCell, never()).setEntity(any(EntityModel.class), any(EntityType.class));
+    verify(mockAntEntity, never()).setCarriedEntity(any(EntityModel.class));
   }
 
   @Test
@@ -548,8 +548,8 @@ public class ActiveAntTest {
 
     activeAnt.performAction(mockEnvironment, mockEntityManager, random);
 
-    verify(mockCell, never()).setEntity(any(Entity.class), any(EntityType.class));
-    verify(mockAntEntity, never()).setCarriedEntity(any(Entity.class));
+    verify(mockCell, never()).setEntity(any(EntityModel.class), any(EntityType.class));
+    verify(mockAntEntity, never()).setCarriedEntity(any(EntityModel.class));
   }
 
   @Test
@@ -693,7 +693,7 @@ public class ActiveAntTest {
   }
 
   private void mockEntityAtCellInDirection(
-      EntityType entityType, Entity entity, Cell cell, Direction direction) {
+      EntityType entityType, EntityModel entity, Cell cell, Direction direction) {
     when(mockEnvironment.getCellInDirection(cell, direction)).thenReturn(mockOtherCell);
     when(mockOtherCell.getEntity()).thenReturn(entity);
     when(mockOtherCell.getEntityType()).thenReturn(entityType);

@@ -1,15 +1,15 @@
 package org.mechaverse.simulation.primordial.core.entity;
 
-import org.mechaverse.simulation.primordial.core.model.PrimordialEntity;
+import org.mechaverse.simulation.common.model.EntityModel;
+import org.mechaverse.simulation.primordial.core.model.PrimordialEntityModel;
 import org.mechaverse.simulation.primordial.core.model.Barrier;
-import org.mechaverse.simulation.common.model.Entity;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
 import org.mechaverse.simulation.primordial.core.model.Food;
 
 import com.google.common.collect.Ordering;
 
 /**
- * Entity utility methods.
+ * EntityModel utility methods.
  *
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
@@ -24,9 +24,9 @@ public class EntityUtil {
    * cells in higher. Entities in the same cell are ordered first by type based on the
    * {@link EntityType} ordinal value and then by id.
    */
-  public static final Ordering<Entity> ENTITY_ORDERING = new Ordering<Entity>() {
+  public static final Ordering<EntityModel> ENTITY_ORDERING = new Ordering<EntityModel>() {
     @Override
-    public int compare(Entity left, Entity right) {
+    public int compare(EntityModel left, EntityModel right) {
       if (left.getY() < right.getY()) {
         return -1;
       } else if (left.getY() > right.getY()) {
@@ -49,10 +49,10 @@ public class EntityUtil {
   };
 
   /**
-   * Returns the {@link EntityType} of the given {@link Entity}.
+   * Returns the {@link EntityType} of the given {@link EntityModel}.
    */
-  public static EntityType getType(Entity entity) {
-    if (entity instanceof PrimordialEntity) {
+  public static EntityType getType(EntityModel entity) {
+    if (entity instanceof PrimordialEntityModel) {
       return EntityType.ENTITY;
     } else if (entity instanceof Barrier) {
       return EntityType.BARRIER;
@@ -63,14 +63,14 @@ public class EntityUtil {
   }
 
   /**
-   * Returns a new {@link Entity} instance of the given type.
+   * Returns a new {@link EntityModel} instance of the given type.
    */
-  public static Entity newEntity(EntityType entityType) {
+  public static EntityModel newEntity(EntityType entityType) {
     switch (entityType) {
       case NONE:
         break;
       case ENTITY:
-        return new PrimordialEntity();
+        return new PrimordialEntityModel();
       case BARRIER:
         return new Barrier();
       case FOOD:

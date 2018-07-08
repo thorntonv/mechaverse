@@ -6,17 +6,17 @@ import org.mechaverse.simulation.ant.core.model.Nest;
 import org.mechaverse.simulation.common.EntityFactory;
 import org.mechaverse.simulation.common.cellautomaton.environment.AbstractCellEnvironment;
 import org.mechaverse.simulation.common.model.Direction;
-import org.mechaverse.simulation.common.model.Entity;
-import org.mechaverse.simulation.common.model.Environment;
+import org.mechaverse.simulation.common.model.EntityModel;
+import org.mechaverse.simulation.common.model.EnvironmentModel;
 
 public class CellEnvironment extends AbstractCellEnvironment<EntityType, Cell> {
 
     private Direction[][] nestDirectionIndex;
 
-    public CellEnvironment(Environment env) {
+    public CellEnvironment(EnvironmentModel env) {
         super(env, new AntEntityFactory());
 
-        for (Entity entity : env.getEntities()) {
+        for (EntityModel entity : env.getEntities()) {
             if (entity instanceof Nest) {
                 Cell nestCell = getCell(entity);
                 nestDirectionIndex = new Direction[getRowCount()][getColumnCount()];

@@ -8,9 +8,9 @@ import org.mechaverse.gwt.client.AntSimulationResourceBundle;
 import org.mechaverse.gwt.common.client.util.Coordinate;
 import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.common.model.Direction;
-import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.ant.core.model.EntityType;
-import org.mechaverse.simulation.common.model.Environment;
+import org.mechaverse.simulation.common.model.EnvironmentModel;
 import org.mechaverse.simulation.ant.core.model.Rock;
 import org.mechaverse.simulation.ant.core.entity.EntityUtil;
 
@@ -45,7 +45,7 @@ public class EnvironmentView extends SimplePanel {
   private int cellHeight = AntSimulationResourceBundle.INSTANCE.dirt().getHeight();
 
   private Canvas canvas;
-  private Environment environment;
+  private EnvironmentModel environment;
   private Set<Coordinate> dirtyCells = Sets.newHashSet();
   private Set<Observer> observers = Sets.newHashSet();
 
@@ -71,7 +71,7 @@ public class EnvironmentView extends SimplePanel {
     });
   }
 
-  public void setEnvironment(Environment environment) {
+  public void setEnvironment(EnvironmentModel environment) {
     this.environment = environment;
     canvas.setCoordinateSpaceWidth(cellWidth * environment.getWidth());
     canvas.setCoordinateSpaceHeight(cellHeight * environment.getHeight());
@@ -105,8 +105,8 @@ public class EnvironmentView extends SimplePanel {
     }
     dirtyCells.clear();
 
-    List<Entity> carriedEntities = new ArrayList<>();
-    for (Entity entity : environment.getEntities()) {
+    List<EntityModel> carriedEntities = new ArrayList<>();
+    for (EntityModel entity : environment.getEntities()) {
       if (entity instanceof Ant) {
         Ant ant = (Ant) entity;
         if (ant.getCarriedEntity() != null) {
@@ -116,7 +116,7 @@ public class EnvironmentView extends SimplePanel {
     }
 
     for (EntityType entityType : ENTITY_TYPE_DRAW_ORDER) {
-      for (Entity entity : environment.getEntities()) {
+      for (EntityModel entity : environment.getEntities()) {
         if (EntityUtil.getType(entity) == entityType) {
           ImageElement image = getImage(entity);
           drawEntity(entity, image, context);
@@ -124,7 +124,7 @@ public class EnvironmentView extends SimplePanel {
       }
     }
 
-    for (Entity entity : carriedEntities) {
+    for (EntityModel entity : carriedEntities) {
       ImageElement image = getImage(entity);
       double scale = .85;
       if(entity instanceof Rock) {
@@ -134,7 +134,7 @@ public class EnvironmentView extends SimplePanel {
     }
   }
 
-  private ImageElement getImage(Entity entity) {
+  private ImageElement getImage(EntityModel entity) {
     EntityType entityType = EntityUtil.getType(entity);
     ImageElement image = AntSimulationResourceBundle.ENTITY_IMAGE_ELEMENTS.get(entityType);
     if (entityType == EntityType.ANT) {
@@ -145,12 +145,12 @@ public class EnvironmentView extends SimplePanel {
     return image;
   }
 
-  protected void drawEntity(Entity entity, ImageElement image, Context2d context) {
+  protected void drawEntity(EntityModel entity, ImageElement image, Context2d context) {
     double scale = 1;
     drawEntity(entity, image, scale, context);
   }
 
-  protected void drawEntity(Entity entity, ImageElement image, double scale, Context2d context) {
+  protected void drawEntity(EntityModel entity, ImageElement image, double scale, Context2d context) {
     Coordinate coord = Coordinate.create(entity.getY(), entity.getX());
     drawImage(image, context, coord.getRow(), coord.getColumn(), scale);
     dirtyCells.add(coord);

@@ -13,7 +13,7 @@ import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.model.Pheromone;
 import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.common.model.Direction;
-import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.util.SimulationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,7 +85,7 @@ public final class ActiveAnt implements ActiveEntity {
     // Cell sensor.
     Cell cell = env.getCell(entity);
     for (EntityType cellEntityType : EntityUtil.ENTITY_TYPES) {
-      Entity cellEntity = cell.getEntity(cellEntityType);
+      EntityModel cellEntity = cell.getEntity(cellEntityType);
       if (cellEntity != null && cellEntity != entity) {
         input.setCellSensor(cellEntityType);
         break;
@@ -98,7 +98,7 @@ public final class ActiveAnt implements ActiveEntity {
     // Front cell sensor.
     Cell frontCell = env.getCellInDirection(cell, entity.getDirection());
     if (frontCell != null) {
-      Entity frontEntity = frontCell.getEntity();
+      EntityModel frontEntity = frontCell.getEntity();
       if (frontEntity != null) {
         input.setFrontSensor(
             frontCell.getEntityType(), frontEntity.getDirection(), frontEntity.getId());
@@ -111,7 +111,7 @@ public final class ActiveAnt implements ActiveEntity {
     Direction frontLeftDirection = SimulationUtil.directionCCW(entity.getDirection());
     Cell frontLeftCell = env.getCellInDirection(cell, frontLeftDirection);
     if (frontLeftCell != null) {
-      Entity frontLeftEntity = frontLeftCell.getEntity();
+      EntityModel frontLeftEntity = frontLeftCell.getEntity();
       if (frontLeftEntity != null) {
         input.setFrontLeftSensor(frontLeftCell.getEntityType(), frontLeftEntity.getDirection());
       }
@@ -123,7 +123,7 @@ public final class ActiveAnt implements ActiveEntity {
     Cell leftCell =
         env.getCellInDirection(cell, SimulationUtil.directionCCW(frontLeftDirection));
     if (leftCell != null) {
-      Entity leftEntity = leftCell.getEntity();
+      EntityModel leftEntity = leftCell.getEntity();
       if (leftEntity != null) {
         input.setLeftSensor(leftCell.getEntityType(), leftEntity.getDirection());
       }
@@ -135,7 +135,7 @@ public final class ActiveAnt implements ActiveEntity {
     Direction frontRightDirection = SimulationUtil.directionCW(entity.getDirection());
     Cell frontRightCell = env.getCellInDirection(cell, frontRightDirection);
     if (frontRightCell != null) {
-      Entity frontRightEntity = frontRightCell.getEntity();
+      EntityModel frontRightEntity = frontRightCell.getEntity();
       if (frontRightEntity != null) {
         input.setFrontRightSensor(frontRightCell.getEntityType(), frontRightEntity.getDirection());
       }
@@ -147,7 +147,7 @@ public final class ActiveAnt implements ActiveEntity {
     Cell rightCell =
         env.getCellInDirection(cell, SimulationUtil.directionCW(frontRightDirection));
     if (rightCell != null) {
-      Entity rightEntity = rightCell.getEntity();
+      EntityModel rightEntity = rightCell.getEntity();
       if (rightEntity != null) {
         input.setRightSensor(rightCell.getEntityType(), rightEntity.getDirection());
       }
@@ -156,7 +156,7 @@ public final class ActiveAnt implements ActiveEntity {
     }
 
     // Pheromone sensor.
-    Entity pheromoneEntity = cell.getEntity(EntityType.PHEROMONE);
+    EntityModel pheromoneEntity = cell.getEntity(EntityType.PHEROMONE);
     if (pheromoneEntity instanceof Pheromone) {
       Pheromone pheromone = (Pheromone) pheromoneEntity;
       input.setPheromoneType(pheromone.getValue());
@@ -300,7 +300,7 @@ public final class ActiveAnt implements ActiveEntity {
   private boolean pickup(Cell cell) {
     if(cell != null) {
       for (EntityType type : CARRIABLE_ENTITY_TYPES) {
-        Entity carriableEntity = cell.getEntity(type);
+        EntityModel carriableEntity = cell.getEntity(type);
         if (carriableEntity != null) {
           cell.removeEntity(type);
           entity.setCarriedEntity(carriableEntity);
@@ -322,7 +322,7 @@ public final class ActiveAnt implements ActiveEntity {
   private boolean drop(Cell cell) {
     // The cell must not already have an entity of the given type.
     if (cell != null && cell.getEntity(carriedEntityType) == null) {
-      Entity carriedEntity = entity.getCarriedEntity();
+      EntityModel carriedEntity = entity.getCarriedEntity();
       cell.setEntity(carriedEntity, carriedEntityType);
       entity.setCarriedEntity(null);
       carriedEntityType = EntityType.NONE;
@@ -341,7 +341,7 @@ public final class ActiveAnt implements ActiveEntity {
       pheromone.setEnergy(pheromoneInitialEnergy);
       pheromone.setMaxEnergy(pheromoneInitialEnergy);
 
-      Entity existingPheromone = cell.getEntity(EntityType.PHEROMONE);
+      EntityModel existingPheromone = cell.getEntity(EntityType.PHEROMONE);
       if (existingPheromone != null) {
         entityManager.removeEntity(existingPheromone);
       }
@@ -350,7 +350,7 @@ public final class ActiveAnt implements ActiveEntity {
     }
   }
 
-  private boolean consumeFood(Entity food, EntityManager entityManager) {
+  private boolean consumeFood(EntityModel food, EntityManager entityManager) {
     if (food != null) {
       addEnergy(food.getEnergy());
       entityManager.removeEntity(food);
@@ -359,7 +359,7 @@ public final class ActiveAnt implements ActiveEntity {
     return false;
   }
 
-  private boolean consumeFoodFromNest(Entity nest) {
+  private boolean consumeFoodFromNest(EntityModel nest) {
     if(nest != null) {
       int energyNeeded = entity.getMaxEnergy() - entity.getEnergy();
       int energy = energyNeeded <= nest.getEnergy() ? energyNeeded : nest.getEnergy();
@@ -370,7 +370,7 @@ public final class ActiveAnt implements ActiveEntity {
   }
 
   private void updateCarriedEntityLocation() {
-    Entity carriedEntity = entity.getCarriedEntity();
+    EntityModel carriedEntity = entity.getCarriedEntity();
     if (carriedEntity != null) {
       carriedEntity.setX(entity.getX());
       carriedEntity.setY(entity.getY());

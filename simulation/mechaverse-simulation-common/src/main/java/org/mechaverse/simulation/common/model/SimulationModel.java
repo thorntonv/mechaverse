@@ -16,9 +16,9 @@ public class SimulationModel implements Serializable {
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model", required = true)
   protected String id;
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model", required = true)
-  protected Environment environment;
+  protected EnvironmentModel environment;
   @XmlElement(name = "sub_environment", namespace = "http://www.mechaverse.org/simulation/api/model")
-  protected List<Environment> subEnvironments;
+  protected List<EnvironmentModel> subEnvironments;
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model")
   protected long iteration;
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model", required = true)
@@ -50,9 +50,9 @@ public class SimulationModel implements Serializable {
    * Gets the value of the environment property.
    *
    * @return possible object is
-   * {@link Environment }
+   * {@link EnvironmentModel }
    */
-  public Environment getEnvironment() {
+  public EnvironmentModel getEnvironment() {
     return environment;
   }
 
@@ -60,9 +60,9 @@ public class SimulationModel implements Serializable {
    * Sets the value of the environment property.
    *
    * @param value allowed object is
-   *              {@link Environment }
+   *              {@link EnvironmentModel }
    */
-  public void setEnvironment(Environment value) {
+  public void setEnvironment(EnvironmentModel value) {
     this.environment = value;
   }
 
@@ -84,9 +84,9 @@ public class SimulationModel implements Serializable {
    * <p>
    * <p>
    * Objects of the following type(s) are allowed in the list
-   * {@link Environment }
+   * {@link EnvironmentModel }
    */
-  public List<Environment> getSubEnvironments() {
+  public List<EnvironmentModel> getSubEnvironments() {
     if (subEnvironments == null) {
       subEnvironments = new ArrayList<>();
     }

@@ -15,7 +15,7 @@ import org.mechaverse.simulation.common.genetic.GeneticDataStore;
 import org.mechaverse.simulation.common.util.ArrayUtil;
 import org.mechaverse.simulation.primordial.core.PrimordialSimulationState;
 import org.mechaverse.simulation.primordial.core.entity.primordial.ActivePrimordialEntity.PrimordialEntityBehavior;
-import org.mechaverse.simulation.primordial.core.model.PrimordialEntity;
+import org.mechaverse.simulation.primordial.core.model.PrimordialEntityModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +31,7 @@ public class CellularAutomatonPrimordialEntityBehavior implements PrimordialEnti
 
   private static final Logger logger = LoggerFactory.getLogger(CellularAutomatonPrimordialEntityBehavior.class);
 
-  private PrimordialEntity entity;
+  private PrimordialEntityModel entity;
   private final int automatonIndex;
   private final int[] entityOutputData;
   private final int[] automatonOutputData;
@@ -62,7 +62,7 @@ public class CellularAutomatonPrimordialEntityBehavior implements PrimordialEnti
   }
 
   @Override
-  public void setEntity(PrimordialEntity entity) {
+  public void setEntity(PrimordialEntityModel entity) {
     this.entity = entity;
   }
 

@@ -4,10 +4,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.EntityModel;
 
 /**
- * A {@link DataOutputStream} for writing {@link Entity} instances.
+ * A {@link DataOutputStream} for writing {@link EntityModel} instances.
  * 
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
@@ -19,7 +19,7 @@ public class EntityDataOutputStream extends DataOutputStream {
     super(out);
   }
 
-  public void writeEntity(Entity entity) throws IOException {
+  public void writeEntity(EntityModel entity) throws IOException {
     writeShort(EntityUtil.getType(entity).ordinal());
     writeUTF(entity.getId());
     writeInt(entity.getX());

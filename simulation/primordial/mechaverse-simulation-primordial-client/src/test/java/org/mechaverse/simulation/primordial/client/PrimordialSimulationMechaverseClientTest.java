@@ -18,8 +18,8 @@ import org.mechaverse.client.MechaverseClient;
 import org.mechaverse.service.manager.api.MechaverseManager;
 import org.mechaverse.service.manager.api.model.Task;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.primordial.core.PrimordialSimulationState;
-import org.mechaverse.simulation.common.model.Entity;
 import org.mechaverse.simulation.primordial.core.PrimordialSimulationImpl;
 import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore;
 import org.mechaverse.simulation.common.datastore.SimulationDataStore;
@@ -77,9 +77,9 @@ public class PrimordialSimulationMechaverseClientTest {
     assertTrue(getEntityCount(stateData.getModel().getEnvironment().getEntities()) > 0);
   }
 
-  private int getEntityCount(Iterable<Entity> entities) {
+  private int getEntityCount(Iterable<EntityModel> entities) {
     int count = 0;
-    for(Entity entity : entities) {
+    for(EntityModel entity : entities) {
       count++;
     }
     return count;

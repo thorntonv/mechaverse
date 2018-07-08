@@ -10,7 +10,7 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Test;
 import org.mechaverse.simulation.ant.core.model.Ant;
-import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.ant.core.entity.ant.CellularAutomatonAntBehavior;
 import org.mechaverse.simulation.common.Simulation;
 import org.mechaverse.simulation.common.datastore.SimulationDataStore;
@@ -57,7 +57,7 @@ public class CellularAutomatonAntSimulationImplTest extends AbstractAntSimulatio
       AntSimulationState state = simulation.getState();
 
       int antCount = 0;
-      for (Entity entity : state.getModel().getEnvironment().getEntities()) {
+      for (EntityModel entity : state.getModel().getEnvironment().getEntities()) {
         if (entity instanceof Ant) {
           SimulationDataStore entityDataStore = state.getEntityDataStore(entity);
           assertTrue(entityDataStore.containsKey(CellularAutomatonAntBehavior.AUTOMATON_STATE_KEY));

@@ -3,7 +3,7 @@ package org.mechaverse.gwt.client.environment;
 import org.mechaverse.gwt.client.manager.ManagerDashboardPresenter.ManagerDashboardPlace;
 import org.mechaverse.gwt.common.client.webconsole.BasicNavMenu;
 import org.mechaverse.gwt.common.client.webconsole.WebConsoleLayoutView;
-import org.mechaverse.simulation.common.model.Environment;
+import org.mechaverse.simulation.common.model.EnvironmentModel;
 
 import com.google.gwt.place.shared.PlaceHistoryMapper;
 import com.google.gwt.user.client.ui.ScrollPanel;
@@ -25,7 +25,7 @@ public class SimulationView extends ScrollPanel {
       .build());
   }
 
-  public void setEnvironment(Environment environment) {
+  public void setEnvironment(EnvironmentModel environment) {
     environmentView.setEnvironment(environment);
   }
 }

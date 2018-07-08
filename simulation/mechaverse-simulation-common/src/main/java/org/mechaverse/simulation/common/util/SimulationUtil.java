@@ -2,17 +2,17 @@ package org.mechaverse.simulation.common.util;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.model.Direction;
-import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.EntityModel;
 
 public final class SimulationUtil {
 
   private SimulationUtil() {}
 
-  public static void turnCW(Entity entity) {
+  public static void turnCW(EntityModel entity) {
     entity.setDirection(directionCW(entity.getDirection()));
   }
 
-  public static void turnCCW(Entity entity) {
+  public static void turnCCW(EntityModel entity) {
     entity.setDirection(directionCCW(entity.getDirection()));
   }
 

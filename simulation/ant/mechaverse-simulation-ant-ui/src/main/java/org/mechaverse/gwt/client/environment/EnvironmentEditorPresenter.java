@@ -4,8 +4,8 @@ import org.mechaverse.gwt.common.client.util.UUID;
 import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.ant.core.model.Barrier;
 import org.mechaverse.simulation.common.model.Direction;
-import org.mechaverse.simulation.common.model.Entity;
-import org.mechaverse.simulation.common.model.Environment;
+import org.mechaverse.simulation.common.model.EntityModel;
+import org.mechaverse.simulation.common.model.EnvironmentModel;
 import org.mechaverse.simulation.ant.core.model.Food;
 import org.mechaverse.simulation.ant.core.model.Rock;
 import org.mechaverse.simulation.ant.core.Cell;
@@ -30,7 +30,7 @@ public class EnvironmentEditorPresenter implements EnvironmentView.Observer, IsW
     view.getEnvironmentView().addObserver(this);
   }
 
-  public void setEnvironment(Environment environment) {
+  public void setEnvironment(EnvironmentModel environment) {
     this.cells = new CellEnvironment(environment);
     view.setEnvironment(environment);
     view.getEnvironmentView().update();
@@ -40,7 +40,7 @@ public class EnvironmentEditorPresenter implements EnvironmentView.Observer, IsW
   public void onCellClick(int row, int column) {
     Cell cell = cells.getCell(row, column);
 
-    Entity newEntity = null;
+    EntityModel newEntity = null;
     switch (view.getToolbar().getSelectedEntityType()) {
       case ANT:
         newEntity = new Ant();

@@ -9,7 +9,7 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.common.util.SimulationModelUtil;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
-import org.mechaverse.simulation.common.model.Environment;
+import org.mechaverse.simulation.common.model.EnvironmentModel;
 import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.common.Simulation;
 import org.mechaverse.simulation.common.cellautomaton.EnvironmentGenerator;
@@ -90,7 +90,7 @@ public final class PrimordialSimulationImpl implements Simulation {
     }
 
     environmentSimulations.clear();
-    for (Environment environment : SimulationModelUtil.getEnvironments(simulationModel)) {
+    for (EnvironmentModel environment : SimulationModelUtil.getEnvironments(simulationModel)) {
       environmentSimulations.add(environmentSimulatorFactory.create(environment.getId()));
     }
 

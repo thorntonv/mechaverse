@@ -5,19 +5,19 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mechaverse.simulation.common.model.Direction;
-import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.EntityModel;
 
 /**
  * Unit tests for {@link SimulationUtil}.
  */
 public class SimulationUtilTest {
 
-  private static class TestEntity extends Entity {
+  private static class TestEntityModel extends EntityModel {
   }
 
   @Test
   public void testTurnCW() {
-    Entity entity = new TestEntity();
+    EntityModel entity = new TestEntityModel();
     for(Direction direction : Direction.values()) {
       entity.setDirection(direction);
       SimulationUtil.turnCW(entity);
@@ -27,7 +27,7 @@ public class SimulationUtilTest {
 
   @Test
   public void testTurnCCW() {
-    Entity entity = new TestEntity();
+    EntityModel entity = new TestEntityModel();
     for(Direction direction : Direction.values()) {
       entity.setDirection(direction);
       SimulationUtil.turnCCW(entity);

@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import org.junit.Test;
 import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.common.datastore.SimulationDataStore;
-import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.EntityModel;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -26,7 +26,7 @@ public class AntSimulationStateTest {
   @Test
   public void putAndGetEntityValue() {
     AntSimulationState state = new AntSimulationState();
-    Entity entity = new Ant();
+    EntityModel entity = new Ant();
     entity.setId("001");
     SimulationDataStore entityDataStore = state.getEntityDataStore(entity);
     entityDataStore.put(KEY1, DATA1);
@@ -40,7 +40,7 @@ public class AntSimulationStateTest {
   @Test
   public void putAndGetEntityValues() {
     AntSimulationState state = new AntSimulationState();
-    Entity entity = new Ant();
+    EntityModel entity = new Ant();
     entity.setId("001");
 
     SimulationDataStore entityDataStore = state.getEntityDataStore(entity);
@@ -65,13 +65,13 @@ public class AntSimulationStateTest {
   @Test
   public void clearEntityDataStores() {
     AntSimulationState state = new AntSimulationState();
-    Entity entity1 = new Ant();
+    EntityModel entity1 = new Ant();
     entity1.setId("001");
     SimulationDataStore entityDataStore1 = state.getEntityDataStore(entity1);
     entityDataStore1.put(KEY1, DATA1);
     entityDataStore1.put(KEY2, DATA2);
 
-    Entity entity2 = new Ant();
+    EntityModel entity2 = new Ant();
     entity2.setId("002");
     SimulationDataStore entityDataStore2 = state.getEntityDataStore(entity2);
     entityDataStore2.put(KEY1, DATA1);

@@ -11,7 +11,7 @@ import java.io.OutputStream;
 public class PrimordialSimulationModelUtil {
 
   private static final Class[] CLASSES_TO_BE_BOUND =
-      new Class[] {SimulationModel.class, PrimordialEntity.class, Barrier.class, Food.class};
+      new Class[] {SimulationModel.class, PrimordialEntityModel.class, Barrier.class, Food.class};
 
   public static SimulationModel deserialize(InputStream in) throws IOException {
     return SimulationModelUtil.deserialize(in, CLASSES_TO_BE_BOUND);

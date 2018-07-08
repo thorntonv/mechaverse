@@ -4,11 +4,11 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.util.SimulationModelUtil;
 
 /**
- * A {@link DataInputStream} for reading {@link Entity} instances.
+ * A {@link DataInputStream} for reading {@link EntityModel} instances.
  * 
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
@@ -20,8 +20,8 @@ public class EntityDataInputStream extends DataInputStream {
     super(in);
   }
 
-  public Entity readEntity() throws IOException {
-    Entity entity = EntityUtil.newEntity(EntityUtil.ENTITY_TYPES[readShort()]);
+  public EntityModel readEntity() throws IOException {
+    EntityModel entity = EntityUtil.newEntity(EntityUtil.ENTITY_TYPES[readShort()]);
     entity.setId(readUTF());
     entity.setX(readInt());
     entity.setY(readInt());

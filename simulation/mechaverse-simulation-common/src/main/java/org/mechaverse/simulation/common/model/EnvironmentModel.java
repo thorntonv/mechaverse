@@ -1,7 +1,5 @@
 package org.mechaverse.simulation.common.model;
 
-import org.mechaverse.simulation.common.model.Entity;
-
 import javax.xml.bind.annotation.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -9,10 +7,10 @@ import java.util.List;
 
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Environment", namespace = "http://www.mechaverse.org/simulation/api/model",
+@XmlType(name = "EnvironmentModel", namespace = "http://www.mechaverse.org/simulation/api/model",
     propOrder = {"id", "width", "height", "entities"})
-@XmlRootElement(name = "Environment", namespace = "http://www.mechaverse.org/simulation/api/model")
-public class Environment implements Serializable {
+@XmlRootElement(name = "EnvironmentModel", namespace = "http://www.mechaverse.org/simulation/api/model")
+public class EnvironmentModel implements Serializable {
 
   private final static long serialVersionUID = -1L;
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model", required = true)
@@ -22,9 +20,9 @@ public class Environment implements Serializable {
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model")
   protected int height;
   @XmlElement(name = "entity", namespace = "http://www.mechaverse.org/simulation/api/model")
-  protected List<Entity> entities;
+  protected List<EntityModel> entities;
 
-  public Environment() {}
+  public EnvironmentModel() {}
 
   /**
    * Gets the value of the id property.
@@ -92,9 +90,9 @@ public class Environment implements Serializable {
    * <p>
    * <p>
    * Objects of the following type(s) are allowed in the list
-   * {@link Entity }
+   * {@link EntityModel }
    */
-  public List<Entity> getEntities() {
+  public List<EntityModel> getEntities() {
     if (entities == null) {
       entities = new ArrayList<>();
     }

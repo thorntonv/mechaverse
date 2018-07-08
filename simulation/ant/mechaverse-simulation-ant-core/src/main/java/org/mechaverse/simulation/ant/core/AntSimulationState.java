@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 
 import org.mechaverse.simulation.ant.core.util.AntSimulationModelUtil;
-import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.common.SimulationState;
 import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore;
@@ -57,16 +57,16 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
     return super.get(key);
   }
 
-  public SimulationDataStore getEntityDataStore(Entity entity) {
+  public SimulationDataStore getEntityDataStore(EntityModel entity) {
     return new SimulationDataStoreView(getEntityRootKey(entity), this);
   }
 
-  public GeneticDataStore getEntityGeneticDataStore(Entity entity) {
+  public GeneticDataStore getEntityGeneticDataStore(EntityModel entity) {
     return new GeneticDataStore(
         new SimulationDataStoreView(GeneticDataStore.KEY, getEntityDataStore(entity)));
   }
 
-  public SimulationDataStore getEntityReplayDataStore(Entity entity) {
+  public SimulationDataStore getEntityReplayDataStore(EntityModel entity) {
     return new SimulationDataStoreView(
         REPLAY_DATA_ROOT_KEY + SimulationDataStore.KEY_SEPARATOR + getEntityRootKey(entity), this);
   }
@@ -75,7 +75,7 @@ public final class AntSimulationState extends SimulationState<SimulationModel> {
     return new SimulationDataStoreView(REPLAY_DATA_ROOT_KEY, this);
   }
 
-  private String getEntityRootKey(Entity entity) {
+  private String getEntityRootKey(EntityModel entity) {
     return ENTITY_DATA_ROOT_KEY + SimulationDataStore.KEY_SEPARATOR + entity.getId();
   }
 }

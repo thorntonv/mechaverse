@@ -2,7 +2,7 @@ package org.mechaverse.simulation.ant.core.module;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.core.AntSimulationState;
-import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
 import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
@@ -27,10 +27,10 @@ public class CellularAutomatonSimulationModule implements AntSimulationModule {
       EntityManager entityManager) {}
 
   @Override
-  public void onAddEntity(Entity entity, AntSimulationState state) {}
+  public void onAddEntity(EntityModel entity, AntSimulationState state) {}
 
   @Override
-  public void onRemoveEntity(Entity entity, AntSimulationState state) {}
+  public void onRemoveEntity(EntityModel entity, AntSimulationState state) {}
 
   @Override
   public void beforeUpdate(AntSimulationState state, CellEnvironment env,

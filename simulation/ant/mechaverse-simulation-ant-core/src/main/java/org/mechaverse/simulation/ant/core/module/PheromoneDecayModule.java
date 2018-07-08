@@ -2,7 +2,7 @@ package org.mechaverse.simulation.ant.core.module;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.core.AntSimulationState;
-import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.Cell;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
@@ -26,10 +26,10 @@ public class PheromoneDecayModule implements AntSimulationModule {
       EntityManager entityManager) {}
 
   @Override
-  public void onAddEntity(Entity entity, AntSimulationState state) {}
+  public void onAddEntity(EntityModel entity, AntSimulationState state) {}
 
   @Override
-  public void onRemoveEntity(Entity entity, AntSimulationState state) {}
+  public void onRemoveEntity(EntityModel entity, AntSimulationState state) {}
 
   @Override
   public void beforeUpdate(AntSimulationState state, CellEnvironment env,
@@ -55,7 +55,7 @@ public class PheromoneDecayModule implements AntSimulationModule {
     for (int row = 0; row < env.getRowCount(); row++) {
       for (int col = 0; col < env.getColumnCount(); col++) {
         Cell cell = env.getCell(row, col);
-        Entity pheromone = cell.getEntity(EntityType.PHEROMONE);
+        EntityModel pheromone = cell.getEntity(EntityType.PHEROMONE);
         if (pheromone != null) {
           if (pheromone.getEnergy() > decayAmount) {
             pheromone.setEnergy(pheromone.getEnergy() - decayAmount);

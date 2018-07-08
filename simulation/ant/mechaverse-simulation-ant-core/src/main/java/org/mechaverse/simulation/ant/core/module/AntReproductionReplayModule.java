@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.core.AntSimulationState;
-import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.Cell;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
@@ -30,14 +30,14 @@ public class AntReproductionReplayModule implements AntSimulationModule {
   private static final Logger logger = LoggerFactory.getLogger(AntReproductionReplayModule.class);
 
   private long nextIteration;
-  private List<Entity> nextAnts;
+  private List<EntityModel> nextAnts;
   private EntityDataInputStream antGenerationReplayDataIn;
 
   @Override
-  public void onAddEntity(Entity entity, AntSimulationState state) {}
+  public void onAddEntity(EntityModel entity, AntSimulationState state) {}
 
   @Override
-  public void onRemoveEntity(Entity entity, AntSimulationState state) {}
+  public void onRemoveEntity(EntityModel entity, AntSimulationState state) {}
 
   @Override
   public void setState(AntSimulationState state, CellEnvironment env, EntityManager entityManager) {
@@ -63,7 +63,7 @@ public class AntReproductionReplayModule implements AntSimulationModule {
           }
         }
         if (state.getIteration() == nextIteration) {
-          for (Entity entity : nextAnts) {
+          for (EntityModel entity : nextAnts) {
             logger.debug("Generated ant {}", entity.getId());
             Cell cell = env.getCell(entity.getY(), entity.getX());
             cell.setEntity(entity, EntityType.ANT);

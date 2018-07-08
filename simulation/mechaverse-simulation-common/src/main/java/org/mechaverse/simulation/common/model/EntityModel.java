@@ -8,9 +8,9 @@ import java.io.Serializable;
 
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Entity", namespace = "http://www.mechaverse.org/simulation/api/model",
+@XmlType(name = "EntityModel", namespace = "http://www.mechaverse.org/simulation/api/model",
     propOrder = {"id", "x", "y", "energy", "maxEnergy", "age", "direction"})
-public abstract class Entity implements Serializable {
+public abstract class EntityModel implements Serializable {
 
   private final static long serialVersionUID = -1L;
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model")
@@ -28,7 +28,7 @@ public abstract class Entity implements Serializable {
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model")
   protected Direction direction;
 
-  public Entity() {}
+  public EntityModel() {}
 
   /**
    * Gets the value of the id property.

@@ -3,7 +3,7 @@ package org.mechaverse.gwt.client.environment;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.mechaverse.simulation.common.model.Environment;
+import org.mechaverse.simulation.common.model.EnvironmentModel;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -45,9 +45,9 @@ public class SimulationEditorView extends ResizeComposite {
   public SimulationEditorView() {
     initWidget(uiBinder.createAndBindUi(this));
 
-    environmentDropDown.addValueChangeHandler(new ValueChangeHandler<Environment>() {
+    environmentDropDown.addValueChangeHandler(new ValueChangeHandler<EnvironmentModel>() {
       @Override
-      public void onValueChange(ValueChangeEvent<Environment> event) {
+      public void onValueChange(ValueChangeEvent<EnvironmentModel> event) {
         if (observer != null) {
           observer.onEnvironmentSelected(event.getValue().getId());
         }
@@ -88,15 +88,15 @@ public class SimulationEditorView extends ResizeComposite {
     return environmentEditorView;
   }
 
-  public void setAvailableEnvironments(Collection<Environment> environments) {
-    Iterator<Environment> environmentIt = environments.iterator();
+  public void setAvailableEnvironments(Collection<EnvironmentModel> environments) {
+    Iterator<EnvironmentModel> environmentIt = environments.iterator();
     if (environmentIt.hasNext()) {
       environmentDropDown.setValue(environmentIt.next());
       environmentDropDown.setAcceptableValues(environments);
     }
   }
 
-  public void setEnvironment(Environment environment) {
+  public void setEnvironment(EnvironmentModel environment) {
     environmentEditorView.setEnvironment(environment);
   }
 

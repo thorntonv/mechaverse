@@ -1,7 +1,7 @@
 package org.mechaverse.gwt.client.environment;
 
 import org.mechaverse.gwt.client.util.renderer.EnvironmentRenderer;
-import org.mechaverse.simulation.common.model.Environment;
+import org.mechaverse.simulation.common.model.EnvironmentModel;
 
 import com.google.gwt.user.client.ui.ValueListBox;
 
@@ -10,7 +10,7 @@ import com.google.gwt.user.client.ui.ValueListBox;
  *
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
-public class EnvironmentDropDown extends ValueListBox<Environment> {
+public class EnvironmentDropDown extends ValueListBox<EnvironmentModel> {
 
   public EnvironmentDropDown() {
     super(EnvironmentRenderer.INSTANCE);

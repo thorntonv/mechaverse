@@ -2,8 +2,8 @@ package org.mechaverse.simulation.common.cellautomaton.environment;
 
 import org.mechaverse.simulation.common.EntityFactory;
 import org.mechaverse.simulation.common.model.Direction;
-import org.mechaverse.simulation.common.model.Entity;
-import org.mechaverse.simulation.common.model.Environment;
+import org.mechaverse.simulation.common.model.EntityModel;
+import org.mechaverse.simulation.common.model.EnvironmentModel;
 import org.mechaverse.simulation.common.util.SimulationModelUtil;
 
 @SuppressWarnings("WeakerAccess")
@@ -16,10 +16,10 @@ public abstract class AbstractCellEnvironment<T extends Enum<T>, C extends Abstr
     private final int rowCount;
     private final int colCount;
     protected final C[][] cells;
-    protected final Environment env;
+    protected final EnvironmentModel env;
     protected final EntityFactory<T> entityFactory;
 
-    public AbstractCellEnvironment(Environment env, EntityFactory<T> entityFactory) {
+    public AbstractCellEnvironment(EnvironmentModel env, EntityFactory<T> entityFactory) {
         this.rowCount = env.getHeight();
         this.colCount = env.getWidth();
         this.cells = createCells(env.getWidth(), env.getHeight(), entityFactory);
@@ -34,12 +34,12 @@ public abstract class AbstractCellEnvironment<T extends Enum<T>, C extends Abstr
         }
 
         // Add entities to the appropriate cells.
-        for (Entity entity : env.getEntities()) {
+        for (EntityModel entity : env.getEntities()) {
             setEntityCell(entity, getCell(entity));
         }
     }
 
-    public Environment getEnvironment() {
+    public EnvironmentModel getEnvironment() {
         updateModel();
         return env;
     }
@@ -60,7 +60,7 @@ public abstract class AbstractCellEnvironment<T extends Enum<T>, C extends Abstr
         return cells[row][col];
     }
 
-    public C getCell(Entity entity) {
+    public C getCell(EntityModel entity) {
         return cells[entity.getY()][entity.getX()];
     }
 
@@ -126,13 +126,13 @@ public abstract class AbstractCellEnvironment<T extends Enum<T>, C extends Abstr
         return closestDirection;
     }
 
-    public void addEntity(Entity entity, C cell) {
+    public void addEntity(EntityModel entity, C cell) {
         env.getEntities().add(entity);
         setEntityCell(entity, cell);
     }
 
     public void moveEntityToCell(T entityType, C fromCell, C targetCell) {
-        Entity entity = fromCell.removeEntity(entityType);
+        EntityModel entity = fromCell.removeEntity(entityType);
         targetCell.setEntity(entity, entityType);
     }
 
@@ -149,7 +149,7 @@ public abstract class AbstractCellEnvironment<T extends Enum<T>, C extends Abstr
 
     protected abstract C createCell(int row, int column, EntityFactory<T> entityFactory);
 
-    private void setEntityCell(Entity entity, C cell) {
+    private void setEntityCell(EntityModel entity, C cell) {
         entity.setX(cell.getColumn());
         entity.setY(cell.getRow());
         cell.setEntity(entity);

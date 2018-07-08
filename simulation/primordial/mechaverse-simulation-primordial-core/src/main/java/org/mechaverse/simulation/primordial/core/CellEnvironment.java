@@ -2,13 +2,13 @@ package org.mechaverse.simulation.primordial.core;
 
 import org.mechaverse.simulation.common.EntityFactory;
 import org.mechaverse.simulation.common.cellautomaton.environment.AbstractCellEnvironment;
-import org.mechaverse.simulation.common.model.Environment;
+import org.mechaverse.simulation.common.model.EnvironmentModel;
 import org.mechaverse.simulation.primordial.core.entity.PrimordialEntityFactory;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
 
 public class CellEnvironment extends AbstractCellEnvironment<EntityType, Cell> {
 
-    public CellEnvironment(Environment env) {
+    public CellEnvironment(EnvironmentModel env) {
         super(env, new PrimordialEntityFactory());
     }
 

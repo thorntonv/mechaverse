@@ -3,13 +3,13 @@ package org.mechaverse.simulation.primordial.core.module;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.EntityManager;
-import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.util.SimulationUtil;
 import org.mechaverse.simulation.primordial.core.Cell;
 import org.mechaverse.simulation.primordial.core.CellEnvironment;
 import org.mechaverse.simulation.primordial.core.PrimordialSimulationState;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
-import org.mechaverse.simulation.primordial.core.model.PrimordialEntity;
+import org.mechaverse.simulation.primordial.core.model.PrimordialEntityModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +35,7 @@ public class EntityReproductionModule implements PrimordialSimulationModule {
   @Value("#{properties['entityMinReproductiveAge']}")
   private int entityMinReproductiveAge;
 
-  private final Set<PrimordialEntity> entities = new LinkedHashSet<>();
+  private final Set<PrimordialEntityModel> entities = new LinkedHashSet<>();
 
   public EntityReproductionModule() {
   }
@@ -58,7 +58,7 @@ public class EntityReproductionModule implements PrimordialSimulationModule {
       if (env.hasCell(row, col)) {
         Cell cell = env.getCell(row, col);
         if (cell.getEntity(EntityType.ENTITY) == null) {
-          PrimordialEntity entity = generateRandomEntity(state, random);
+          PrimordialEntityModel entity = generateRandomEntity(state, random);
           cell.setEntity(entity, EntityType.ENTITY);
           entityManager.addEntity(entity);
         }
@@ -76,8 +76,8 @@ public class EntityReproductionModule implements PrimordialSimulationModule {
                           EntityManager entityManager, RandomGenerator random) {
   }
 
-  private PrimordialEntity generateRandomEntity(PrimordialSimulationState state, RandomGenerator random) {
-    PrimordialEntity entity = new PrimordialEntity();
+  private PrimordialEntityModel generateRandomEntity(PrimordialSimulationState state, RandomGenerator random) {
+    PrimordialEntityModel entity = new PrimordialEntityModel();
     entity.setId(new UUID(random.nextLong(), random.nextLong()).toString());
     entity.setDirection(SimulationUtil.randomDirection(random));
     entity.setEnergy(entityInitialEnergy);
@@ -86,15 +86,15 @@ public class EntityReproductionModule implements PrimordialSimulationModule {
   }
 
   @Override
-  public void onAddEntity(Entity entity, PrimordialSimulationState state) {
-    if (entity instanceof PrimordialEntity) {
-      entities.add((PrimordialEntity) entity);
+  public void onAddEntity(EntityModel entity, PrimordialSimulationState state) {
+    if (entity instanceof PrimordialEntityModel) {
+      entities.add((PrimordialEntityModel) entity);
     }
   }
 
   @Override
-  public void onRemoveEntity(Entity entity, PrimordialSimulationState state) {
-    if (entity instanceof PrimordialEntity) {
+  public void onRemoveEntity(EntityModel entity, PrimordialSimulationState state) {
+    if (entity instanceof PrimordialEntityModel) {
       entities.remove(entity);
     }
   }

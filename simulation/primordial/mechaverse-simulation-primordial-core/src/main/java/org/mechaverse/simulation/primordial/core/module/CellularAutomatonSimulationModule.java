@@ -1,8 +1,8 @@
 package org.mechaverse.simulation.primordial.core.module;
 
 import org.apache.commons.math3.random.RandomGenerator;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.primordial.core.PrimordialSimulationState;
-import org.mechaverse.simulation.common.model.Entity;
 import org.mechaverse.simulation.primordial.core.CellEnvironment;
 import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
@@ -27,10 +27,10 @@ public class CellularAutomatonSimulationModule implements PrimordialSimulationMo
       EntityManager entityManager) {}
 
   @Override
-  public void onAddEntity(Entity entity, PrimordialSimulationState state) {}
+  public void onAddEntity(EntityModel entity, PrimordialSimulationState state) {}
 
   @Override
-  public void onRemoveEntity(Entity entity, PrimordialSimulationState state) {}
+  public void onRemoveEntity(EntityModel entity, PrimordialSimulationState state) {}
 
   @Override
   public void beforeUpdate(PrimordialSimulationState state, CellEnvironment env,

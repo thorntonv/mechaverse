@@ -3,7 +3,7 @@ package org.mechaverse.simulation.primordial.core.entity.primordial;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.common.model.Direction;
-import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.util.SimulationModelUtil;
 import org.mechaverse.simulation.common.util.SimulationUtil;
 import org.mechaverse.simulation.primordial.core.Cell;
@@ -11,7 +11,7 @@ import org.mechaverse.simulation.primordial.core.CellEnvironment;
 import org.mechaverse.simulation.primordial.core.PrimordialSimulationState;
 import org.mechaverse.simulation.primordial.core.entity.ActiveEntity;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
-import org.mechaverse.simulation.primordial.core.model.PrimordialEntity;
+import org.mechaverse.simulation.primordial.core.model.PrimordialEntityModel;
 
 /**
  * An primordial that active in the simulation. An active primordial receives sensory information about itself and
@@ -25,7 +25,7 @@ public final class ActivePrimordialEntity implements ActiveEntity {
    */
   public interface PrimordialEntityBehavior {
 
-    void setEntity(PrimordialEntity entity);
+    void setEntity(PrimordialEntityModel entity);
 
     /**
      * Sets the current input.
@@ -43,11 +43,11 @@ public final class ActivePrimordialEntity implements ActiveEntity {
     void updateState(PrimordialSimulationState state);
   }
 
-  private final PrimordialEntity entity;
+  private final PrimordialEntityModel entity;
   private final PrimordialEntityBehavior behavior;
   private final PrimordialEntityInput input = new PrimordialEntityInput();
 
-  public ActivePrimordialEntity(PrimordialEntity entity, PrimordialEntityBehavior behavior) {
+  public ActivePrimordialEntity(PrimordialEntityModel entity, PrimordialEntityBehavior behavior) {
     this.entity = entity;
     this.behavior = behavior;
     behavior.setEntity(entity);
@@ -63,7 +63,7 @@ public final class ActivePrimordialEntity implements ActiveEntity {
     // Front cell sensor.
     Cell frontCell = env.getCellInDirection(cell, entity.getDirection());
     if (frontCell != null) {
-      Entity frontEntity = frontCell.getEntity();
+      EntityModel frontEntity = frontCell.getEntity();
       if (frontEntity != null) {
         input.setFrontSensor(
             frontCell.getEntityType(), frontEntity.getDirection(), frontEntity.getId());
@@ -72,7 +72,7 @@ public final class ActivePrimordialEntity implements ActiveEntity {
       input.setFrontSensor(null, null, "");
     }
 
-    // Entity and food sensors.
+    // EntityModel and food sensors.
     boolean nearbyEntity = false;
     boolean nearbyFood = false;
     for (Direction direction : SimulationModelUtil.DIRECTIONS) {
@@ -144,7 +144,7 @@ public final class ActivePrimordialEntity implements ActiveEntity {
   }
 
   @Override
-  public PrimordialEntity getEntity() {
+  public PrimordialEntityModel getEntity() {
     return entity;
   }
 
@@ -181,7 +181,7 @@ public final class ActivePrimordialEntity implements ActiveEntity {
     return !cell.hasEntity(EntityType.ENTITY) && !cell.hasEntity(EntityType.BARRIER);
   }
 
-  private boolean consumeFood(Entity food, EntityManager entityManager) {
+  private boolean consumeFood(EntityModel food, EntityManager entityManager) {
     if (food != null) {
       addEnergy(food.getEnergy());
       entityManager.removeEntity(food);

@@ -14,7 +14,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import org.mechaverse.simulation.common.model.Direction;
-import org.mechaverse.simulation.common.model.Environment;
+import org.mechaverse.simulation.common.model.EnvironmentModel;
 import org.mechaverse.simulation.common.model.SimulationModel;
 
 import com.google.common.collect.Lists;
@@ -31,11 +31,11 @@ public final class SimulationModelUtil {
   /**
    * @return the environment with the given id from the given state
    */
-  public static Environment getEnvironment(SimulationModel simulationModel, String environmentId) {
+  public static EnvironmentModel getEnvironment(SimulationModel simulationModel, String environmentId) {
     if (simulationModel.getEnvironment().getId().equals(environmentId)) {
       return simulationModel.getEnvironment();
     }
-    for (Environment subEnvironment : simulationModel.getSubEnvironments()) {
+    for (EnvironmentModel subEnvironment : simulationModel.getSubEnvironments()) {
       if (subEnvironment.getId().equals(environmentId)) {
         return subEnvironment;
       }
@@ -46,8 +46,8 @@ public final class SimulationModelUtil {
   /**
    * @return a list of the environments in the given state
    */
-  public static Collection<Environment> getEnvironments(SimulationModel simulationModel) {
-    List<Environment> environments = Lists.newArrayList();
+  public static Collection<EnvironmentModel> getEnvironments(SimulationModel simulationModel) {
+    List<EnvironmentModel> environments = Lists.newArrayList();
     environments.add(simulationModel.getEnvironment());
     environments.addAll(simulationModel.getSubEnvironments());
     return environments;

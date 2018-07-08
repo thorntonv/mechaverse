@@ -27,7 +27,7 @@ import org.mechaverse.simulation.common.cellautomaton.simulation.generator.Cellu
 import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 import org.mechaverse.simulation.common.genetic.GeneticData;
 import org.mechaverse.simulation.common.genetic.GeneticDataStore;
-import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.util.ArrayUtil;
 import org.mechaverse.simulation.common.util.RandomUtil;
 import org.mockito.ArgumentCaptor;
@@ -188,7 +188,7 @@ public class CellularAutomatonAntBehaviorTest {
 
   @Test
   public void onRemoveEntity() {
-    Entity otherEntity = new Ant();
+    EntityModel otherEntity = new Ant();
     otherEntity.setId("100");
     createGeneticDataStore(state.getEntityGeneticDataStore(otherEntity));
 

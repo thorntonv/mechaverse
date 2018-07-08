@@ -8,7 +8,7 @@ import org.mechaverse.simulation.common.cellautomaton.examples.CellularAutomaton
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomaton;
 import org.mechaverse.simulation.common.cellautomaton.ui.CellularAutomatonRenderer;
 import org.mechaverse.simulation.common.cellautomaton.ui.CellularAutomatonVisualizer;
-import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.primordial.core.entity.EntityUtil;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -26,7 +26,7 @@ public class PrimordialCellularAutomaton implements CellularAutomaton {
 
     @Override
     public int getOutput(int idx) {
-      List<Entity> entities = primordialCell.getEntities();
+      List<EntityModel> entities = primordialCell.getEntities();
       if (entities.size() < idx || entities.get(idx) == null) {
         return -1;
       }

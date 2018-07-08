@@ -15,8 +15,8 @@ import org.mechaverse.simulation.ant.core.entity.ant.AntOutput;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.util.AntSimulationModelUtil;
 import org.mechaverse.simulation.common.model.Direction;
-import org.mechaverse.simulation.common.model.Entity;
-import org.mechaverse.simulation.common.model.Environment;
+import org.mechaverse.simulation.common.model.EntityModel;
+import org.mechaverse.simulation.common.model.EnvironmentModel;
 import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.common.util.SimulationModelUtil;
 
@@ -25,9 +25,9 @@ import org.mechaverse.simulation.common.util.SimulationModelUtil;
  */
 public class AntSimulationTestUtil {
 
-  public static Entity newEntity(EntityType entityType, String id, int x, int y,
+  public static EntityModel newEntity(EntityType entityType, String id, int x, int y,
       Direction direction, int energy, int maxEnergy) {
-    Entity entity = EntityUtil.newEntity(entityType);
+    EntityModel entity = EntityUtil.newEntity(entityType);
     entity.setId(id);
     entity.setX(x);
     entity.setY(y);
@@ -63,10 +63,10 @@ public class AntSimulationTestUtil {
       new CellEnvironment(actual.getEnvironment()).toString());
 
     // Sort the entities so that order will not cause the comparison to fail.
-    for (Environment env : SimulationModelUtil.getEnvironments(expected)) {
+    for (EnvironmentModel env : SimulationModelUtil.getEnvironments(expected)) {
       env.getEntities().sort(EntityUtil.ENTITY_ORDERING);
     }
-    for (Environment env : SimulationModelUtil.getEnvironments(actual)) {
+    for (EnvironmentModel env : SimulationModelUtil.getEnvironments(actual)) {
       env.getEntities().sort(EntityUtil.ENTITY_ORDERING);
     }
 
@@ -79,7 +79,7 @@ public class AntSimulationTestUtil {
     assertEquals(model1ByteOut.toString(), model2ByteOut.toString());
   }
 
-  public static void assertEntitiesEqual(Entity expected, Entity actual) {
+  public static void assertEntitiesEqual(EntityModel expected, EntityModel actual) {
     assertEquals(expected.getClass(), actual.getClass());
     assertEquals(expected.getId(), actual.getId());
     assertEquals(expected.getX(), actual.getX());

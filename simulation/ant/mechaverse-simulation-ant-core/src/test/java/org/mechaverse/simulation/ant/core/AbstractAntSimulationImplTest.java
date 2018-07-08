@@ -14,7 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.common.EntityManager;
-import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.ant.core.entity.EntityUtil;
@@ -36,11 +36,11 @@ public abstract class AbstractAntSimulationImplTest {
 
     int[] entityTypeCounts = new int[EntityUtil.ENTITY_TYPES.length];
 
-    public void addEntity(Entity entity) {
+    public void addEntity(EntityModel entity) {
       entityTypeCounts[EntityUtil.getType(entity).ordinal()]++;
     }
 
-    public void removeEntity(Entity entity) {
+    public void removeEntity(EntityModel entity) {
       entityTypeCounts[EntityUtil.getType(entity).ordinal()]--;
     }
 
@@ -54,12 +54,12 @@ public abstract class AbstractAntSimulationImplTest {
     private EntityTypeCounter entityTypeCounter = new EntityTypeCounter();
 
     @Override
-    public void onAddEntity(Entity entity, AntSimulationState state) {
+    public void onAddEntity(EntityModel entity, AntSimulationState state) {
       entityTypeCounter.addEntity(entity);
     }
 
     @Override
-    public void onRemoveEntity(Entity entity, AntSimulationState state) {
+    public void onRemoveEntity(EntityModel entity, AntSimulationState state) {
       entityTypeCounter.removeEntity(entity);
     }
 
@@ -187,10 +187,10 @@ public abstract class AbstractAntSimulationImplTest {
   private void verifyEntityTypeCounts(SimulationModel model, EntityTypeCountObserver observer) {
     EntityTypeCounter counter = new EntityTypeCounter();
 
-    for (Entity entity : model.getEnvironment().getEntities()) {
+    for (EntityModel entity : model.getEnvironment().getEntities()) {
       counter.addEntity(entity);
       if (entity instanceof Ant) {
-        Entity carriedEntity = ((Ant) entity).getCarriedEntity();
+        EntityModel carriedEntity = ((Ant) entity).getCarriedEntity();
         if (carriedEntity != null) {
           counter.addEntity(carriedEntity);
         }

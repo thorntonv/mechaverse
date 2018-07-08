@@ -5,7 +5,7 @@ import java.util.Map.Entry;
 
 import org.mechaverse.simulation.common.cellautomaton.environment.AbstractCell;
 import org.mechaverse.simulation.common.cellautomaton.environment.AbstractCellEnvironment;
-import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.EntityModel;
 
 public abstract class AbstractActiveEntityProviders<M, S extends SimulationState<M>, T extends Enum<T>,
     C extends AbstractCell<T>, E extends AbstractCellEnvironment<T, C>,
@@ -22,7 +22,7 @@ public abstract class AbstractActiveEntityProviders<M, S extends SimulationState
         }
     }
 
-    public P get(Entity entity) {
+    public P get(EntityModel entity) {
         return get(entityFactory.getType(entity));
     }
 

@@ -21,7 +21,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mechaverse.simulation.ant.core.AntSimulationState;
 import org.mechaverse.simulation.ant.core.model.Ant;
-import org.mechaverse.simulation.common.model.Environment;
+import org.mechaverse.simulation.common.model.EnvironmentModel;
 import org.mechaverse.simulation.ant.core.model.Nest;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
 import org.mechaverse.simulation.common.EntityManager;
@@ -164,7 +164,7 @@ public class AntReproductionModuleTest {
   }
 
   private CellEnvironment newEnvironment() {
-    Environment env = new Environment();
+    EnvironmentModel env = new EnvironmentModel();
     env.setWidth(40);
     env.setHeight(40);
     Nest nest = new Nest();

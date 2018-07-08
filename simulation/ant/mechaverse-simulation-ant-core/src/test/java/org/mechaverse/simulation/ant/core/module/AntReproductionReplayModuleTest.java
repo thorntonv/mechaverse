@@ -15,7 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mechaverse.simulation.ant.core.AntSimulationState;
 import org.mechaverse.simulation.common.model.Direction;
-import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.AntSimulationEnvironmentGenerator;
 import org.mechaverse.simulation.ant.core.AntSimulationImpl;
@@ -33,9 +33,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class AntReproductionReplayModuleTest {
 
-  private static final Entity ANT1 =
+  private static final EntityModel ANT1 =
       newEntity(EntityType.ANT, "001", 10, 10, Direction.SOUTH, 75, 100);
-  private static final Entity ANT2 =
+  private static final EntityModel ANT2 =
       newEntity(EntityType.ANT, "002", 15, 15, Direction.EAST, 70, 100);
 
   @Mock EntityManager mockEntityManager;
@@ -74,7 +74,7 @@ public class AntReproductionReplayModuleTest {
 
     state.getModel().setIteration(3);
     antReproductionReplayModule.beforeUpdate(state, environment, mockEntityManager, random);
-    ArgumentCaptor<Entity> entityCaptor = ArgumentCaptor.forClass(Entity.class);
+    ArgumentCaptor<EntityModel> entityCaptor = ArgumentCaptor.forClass(EntityModel.class);
     verify(mockEntityManager).addEntity(entityCaptor.capture());
     assertEntitiesEqual(ANT1, entityCaptor.getValue());
   }
@@ -101,7 +101,7 @@ public class AntReproductionReplayModuleTest {
 
     state.getModel().setIteration(3);
     antReproductionReplayModule.beforeUpdate(state, environment, mockEntityManager, random);
-    ArgumentCaptor<Entity> entityCaptor = ArgumentCaptor.forClass(Entity.class);
+    ArgumentCaptor<EntityModel> entityCaptor = ArgumentCaptor.forClass(EntityModel.class);
     verify(mockEntityManager, times(2)).addEntity(entityCaptor.capture());
     assertEntitiesEqual(ANT1, entityCaptor.getAllValues().get(0));
     assertEntitiesEqual(ANT2, entityCaptor.getAllValues().get(1));
@@ -126,7 +126,7 @@ public class AntReproductionReplayModuleTest {
         AntReproductionReplayModule.ANT_GENERATION_DATA_KEY, byteOut.toByteArray());
     antReproductionReplayModule.setState(state, environment, mockEntityManager);
 
-    ArgumentCaptor<Entity> entityCaptor = ArgumentCaptor.forClass(Entity.class);
+    ArgumentCaptor<EntityModel> entityCaptor = ArgumentCaptor.forClass(EntityModel.class);
 
     state.getModel().setIteration(3);
     antReproductionReplayModule.beforeUpdate(state, environment, mockEntityManager, random);

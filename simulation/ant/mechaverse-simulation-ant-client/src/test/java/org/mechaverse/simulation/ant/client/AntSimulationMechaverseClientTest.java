@@ -20,7 +20,7 @@ import org.mechaverse.service.manager.api.model.Task;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
 import org.mechaverse.simulation.ant.core.AntSimulationState;
 import org.mechaverse.simulation.ant.core.model.Ant;
-import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.ant.core.AntSimulationImpl;
 import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore;
 import org.mechaverse.simulation.common.datastore.SimulationDataStore;
@@ -78,9 +78,9 @@ public class AntSimulationMechaverseClientTest {
     assertTrue(getAntCount(stateData.getModel().getEnvironment().getEntities()) > 0);
   }
 
-  private int getAntCount(Iterable<Entity> entities) {
+  private int getAntCount(Iterable<EntityModel> entities) {
     int count = 0;
-    for(Entity entity : entities) {
+    for(EntityModel entity : entities) {
       if(entity instanceof Ant) {
         count++;
       }

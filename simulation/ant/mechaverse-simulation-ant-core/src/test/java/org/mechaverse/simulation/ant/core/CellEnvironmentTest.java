@@ -6,7 +6,7 @@ import static org.mockito.Mockito.when;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mechaverse.simulation.common.model.Direction;
-import org.mechaverse.simulation.common.model.Environment;
+import org.mechaverse.simulation.common.model.EnvironmentModel;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -18,7 +18,8 @@ public class CellEnvironmentTest {
 
   // TODO(thorntonv): Implement additional tests.
 
-  @Mock Environment mockEnvironmentModel;
+  @Mock
+  EnvironmentModel mockEnvironmentModel;
 
   @Test
   public void getDirection() {

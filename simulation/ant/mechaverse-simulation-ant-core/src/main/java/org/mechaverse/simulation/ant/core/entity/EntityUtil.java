@@ -4,7 +4,7 @@ import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.ant.core.model.Barrier;
 import org.mechaverse.simulation.ant.core.model.Conduit;
 import org.mechaverse.simulation.ant.core.model.Dirt;
-import org.mechaverse.simulation.common.model.Entity;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.model.Food;
 import org.mechaverse.simulation.ant.core.model.Nest;
@@ -14,7 +14,7 @@ import org.mechaverse.simulation.ant.core.model.Rock;
 import com.google.common.collect.Ordering;
 
 /**
- * Entity utility methods.
+ * EntityModel utility methods.
  *
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
@@ -29,9 +29,9 @@ public class EntityUtil {
    * cells in higher. Entities in the same cell are ordered first by type based on the
    * {@link EntityType} ordinal value and then by id.
    */
-  public static final Ordering<Entity> ENTITY_ORDERING = new Ordering<Entity>() {
+  public static final Ordering<EntityModel> ENTITY_ORDERING = new Ordering<EntityModel>() {
     @Override
-    public int compare(Entity left, Entity right) {
+    public int compare(EntityModel left, EntityModel right) {
       if (left.getY() < right.getY()) {
         return -1;
       } else if (left.getY() > right.getY()) {
@@ -54,9 +54,9 @@ public class EntityUtil {
   };
 
   /**
-   * Returns the {@link EntityType} of the given {@link Entity}.
+   * Returns the {@link EntityType} of the given {@link EntityModel}.
    */
-  public static EntityType getType(Entity entity) {
+  public static EntityType getType(EntityModel entity) {
     if (entity instanceof Ant) {
       return EntityType.ANT;
     } else if (entity instanceof Barrier) {
@@ -78,9 +78,9 @@ public class EntityUtil {
   }
 
   /**
-   * Returns a new {@link Entity} instance of the given type.
+   * Returns a new {@link EntityModel} instance of the given type.
    */
-  public static Entity newEntity(EntityType entityType) {
+  public static EntityModel newEntity(EntityType entityType) {
     switch (entityType) {
       case NONE:
         break;

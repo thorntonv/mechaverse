@@ -1,8 +1,8 @@
 package org.mechaverse.simulation.primordial.core.module;
 
 import org.apache.commons.math3.random.RandomGenerator;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.primordial.core.PrimordialSimulationState;
-import org.mechaverse.simulation.common.model.Entity;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
 import org.mechaverse.simulation.primordial.core.model.Food;
 import org.mechaverse.simulation.primordial.core.entity.EntityUtil;
@@ -81,8 +81,8 @@ public class FoodGenerationModule implements PrimordialSimulationModule {
 
       logger.debug("Generating food at ({}, {})", row, col);
 
-      Function<EntityType, Entity> entityFactory = entityType -> {
-        Entity entity = EntityUtil.newEntity(entityType);
+      Function<EntityType, EntityModel> entityFactory = entityType -> {
+        EntityModel entity = EntityUtil.newEntity(entityType);
         if (entityType == EntityType.FOOD) {
           entity.setEnergy(foodInitialEnergy);
           entity.setMaxEnergy(foodInitialEnergy);
@@ -103,14 +103,14 @@ public class FoodGenerationModule implements PrimordialSimulationModule {
       EntityManager entityManager, RandomGenerator random) {}
 
   @Override
-  public void onAddEntity(Entity entity, PrimordialSimulationState state) {
+  public void onAddEntity(EntityModel entity, PrimordialSimulationState state) {
     if (entity instanceof Food) {
       foodCount++;
     }
   }
 
   @Override
-  public void onRemoveEntity(Entity entity, PrimordialSimulationState state) {
+  public void onRemoveEntity(EntityModel entity, PrimordialSimulationState state) {
     if (entity instanceof Food) {
       foodCount--;
     }
