@@ -9,7 +9,7 @@ import org.mechaverse.simulation.common.datastore.AbstractSimulationDataStore;
 import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 import org.mechaverse.simulation.common.datastore.SimulationDataStoreInputStream;
 
-import com.google.common.base.Supplier;
+import java.util.function.Supplier;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCursor;
@@ -82,12 +82,7 @@ public class MongoDBSimulationDataStore extends AbstractSimulationDataStore {
       final SimulationDataStore store =
           new MongoDBSimulationDataStore(mongoDatabase, simulationId, instanceId, iteration);
 
-      return new Supplier<SimulationDataStore>() {
-        @Override
-        public SimulationDataStore get() {
-          return store;
-        }
-      };
+      return () -> store;
     }
 
     public MongoDBSimulationDataStoreInputStream(InputStream in, final DB mongoDatabase,
@@ -133,7 +128,7 @@ public class MongoDBSimulationDataStore extends AbstractSimulationDataStore {
    * @param instanceId If not null, add instance Id to query of stores to be deleted
    * @param iteration If not null, add iteration to query of stores to be deleted
    */
-  public static void delete(DB mongoDatabase, String simulationId, String instanceId, Long iteration) {
+  public static void delete(DB mongoDatabase, String simulationId, String instanceId, Long iteration) throws IOException {
     DBObject query = new BasicDBObject();
 
     if (simulationId != null) {
@@ -146,14 +141,16 @@ public class MongoDBSimulationDataStore extends AbstractSimulationDataStore {
       query.put(iterationKey, iteration);
     }
 
-    mongoDatabase.getCollection(mongoCollectionName).remove(query);
+    try {
+      mongoDatabase.getCollection(mongoCollectionName).remove(query);
+    } catch(Exception ex) {
+      throw new IOException(ex);
+    }
   }
 
   /**
    * Instantiates a store object tied to the given database and store parameters. An exception will
    * be thrown if the store object does not exist in the database.
-   *
-   * @throws IOException
    */
   public MongoDBSimulationDataStore(DB mongoDatabase, String simulationId, String instanceId,
       long iteration) throws IOException {

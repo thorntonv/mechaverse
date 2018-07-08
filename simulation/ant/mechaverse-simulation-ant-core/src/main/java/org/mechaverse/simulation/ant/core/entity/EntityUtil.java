@@ -3,7 +3,6 @@ package org.mechaverse.simulation.ant.core.entity;
 import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.ant.core.model.Barrier;
 import org.mechaverse.simulation.ant.core.model.Conduit;
-import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.ant.core.model.Dirt;
 import org.mechaverse.simulation.common.model.Entity;
 import org.mechaverse.simulation.ant.core.model.EntityType;

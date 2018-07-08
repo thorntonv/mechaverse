@@ -25,7 +25,7 @@ public class OpenClCellularAutomatonSimulatorTest extends AbstractCellularAutoma
       "}";
 
   @Test
-  public void update() throws Exception {
+  public void update() {
     int input[] = {10};
     int state[] = {5};
     int output[] = {0};
@@ -44,7 +44,7 @@ public class OpenClCellularAutomatonSimulatorTest extends AbstractCellularAutoma
   }
 
   @Test
-  public void multipleUpdate() throws Exception {
+  public void multipleUpdate() {
     int input[] = {10};
     int state[] = {5};
     int output[] = {0};
@@ -68,7 +68,7 @@ public class OpenClCellularAutomatonSimulatorTest extends AbstractCellularAutoma
   }
 
   @Test
-  public void multipleAutomata() throws Exception {
+  public void multipleAutomata() {
     // Two automata each with 5 cells.
     int input1[] = {1, 2, 3, 4, 5};
     int state1[] = {1, 1, 1, 1, 1};
@@ -106,7 +106,7 @@ public class OpenClCellularAutomatonSimulatorTest extends AbstractCellularAutoma
     stressTest(numUpdates, numAutomata, size);
   }
 
-  private void stressTest(int numUpdates, int numAutomata, int size) throws Exception {
+  private void stressTest(int numUpdates, int numAutomata, int size) {
     int input[] = new int[size];
     int state[] = new int[size];
     int output[] = new int[size];
@@ -143,7 +143,7 @@ public class OpenClCellularAutomatonSimulatorTest extends AbstractCellularAutoma
 
   @Override
   protected CellularAutomatonSimulator newSimulator(
-      CellularAutomatonDescriptor descriptor, int automatonCount) throws Exception {
+      CellularAutomatonDescriptor descriptor, int automatonCount) {
     return new OpenClCellularAutomatonSimulator(
         automatonCount, 16, 16, CLPlatform.getDefault().getMaxFlopsDevice(), descriptor);
   }

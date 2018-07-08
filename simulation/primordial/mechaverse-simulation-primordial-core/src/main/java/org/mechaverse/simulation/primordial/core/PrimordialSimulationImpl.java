@@ -150,7 +150,7 @@ public final class PrimordialSimulationImpl implements Simulation {
   }
 
   @Override
-  public void step(int stepCount, double targetFitness) throws Exception {
+  public void step(int stepCount, double targetFitness) {
     step(stepCount);
   }
 

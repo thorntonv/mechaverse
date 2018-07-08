@@ -29,6 +29,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 /**
  * Unit test for {@link AntSimulationImpl}.
  */
+@SuppressWarnings("WeakerAccess")
 public abstract class AbstractAntSimulationImplTest {
 
   private static class EntityTypeCounter {

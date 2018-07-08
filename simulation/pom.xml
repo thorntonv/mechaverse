@@ -3,7 +3,6 @@
                              http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.mechaverse</groupId>
   <artifactId>simulation</artifactId>
   <packaging>pom</packaging>
   <name>Mechaverse Simulation</name>

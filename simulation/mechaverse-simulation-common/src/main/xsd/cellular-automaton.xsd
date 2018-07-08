@@ -2,20 +2,20 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.mechaverse.org/cellautomaton/model"
   xmlns:cellautomaton="http://www.mechaverse.org/cellautomaton/model" elementFormDefault="qualified">
 
-  <element name="CellularAutomatonDescriptor" type="cellautomaton:CellularAutomatonDescriptor"></element>
-  <element name="LogicalUnit" type="cellautomaton:LogicalUnit"></element>
-  <element name="CellType" type="cellautomaton:CellType"></element>
+  <element name="CellularAutomatonDescriptor" type="cellautomaton:CellularAutomatonDescriptor"/>
+  <element name="LogicalUnit" type="cellautomaton:LogicalUnit"/>
+  <element name="CellType" type="cellautomaton:CellType"/>
 
   <complexType name="CellularAutomatonDescriptor">
     <sequence>
-      <element name="CellType" type="cellautomaton:CellType" minOccurs="1" maxOccurs="unbounded" />
-      <element name="LogicalUnit" type="cellautomaton:LogicalUnit" minOccurs="1" maxOccurs="1" />
+      <element name="CellType" type="cellautomaton:CellType" maxOccurs="unbounded" />
+      <element name="LogicalUnit" type="cellautomaton:LogicalUnit"/>
     </sequence>
     <attribute name="id" type="string" />
     <attribute name="width" type="int" use="required" />
     <attribute name="height" type="int" use="required" />
-    <attribute name="iterationsPerUpdate" type="int" use="optional" />
-    <attribute name="valueType" type="string" use="optional" />
+    <attribute name="iterationsPerUpdate" type="int"/>
+    <attribute name="valueType" type="string"/>
   </complexType>
 
   <complexType name="CellType">
@@ -37,7 +37,7 @@
 
   <complexType name="row">
     <sequence>
-      <element name="Cell" type="cellautomaton:Cell" minOccurs="1" maxOccurs="unbounded" />
+      <element name="Cell" type="cellautomaton:Cell" maxOccurs="unbounded" />
     </sequence>
   </complexType>
 
@@ -50,11 +50,11 @@
   <complexType name="Output">
     <sequence>
       <element name="Param" type="cellautomaton:Param" minOccurs="0" maxOccurs="unbounded" />
-      <element name="BeforeUpdate" type="string" minOccurs="0" maxOccurs="1" />
-      <element name="UpdateExpression" type="string" minOccurs="1" maxOccurs="1" />
+      <element name="BeforeUpdate" type="string" minOccurs="0"/>
+      <element name="UpdateExpression" type="string"/>
     </sequence>
     <attribute name="id" type="string" use="required" />
-    <attribute name="constant" type="boolean" use="optional" default="false"/>
+    <attribute name="constant" type="boolean" default="false"/>
   </complexType>
 
   <complexType name="Param">

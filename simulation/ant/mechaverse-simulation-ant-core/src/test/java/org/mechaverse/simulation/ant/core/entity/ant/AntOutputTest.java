@@ -1,6 +1,8 @@
 package org.mechaverse.simulation.ant.core.entity.ant;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Random;
 
@@ -34,8 +36,8 @@ public class AntOutputTest {
 
     assertEquals(MoveDirection.NONE, output.getMoveDirection());
     assertEquals(TurnDirection.NONE, output.getTurnDirection());
-    assertEquals(false, output.shouldPickUpOrDrop());
-    assertEquals(false, output.shouldLeavePheromone());
+    assertFalse(output.shouldPickUpOrDrop());
+    assertFalse(output.shouldLeavePheromone());
     assertEquals(0, output.getPheromoneType());
   }
 
@@ -59,10 +61,10 @@ public class AntOutputTest {
   @Test
   public void pickUpOrDrop() {
     output.setPickUpOrDrop(true);
-    assertEquals(true, output.shouldPickUpOrDrop());
+    assertTrue(output.shouldPickUpOrDrop());
 
     output.setPickUpOrDrop(false);
-    assertEquals(false, output.shouldPickUpOrDrop());
+    assertFalse(output.shouldPickUpOrDrop());
   }
 
   @Test
@@ -70,12 +72,12 @@ public class AntOutputTest {
     for (int type = 0; type < 8; type++) {
       output.setLeavePheromone(true);
       output.setPheromoneType(type);
-      assertEquals(true, output.shouldLeavePheromone());
+      assertTrue(output.shouldLeavePheromone());
       assertEquals(type, output.getPheromoneType());
       
       output.setLeavePheromone(false);
       output.setPheromoneType(type);
-      assertEquals(false, output.shouldLeavePheromone());
+      assertFalse(output.shouldLeavePheromone());
       assertEquals(type, output.getPheromoneType());
     }
   }
@@ -83,10 +85,10 @@ public class AntOutputTest {
   @Test
   public void consume() {
     output.setConsume(true);
-    assertEquals(true, output.shouldConsume());
+    assertTrue(output.shouldConsume());
 
     output.setConsume(false);
-    assertEquals(false, output.shouldConsume());
+    assertFalse(output.shouldConsume());
   }
 
   @Test

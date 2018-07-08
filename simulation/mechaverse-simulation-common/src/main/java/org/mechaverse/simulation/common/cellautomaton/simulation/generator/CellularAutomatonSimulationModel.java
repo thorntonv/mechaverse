@@ -1,19 +1,24 @@
 package org.mechaverse.simulation.common.cellautomaton.simulation.generator;
 
+import com.google.common.collect.ImmutableBiMap;
+import com.google.common.collect.Iterables;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import org.mechaverse.cellautomaton.model.*;
+import org.mechaverse.cellautomaton.model.Cell;
+import org.mechaverse.cellautomaton.model.CellType;
+import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
+import org.mechaverse.cellautomaton.model.LogicalUnit;
+import org.mechaverse.cellautomaton.model.Output;
+import org.mechaverse.cellautomaton.model.Param;
+import org.mechaverse.cellautomaton.model.Var;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.ExternalCell.ExternalCellType;
-
-import com.google.common.collect.ImmutableBiMap;
-import com.google.common.collect.Iterables;
 
 /**
  * A model used for generating a cellular automaton simulation.
  */
+@SuppressWarnings("WeakerAccess")
 public class CellularAutomatonSimulationModel {
 
   public static final String EXTERNAL_INPUT_ID_PREFIX = "in";
@@ -46,8 +51,8 @@ public class CellularAutomatonSimulationModel {
 
     public ExternalCellInfo(ExternalCell cell, Map<String, String> outputVarNameMap) {
       super(cell, ExternalCellType.INSTANCE, new Input[] {}, outputVarNameMap,
-        Collections.<String, String>emptyMap(), Collections.<String, String>emptyMap(),
-        Collections.<String, Map<String, String>>emptyMap());
+        Collections.emptyMap(), Collections.emptyMap(),
+        Collections.emptyMap());
       this.cell = cell;
     }
 

@@ -35,7 +35,7 @@ public class ElitistSelectionStrategy<E> implements SelectionStrategy<E> {
     List<Pair<E, E>> selectedPairs = new ArrayList<>();
 
     for (E entity : eliteEntities) {
-      selectedPairs.add(new Pair<E, E>(entity, null));
+      selectedPairs.add(new Pair<>(entity, null));
     }
 
     selectedPairs.addAll(selectionStrategy.selectEntities(

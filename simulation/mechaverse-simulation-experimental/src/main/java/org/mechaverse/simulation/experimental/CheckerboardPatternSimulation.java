@@ -1,7 +1,7 @@
 package org.mechaverse.simulation.experimental;
 
-import com.google.common.base.Function;
-import com.google.common.base.Supplier;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
 import org.mechaverse.simulation.common.AbstractEntity;
 import org.mechaverse.simulation.common.SimulationConfig;
@@ -76,7 +76,7 @@ public class CheckerboardPatternSimulation {
         new SimulationConfig.Builder<>();
     SelectionStrategy<CheckerboardPatternEntity> selectionStrategy = new ElitistSelectionStrategy<>(
         RETAIN_TOP_ENTITY_COUNT, REMOVE_BOTTOM_ENTITY_COUNT,
-            new TournamentSelectionStrategy<CheckerboardPatternEntity>());
+            new TournamentSelectionStrategy<>());
 
     Simulation simulation = new Simulation(configBuilder
         .setEntitySupplier(new CheckerboardPatternEntitySupplier())

@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
  *
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
+@SuppressWarnings("WeakerAccess")
 public class CellularAutomatonAnalyzer {
 
   private static class CellularAutomatonStateRecord {
@@ -66,11 +67,8 @@ public class CellularAutomatonAnalyzer {
     stateHistory.add(state);
 
     int hashCode = Arrays.hashCode(state);
-    ArrayList<CellularAutomatonStateRecord> previousStatesWithHash = previousStatesMap.get(hashCode);
-    if (previousStatesWithHash == null) {
-      previousStatesWithHash = new ArrayList<>();
-      previousStatesMap.put(hashCode, previousStatesWithHash);
-    }
+    ArrayList<CellularAutomatonStateRecord> previousStatesWithHash = previousStatesMap
+        .computeIfAbsent(hashCode, k -> new ArrayList<>());
 
     for (CellularAutomatonStateRecord previousStateWithHash : previousStatesWithHash) {
       if (Arrays.equals(state, previousStateWithHash.getState())) {

@@ -1,7 +1,7 @@
 package org.mechaverse.simulation.common.cellautomaton.examples;
 
-import com.google.common.base.Function;
-import com.google.common.base.Supplier;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import com.google.common.collect.Sets;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
@@ -26,6 +26,7 @@ import java.util.Set;
  * 
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
+@SuppressWarnings("WeakerAccess")
 public class Association extends AbstractCellularAutomaton {
 
   private static final int ROW_COUNT = 108;
@@ -125,7 +126,7 @@ public class Association extends AbstractCellularAutomaton {
     protected int getNeighborCount() {
       int neighborCount = 0;
       for (Cell neighborCell : neighbors) {
-        if (neighborCell != null && neighborCell instanceof AssociationCell
+        if (neighborCell instanceof AssociationCell
             && cellEntityMap.containsKey(neighborCell)) {
           neighborCount++;
         }
@@ -134,7 +135,7 @@ public class Association extends AbstractCellularAutomaton {
     }
 
     protected boolean isConnected(Cell cell, String association) {
-      return isConnected(cell, association, Sets.<Cell>newIdentityHashSet(), 0);
+      return isConnected(cell, association, Sets.newIdentityHashSet(), 0);
     }
 
     protected boolean isConnected(Cell cell, String association, Set<Cell> visited, int depth) {
@@ -183,31 +184,24 @@ public class Association extends AbstractCellularAutomaton {
     }
   }
  
-  private static final Function<Cell, Color> CELL_COLOR_PROVIDER = new Function<Cell, Color>() {
-    @Override
-    public Color apply(Cell cell) {
-      switch (cell.getOutput(0)) {
-        case 0:
-          return Color.BLACK;
-        case 1:
-          return Color.WHITE;
-        default:
-          return Color.GREEN;
-      }
+  private static final Function<Cell, Color> CELL_COLOR_PROVIDER = cell -> {
+    switch (cell.getOutput(0)) {
+      case 0:
+        return Color.BLACK;
+      case 1:
+        return Color.WHITE;
+      default:
+        return Color.GREEN;
     }
   };
 
   public Association(int width, int height) {
-    this(width, height, new IdentityHashMap<Cell, Entity>());
+    this(width, height, new IdentityHashMap<>());
   }
   
   protected Association(int width, int height, final IdentityHashMap<Cell, Entity> cellEntityMap) {
-    super(width, height, new Supplier<AssociationCell>() {
-      @Override
-      public AssociationCell get() {
-        return new AssociationCell(cellEntityMap);
-      }
-    }, new EightNeighborCellConnector());
+    super(width, height, (Supplier<AssociationCell>) () -> new AssociationCell(cellEntityMap),
+        new EightNeighborCellConnector());
     
     AssociationCell cell = getCell(getHeight() / 2, getWidth() /2);
     Entity entity = new Entity();
@@ -223,7 +217,7 @@ public class Association extends AbstractCellularAutomaton {
     CellularAutomatonCLI cli = new CellularAutomatonCLI() {
 
       @Override
-      protected CellularAutomaton createCellularAutomaton() throws IOException {
+      protected CellularAutomaton createCellularAutomaton() {
         return new Association(COL_COUNT, ROW_COUNT);
       }
 
@@ -235,7 +229,7 @@ public class Association extends AbstractCellularAutomaton {
 
       @Override
       protected CellularAutomatonVisualizer createVisualizer(int width, int height,
-          int framesPerSecond, int frameCount) throws IOException {
+          int framesPerSecond, int frameCount) {
         return new CellularAutomatonVisualizer(createCellularAutomaton(), CELL_COLOR_PROVIDER,
             width, height, framesPerSecond, frameCount);
       }

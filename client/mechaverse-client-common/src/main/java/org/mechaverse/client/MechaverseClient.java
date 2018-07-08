@@ -45,14 +45,11 @@ public class MechaverseClient {
       ExecutorService executorService = Executors.newFixedThreadPool(instanceCount);
       for (int idx = 0; idx < instanceCount; idx++) {
         final int instanceIdx = idx;
-        executorService.submit(new Runnable() {
-          @Override
-          public void run() {
-            MechaverseClient clientInstance = new MechaverseClient(
-              config.getManager(), config.getStorageService(), instanceIdx);
-            clientInstances.add(clientInstance);
-            clientInstance.start();
-          }
+        executorService.submit(() -> {
+          MechaverseClient clientInstance = new MechaverseClient(
+            config.getManager(), config.getStorageService(), instanceIdx);
+          clientInstances.add(clientInstance);
+          clientInstance.start();
         });
       }
 
@@ -87,7 +84,7 @@ public class MechaverseClient {
     running.set(false);
   }
 
-  public Task getTask() throws Exception {
+  public Task getTask() {
     try {
       logOperationStart("Getting task");
       Task task = manager.getTask();
@@ -109,7 +106,7 @@ public class MechaverseClient {
         instanceIdx, task.getSimulationId(), task.getInstanceId(), task.getIteration());
 
     try(AbstractApplicationContext ctx = getApplicationContext()) {
-      SimulationDataStore state = null;
+      SimulationDataStore state;
       Simulation simulation = createSimulation(ctx);
       if (task.getIteration() >= 0) {
         // Get the state from the storage service.

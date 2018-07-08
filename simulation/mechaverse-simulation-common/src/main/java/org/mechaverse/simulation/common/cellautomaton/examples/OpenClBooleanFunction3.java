@@ -5,7 +5,7 @@ import java.io.InputStream;
 
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomaton.Cell;
 
-import com.google.common.base.Function;
+import java.util.function.Function;
 
 /**
  * Three input boolean function implementation of {@link OpenClCellularAutomatonCLI}.

@@ -145,7 +145,7 @@ public final class AntSimulationImpl implements Simulation {
   }
 
   @Override
-  public void step(int stepCount, double targetFitness) throws Exception {
+  public void step(int stepCount, double targetFitness) {
     step(stepCount);
   }
 

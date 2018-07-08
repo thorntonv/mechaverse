@@ -1,7 +1,7 @@
 package org.mechaverse.simulation.experimental.ant;
 
-import com.google.common.base.Function;
-import com.google.common.base.Supplier;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import com.google.common.io.Files;
 import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
 import org.mechaverse.simulation.common.SimulationConfig;
@@ -60,7 +60,7 @@ public class SimpleAntSimulation {
         new SimulationConfig.Builder<>();
     SelectionStrategy<AntEntity> selectionStrategy = new ElitistSelectionStrategy<>(
         RETAIN_TOP_ENTITY_COUNT, REMOVE_BOTTOM_ENTITY_COUNT,
-            new TournamentSelectionStrategy<AntEntity>());
+            new TournamentSelectionStrategy<>());
     //selectionStrategy = new NoSelectionStrategy<>();
 
     Simulation simulation = new Simulation(configBuilder

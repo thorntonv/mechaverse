@@ -120,7 +120,7 @@ public final class JavaCellularAutomatonSimulator implements CellularAutomatonSi
   }
 
   @Override
-  public void close() throws Exception {}
+  public void close() {}
 
   public static JavaCellularAutomatonSimulation compile(CellularAutomatonDescriptor descriptor,
       int inputSize, int outputSize) throws CompileException {

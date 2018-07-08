@@ -16,10 +16,10 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("manager")
 public interface ManagerGwtRpcService extends RemoteService {
 
-  List<SimulationInfo> getSimulationInfo() throws Exception;
-  SimulationInfo createSimulation(String name) throws Exception;
+  List<SimulationInfo> getSimulationInfo();
+  SimulationInfo createSimulation(String name);
   void setSimulationActive(String simulationId, boolean active);
-  SimulationInfo getSimulationInfo(String simulationId) throws Exception;
-  void updateSimulationConfig(SimulationConfig config) throws Exception;
+  SimulationInfo getSimulationInfo(String simulationId);
+  void updateSimulationConfig(SimulationConfig config);
   void deleteSimulation(String simulationId) throws Exception;
 }

@@ -8,17 +8,15 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
+import com.google.common.collect.ImmutableSet;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mechaverse.simulation.ant.core.AntSimulationState;
 import org.mechaverse.simulation.ant.core.model.Ant;
-import org.mechaverse.simulation.common.model.Entity;
 import org.mechaverse.simulation.common.SimulationStateCellularAutomatonDescriptor;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonAllocator;
@@ -29,15 +27,13 @@ import org.mechaverse.simulation.common.cellautomaton.simulation.generator.Cellu
 import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 import org.mechaverse.simulation.common.genetic.GeneticData;
 import org.mechaverse.simulation.common.genetic.GeneticDataStore;
+import org.mechaverse.simulation.common.model.Entity;
 import org.mechaverse.simulation.common.util.ArrayUtil;
 import org.mechaverse.simulation.common.util.RandomUtil;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
-
-import com.google.common.collect.ImmutableSet;
 
 /**
  * Unit test for {@link CellularAutomatonAntBehavior}.
@@ -80,7 +76,7 @@ public class CellularAutomatonAntBehaviorTest {
   }
 
   @Test
-  public void generateGeneticData() throws IOException {
+  public void generateGeneticData() {
     behavior.setState(state);
     behavior.setInput(input, random);
 
@@ -126,7 +122,7 @@ public class CellularAutomatonAntBehaviorTest {
   }
 
   @Test
-  public void loadGeneticData() throws IOException {
+  public void loadGeneticData() {
     createGeneticDataStore(state.getEntityGeneticDataStore(ant));
     behavior.setState(state);
     behavior.setInput(input, random);
@@ -164,21 +160,18 @@ public class CellularAutomatonAntBehaviorTest {
   }
 
   @Test
-  public void getOutput() throws IOException {
+  public void getOutput() {
     GeneticDataStore geneticData = state.getEntityGeneticDataStore(ant);
     createGeneticDataStore(geneticData);
 
     final int[] automatonOutput = ArrayUtil.toIntArray(
         RandomUtil.randomBytes(TEST_AUTOMATON_OUTPUT_SIZE_BYTES, random));
     final ArgumentCaptor<int[]> outputCaptor = ArgumentCaptor.forClass(int[].class);
-    doAnswer(new Answer<Void>() {
-      @Override
-      public Void answer(InvocationOnMock invocation) throws Throwable {
-        for (int idx = 0; idx < automatonOutput.length; idx++) {
-          outputCaptor.getValue()[idx] = automatonOutput[idx];
-        }
-        return null;
+    doAnswer((Answer<Void>) invocation -> {
+      for (int idx = 0; idx < automatonOutput.length; idx++) {
+        outputCaptor.getValue()[idx] = automatonOutput[idx];
       }
+      return null;
     }).when(mockSimulator).getAutomatonOutput(eq(0), outputCaptor.capture());
     behavior.setState(state);
     behavior.setInput(input, random);
@@ -214,7 +207,7 @@ public class CellularAutomatonAntBehaviorTest {
   }
 
   @Test
-  public void setState() throws IOException {
+  public void setState() {
     byte[] stateBytes = RandomUtil.randomBytes(TEST_AUTOMATON_STATE_SIZE_BYTES, random);
     byte[] outputMapBytes = RandomUtil.randomBytes(TEST_AUTOMATON_OUTPUT_SIZE_BYTES, random);
 
@@ -229,22 +222,19 @@ public class CellularAutomatonAntBehaviorTest {
   }
 
   @Test
-  public void updateState() throws IOException {
+  public void updateState() {
     final byte[] stateBytes =
         RandomUtil.randomBytes(TEST_AUTOMATON_STATE_SIZE_BYTES, random);
     SimulationDataStore entityDataStore = state.getEntityDataStore(ant);
     entityDataStore.put(CellularAutomatonAntBehavior.AUTOMATON_STATE_KEY, new byte[0]);
 
     final ArgumentCaptor<int[]> stateCaptor = ArgumentCaptor.forClass(int[].class);
-    doAnswer(new Answer<Void>() {
-      @Override
-      public Void answer(InvocationOnMock invocation) throws Throwable {
-        int[] automatonState = ArrayUtil.toIntArray(stateBytes);
-        for (int idx = 0; idx < automatonState.length; idx++) {
-          stateCaptor.getValue()[idx] = automatonState[idx];
-        }
-        return null;
+    doAnswer((Answer<Void>) invocation -> {
+      int[] automatonState = ArrayUtil.toIntArray(stateBytes);
+      for (int idx = 0; idx < automatonState.length; idx++) {
+        stateCaptor.getValue()[idx] = automatonState[idx];
       }
+      return null;
     }).when(mockSimulator).getAutomatonState(eq(0), stateCaptor.capture());
 
     behavior.setState(state);

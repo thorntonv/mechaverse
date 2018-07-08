@@ -95,7 +95,7 @@ public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
   }
 
   @Override
-  public void step() throws Exception {
+  public void step() {
     Simulation service = getSimulation();
     synchronized (service) {
       service.step(1);

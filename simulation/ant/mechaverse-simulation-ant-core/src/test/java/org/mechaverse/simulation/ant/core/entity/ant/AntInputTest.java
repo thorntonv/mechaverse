@@ -1,6 +1,7 @@
 package org.mechaverse.simulation.ant.core.entity.ant;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.util.Random;
 
@@ -148,7 +149,7 @@ public class AntInputTest {
   public void frontSensor_noCell() {
     input.setFrontSensor(null, null, null);
     SensorInfo sensorInfo = input.getFrontSensor();
-    assertEquals(null, sensorInfo.getEntityType());
+    assertNull(sensorInfo.getEntityType());
   }
 
   @Test
@@ -167,7 +168,7 @@ public class AntInputTest {
   public void frontLeftSensor_noCell() {
     input.setFrontLeftSensor(null, null);
     SensorInfo sensorInfo = input.getFrontLeftSensor();
-    assertEquals(null, sensorInfo.getEntityType());
+    assertNull(sensorInfo.getEntityType());
   }
 
   @Test
@@ -186,7 +187,7 @@ public class AntInputTest {
   public void frontRightSensor_noCell() {
     input.setFrontRightSensor(null, null);
     SensorInfo sensorInfo = input.getFrontRightSensor();
-    assertEquals(null, sensorInfo.getEntityType());
+    assertNull(sensorInfo.getEntityType());
   }
 
   @Test
@@ -205,7 +206,7 @@ public class AntInputTest {
   public void leftSensor_noCell() {
     input.setLeftSensor(null, null);
     SensorInfo sensorInfo = input.getLeftSensor();
-    assertEquals(null, sensorInfo.getEntityType());
+    assertNull(sensorInfo.getEntityType());
   }
 
   @Test
@@ -224,7 +225,7 @@ public class AntInputTest {
   public void rightSensor_noCell() {
     input.setRightSensor(null, null);
     SensorInfo sensorInfo = input.getRightSensor();
-    assertEquals(null, sensorInfo.getEntityType());
+    assertNull(sensorInfo.getEntityType());
   }
 
   @Test

@@ -15,6 +15,7 @@ import com.google.common.base.Preconditions;
  *
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
+@SuppressWarnings("WeakerAccess")
 public class CellularAutomatonGeneticData extends GeneticData {
 
   public static class CellGeneticData {

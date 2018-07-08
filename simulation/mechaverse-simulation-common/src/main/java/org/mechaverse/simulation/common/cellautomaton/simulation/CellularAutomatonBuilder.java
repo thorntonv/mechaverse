@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableList;
  *
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
+@SuppressWarnings("WeakerAccess")
 public class CellularAutomatonBuilder {
 
   // TODO(thorntonv): Implement unit tests for this class.

@@ -10,7 +10,6 @@ import org.apache.commons.math3.util.Pair;
 import com.google.common.base.Preconditions;
 
 import gnu.trove.map.TObjectDoubleMap;
-import gnu.trove.procedure.TObjectDoubleProcedure;
 
 /**
  * A {@link SelectionStrategy} implementation that selects parent entities proportionally based on
@@ -57,16 +56,13 @@ public class FitnessProportionalSelectionStrategy<E> extends AbstractSelectionSt
 
     final double fitnessSum = sum;
     final List<Pair<E, Double>> pmf = new ArrayList<>();
-    entityFitnessMap.forEachEntry(new TObjectDoubleProcedure<E>() {
-      @Override
-      public boolean execute(E entity, double value) {
-        if (fitnessSum != 0) {
-          pmf.add(new Pair<>(entity, value));
-        } else {
-          pmf.add(new Pair<>(entity, 1.0D / entityFitnessMap.size()));
-        }
-        return true;
+    entityFitnessMap.forEachEntry((entity, value) -> {
+      if (fitnessSum != 0) {
+        pmf.add(new Pair<>(entity, value));
+      } else {
+        pmf.add(new Pair<>(entity, 1.0D / entityFitnessMap.size()));
       }
+      return true;
     });
 
     return new EnumeratedDistribution<>(random, pmf);

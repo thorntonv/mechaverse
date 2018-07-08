@@ -76,31 +76,31 @@ public class MongoDBSimulationDataStoreTest {
   }
 
   @Test
-  public void testPutGetA() throws IOException {
+  public void testPutGetA() {
     dataStore.put("foo.bar", "testValue".getBytes());
     assertArrayEquals("testValue".getBytes(), dataStore.get("foo.bar"));
   }
 
   @Test
-  public void testGetA() throws IOException {
+  public void testGetA() {
     assertArrayEquals(null, dataStore.get("foo.bar"));
   }
 
   @Test
-  public void testRemoveA() throws IOException {
+  public void testRemoveA() {
     dataStore.put("foo.bar", "testValue".getBytes());
     dataStore.remove("foo.bar");
     assertFalse(dataStore.containsKey("foo.bar"));
     assertEquals(0, dataStore.keySet().size());
-    assertEquals(null, dataStore.get("foo.bar"));
+    assertNull(dataStore.get("foo.bar"));
   }
 
   @Test
-  public void testRemoveB() throws IOException {
+  public void testRemoveB() {
     dataStore.remove("foo.bar");
     assertFalse(dataStore.containsKey("foo.bar"));
     assertEquals(0, dataStore.keySet().size());
-    assertEquals(null, dataStore.get("foo.bar"));
+    assertNull(dataStore.get("foo.bar"));
   }
 
   @Test

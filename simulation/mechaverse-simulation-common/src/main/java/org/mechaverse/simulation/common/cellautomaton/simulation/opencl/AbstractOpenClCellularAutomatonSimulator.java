@@ -238,7 +238,7 @@ public abstract class AbstractOpenClCellularAutomatonSimulator<B extends Buffer,
     finished = false;
   }
 
-  public void close() throws Exception {
+  public void close() {
     queue.finish();
     inputBuffer.release();
     stateBuffer.release();

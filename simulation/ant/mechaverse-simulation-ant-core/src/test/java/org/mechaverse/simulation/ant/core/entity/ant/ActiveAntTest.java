@@ -2,6 +2,7 @@ package org.mechaverse.simulation.ant.core.entity.ant;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
@@ -174,7 +175,7 @@ public class ActiveAntTest {
     when(mockEnvironment.getCellInDirection(mockCell, Direction.EAST)).thenReturn(null);
     activeAnt.updateInput(mockEnvironment, random);
     verify(mockAntBehavior).setInput(inputCaptor.capture(), eq(random));
-    assertEquals(null, inputCaptor.getValue().getFrontSensor().getEntityType());
+    assertNull(inputCaptor.getValue().getFrontSensor().getEntityType());
   }
 
   @Test
@@ -220,7 +221,7 @@ public class ActiveAntTest {
   public void frontLeftCellSensor_noCell() {
     activeAnt.updateInput(mockEnvironment, random);
     verify(mockAntBehavior).setInput(inputCaptor.capture(), eq(random));
-    assertEquals(null, inputCaptor.getValue().getFrontLeftSensor().getEntityType());
+    assertNull(inputCaptor.getValue().getFrontLeftSensor().getEntityType());
   }
 
   @Test
@@ -243,7 +244,7 @@ public class ActiveAntTest {
   public void frontRightCellSensor_noCell() {
     activeAnt.updateInput(mockEnvironment, random);
     verify(mockAntBehavior).setInput(inputCaptor.capture(), eq(random));
-    assertEquals(null, inputCaptor.getValue().getFrontRightSensor().getEntityType());
+    assertNull(inputCaptor.getValue().getFrontRightSensor().getEntityType());
   }
 
   @Test
@@ -266,7 +267,7 @@ public class ActiveAntTest {
   public void leftCellSensor_noCell() {
     activeAnt.updateInput(mockEnvironment, random);
     verify(mockAntBehavior).setInput(inputCaptor.capture(), eq(random));
-    assertEquals(null, inputCaptor.getValue().getLeftSensor().getEntityType());
+    assertNull(inputCaptor.getValue().getLeftSensor().getEntityType());
   }
 
   @Test
@@ -289,7 +290,7 @@ public class ActiveAntTest {
   public void rightCellSensor_noCell() {
     activeAnt.updateInput(mockEnvironment, random);
     verify(mockAntBehavior).setInput(inputCaptor.capture(), eq(random));
-    assertEquals(null, inputCaptor.getValue().getRightSensor().getEntityType());
+    assertNull(inputCaptor.getValue().getRightSensor().getEntityType());
   }
 
   @Test

@@ -18,6 +18,7 @@ import gnu.trove.list.array.TIntArrayList;
  *
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class SimulatorCellularAutomaton implements CellularAutomaton {
 
   public final class SimulatorCellularAutomatonCell implements CellularAutomaton.Cell {
@@ -231,9 +232,9 @@ public class SimulatorCellularAutomaton implements CellularAutomaton {
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
-    for (int row = 0; row < cells.length; row++) {
-      for (int col = 0; col < cells[row].length; col++) {
-        builder.append(cells[row][col].getOutput(0)).append("\t");
+    for (SimulatorCellularAutomatonCell[] row : cells) {
+      for (SimulatorCellularAutomatonCell cell : row) {
+        builder.append(cell.getOutput(0)).append("\t");
       }
       builder.append("\n");
     }

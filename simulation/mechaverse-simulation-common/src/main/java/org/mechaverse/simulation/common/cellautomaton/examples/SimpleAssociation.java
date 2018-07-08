@@ -1,7 +1,7 @@
 package org.mechaverse.simulation.common.cellautomaton.examples;
 
-import com.google.common.base.Function;
-import com.google.common.base.Supplier;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
 import org.apache.commons.math3.util.Pair;
@@ -25,6 +25,7 @@ import java.util.*;
  *
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
+@SuppressWarnings("WeakerAccess")
 public class SimpleAssociation extends AbstractCellularAutomaton {
 
   private static final int ROW_COUNT = 108*2;
@@ -150,9 +151,7 @@ public class SimpleAssociation extends AbstractCellularAutomaton {
             for (Cell neighborCell : neighbors) {
               Entity neighborEntity = cellEntityMap.get(neighborCell);
               if (neighborEntity != null) {
-                boolean infectious = false;
-
-                if(infectious || neighborEntity.getAssociationId() == null) {
+                if(neighborEntity.getAssociationId() == null) {
                   Pair<Integer, Integer> neighborPosition = cells.getCellPosition(neighborCell);
                   if(neighborEntity.getAssociationId() != null) {
                     AssociationCentroid oldCentroid = associationCentroidMap.get(neighborEntity.getAssociationId());
@@ -167,10 +166,7 @@ public class SimpleAssociation extends AbstractCellularAutomaton {
 
           boolean associationConstraintSatisfied = entity.getAssociationId() == null;
           if (!associationConstraintSatisfied) {
-            associationConstraintSatisfied = true;
-            if (!isConnected(targetNeighborCell, centroid)) {
-              associationConstraintSatisfied = false;
-            }
+            associationConstraintSatisfied = isConnected(targetNeighborCell, centroid);
           }
 
           if (associationConstraintSatisfied) {
@@ -192,7 +188,7 @@ public class SimpleAssociation extends AbstractCellularAutomaton {
     protected int getNeighborCount() {
       int neighborCount = 0;
       for (Cell neighborCell : neighbors) {
-        if (neighborCell != null && neighborCell instanceof AssociationCell
+        if (neighborCell instanceof AssociationCell
             && cellEntityMap.containsKey(neighborCell)) {
           neighborCount++;
         }
@@ -223,11 +219,7 @@ public class SimpleAssociation extends AbstractCellularAutomaton {
         return true;
       }
 
-      if (RandomUtil.nextEvent(.5, random)) {
-        return true;
-      }
-
-      return false;
+      return RandomUtil.nextEvent(.5, random);
     }
 
     public void update() {
@@ -252,40 +244,34 @@ public class SimpleAssociation extends AbstractCellularAutomaton {
 
   private static Map<String, Color> associationColorMap = new HashMap<>();
 
-  private static final Function<Cell, Color> CELL_COLOR_PROVIDER = new Function<Cell, Color>() {
-    @Override
-    public Color apply(Cell cell) {
-      AssociationCell associationCell = (AssociationCell) cell;
-      if(associationCell.getEntity() == null) {
-        return Color.BLACK;
-      }
-      String associationId = associationCell.getEntity().getAssociationId();
-      if(associationId == null) {
-        return Color.WHITE;
-      }
-
-      Color color = associationColorMap.get(associationId);
-      if(color == null) {
-        Random random = new Random();
-        color = Color.getHSBColor(random.nextFloat(), 1.0f, 1.0f);
-        associationColorMap.put(associationId, color);
-      }
-      return color;
+  private static final Function<Cell, Color> CELL_COLOR_PROVIDER = cell -> {
+    AssociationCell associationCell = (AssociationCell) cell;
+    if(associationCell.getEntity() == null) {
+      return Color.BLACK;
     }
+    String associationId = associationCell.getEntity().getAssociationId();
+    if(associationId == null) {
+      return Color.WHITE;
+    }
+
+    Color color = associationColorMap.get(associationId);
+    if(color == null) {
+      Random random = new Random();
+      color = Color.getHSBColor(random.nextFloat(), 1.0f, 1.0f);
+      associationColorMap.put(associationId, color);
+    }
+    return color;
   };
 
   public SimpleAssociation(int width, int height) {
-    this(width, height, new IdentityHashMap<Cell, Entity>(), new HashMap<String, AssociationCentroid>());
+    this(width, height, new IdentityHashMap<>(), new HashMap<>());
   }
 
   protected SimpleAssociation(int width, int height, final IdentityHashMap<Cell, Entity> cellEntityMap,
                               final Map<String, AssociationCentroid> associationCentroidMap) {
-    super(width, height, new Supplier<AssociationCell>() {
-      @Override
-      public AssociationCell get() {
-        return new AssociationCell(cellEntityMap, associationCentroidMap);
-      }
-    }, new EightNeighborCellConnector());
+    super(width, height,
+        (Supplier<AssociationCell>) () -> new AssociationCell(cellEntityMap, associationCentroidMap),
+        new EightNeighborCellConnector());
 
     for(int row = 0; row < getHeight(); row++) {
       for(int col = 0; col < getWidth(); col++) {
@@ -308,7 +294,7 @@ public class SimpleAssociation extends AbstractCellularAutomaton {
     CellularAutomatonCLI cli = new CellularAutomatonCLI() {
 
       @Override
-      protected CellularAutomaton createCellularAutomaton() throws IOException {
+      protected CellularAutomaton createCellularAutomaton() {
         return new SimpleAssociation(COL_COUNT, ROW_COUNT);
       }
 
@@ -320,7 +306,7 @@ public class SimpleAssociation extends AbstractCellularAutomaton {
 
       @Override
       protected CellularAutomatonVisualizer createVisualizer(int width, int height,
-          int framesPerSecond, int frameCount) throws IOException {
+          int framesPerSecond, int frameCount) {
         return new CellularAutomatonVisualizer(createCellularAutomaton(), CELL_COLOR_PROVIDER,
             width, height, framesPerSecond, frameCount);
       }

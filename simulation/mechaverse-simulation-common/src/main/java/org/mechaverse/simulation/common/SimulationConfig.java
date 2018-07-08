@@ -15,9 +15,10 @@ import org.mechaverse.simulation.common.genetic.selection.FitnessProportionalSel
 import org.mechaverse.simulation.common.genetic.selection.SelectionStrategy;
 import org.mechaverse.simulation.common.simple.SimpleSimulationLogger;
 
-import com.google.common.base.Function;
-import com.google.common.base.Supplier;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class SimulationConfig<E extends AbstractEntity, M> {
 
   public static class Builder<E extends AbstractEntity, M> {
@@ -67,7 +68,7 @@ public class SimulationConfig<E extends AbstractEntity, M> {
     public Builder<E, M> setSimulationLogger(String filename,
           Function<E, Double> entityFitnessFunction) throws FileNotFoundException {
       PrintWriter results = new PrintWriter(new File(filename));
-      return setSimulationLogger(new SimpleSimulationLogger<E, M>(results, entityFitnessFunction));
+      return setSimulationLogger(new SimpleSimulationLogger<>(results, entityFitnessFunction));
     }
 
     public Builder<E, M> setSimulationLogger(SimulationLogger<E, M> simulationLogger) {

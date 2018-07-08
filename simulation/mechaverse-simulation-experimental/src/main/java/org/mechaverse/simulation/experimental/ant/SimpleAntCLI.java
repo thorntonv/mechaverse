@@ -1,6 +1,6 @@
 package org.mechaverse.simulation.experimental.ant;
 
-import com.google.common.base.Function;
+import java.util.function.Function;
 import com.google.common.io.Resources;
 import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
 import org.mechaverse.simulation.common.cellautomaton.examples.OpenClCellularAutomatonCLI;

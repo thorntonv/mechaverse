@@ -28,7 +28,7 @@ public class AbstractCellularAutomatonSimulationGeneratorTest {
   protected CellularAutomatonDescriptor descriptor1;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     descriptor1 = CellularAutomatonBuilder.newCellularAutomaton(
         1, 1, Routing3In3OutCellType.newInstance(), 1, 2);
     descriptor1.getLogicalUnit().setNeighborConnections("3");

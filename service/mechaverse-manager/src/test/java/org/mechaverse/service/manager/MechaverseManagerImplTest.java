@@ -44,7 +44,7 @@ import com.google.common.collect.Iterables;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/test-context.xml")
 @Transactional
-@TransactionConfiguration(defaultRollback = true)
+@TransactionConfiguration()
 public class MechaverseManagerImplTest {
 
   @Autowired private SessionFactory sessionFactory;
@@ -62,7 +62,7 @@ public class MechaverseManagerImplTest {
   }
 
   @Test
-  public void createSimulation() throws Exception {
+  public void createSimulation() {
     SimulationInfo simulationInfo = service.createSimulation("test");
     List<SimulationInfo> simulationInfoList = service.getSimulationInfo();
     assertEquals(1, simulationInfoList.size());
@@ -72,7 +72,7 @@ public class MechaverseManagerImplTest {
   }
 
   @Test
-  public void getSimulationById() throws Exception {
+  public void getSimulationById() {
     SimulationInfo simulationInfo = service.createSimulation("test");
 
     SimulationInfo retrievedSimulationInfo =
@@ -81,7 +81,7 @@ public class MechaverseManagerImplTest {
   }
 
   @Test
-  public void updateSimulationConfig() throws Exception {
+  public void updateSimulationConfig() {
     SimulationInfo simulationInfo = service.createSimulation("test");
     sessionFactory.getCurrentSession().flush();
     sessionFactory.getCurrentSession().evict(simulationInfo.getConfig());
@@ -109,7 +109,7 @@ public class MechaverseManagerImplTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void deleteSimulationConfigProperty() throws Exception {
+  public void deleteSimulationConfigProperty() {
     sessionFactory.getCurrentSession().setFlushMode(FlushMode.ALWAYS);
 
     SimulationInfo simulationInfo = service.createSimulation("test");
@@ -136,12 +136,12 @@ public class MechaverseManagerImplTest {
   }
 
   @Test
-  public void getTask_noSimulations() throws Exception {
-    assertEquals(null, service.getTask());
+  public void getTask_noSimulations() {
+    assertNull(service.getTask());
   }
 
   @Test
-  public void getTask() throws Exception {
+  public void getTask() {
     SimulationInfo simulationInfo = service.createSimulation("test");
     simulationInfo.getConfig().setMaxInstanceCount(1);
     simulationInfo.getConfig().setTaskIterationCount(60*300);
@@ -241,7 +241,7 @@ public class MechaverseManagerImplTest {
   }
 
   @Test
-  public void getTask_inactiveTask() throws Exception {
+  public void getTask_inactiveTask() {
     SimulationInfo simulationInfo = service.createSimulation("test");
     simulationInfo.getConfig().setMaxInstanceCount(1);
     simulationInfo.getConfig().setTaskIterationCount(60 * 300);
@@ -260,7 +260,7 @@ public class MechaverseManagerImplTest {
   }
 
   @Test
-  public void getTask_simulationMaxTasks() throws Exception {
+  public void getTask_simulationMaxTasks() {
     SimulationInfo simulationInfo = service.createSimulation("test");
     simulationInfo.getConfig().setMaxInstanceCount(1);
     simulationInfo.getConfig().setTaskIterationCount(60 * 300);
@@ -274,7 +274,7 @@ public class MechaverseManagerImplTest {
   }
 
   @Test
-  public void getTask_inactiveSimulation() throws Exception {
+  public void getTask_inactiveSimulation() {
     SimulationInfo simulationInfo = service.createSimulation("test");
     simulationInfo.getConfig().setMaxInstanceCount(1);
     simulationInfo.getConfig().setTaskIterationCount(60 * 300);
@@ -315,7 +315,7 @@ public class MechaverseManagerImplTest {
   }
 
   @Test
-  public void setActive() throws Exception {
+  public void setActive() {
     SimulationInfo simulationInfo = service.createSimulation("test");
     assertTrue(simulationInfo.isActive());
     service.setSimulationActive(simulationInfo.getSimulationId(), false);

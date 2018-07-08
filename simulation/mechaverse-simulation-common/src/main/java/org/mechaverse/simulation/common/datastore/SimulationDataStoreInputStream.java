@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 
-import com.google.common.base.Supplier;
+import java.util.function.Supplier;
 
 /**
  * A {@link DataInputStream} that can be used to read a {@link SimulationDataStore}.
@@ -22,22 +22,19 @@ public class SimulationDataStoreInputStream extends DataInputStream {
   public static InputStream newInputStream(final SimulationDataStore dataStore) throws IOException {
     // TODO(thorntonv): Implement unit test for this method.
     final PipedOutputStream out = new PipedOutputStream();
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        SimulationDataStoreOutputStream dataStoreOut = new SimulationDataStoreOutputStream(out);
+    new Thread(() -> {
+      SimulationDataStoreOutputStream dataStoreOut = new SimulationDataStoreOutputStream(out);
+      try {
+        dataStoreOut.writeDataStore(dataStore);
+      } catch (IOException e) {
+        e.printStackTrace();
+      } finally {
         try {
-          dataStoreOut.writeDataStore(dataStore);
-        } catch (IOException e) {
-          e.printStackTrace();
-        } finally {
-          try {
-            dataStoreOut.close();
-          } catch (IOException ignored) {}
-          try {
-            out.close();
-          } catch (IOException ignored) {}
-        }
+          dataStoreOut.close();
+        } catch (IOException ignored) {}
+        try {
+          out.close();
+        } catch (IOException ignored) {}
       }
     }).start();
     return new PipedInputStream(out);

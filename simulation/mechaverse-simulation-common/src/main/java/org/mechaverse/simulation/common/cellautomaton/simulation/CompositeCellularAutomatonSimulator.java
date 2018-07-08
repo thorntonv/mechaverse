@@ -11,6 +11,7 @@ import com.google.common.base.Preconditions;
  *
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
+@SuppressWarnings("WeakerAccess")
 public final class CompositeCellularAutomatonSimulator implements CellularAutomatonSimulator {
 
   /**
@@ -51,7 +52,7 @@ public final class CompositeCellularAutomatonSimulator implements CellularAutoma
     Preconditions.checkNotNull(simulators);
     Preconditions.checkState(simulators.size() > 0);
 
-    this.simulators = simulators.toArray(new CellularAutomatonSimulator[simulators.size()]);
+    this.simulators = simulators.toArray(new CellularAutomatonSimulator[0]);
     this.mappedCellularAutomatonInfo = buildMappedCellularAutomatonInfo(simulators);
     this.allocator = new CellularAutomatonAllocator(mappedCellularAutomatonInfo.length);
   }
@@ -163,6 +164,6 @@ public final class CompositeCellularAutomatonSimulator implements CellularAutoma
     }
 
     return mappedCellularAutomatonInfo.toArray(
-        new MappedCellularAutomatonInfo[mappedCellularAutomatonInfo.size()]);
+        new MappedCellularAutomatonInfo[0]);
   }
 }

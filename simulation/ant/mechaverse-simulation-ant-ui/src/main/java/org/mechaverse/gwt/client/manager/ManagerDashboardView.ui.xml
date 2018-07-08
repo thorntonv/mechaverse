@@ -1,6 +1,7 @@
-<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder' xmlns:g='urn:import:com.google.gwt.user.client.ui'
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+  xmlns:g='urn:import:com.google.gwt.user.client.ui'
   xmlns:cell='urn:import:com.google.gwt.user.cellview.client'
-  xmlns:manager='urn:import:org.mechaverse.gwt.client.manager'>
+>
 
   <ui:style>
   .rootPanel {

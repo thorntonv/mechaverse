@@ -2,9 +2,9 @@ package org.mechaverse.simulation.common.cellautomaton;
 
 import java.util.List;
 
+import java.util.Optional;
 import org.apache.commons.math3.random.RandomGenerator;
 
-import com.google.common.base.Optional;
 
 /**
  * An environment generator.

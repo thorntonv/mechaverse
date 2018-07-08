@@ -1,7 +1,5 @@
 package org.mechaverse.simulation.common.cellautomaton.simulation;
 
-import java.util.Collection;
-
 /**
  * An interface for cellular automatons.
  * 

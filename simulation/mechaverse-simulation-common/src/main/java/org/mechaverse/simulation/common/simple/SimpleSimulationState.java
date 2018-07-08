@@ -12,7 +12,7 @@ import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 import org.mechaverse.simulation.common.datastore.SimulationDataStoreView;
 import org.mechaverse.simulation.common.genetic.GeneticDataStore;
 
-import com.google.common.base.Function;
+import java.util.function.Function;
 
 /**
  * The simple simulation state.

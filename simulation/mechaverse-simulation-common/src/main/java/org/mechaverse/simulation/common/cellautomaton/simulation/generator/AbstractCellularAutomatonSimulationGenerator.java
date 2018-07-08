@@ -19,7 +19,7 @@ public abstract class AbstractCellularAutomatonSimulationGenerator
   /**
    * A pattern that matches placeholder ids in an output expression.
    */
-  protected static final Pattern EXPRESSION_VAR_PATTERN = Pattern.compile("\\{[^}]+\\}");
+  protected static final Pattern EXPRESSION_VAR_PATTERN = Pattern.compile("\\{[^}]+}");
 
   private static final String CELL_INPUT_ID_PREFIX = "input";
   private static final String CELL_OUTPUT_ID_PREFIX = "output";
@@ -79,7 +79,7 @@ public abstract class AbstractCellularAutomatonSimulationGenerator
 
       // Append the part of the expression between the last position and the start of the
       // placeholder id.
-      out.append(str.substring(position, matcher.start()));
+      out.append(str, position, matcher.start());
       // Append the variable name to which the placeholder id was mapped.
       out.append(varName);
       // Set the current position the the end of the placeholder id.

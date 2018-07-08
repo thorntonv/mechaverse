@@ -30,7 +30,7 @@ public class MechaverseStorageServiceImpl implements MechaverseStorageService {
 
   @Override
   public InputStream getStateValue(
-      String simulationId, String instanceId, long iteration, String key) throws IOException {
+      String simulationId, String instanceId, long iteration, String key) {
     throw new UnsupportedOperationException();
   }
 
@@ -55,7 +55,7 @@ public class MechaverseStorageServiceImpl implements MechaverseStorageService {
 
   @Override
   public void setStateValue(String simulationId, String instanceId, long iteration, String key,
-      InputStream valueInput) throws IOException {
+      InputStream valueInput) {
     throw new UnsupportedOperationException();
   }
 

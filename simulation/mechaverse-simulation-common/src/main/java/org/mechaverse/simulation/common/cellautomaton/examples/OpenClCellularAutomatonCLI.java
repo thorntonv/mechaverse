@@ -18,7 +18,7 @@ import org.mechaverse.simulation.common.cellautomaton.simulation.opencl.OpenClCe
 import org.mechaverse.simulation.common.cellautomaton.ui.CellularAutomatonRenderer;
 import org.mechaverse.simulation.common.cellautomaton.ui.CellularAutomatonVisualizer;
 
-import com.google.common.base.Function;
+import java.util.function.Function;
 
 /**
  * A base class for OpenCL based cellular automata visualization command line applications.
@@ -28,20 +28,12 @@ import com.google.common.base.Function;
 public abstract class OpenClCellularAutomatonCLI extends CellularAutomatonCLI {
 
   protected static final Function<Cell, Color> SINGLE_BITPLANE_CELL_COLOR_PROVIDER =
-      new Function<Cell, Color>() {
-        @Override
-        public Color apply(Cell cell) {
-          return ((cell.getOutput(0) >> 0) & 0b1) == 1 ? Color.WHITE : Color.BLACK;
-        }
-      };
+      cell -> ((cell.getOutput(0)) & 0b1) == 1 ? Color.WHITE : Color.BLACK;
 
   protected static final Function<Cell, Color> BITPLANE_AVERAGE_CELL_COLOR_PROVIDER =
-      new Function<Cell, Color>() {
-        @Override
-        public Color apply(Cell cell) {
-          int color = CellularAutomatonAnalyzer.getSetBitCount(cell.getOutput(0)) * 8;
-          return new Color(color, color, color);
-        }
+      cell -> {
+        int color = CellularAutomatonAnalyzer.getSetBitCount(cell.getOutput(0)) * 8;
+        return new Color(color, color, color);
       };
 
   protected static void main(String[] args, OpenClCellularAutomatonCLI cli) throws IOException {
