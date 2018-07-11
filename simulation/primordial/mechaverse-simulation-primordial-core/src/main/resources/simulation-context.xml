@@ -22,7 +22,7 @@
   <bean class="org.mechaverse.simulation.primordial.core.PrimordialSimulationImpl" lazy-init="true" />
 
   <bean id="cellularAutomatonDescriptorDataSource" lazy-init="true" 
-      class="org.mechaverse.simulation.common.SimulationStateCellularAutomatonDescriptor" >
+      class="org.mechaverse.simulation.common.cellautomaton.SimulationStateCellularAutomatonDescriptor" >
     <property name="defaultDescriptorResourceName">
       <value>primordial-automaton-descriptor.xml</value>
     </property>
@@ -33,7 +33,7 @@
     <constructor-arg index="0" value="4" />
     <constructor-arg index="1" value="500" />
     <constructor-arg index="2">
-      <util:constant static-field="org.mechaverse.simulation.primordial.core.entity.primordial.PrimordialEntityInput.DATA_SIZE"/>
+      <util:constant static-field="org.mechaverse.simulation.primordial.core.entity.PrimordialEntityInput.DATA_SIZE"/>
     </constructor-arg>
     <!-- One for each bit of output -->
     <constructor-arg index="3" value="4" />
@@ -47,7 +47,7 @@
   <bean id="activePrimordialEntityProvider" class="org.mechaverse.simulation.primordial.core.entity.primordial.ActivePrimordialEntityProvider" scope="prototype" />
   
   <bean id="primordialEntityBehavior"
-        class="org.mechaverse.simulation.primordial.core.entity.primordial.CellularAutomatonPrimordialEntityBehavior" scope="prototype" >
+        class="org.mechaverse.simulation.primordial.core.entity.CellularAutomatonPrimordialEntityBehavior" scope="prototype" >
       <constructor-arg><ref bean="cellularAutomatonDescriptorDataSource" /></constructor-arg>
       <constructor-arg><ref bean="cellularAutomatonSimulator" /></constructor-arg>
   </bean>  
@@ -61,8 +61,8 @@
     </constructor-arg>
   </bean>
 
-  <bean id="foodGenerationModule" class="org.mechaverse.simulation.primordial.core.module.FoodGenerationModule" scope="prototype" />
-  <bean id="entityReproductionModule" class="org.mechaverse.simulation.primordial.core.module.EntityReproductionModule" scope="prototype" />
+  <bean id="foodGenerationModule" class="org.mechaverse.simulation.primordial.core.environment.FoodGenerationModule" scope="prototype" />
+  <bean id="entityReproductionModule" class="org.mechaverse.simulation.primordial.core.environment.EntityReproductionModule" scope="prototype" />
   <bean id="cellularAutomatonModule" class="org.mechaverse.simulation.primordial.core.module.CellularAutomatonSimulationModule" lazy-init="true" />
 
   <util:list id="modules" value-type="org.mechaverse.simulation.primordial.core.module.PrimordialSimulationModule" scope="prototype">

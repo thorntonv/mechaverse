@@ -100,14 +100,14 @@ public class SimpleSimulationConfig<E extends SimpleCellularAutomatonEntity, M> 
   private final CellularAutomatonSimulator simulator;
   private final SelectionStrategy<E> selectionStrategy;
   private final GeneticRecombinator geneticRecombinator;
-  private final SimpleSimulationLogger simulationLogger;
+  private final SimpleSimulationLogger<E, M> simulationLogger;
   private final int updatesPerIteration;
 
   public SimpleSimulationConfig(Supplier<E> entitySupplier,
       Function<E, Double> entityFitnessFunction,
       CellularAutomatonSimulationModel cellularAutomatonModel, CellularAutomatonSimulator simulator,
       SelectionStrategy<E> selectionStrategy, GeneticRecombinator geneticRecombinator,
-      SimpleSimulationLogger simulationLogger, int updatesPerIteration) {
+      SimpleSimulationLogger<E, M> simulationLogger, int updatesPerIteration) {
     this.entitySupplier = entitySupplier;
     this.entityFitnessFunction = entityFitnessFunction;
     this.cellularAutomatonModel = cellularAutomatonModel;
@@ -142,7 +142,7 @@ public class SimpleSimulationConfig<E extends SimpleCellularAutomatonEntity, M> 
     return geneticRecombinator;
   }
 
-  public SimpleSimulationLogger getSimulationLogger() {
+  public SimpleSimulationLogger<E, M> getSimulationLogger() {
     return simulationLogger;
   }
 

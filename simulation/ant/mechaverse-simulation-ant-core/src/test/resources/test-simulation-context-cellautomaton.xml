@@ -24,7 +24,7 @@
   <bean class="org.mechaverse.simulation.ant.core.AntSimulationImpl" lazy-init="true" />
 
   <bean id="cellularAutomatonDescriptorDataSource" lazy-init="true" 
-      class="org.mechaverse.simulation.common.SimulationStateCellularAutomatonDescriptor" />
+      class="org.mechaverse.simulation.common.cellautomaton.SimulationStateCellularAutomatonDescriptor" />
 
   <bean class="org.mechaverse.simulation.common.cellautomaton.simulation.opencl.CompositeOpenClCellularAutomatonSimulatorFactory" 
       name="CompositeCellularAutomatonSimulatorFactory">

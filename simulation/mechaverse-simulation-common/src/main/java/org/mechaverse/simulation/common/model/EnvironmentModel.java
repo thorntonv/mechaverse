@@ -20,7 +20,7 @@ public class EnvironmentModel implements Serializable {
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model")
   protected int height;
   @XmlElement(name = "entity", namespace = "http://www.mechaverse.org/simulation/api/model")
-  protected List<EntityModel> entities;
+  protected List<EntityModel> entities = new ArrayList<>();
 
   public EnvironmentModel() {}
 
@@ -92,7 +92,7 @@ public class EnvironmentModel implements Serializable {
    * Objects of the following type(s) are allowed in the list
    * {@link EntityModel }
    */
-  public List<EntityModel> getEntities() {
+  public List<? extends EntityModel> getEntities() {
     if (entities == null) {
       entities = new ArrayList<>();
     }

@@ -1,22 +1,23 @@
 package org.mechaverse.simulation.experimental.simple;
 
-import java.util.UUID;
+import static org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_STATE_KEY;
 
+import java.util.UUID;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticData;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticData.CellGeneticData;
 import org.mechaverse.simulation.common.cellautomaton.simulation.SimulatorCellularAutomaton;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel;
 import org.mechaverse.simulation.common.genetic.GeneticDataStore;
+import org.mechaverse.simulation.common.model.EntityModel;
 
 /**
  * An entity base class.
  *
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
-public abstract class SimpleCellularAutomatonEntity {
+public abstract class SimpleCellularAutomatonEntity extends EntityModel {
 
-  private final String id;
-  private GeneticDataStore geneticDataStore;
+  private GeneticDataStore geneticDataStore = new GeneticDataStore(this);
   private CellularAutomatonGeneticData cellularAutomatonGeneticData;
   private SimulatorCellularAutomaton cellularAutomaton;
   private CellularAutomatonSimulationModel model;
@@ -29,10 +30,6 @@ public abstract class SimpleCellularAutomatonEntity {
 
   public SimpleCellularAutomatonEntity(String id) {
     this.id = id;
-  }
-
-  public String getId() {
-    return id;
   }
 
   public int[] getInput() {
@@ -48,7 +45,7 @@ public abstract class SimpleCellularAutomatonEntity {
   public void setGeneticDataStore(GeneticDataStore geneticDataStore) {
     this.geneticDataStore = geneticDataStore;
     this.cellularAutomatonGeneticData = new CellularAutomatonGeneticData(
-        geneticDataStore.get(SimpleSimulation.AUTOMATON_STATE_KEY), getCellularAutomatonModel());
+        geneticDataStore.get(CELLULAR_AUTOMATON_STATE_KEY), getCellularAutomatonModel());
   }
 
   public CellularAutomatonGeneticData getCellularAutomatonGeneticData() {

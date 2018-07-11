@@ -1,85 +1,67 @@
 package org.mechaverse.simulation.common.genetic;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore;
-import org.mechaverse.simulation.common.datastore.SimulationDataStore;
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.util.ArrayUtil;
 
-/**
- * A {@link SimulationDataStore} that stores {@link GeneticData}.
+/**EnvironmentModel
+ * Used to store/retrieve {@link GeneticData} from an entity model.
  *
  * @author Vance Thornton <thorntonv@mechaverse.org>
  */
 public class GeneticDataStore {
 
-  // TODO(thorntonv): Implement unit test for this class.
-
-  public static final String KEY = "geneticData";
-
   private static final String DATA_KEY = "data";
   private static final String CROSSOVER_GROUPS_KEY = "crossoverGroups";
   private static final String CROSSOVER_SPLIT_POINTS_KEY = "crossoverSplitPoints";
 
-  private final SimulationDataStore dataStore;
+  private static final String KEY_SEPARATOR = ".";
 
-  public GeneticDataStore() {
-    this(new MemorySimulationDataStore());
+  private final EntityModel entityModel;
+  private final String keyPrefix;
+
+  public GeneticDataStore(final EntityModel entityModel) {
+    this(entityModel, null);
   }
 
-  public GeneticDataStore(SimulationDataStore dataStore) {
-    this.dataStore = dataStore;
+  public GeneticDataStore(final EntityModel entityModel, final String keyPrefix) {
+    this.entityModel = entityModel;
+    this.keyPrefix = keyPrefix;
   }
 
-  public void put(String key, GeneticData geneticData) {
-    dataStore.put(geneticDataKey(key), geneticData.getData());
-    dataStore.put(crossoverGroupsKey(key), ArrayUtil.toByteArray(geneticData.getCrossoverGroups()));
-    dataStore.put(crossoverSplitPointsKey(key),
+  public void put(String type, GeneticData geneticData) {
+    entityModel.putData(getKey(type, DATA_KEY), geneticData.getData());
+    entityModel.putData(getKey(type, CROSSOVER_GROUPS_KEY), ArrayUtil.toByteArray(geneticData.getCrossoverGroups()));
+    entityModel.putData(getKey(type, CROSSOVER_SPLIT_POINTS_KEY),
         ArrayUtil.toByteArray(geneticData.getCrossoverSplitPoints()));
   }
 
-  public GeneticData get(String key) {
-    byte[] data = dataStore.get(geneticDataKey(key));
-    int[] crossoverGroups = ArrayUtil.toIntArray(dataStore.get(crossoverGroupsKey(key)));
-    int[] crossoverSplitPoints = ArrayUtil.toIntArray(dataStore.get(crossoverSplitPointsKey(key)));
+  public GeneticData get(String type) {
+    byte[] data = entityModel.getData(getKey(type, DATA_KEY));
+    int[] crossoverGroups = ArrayUtil.toIntArray(entityModel.getData(getKey(type, CROSSOVER_GROUPS_KEY)));
+    int[] crossoverSplitPoints = ArrayUtil.toIntArray(entityModel.getData(getKey(type, CROSSOVER_SPLIT_POINTS_KEY)));
     return new GeneticData(data, crossoverGroups, crossoverSplitPoints);
   }
 
-  public void remove(String key) {
-    dataStore.remove(geneticDataKey(key));
-    dataStore.remove(crossoverGroupsKey(key));
-    dataStore.remove(crossoverSplitPointsKey(key));
-  }
-
-  public Set<String> keySet() {
-    Set<String> keySet = new LinkedHashSet<>();
-    String suffix = SimulationDataStore.KEY_SEPARATOR + DATA_KEY;
-    for (String key : dataStore.keySet()) {
-      if (key.endsWith(suffix)) {
-        keySet.add(key.substring(0, key.length() - suffix.length()));
-      }
-    }
-    return keySet;
-  }
-
   public void clear() {
-    dataStore.clear();
+    clear(null);
   }
 
-  public int size() {
-    return keySet().size();
+  public void clear(String type) {
+    entityModel.removeData(getKey(type, DATA_KEY));
+    entityModel.removeData(getKey(type, CROSSOVER_GROUPS_KEY));
+    entityModel.removeData(getKey(type, CROSSOVER_SPLIT_POINTS_KEY));
   }
 
-  private String geneticDataKey(String key) {
-    return key + SimulationDataStore.KEY_SEPARATOR + DATA_KEY;
+  public boolean contains(String type) {
+    return entityModel.dataContainsKey(getKey(type, DATA_KEY)) ||
+        entityModel.dataContainsKey(getKey(type, CROSSOVER_GROUPS_KEY)) ||
+        entityModel.dataContainsKey(getKey(type, CROSSOVER_SPLIT_POINTS_KEY));
   }
 
-  private String crossoverGroupsKey(String key) {
-    return key + SimulationDataStore.KEY_SEPARATOR + CROSSOVER_GROUPS_KEY;
-  }
-
-  private String crossoverSplitPointsKey(String key) {
-    return key + SimulationDataStore.KEY_SEPARATOR + CROSSOVER_SPLIT_POINTS_KEY;
+  private String getKey(String type, String key) {
+    return Joiner.on(KEY_SEPARATOR).skipNulls()
+        .join(Strings.emptyToNull(keyPrefix), Strings.emptyToNull(type), key);
   }
 }

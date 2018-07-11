@@ -1,5 +1,7 @@
 package org.mechaverse.simulation.common.model;
 
+import java.util.HashMap;
+import java.util.Map;
 import javax.xml.bind.annotation.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -8,7 +10,7 @@ import java.util.List;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SimulationModel", namespace = "http://www.mechaverse.org/simulation/api/model",
-    propOrder = {"id", "environment", "subEnvironments", "iteration", "seed"})
+    propOrder = {"id", "environment", "subEnvironments", "iteration", "seed", "data"})
 @XmlRootElement(name = "SimulationModel", namespace = "http://www.mechaverse.org/simulation/api/model")
 public class SimulationModel implements Serializable {
 
@@ -18,11 +20,12 @@ public class SimulationModel implements Serializable {
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model", required = true)
   protected EnvironmentModel environment;
   @XmlElement(name = "sub_environment", namespace = "http://www.mechaverse.org/simulation/api/model")
-  protected List<EnvironmentModel> subEnvironments;
+  private List<EnvironmentModel> subEnvironments;
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model")
   protected long iteration;
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model", required = true)
-  protected String seed;
+  private String seed;
+  private Map<String, byte[]> data = new HashMap<>();
 
   public SimulationModel() {}
 
@@ -127,4 +130,15 @@ public class SimulationModel implements Serializable {
     this.seed = value;
   }
 
+  public byte[] getData(String key) {
+    return data.get(key);
+  }
+
+  public void putData(String key, byte[] value) {
+    data.put(key, value);
+  }
+
+  public boolean dataContainsKey(String key) {
+    return data.containsKey(key);
+  }
 }

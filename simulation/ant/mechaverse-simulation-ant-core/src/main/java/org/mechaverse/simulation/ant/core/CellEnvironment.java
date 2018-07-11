@@ -4,12 +4,12 @@ import org.mechaverse.simulation.ant.core.entity.AntEntityFactory;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.model.Nest;
 import org.mechaverse.simulation.common.EntityFactory;
-import org.mechaverse.simulation.common.cellautomaton.environment.AbstractCellEnvironment;
+import org.mechaverse.simulation.common.cellautomaton.environment.AbstractCellEnvironmentModel;
 import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.EnvironmentModel;
 
-public class CellEnvironment extends AbstractCellEnvironment<EntityType, Cell> {
+public class CellEnvironment extends AbstractCellEnvironmentModel<EntityType, Cell> {
 
     private Direction[][] nestDirectionIndex;
 

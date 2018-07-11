@@ -1,7 +1,6 @@
 package org.mechaverse.simulation.ant.core.module;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.mechaverse.simulation.ant.core.AntSimulationState;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.model.Food;
@@ -9,8 +8,8 @@ import org.mechaverse.simulation.ant.core.entity.EntityUtil;
 import org.mechaverse.simulation.ant.core.AntSimulationEnvironmentGenerator;
 import org.mechaverse.simulation.ant.core.CellEnvironment;
 import org.mechaverse.simulation.common.EntityManager;
-import org.mechaverse.simulation.common.cellautomaton.AbstractProbabilisticEnvironmentGenerator.EntityDistribution;
-import org.mechaverse.simulation.common.cellautomaton.AbstractProbabilisticEnvironmentGenerator.ProbabilisticLocalGenerator;
+import org.mechaverse.simulation.common.AbstractProbabilisticEnvironmentModelGenerator.EntityDistribution;
+import org.mechaverse.simulation.common.AbstractProbabilisticEnvironmentModelGenerator.ProbabilisticLocalGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

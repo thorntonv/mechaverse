@@ -12,7 +12,6 @@ import javax.servlet.http.HttpSessionListener;
 
 import org.mechaverse.gwt.shared.MechaverseGwtRpcService;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
-import org.mechaverse.simulation.ant.core.AntSimulationState;
 import org.mechaverse.simulation.ant.core.util.AntSimulationModelUtil;
 import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.common.Simulation;

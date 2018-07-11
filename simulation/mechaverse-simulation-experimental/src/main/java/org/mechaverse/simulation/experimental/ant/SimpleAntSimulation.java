@@ -4,6 +4,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import com.google.common.io.Files;
 import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
+import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.experimental.simple.SimpleSimulationConfig;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorReader;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulatorConfig;
@@ -11,8 +12,6 @@ import org.mechaverse.simulation.common.genetic.selection.ElitistSelectionStrate
 import org.mechaverse.simulation.common.genetic.selection.SelectionStrategy;
 import org.mechaverse.simulation.common.genetic.selection.TournamentSelectionStrategy;
 import org.mechaverse.simulation.experimental.simple.SimpleSimulation;
-import org.mechaverse.simulation.experimental.simple.SimpleSimulationModel;
-import org.mechaverse.simulation.experimental.simple.SimpleSimulationState;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,16 +46,15 @@ public class SimpleAntSimulation {
     }
   }
 
-  private static class Simulation extends SimpleSimulation<SimpleAntEntity, SimpleSimulationModel> {
+  private static class Simulation extends SimpleSimulation<SimpleAntEntity, SimulationModel> {
 
-    public Simulation(SimpleSimulationConfig<SimpleAntEntity, SimpleSimulationModel> config) {
-      super(new SimpleSimulationState<>(new SimpleSimulationModel(),
-          SimpleSimulationModel.SERIALIZER), config);
+    public Simulation(SimpleSimulationConfig<SimpleAntEntity, SimulationModel> config) {
+      super(new SimulationModel(), config);
     }
   }
 
   public static void main(String[] args) throws Exception {
-    SimpleSimulationConfig.Builder<SimpleAntEntity, SimpleSimulationModel> configBuilder =
+    SimpleSimulationConfig.Builder<SimpleAntEntity, SimulationModel> configBuilder =
         new SimpleSimulationConfig.Builder<>();
     SelectionStrategy<SimpleAntEntity> selectionStrategy = new ElitistSelectionStrategy<>(
         RETAIN_TOP_ENTITY_COUNT, REMOVE_BOTTOM_ENTITY_COUNT,

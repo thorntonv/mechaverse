@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
+import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.experimental.simple.SimpleCellularAutomatonEntity;
 import org.mechaverse.simulation.experimental.simple.SimpleSimulationConfig;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticData;
@@ -16,8 +17,6 @@ import org.mechaverse.simulation.common.genetic.selection.ElitistSelectionStrate
 import org.mechaverse.simulation.common.genetic.selection.SelectionStrategy;
 import org.mechaverse.simulation.common.genetic.selection.TournamentSelectionStrategy;
 import org.mechaverse.simulation.experimental.simple.SimpleSimulation;
-import org.mechaverse.simulation.experimental.simple.SimpleSimulationModel;
-import org.mechaverse.simulation.experimental.simple.SimpleSimulationState;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -86,16 +85,15 @@ public class SequentialPatternSimulation {
   }
 
   private static class Simulation
-      extends SimpleSimulation<SequentialPatternEntity, SimpleSimulationModel> {
+      extends SimpleSimulation<SequentialPatternEntity, SimulationModel> {
 
-    public Simulation(SimpleSimulationConfig<SequentialPatternEntity, SimpleSimulationModel> config) {
-      super(new SimpleSimulationState<>(new SimpleSimulationModel(),
-          SimpleSimulationModel.SERIALIZER), config);
+    public Simulation(SimpleSimulationConfig<SequentialPatternEntity, SimulationModel> config) {
+      super(new SimulationModel(), config);
     }
   }
 
   public static void main(String[] args) throws Exception {
-    SimpleSimulationConfig.Builder<SequentialPatternEntity, SimpleSimulationModel> configBuilder =
+    SimpleSimulationConfig.Builder<SequentialPatternEntity, SimulationModel> configBuilder =
         new SimpleSimulationConfig.Builder<>();
     SelectionStrategy<SequentialPatternEntity> selectionStrategy =
         new ElitistSelectionStrategy<>(RETAIN_TOP_ENTITY_COUNT, REMOVE_BOTTOM_ENTITY_COUNT,

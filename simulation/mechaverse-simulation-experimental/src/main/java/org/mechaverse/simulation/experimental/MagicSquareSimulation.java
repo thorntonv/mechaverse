@@ -1,10 +1,11 @@
 package org.mechaverse.simulation.experimental;
 
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
-import org.mechaverse.simulation.experimental.simple.SimpleCellularAutomatonEntity;
-import org.mechaverse.simulation.experimental.simple.SimpleSimulationConfig;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticData;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticData.CellGeneticData;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorBuilder;
@@ -13,13 +14,10 @@ import org.mechaverse.simulation.common.cellautomaton.simulation.LogicalUnitBuil
 import org.mechaverse.simulation.common.genetic.selection.ElitistSelectionStrategy;
 import org.mechaverse.simulation.common.genetic.selection.SelectionStrategy;
 import org.mechaverse.simulation.common.genetic.selection.TournamentSelectionStrategy;
+import org.mechaverse.simulation.common.model.SimulationModel;
+import org.mechaverse.simulation.experimental.simple.SimpleCellularAutomatonEntity;
 import org.mechaverse.simulation.experimental.simple.SimpleSimulation;
-import org.mechaverse.simulation.experimental.simple.SimpleSimulationModel;
-import org.mechaverse.simulation.experimental.simple.SimpleSimulationState;
-
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import org.mechaverse.simulation.experimental.simple.SimpleSimulationConfig;
 
 /**
  * A simulation to find magic squares.
@@ -113,16 +111,15 @@ public class MagicSquareSimulation {
   }
 
   private static class Simulation
-      extends SimpleSimulation<MagicSquareEntity, SimpleSimulationModel> {
+      extends SimpleSimulation<MagicSquareEntity, SimulationModel> {
 
-    public Simulation(SimpleSimulationConfig<MagicSquareEntity, SimpleSimulationModel> config) {
-      super(new SimpleSimulationState<>(new SimpleSimulationModel(),
-          SimpleSimulationModel.SERIALIZER), config);
+    public Simulation(SimpleSimulationConfig<MagicSquareEntity, SimulationModel> config) {
+      super(new SimulationModel(), config);
     }
   }
 
   public static void main(String[] args) throws Exception {
-    SimpleSimulationConfig.Builder<MagicSquareEntity, SimpleSimulationModel> configBuilder =
+    SimpleSimulationConfig.Builder<MagicSquareEntity, SimulationModel> configBuilder =
         new SimpleSimulationConfig.Builder<>();
     SelectionStrategy<MagicSquareEntity> selectionStrategy =
         new ElitistSelectionStrategy<>(RETAIN_TOP_ENTITY_COUNT, REMOVE_BOTTOM_ENTITY_COUNT,

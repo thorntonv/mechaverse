@@ -1,12 +1,18 @@
 package org.mechaverse.simulation.experimental.simple;
 
+import static org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_STATE_KEY;
+import static org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator.OUTPUT_MAP_KEY;
+
+import com.google.common.collect.Sets;
+import gnu.trove.map.TObjectDoubleMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
+import java.util.function.Function;
+import java.util.function.Supplier;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
 import org.apache.commons.math3.util.Pair;
@@ -17,18 +23,13 @@ import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonM
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.SimulatorCellularAutomaton;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel;
-import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 import org.mechaverse.simulation.common.genetic.GeneticData;
 import org.mechaverse.simulation.common.genetic.GeneticDataStore;
 import org.mechaverse.simulation.common.genetic.GeneticRecombinator;
 import org.mechaverse.simulation.common.genetic.selection.SelectionStrategy;
 import org.mechaverse.simulation.common.genetic.selection.SelectionUtil;
+import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.common.util.ArrayUtil;
-
-import java.util.function.Function;
-import java.util.function.Supplier;
-
-import gnu.trove.map.TObjectDoubleMap;
 
 /**
  * A base class for simple simulations.
@@ -38,10 +39,8 @@ import gnu.trove.map.TObjectDoubleMap;
  * @param <E> the entity type
  * @param <M> the model type
  */
-public class SimpleSimulation<E extends SimpleCellularAutomatonEntity, M> implements Simulation {
-
-  public static final String AUTOMATON_STATE_KEY = "cellularAutomatonState";
-  public static final String AUTOMATON_OUTPUT_MAP_KEY = "cellularAutomatonOutputMap";
+@SuppressWarnings("WeakerAccess")
+public class SimpleSimulation<E extends SimpleCellularAutomatonEntity, M extends SimulationModel> implements Simulation<M> {
 
   private final CellularAutomatonSimulationModel cellularAutomatonModel;
   private final CellularAutomatonSimulator simulator;
@@ -59,10 +58,10 @@ public class SimpleSimulation<E extends SimpleCellularAutomatonEntity, M> implem
   private final List<E> entities = new LinkedList<>();
   private final Map<E, Integer> entityIndexMap = new IdentityHashMap<>();
   private final RandomGenerator random = new Well19937c();
-  private final SimpleSimulationState<M> state;
+  private final M state;
   private final SimpleSimulationLogger<E, M> simulationLogger;
 
-  public SimpleSimulation(SimpleSimulationState<M> state, SimpleSimulationConfig<E, M> config) {
+  public SimpleSimulation(M state, SimpleSimulationConfig<E, M> config) {
     this.state = state;
     this.cellularAutomatonModel = config.getCellularAutomatonModel();
     this.simulator = config.getSimulator();
@@ -78,17 +77,17 @@ public class SimpleSimulation<E extends SimpleCellularAutomatonEntity, M> implem
   }
 
   @Override
-  public SimulationDataStore getState() {
+  public M getState() {
     return state;
   }
 
   @Override
-  public void setState(SimulationDataStore stateDataStore) {
+  public void setState(M model) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public SimulationDataStore generateRandomState() {
+  public M generateRandomState() {
     throw new UnsupportedOperationException();
   }
 
@@ -132,7 +131,7 @@ public class SimpleSimulation<E extends SimpleCellularAutomatonEntity, M> implem
       }
     }
 
-    simulationLogger.log(state.getIteration(), state.getModel(), entities);
+    simulationLogger.log(state.getIteration(), state, entities);
 
     TObjectDoubleMap<E> entityFitnessMap =
         SelectionUtil.buildEntityFitnessMap(entities, entityFitnessFunction);
@@ -151,16 +150,11 @@ public class SimpleSimulation<E extends SimpleCellularAutomatonEntity, M> implem
     }
 
     for(E entity : previousGeneration) {
-      state.getEntityDataStore(entity).clear();
-      state.getEntityGeneticDataStore(entity).clear();
+      entity.clearData();
+      entity.getGeneticDataStore().clear();
     }
 
     state.setIteration(state.getIteration() + 1);
-  }
-
-  @Override
-  public String getDeviceInfo() {
-    return simulator.toString();
   }
 
   public List<E> getEntities() {
@@ -189,17 +183,17 @@ public class SimpleSimulation<E extends SimpleCellularAutomatonEntity, M> implem
     E parent2 = parents.getSecond();
 
     // Get the parents genetic information.
-    GeneticDataStore parent1GeneticDataStore = state.getEntityGeneticDataStore(parent1);
+    GeneticDataStore parent1GeneticDataStore = parent1.getGeneticDataStore();
     GeneticDataStore parent2GeneticDataStore =
-        (parent2 != null) ? state.getEntityGeneticDataStore(parent2) : null;
+        (parent2 != null) ? parent2.getGeneticDataStore() : null;
 
-    GeneticDataStore childGeneticDataStore = state.getEntityGeneticDataStore(entity);
-    for (String key : parent1GeneticDataStore.keySet()) {
+    GeneticDataStore childGeneticDataStore = entity.getGeneticDataStore();
+    for (String key : Sets.newHashSet(CELLULAR_AUTOMATON_STATE_KEY, OUTPUT_MAP_KEY)) {
       GeneticData parent1GeneticData = parent1GeneticDataStore.get(key);
       GeneticData childData = parent1GeneticData;
       if (parent2 != null) {
         GeneticData parent2GeneticData = parent2GeneticDataStore.get(key);
-        if(AUTOMATON_STATE_KEY.equals(key)) {
+        if(CELLULAR_AUTOMATON_STATE_KEY.equals(key)) {
           childData = cellularAutomatonGeneticRecombinator.recombine(
               parent1GeneticData, parent2GeneticData, random);
         } else {
@@ -215,25 +209,24 @@ public class SimpleSimulation<E extends SimpleCellularAutomatonEntity, M> implem
   }
 
   private void generateGeneticData(E entity) {
-    GeneticDataStore geneticDataStore = state.getEntityGeneticDataStore(entity);
+    GeneticDataStore geneticDataStore = new GeneticDataStore(entity);
     geneticDataGenerator.generateGeneticData(geneticDataStore, cellularAutomatonModel,
         simulator.getAutomatonOutputSize(), random);
   }
 
   private void initializeCellularAutomaton(E entity) {
-    SimulationDataStore dataStore = state.getEntityDataStore(entity);
-    GeneticDataStore geneticDataStore = state.getEntityGeneticDataStore(entity);
+    GeneticDataStore geneticDataStore = entity.getGeneticDataStore();
     int automatonIndex = entityIndexMap.get(entity);
 
     // Cellular automaton state.
     int[] automatonState = geneticDataGenerator.getCellularAutomatonState(geneticDataStore);
     simulator.setAutomatonState(automatonIndex, automatonState);
-    dataStore.put(AUTOMATON_STATE_KEY, ArrayUtil.toByteArray(automatonState));
+    entity.putData(CELLULAR_AUTOMATON_STATE_KEY, ArrayUtil.toByteArray(automatonState));
 
     // Cellular automaton output map.
     int[] outputMap = geneticDataGenerator.getOutputMap(geneticDataStore);
     simulator.setAutomatonOutputMap(automatonIndex, outputMap);
-    dataStore.put(AUTOMATON_OUTPUT_MAP_KEY, ArrayUtil.toByteArray(outputMap));
+    entity.putData(OUTPUT_MAP_KEY, ArrayUtil.toByteArray(outputMap));
 
     entity.setCellularAutomatonModel(cellularAutomatonModel);
     entity.setGeneticDataStore(geneticDataStore);

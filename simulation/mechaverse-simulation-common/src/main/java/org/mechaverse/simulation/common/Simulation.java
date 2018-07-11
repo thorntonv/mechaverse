@@ -1,26 +1,26 @@
 package org.mechaverse.simulation.common;
 
-import org.mechaverse.simulation.common.datastore.SimulationDataStore;
+import org.mechaverse.simulation.common.model.SimulationModel;
 
 /**
  * Interface for a mechaverse simulation.
  */
-public interface Simulation {
+public interface Simulation<SIM_MODEL extends SimulationModel> {
 
   /**
    * Returns the state of the simulation.
    */
-  SimulationDataStore getState();
+  SIM_MODEL getState();
 
   /**
    * Sets the state of the simulation.
    */
-  void setState(SimulationDataStore stateDataStore) throws Exception;
+  void setState(SIM_MODEL model) throws Exception;
 
   /**
    * Generates a random state.
    */
-  SimulationDataStore generateRandomState();
+  SIM_MODEL generateRandomState();
 
   /**
    * Performs one or more iterations.
@@ -32,8 +32,4 @@ public interface Simulation {
    */
   void step(int stepCount, double targetFitness);
 
-  /**
-   * Returns a string with information about the device used by the simulation.
-   */
-  String getDeviceInfo();
 }

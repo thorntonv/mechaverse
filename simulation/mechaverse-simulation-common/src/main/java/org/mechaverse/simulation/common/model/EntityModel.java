@@ -1,5 +1,7 @@
 package org.mechaverse.simulation.common.model;
 
+import java.util.HashMap;
+import java.util.Map;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -9,8 +11,8 @@ import java.io.Serializable;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "EntityModel", namespace = "http://www.mechaverse.org/simulation/api/model",
-    propOrder = {"id", "x", "y", "energy", "maxEnergy", "age", "direction"})
-public abstract class EntityModel implements Serializable {
+    propOrder = {"id", "x", "y", "energy", "maxEnergy", "age", "direction", "data"})
+public class EntityModel implements Serializable {
 
   private final static long serialVersionUID = -1L;
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model")
@@ -27,6 +29,8 @@ public abstract class EntityModel implements Serializable {
   private long age;
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model")
   protected Direction direction;
+
+  private Map<String, byte[]> data = new HashMap<>();
 
   public EntityModel() {}
 
@@ -140,4 +144,23 @@ public abstract class EntityModel implements Serializable {
     this.direction = value;
   }
 
+  public byte[] getData(String key) {
+    return data.get(key);
+  }
+
+  public void putData(String key, byte[] value) {
+    data.put(key, value);
+  }
+
+  public void removeData(String key) {
+    data.remove(key);
+  }
+
+  public void clearData() {
+    data.clear();
+  }
+
+  public boolean dataContainsKey(String key) {
+    return data.containsKey(key);
+  }
 }

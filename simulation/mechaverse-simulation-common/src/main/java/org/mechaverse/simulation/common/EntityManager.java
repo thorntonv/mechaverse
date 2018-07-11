@@ -1,22 +1,29 @@
 package org.mechaverse.simulation.common;
 
 import org.mechaverse.simulation.common.model.EntityModel;
+import org.mechaverse.simulation.common.model.SimulationModel;
 
 /**
  * An interface for managing the addition and removal of entities from an environment.
  */
 @SuppressWarnings("unused")
-public interface EntityManager<M, S extends SimulationState<M>> {
+public interface EntityManager<
+    SIM_MODEL extends SimulationModel,
+    ENT_MODEL extends EntityModel> {
 
-  interface Observer<M, S extends SimulationState<M>> {
+  interface Observer<SIM_MODEL extends SimulationModel, ENT_MODEL extends EntityModel> {
 
-    void onAddEntity(EntityModel entity, S state);
-    void onRemoveEntity(EntityModel entity, S state);
+    void onAddEntity(ENT_MODEL entity, SIM_MODEL state);
+    void onRemoveEntity(ENT_MODEL entity, SIM_MODEL state);
   }
 
-  void addEntity(EntityModel entity);
-  void removeEntity(EntityModel entity);
+  void addEntity(ENT_MODEL entity);
+  void removeEntity(ENT_MODEL entity);
 
-  void addObserver(EntityManager.Observer<M, S> observer);
-  void removeObserver(EntityManager.Observer<M, S> observer);
+  void addObserver(EntityManager.Observer<SIM_MODEL, ENT_MODEL> observer);
+  void removeObserver(EntityManager.Observer<SIM_MODEL, ENT_MODEL> observer);
+
+//  ENT_TYPE getType(ENT_MODEL entity);
+//
+//  ENT_TYPE[] getTypeValues();
 }

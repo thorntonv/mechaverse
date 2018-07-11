@@ -1,4 +1,4 @@
-package org.mechaverse.simulation.ant.core;
+package org.mgetRowCountechaverse.simulation.ant.core;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.common.model.EnvironmentModel;
 import org.mechaverse.simulation.ant.core.model.Nest;
 import org.mechaverse.simulation.ant.core.entity.EntityUtil;
-import org.mechaverse.simulation.common.cellautomaton.AbstractProbabilisticEnvironmentGenerator;
+import org.mechaverse.simulation.common.AbstractProbabilisticEnvironmentModelGenerator;
 import org.mechaverse.simulation.common.util.RandomUtil;
 
 import java.util.function.Function;
@@ -24,7 +24,7 @@ import com.google.common.collect.ImmutableTable;
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public class AntSimulationEnvironmentGenerator
-    extends AbstractProbabilisticEnvironmentGenerator<CellEnvironment, EntityType> {
+    extends AbstractProbabilisticEnvironmentModelGenerator<CellEnvironment, EntityType> {
 
   private final EntityManager entityManager;
   private final Function<EntityType, EntityModel> entityFactory;
@@ -68,7 +68,7 @@ public class AntSimulationEnvironmentGenerator
   }
 
   @Override
-  protected void addEntity(EntityType entityType, int row, int column, CellEnvironment env) {
+  protected EntityModel addEntity(EntityType entityType, int row, int column, CellEnvironment env) {
     if (env.hasCell(row, column)) {
       Cell cell = env.getCell(row, column);
 
@@ -84,8 +84,8 @@ public class AntSimulationEnvironmentGenerator
 
   private Cell getRandomEmptyCell(CellEnvironment env, RandomGenerator random) {
     List<Cell> emptyCells = new ArrayList<>();
-    for (int row = 0; row < env.getRowCount(); row++) {
-      for (int col = 0; col < env.getColumnCount(); col++) {
+    for (int row = 0; row < env.getHeight(); row++) {
+      for (int col = 0; col < env.getWidth(); col++) {
         Cell cell = env.getCell(row, col);
         if (cell.isEmpty()) {
           emptyCells.add(cell);
