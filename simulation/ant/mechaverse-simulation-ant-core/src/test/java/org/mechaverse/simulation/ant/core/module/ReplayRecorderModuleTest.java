@@ -12,7 +12,7 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.Before;
 import org.junit.Test;
 import org.mechaverse.simulation.ant.core.AntSimulationEnvironmentGenerator;
-import org.mechaverse.simulation.ant.core.CellEnvironment;
+import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.common.util.RandomUtil;
 

@@ -6,17 +6,20 @@ import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.math3.random.RandomGenerator;
+import org.mechaverse.simulation.ant.core.AbstractAntEnvironmentBehavior;
+import org.mechaverse.simulation.ant.core.model.AntSimulationModel;
 import org.mechaverse.simulation.ant.core.util.AntSimulationModelUtil;
 import org.mechaverse.simulation.common.model.EntityModel;
-import org.mechaverse.simulation.ant.core.CellEnvironment;
+import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.common.EntityManager;
 
 /**
- * An {@link AntSimulationModule} that replays data recorded by the {@link ReplayRecorderModule}.
+ * An {@link org.mechaverse.simulation.common.EnvironmentBehavior} that replays data recorded by
+ * the {@link ReplayRecorderModule}.
  *
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
-public class ReplayModule implements AntSimulationModule {
+public class ReplayModule extends AbstractAntEnvironmentBehavior {
 
   public static final String INITIAL_MODEL_KEY = "initialModel";
   public static final String RANDOM_SEED_DATA_KEY = "randomSeeds";
@@ -24,13 +27,7 @@ public class ReplayModule implements AntSimulationModule {
   private DataInputStream seedDataIn;
 
   @Override
-  public void onAddEntity(EntityModel entity, AntSimulationState state) {}
-
-  @Override
-  public void onRemoveEntity(EntityModel entity, AntSimulationState state) {}
-
-  @Override
-  public void setState(AntSimulationState state, CellEnvironment env, EntityManager entityManager) {
+  public void setState(AntSimulationModel state, CellEnvironment env, EntityManager entityManager) {
     try {
       // Load the model from the initial state.
       byte[] modelData = state.getReplayDataStore().get(INITIAL_MODEL_KEY);
@@ -46,27 +43,15 @@ public class ReplayModule implements AntSimulationModule {
   }
 
   @Override
-  public void updateState(AntSimulationState state, CellEnvironment env,
-      EntityManager entityManager) {}
-
-  @Override
-  public void beforeUpdate(AntSimulationState state, CellEnvironment env,
+  public void beforeUpdate(AntSimulationModel model, CellEnvironment env,
       EntityManager entityManager, RandomGenerator random) {
     // Load the seed from the replay data.
     try {
       long seed = seedDataIn.readLong();
       random.setSeed(seed);
-      state.getModel().setSeed(String.valueOf(seed));
+      model.setSeed(String.valueOf(seed));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
-
-  @Override
-  public void beforePerformAction(AntSimulationState state, CellEnvironment env,
-      EntityManager entityManager, RandomGenerator random) {}
-
-  @Override
-  public void afterUpdate(AntSimulationState state, CellEnvironment env,
-      EntityManager entityManager, RandomGenerator random) {}
 }

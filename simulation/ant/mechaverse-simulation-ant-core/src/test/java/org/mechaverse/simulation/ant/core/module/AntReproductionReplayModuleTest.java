@@ -17,7 +17,7 @@ import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.AntSimulationEnvironmentGenerator;
-import org.mechaverse.simulation.ant.core.CellEnvironment;
+import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.ant.core.entity.EntityDataOutputStream;
 import org.mechaverse.simulation.common.util.RandomUtil;

@@ -50,7 +50,7 @@ public class EntityReproductionModule extends PrimordialEnvironmentBehavior {
         PrimordialCellModel cell = env.getCell(row, col);
         if (cell.getEntity(EntityType.ENTITY) == null) {
           PrimordialEntityModel entity = generateRandomEntity(state, random);
-          cell.setEntity(entity, EntityType.ENTITY);
+          cell.setEntity(entity);
           entityManager.addEntity(entity);
         }
       }

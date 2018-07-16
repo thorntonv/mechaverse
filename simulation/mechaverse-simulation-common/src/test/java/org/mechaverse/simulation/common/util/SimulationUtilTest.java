@@ -13,6 +13,11 @@ import org.mechaverse.simulation.common.model.EntityModel;
 public class SimulationUtilTest {
 
   private static class TestEntityModel extends EntityModel {
+
+    @Override
+    public Enum getType() {
+      return null;
+    }
   }
 
   @Test

@@ -8,8 +8,8 @@ import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.EnvironmentModel;
 import org.mechaverse.simulation.ant.core.model.Food;
 import org.mechaverse.simulation.ant.core.model.Rock;
-import org.mechaverse.simulation.ant.core.Cell;
-import org.mechaverse.simulation.ant.core.CellEnvironment;
+import org.mechaverse.simulation.ant.core.model.Cell;
+import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;

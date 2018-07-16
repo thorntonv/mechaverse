@@ -18,9 +18,9 @@ import org.mechaverse.simulation.common.model.SimulationModel;
  * Simulates an environment.
  */
 public abstract class AbstractEnvironment<
-    SIM_MODEL extends SimulationModel,
-    ENV_MODEL extends EnvironmentModel,
-    ENT_MODEL extends EntityModel,
+    SIM_MODEL extends SimulationModel<ENV_MODEL, ENT_MODEL, ENT_TYPE>,
+    ENV_MODEL extends EnvironmentModel<ENT_MODEL, ENT_TYPE>,
+    ENT_MODEL extends EntityModel<ENT_TYPE>,
     ENT_TYPE extends Enum<ENT_TYPE>,
     ENT extends Entity<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE>>
     implements Environment<SIM_MODEL, ENV_MODEL, ENT_MODEL>, EntityManager<SIM_MODEL, ENT_MODEL>, AutoCloseable {
@@ -78,10 +78,9 @@ public abstract class AbstractEnvironment<
       behavior.setState(simulationModel, environmentModel, this);
     }
 
-    this.environmentModel = getEnvironmentModel(simulationModel, environmentId);
+    this.environmentModel = simulationModel.getEnvironment(environmentId);
 
-    List<ENT_MODEL> entityModels = getEntities(environmentModel);
-    for (ENT_MODEL entityModel : entityModels) {
+    for (ENT_MODEL entityModel : environmentModel.getEntities()) {
       addEntity(entityModel);
     }
 
@@ -135,7 +134,7 @@ public abstract class AbstractEnvironment<
   }
 
   public Iterable<ENT_MODEL> getEntities() {
-    return Iterables.unmodifiableIterable(getEntities(environmentModel));
+    return Iterables.unmodifiableIterable(environmentModel.getEntities());
   }
 
   @Override
@@ -166,7 +165,4 @@ public abstract class AbstractEnvironment<
     }
     activeEntities.clear();
   }
-
-  protected abstract ENV_MODEL getEnvironmentModel(SIM_MODEL simulationModel, String environmentId);
-  protected abstract List<ENT_MODEL> getEntities(ENV_MODEL environmentModel);
 }

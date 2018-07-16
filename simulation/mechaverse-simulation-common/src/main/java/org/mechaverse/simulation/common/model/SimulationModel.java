@@ -1,30 +1,26 @@
 package org.mechaverse.simulation.common.model;
 
-import java.util.HashMap;
-import java.util.Map;
-import javax.xml.bind.annotation.*;
-import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.Lists;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "SimulationModel", namespace = "http://www.mechaverse.org/simulation/api/model",
-    propOrder = {"id", "environment", "subEnvironments", "iteration", "seed", "data"})
-@XmlRootElement(name = "SimulationModel", namespace = "http://www.mechaverse.org/simulation/api/model")
-public class SimulationModel implements Serializable {
+public class SimulationModel<
+    ENV_MODEL extends EnvironmentModel<ENT_MODEL, ENT_TYPE>,
+    ENT_MODEL extends EntityModel<ENT_TYPE>,
+    ENT_TYPE extends Enum<ENT_TYPE>> {
 
-  private final static long serialVersionUID = -1L;
-  @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model", required = true)
   protected String id;
-  @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model", required = true)
-  protected EnvironmentModel environment;
-  @XmlElement(name = "sub_environment", namespace = "http://www.mechaverse.org/simulation/api/model")
-  private List<EnvironmentModel> subEnvironments;
-  @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model")
+  protected ENV_MODEL environment;
+  private List<ENV_MODEL> subEnvironments;
   protected long iteration;
-  @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model", required = true)
   private String seed;
+  @JsonProperty
   private Map<String, byte[]> data = new HashMap<>();
 
   public SimulationModel() {}
@@ -55,7 +51,7 @@ public class SimulationModel implements Serializable {
    * @return possible object is
    * {@link EnvironmentModel }
    */
-  public EnvironmentModel getEnvironment() {
+  public ENV_MODEL getEnvironment() {
     return environment;
   }
 
@@ -65,7 +61,7 @@ public class SimulationModel implements Serializable {
    * @param value allowed object is
    *              {@link EnvironmentModel }
    */
-  public void setEnvironment(EnvironmentModel value) {
+  public void setEnvironment(ENV_MODEL value) {
     this.environment = value;
   }
 
@@ -89,7 +85,7 @@ public class SimulationModel implements Serializable {
    * Objects of the following type(s) are allowed in the list
    * {@link EnvironmentModel }
    */
-  public List<EnvironmentModel> getSubEnvironments() {
+  public List<ENV_MODEL> getSubEnvironments() {
     if (subEnvironments == null) {
       subEnvironments = new ArrayList<>();
     }
@@ -140,5 +136,33 @@ public class SimulationModel implements Serializable {
 
   public boolean dataContainsKey(String key) {
     return data.containsKey(key);
+  }
+
+  @JsonIgnore
+  public ENV_MODEL getEnvironment(String environmentId) {
+    if (environmentId == null) {
+      return null;
+    }
+    ENV_MODEL env = getEnvironment();
+    if (env != null && environmentId.equalsIgnoreCase(env.getId())) {
+      return env;
+    }
+    for (ENV_MODEL subEnvironment : getSubEnvironments()) {
+      if (subEnvironment != null && environmentId.equalsIgnoreCase(subEnvironment.getId())) {
+        return subEnvironment;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * @return a list of the environments in the given state
+   */
+  @JsonIgnore
+  public Collection<ENV_MODEL> getEnvironments() {
+    List<ENV_MODEL> environments = Lists.newArrayList();
+    environments.add(getEnvironment());
+    environments.addAll(getSubEnvironments());
+    return environments;
   }
 }

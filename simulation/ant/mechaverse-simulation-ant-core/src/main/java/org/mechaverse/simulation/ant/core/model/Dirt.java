@@ -9,9 +9,14 @@ import java.io.Serializable;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Dirt", namespace = "http://www.mechaverse.org/simulation/ant/api/model")
-public class Dirt extends EntityModel implements Serializable {
+public class Dirt extends EntityModel<EntityType> implements Serializable {
 
   private final static long serialVersionUID = -1L;
 
   public Dirt() {}
+
+  @Override
+  public EntityType getType() {
+    return EntityType.DIRT;
+  }
 }

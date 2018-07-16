@@ -10,7 +10,7 @@ import java.io.Serializable;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Pheromone", namespace = "http://www.mechaverse.org/simulation/ant/api/model", propOrder = {"value"})
-public class Pheromone extends EntityModel implements Serializable {
+public class Pheromone extends EntityModel<EntityType> implements Serializable {
 
   private final static long serialVersionUID = -1L;
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/ant/api/model")
@@ -32,4 +32,8 @@ public class Pheromone extends EntityModel implements Serializable {
     this.value = value;
   }
 
+  @Override
+  public EntityType getType() {
+    return EntityType.PHEROMONE;
+  }
 }

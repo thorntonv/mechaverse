@@ -7,22 +7,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.math3.random.RandomGenerator;
+import org.mechaverse.simulation.ant.core.AbstractAntEnvironmentBehavior;
+import org.mechaverse.simulation.ant.core.model.AntSimulationModel;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.ant.core.model.EntityType;
-import org.mechaverse.simulation.ant.core.Cell;
-import org.mechaverse.simulation.ant.core.CellEnvironment;
+import org.mechaverse.simulation.ant.core.model.Cell;
+import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.ant.core.entity.EntityDataInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An {@link AntSimulationModule} that replays ant generation data recorded by the
- * {@link ReplayRecorderModule}.
+ * An {@link org.mechaverse.simulation.common.EnvironmentBehavior} that replays ant generation data
+ * recorded by the {@link ReplayRecorderModule}.
  *
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
-public class AntReproductionReplayModule implements AntSimulationModule {
+public class AntReproductionReplayModule extends AbstractAntEnvironmentBehavior {
 
   public static final String ANT_GENERATION_DATA_KEY = "antGeneration";
 
@@ -33,24 +35,14 @@ public class AntReproductionReplayModule implements AntSimulationModule {
   private EntityDataInputStream antGenerationReplayDataIn;
 
   @Override
-  public void onAddEntity(EntityModel entity, AntSimulationState state) {}
-
-  @Override
-  public void onRemoveEntity(EntityModel entity, AntSimulationState state) {}
-
-  @Override
-  public void setState(AntSimulationState state, CellEnvironment env, EntityManager entityManager) {
+  public void setState(AntSimulationModel state, CellEnvironment env, EntityManager entityManager) {
     byte[] generationData = state.getReplayDataStore().get(ANT_GENERATION_DATA_KEY);
     antGenerationReplayDataIn = new EntityDataInputStream(new ByteArrayInputStream(generationData));
   }
 
   @Override
-  public void updateState(AntSimulationState state, CellEnvironment env,
-      EntityManager entityManager) {}
-
-  @Override
-  public void beforeUpdate(AntSimulationState state, CellEnvironment env,
-      EntityManager entityManager, RandomGenerator random) {
+  public void beforeUpdate(AntSimulationModel state, CellEnvironment env,
+      EntityManager<AntSimulationModel, EntityModel<EntityType>> entityManager, RandomGenerator random) {
     if (antGenerationReplayDataIn != null) {
       try {
         if (nextAnts == null) {
@@ -65,7 +57,7 @@ public class AntReproductionReplayModule implements AntSimulationModule {
           for (EntityModel entity : nextAnts) {
             logger.debug("Generated ant {}", entity.getId());
             Cell cell = env.getCell(entity.getY(), entity.getX());
-            cell.setEntity(entity, EntityType.ANT);
+            cell.setEntity(entity);
             entityManager.addEntity(entity);
           }
           nextAnts = null;
@@ -78,12 +70,4 @@ public class AntReproductionReplayModule implements AntSimulationModule {
       }
     }
   }
-
-  @Override
-  public void beforePerformAction(AntSimulationState state, CellEnvironment env,
-      EntityManager entityManager, RandomGenerator random) {}
-
-  @Override
-  public void afterUpdate(AntSimulationState state, CellEnvironment env,
-      EntityManager entityManager, RandomGenerator random) {}
 }

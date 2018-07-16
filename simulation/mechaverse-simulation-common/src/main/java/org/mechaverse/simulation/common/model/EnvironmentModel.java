@@ -1,26 +1,21 @@
 package org.mechaverse.simulation.common.model;
 
-import javax.xml.bind.annotation.*;
-import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import java.util.ArrayList;
 import java.util.List;
 
 
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "EnvironmentModel", namespace = "http://www.mechaverse.org/simulation/api/model",
-    propOrder = {"id", "width", "height", "entities"})
-@XmlRootElement(name = "EnvironmentModel", namespace = "http://www.mechaverse.org/simulation/api/model")
-public class EnvironmentModel implements Serializable {
+@JsonTypeInfo(use=Id.NAME)
+public abstract class EnvironmentModel<
+    ENT_MODEL extends EntityModel<ENT_TYPE>,
+    ENT_TYPE extends Enum<ENT_TYPE>> {
 
-  private final static long serialVersionUID = -1L;
-  @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model", required = true)
-  protected String id;
-  @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model")
-  protected int width;
-  @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model")
-  protected int height;
-  @XmlElement(name = "entity", namespace = "http://www.mechaverse.org/simulation/api/model")
-  protected List<EntityModel> entities = new ArrayList<>();
+  private String id;
+  private int width;
+  private int height;
+  private List<ENT_MODEL> entities;
 
   public EnvironmentModel() {}
 
@@ -92,11 +87,13 @@ public class EnvironmentModel implements Serializable {
    * Objects of the following type(s) are allowed in the list
    * {@link EntityModel }
    */
-  public List<? extends EntityModel> getEntities() {
+  public List<ENT_MODEL> getEntities() {
     if (entities == null) {
       entities = new ArrayList<>();
     }
     return this.entities;
   }
 
+  @JsonIgnore
+  public abstract ENT_TYPE[] getEntityTypes();
 }

@@ -17,9 +17,7 @@ public interface EntityFactory<
 
     /**
      * Creates an {@link Entity} instance for the given entity model. Returns {@link Optional#EMPTY}
-     * if the entity is not an active entity.
+     * if the entity is not an active entity (ie. doesn't have behavior of its own).
      */
     Optional<ENT> create(ENT_MODEL entityModel);
-
-    EntityModel createModel(ENT_TYPE entityType);
 }

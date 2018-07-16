@@ -12,12 +12,15 @@ import java.util.UUID;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.util.Pair;
+import org.mechaverse.simulation.ant.core.AbstractAntEnvironmentBehavior;
 import org.mechaverse.simulation.ant.core.model.Ant;
+import org.mechaverse.simulation.ant.core.model.AntSimulationModel;
+import org.mechaverse.simulation.common.EnvironmentBehavior;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.model.Nest;
-import org.mechaverse.simulation.ant.core.Cell;
-import org.mechaverse.simulation.ant.core.CellEnvironment;
+import org.mechaverse.simulation.ant.core.model.Cell;
+import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.ant.core.entity.EntityDataOutputStream;
 import org.mechaverse.simulation.common.genetic.CutAndSpliceCrossoverGeneticRecombinator;
@@ -39,7 +42,7 @@ import com.google.common.collect.ImmutableList;
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 @SuppressWarnings("WeakerAccess")
-public class AntReproductionModule implements AntSimulationModule {
+public class AntReproductionModule extends AbstractAntEnvironmentBehavior {
 
   /**
    * Calculates the fitness of a set of ants.
@@ -115,13 +118,13 @@ public class AntReproductionModule implements AntSimulationModule {
   }
 
   @Override
-  public void setState(AntSimulationState state, CellEnvironment env, EntityManager entityManager) {
+  public void setState(AntSimulationModel state, CellEnvironment env, EntityManager entityManager) {
     antGenerationReplayDataByteOut = new ByteArrayOutputStream(64 * 1024);
     antGenerationReplayDataOut = new EntityDataOutputStream(antGenerationReplayDataByteOut);
   }
 
   @Override
-  public void updateState(AntSimulationState state, CellEnvironment env,
+  public void updateState(AntSimulationModel state, CellEnvironment env,
       EntityManager entityManager) {
     // Store the ant generation data.
     state.getReplayDataStore().put(AntReproductionReplayModule.ANT_GENERATION_DATA_KEY,
@@ -129,7 +132,7 @@ public class AntReproductionModule implements AntSimulationModule {
   }
 
   @Override
-  public void beforeUpdate(AntSimulationState state, CellEnvironment env,
+  public void beforeUpdate(AntSimulationModel state, CellEnvironment env,
       EntityManager entityManager, RandomGenerator random) {
     if (ants.size() < antMaxCount && nest != null) {
       Cell nestCell = env.getCell(nest);
@@ -150,15 +153,7 @@ public class AntReproductionModule implements AntSimulationModule {
     }
   }
 
-  @Override
-  public void beforePerformAction(AntSimulationState state, CellEnvironment env,
-      EntityManager entityManager, RandomGenerator random) {}
-
-  @Override
-  public void afterUpdate(AntSimulationState state, CellEnvironment env,
-      EntityManager entityManager, RandomGenerator random) {}
-
-  public Ant generateRandomAnt(AntSimulationState state, RandomGenerator random) {
+  public Ant generateRandomAnt(AntSimulationModel state, RandomGenerator random) {
     Ant ant = new Ant();
     ant.setId(new UUID(random.nextLong(), random.nextLong()).toString());
     ant.setDirection(SimulationUtil.randomDirection(random));
@@ -167,7 +162,7 @@ public class AntReproductionModule implements AntSimulationModule {
     return ant;
   }
 
-  public Ant generateAnt(AntSimulationState state, RandomGenerator random) {
+  public Ant generateAnt(AntSimulationModel state, RandomGenerator random) {
     Ant ant = generateRandomAnt(state, random);
 
     Collection<Ant> reproductiveAnts = getReproductiveAnts();
@@ -207,7 +202,7 @@ public class AntReproductionModule implements AntSimulationModule {
   }
 
   @Override
-  public void onAddEntity(EntityModel entity, AntSimulationState state) {
+  public void onAddEntity(EntityModel entity, AntSimulationModel state) {
     if (entity instanceof Ant) {
       ants.add((Ant) entity);
     } else if (entity instanceof Nest) {
@@ -216,7 +211,7 @@ public class AntReproductionModule implements AntSimulationModule {
   }
 
   @Override
-  public void onRemoveEntity(EntityModel entity, AntSimulationState state) {
+  public void onRemoveEntity(EntityModel entity, AntSimulationModel state) {
     if (entity instanceof Ant) {
       ants.remove(entity);
     } else if (entity instanceof Nest) {
@@ -241,7 +236,7 @@ public class AntReproductionModule implements AntSimulationModule {
     return reproductiveAnts;
   }
 
-  private void writeAntGenerationReplayData(List<Ant> ants, AntSimulationState state) {
+  private void writeAntGenerationReplayData(List<Ant> ants, AntSimulationModel state) {
     // Write ant generation replay data.
     if (antGenerationReplayDataOut != null) {
       try {

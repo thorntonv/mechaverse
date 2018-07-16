@@ -10,7 +10,7 @@ import java.io.Serializable;
 @XmlType(name = "Ant", namespace = "http://www.mechaverse.org/simulation/ant/api/model",
     propOrder = {"carriedEntity"})
 @XmlRootElement(name = "Ant", namespace = "http://www.mechaverse.org/simulation/ant/api/model")
-public class Ant extends EntityModel implements Serializable {
+public class Ant extends EntityModel<EntityType> implements Serializable {
 
   private final static long serialVersionUID = -1L;
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/ant/api/model")
@@ -38,4 +38,8 @@ public class Ant extends EntityModel implements Serializable {
     this.carriedEntity = value;
   }
 
+  @Override
+  public EntityType getType() {
+    return EntityType.ANT;
+  }
 }

@@ -11,7 +11,7 @@ import java.io.Serializable;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Conduit", namespace = "http://www.mechaverse.org/simulation/ant/api/model",
     propOrder = {"targetEnvironmentId"})
-public class Conduit extends EntityModel implements Serializable {
+public class Conduit extends EntityModel<EntityType> implements Serializable {
 
   private final static long serialVersionUID = -1L;
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/ant/api/model", required = true)
@@ -39,4 +39,8 @@ public class Conduit extends EntityModel implements Serializable {
     this.targetEnvironmentId = value;
   }
 
+  @Override
+  public EntityType getType() {
+    return EntityType.CONDUIT;
+  }
 }

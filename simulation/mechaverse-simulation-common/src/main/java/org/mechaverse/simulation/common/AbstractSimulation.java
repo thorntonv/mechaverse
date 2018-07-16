@@ -15,9 +15,10 @@ import org.slf4j.LoggerFactory;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
 public abstract class AbstractSimulation<
-    SIM_MODEL extends SimulationModel,
-    ENV_MODEL extends EnvironmentModel,
-    ENT_MODEL extends EntityModel,
+    SIM_MODEL extends SimulationModel<ENV_MODEL, ENT_MODEL, ENT_TYPE>,
+    ENV_MODEL extends EnvironmentModel<ENT_MODEL, ENT_TYPE>,
+    ENT_MODEL extends EntityModel<ENT_TYPE>,
+    ENT_TYPE extends Enum<ENT_TYPE>,
     ENV extends Environment<SIM_MODEL, ENV_MODEL, ENT_MODEL>> implements Simulation<SIM_MODEL> {
 
   private static final int DEFAULT_ENVIRONMENT_WIDTH = 175;
@@ -65,7 +66,7 @@ public abstract class AbstractSimulation<
     }
 
     environments.clear();
-    for (ENV_MODEL environmentModel : getEnvironmentModels(model)) {
+    for (ENV_MODEL environmentModel : model.getEnvironments()) {
       environments.add(environmentFactory.create(environmentModel));
     }
 
@@ -121,8 +122,4 @@ public abstract class AbstractSimulation<
       step();
     }
   }
-
-  protected abstract SIM_MODEL createModel();
-
-  protected abstract List<ENV_MODEL> getEnvironmentModels(SIM_MODEL simulationModel);
 }

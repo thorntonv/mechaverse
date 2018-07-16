@@ -9,9 +9,14 @@ import java.io.Serializable;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Barrier", namespace = "http://www.mechaverse.org/simulation/ant/api/model")
-public class Barrier extends EntityModel implements Serializable {
+public class Barrier extends EntityModel<EntityType> implements Serializable {
 
   private final static long serialVersionUID = -1L;
 
   public Barrier() {}
+
+  @Override
+  public EntityType getType() {
+    return EntityType.BARRIER;
+  }
 }

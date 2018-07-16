@@ -28,6 +28,11 @@ public abstract class SimpleCellularAutomatonEntity extends EntityModel {
     this(UUID.randomUUID().toString());
   }
 
+  @Override
+  public Enum getType() {
+    return null;
+  }
+
   public SimpleCellularAutomatonEntity(String id) {
     this.id = id;
   }

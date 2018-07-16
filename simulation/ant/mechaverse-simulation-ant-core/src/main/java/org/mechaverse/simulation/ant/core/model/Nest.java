@@ -9,9 +9,14 @@ import java.io.Serializable;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Nest", namespace = "http://www.mechaverse.org/simulation/ant/api/model")
-public class Nest extends EntityModel implements Serializable {
+public class Nest extends EntityModel<EntityType> implements Serializable {
 
   private final static long serialVersionUID = -1L;
 
   public Nest() {}
+
+  @Override
+  public EntityType getType() {
+    return EntityType.NEST;
+  }
 }

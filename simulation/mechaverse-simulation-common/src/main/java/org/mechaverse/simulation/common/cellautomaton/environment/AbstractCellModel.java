@@ -7,7 +7,7 @@ import java.util.Map;
 import org.mechaverse.simulation.common.model.EntityModel;
 
 public abstract class AbstractCellModel<
-    ENT_MODEL extends EntityModel,
+    ENT_MODEL extends EntityModel<ENT_TYPE>,
     ENT_TYPE extends Enum<ENT_TYPE>> {
 
   private final int row;
@@ -37,12 +37,9 @@ public abstract class AbstractCellModel<
   }
 
   public void setEntity(ENT_MODEL entity) {
-    setEntity(entity, getType(entity));
-  }
-
-  public void setEntity(ENT_MODEL entity, ENT_TYPE type) {
     entity.setX(column);
     entity.setY(row);
+    ENT_TYPE type = entity.getType();
     entities.put(type, entity);
 
     if (primaryEntityType == null || type.ordinal() <= primaryEntityType.ordinal()) {
@@ -68,7 +65,7 @@ public abstract class AbstractCellModel<
   }
 
   public ENT_MODEL removeEntity(ENT_MODEL entity) {
-    ENT_TYPE type = getType(entity);
+    ENT_TYPE type = entity.getType();
     return entities.get(type) == entity ? removeEntity(type) : null;
   }
 
@@ -104,7 +101,4 @@ public abstract class AbstractCellModel<
     primaryEntityType = null;
     entities.clear();
   }
-
-  protected abstract ENT_TYPE getType(ENT_MODEL entity);
-
 }

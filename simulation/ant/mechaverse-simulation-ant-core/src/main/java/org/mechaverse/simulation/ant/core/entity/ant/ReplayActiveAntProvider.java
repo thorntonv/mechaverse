@@ -1,8 +1,8 @@
 package org.mechaverse.simulation.ant.core.entity.ant;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.mechaverse.simulation.ant.core.CellEnvironment;
-import org.mechaverse.simulation.ant.core.entity.ActiveEntity;
+import org.mechaverse.simulation.ant.core.model.Cell;
+import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.ant.core.entity.ant.ActiveAnt.AntBehavior;
 import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.ant.core.model.EntityType;
@@ -10,6 +10,7 @@ import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.common.model.EntityModel;
 
 import java.io.IOException;
+import org.mechaverse.simulation.common.model.SimulationModel;
 
 /**
  * An {@link ActiveEntityProvider} implementation that provides an ant implementation that replays
@@ -17,11 +18,14 @@ import java.io.IOException;
  *
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
-public class ReplayActiveAntProvider implements ActiveEntityProvider {
+public class ReplayActiveAntProvider implements
+    AbstractActiveEntityProvider<SimulationModel,
+        AntSimulationState, EntityType, Cell, CellEnvironment, ActiveEntity> {
 
   // TODO(thorntonv): Implement unit tests for these classes.
   
-  public static final class ReplayActiveAnt implements ActiveEntity {
+  public static final class ReplayActiveAnt implements
+      org.mechaverse.simulation.common.ActiveEntity<SimulationModel, AntSimulationState, EntityType, Cell, CellEnvironment> {
 
     private final ActiveAnt ant;
 

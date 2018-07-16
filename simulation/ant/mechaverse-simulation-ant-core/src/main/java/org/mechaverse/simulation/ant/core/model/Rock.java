@@ -10,9 +10,14 @@ import java.io.Serializable;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Rock", namespace = "http://www.mechaverse.org/simulation/ant/api/model")
-public class Rock extends EntityModel implements Serializable {
+public class Rock extends EntityModel<EntityType> implements Serializable {
 
   private final static long serialVersionUID = -1L;
 
   public Rock() {}
+
+  @Override
+  public EntityType getType() {
+    return EntityType.ROCK;
+  }
 }

@@ -9,32 +9,30 @@ import org.mechaverse.simulation.common.util.SimulationModelUtil;
 
 @SuppressWarnings("WeakerAccess")
 public abstract class AbstractCellEnvironmentModel<
-    ENT_MODEL extends EntityModel,
+    ENT_MODEL extends EntityModel<ENT_TYPE>,
     ENT_TYPE extends Enum<ENT_TYPE>,
     C extends AbstractCellModel<ENT_MODEL, ENT_TYPE>> extends
-    EnvironmentModel {
+    EnvironmentModel<ENT_MODEL, ENT_TYPE> {
 
   private static final double[] DIRECTION_ANGLES = {
       0, Math.PI / 4, Math.PI / 2, 3 * Math.PI / 4, Math.PI, 5 * Math.PI / 4, 3 * Math.PI / 2,
       7 * Math.PI / 4};
 
   private C[][] cells;
-  private List<ENT_MODEL> entityModels = new ArrayList<>();
-
-  public AbstractCellEnvironmentModel() {
-    initCells();
-  }
 
   public boolean hasCell(int row, int col) {
+    if(cells == null) {
+      initCells();
+    }
     return row >= 0 && col >= 0 && row < cells.length && col < cells[row].length;
   }
 
   public C getCell(int row, int col) {
-    return cells[row][col];
+    return getCells()[row][col];
   }
 
   public C getCell(EntityModel entity) {
-    return cells[entity.getY()][entity.getX()];
+    return getCells()[entity.getY()][entity.getX()];
   }
 
   public C getCellInDirection(C cell, Direction direction) {
@@ -70,7 +68,7 @@ public abstract class AbstractCellEnvironmentModel<
         col++;
         break;
     }
-    return isValidCellCoordinate(row, col) ? cells[row][col] : null;
+    return isValidCellCoordinate(row, col) ? getCells()[row][col] : null;
   }
 
   public int getDistance(C fromCell, C toCell) {
@@ -99,41 +97,44 @@ public abstract class AbstractCellEnvironmentModel<
   }
 
   public void addEntity(ENT_MODEL entity, C cell) {
-    super.entities.add(entity);
     setEntityCell(entity, cell);
   }
 
   public void moveEntityToCell(ENT_TYPE entityType, C fromCell, C targetCell) {
     ENT_MODEL entity = fromCell.removeEntity(entityType);
-    targetCell.setEntity(entity, entityType);
+    targetCell.setEntity(entity);
   }
 
   @Override
   public void setWidth(int value) {
     super.setWidth(value);
-    initCells();
   }
 
   @Override
   public void setHeight(int value) {
     super.setHeight(value);
-    initCells();
   }
 
   public List<ENT_MODEL> getEntities() {
-    entityModels.clear();
-    for (C[] row : cells) {
+    List<ENT_MODEL> entities = new ArrayList<>();
+    for (C[] row : getCells()) {
       for (C cell : row) {
-        List<ENT_MODEL> cellEntities = cell.getEntities();
-        entityModels.addAll(cellEntities);
+        entities.addAll(cell.getEntities());
       }
     }
-    return entityModels;
+    return entities;
   }
 
   protected abstract C[][] createCells();
 
   protected abstract C createCell(int row, int column);
+
+  protected C[][] getCells() {
+    if (cells == null) {
+      initCells();
+    }
+    return cells;
+  }
 
   private void initCells() {
     this.cells = createCells();
@@ -146,7 +147,7 @@ public abstract class AbstractCellEnvironmentModel<
     }
 
     // Add entities to the appropriate cells.
-    for (ENT_MODEL entityModel : getEntities()) {
+    for (ENT_MODEL entityModel : super.getEntities()) {
       setEntityCell(entityModel, getCell(entityModel));
     }
   }
@@ -164,9 +165,9 @@ public abstract class AbstractCellEnvironmentModel<
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    for (C[] row : cells) {
+    for (C[] row : getCells()) {
       for (C cell : row) {
-        for (ENT_TYPE type : getTypeValues()) {
+        for (ENT_TYPE type : getEntityTypes()) {
           if (cell.hasEntity(type)) {
             sb.append(type.name().charAt(0));
           } else {
@@ -180,6 +181,4 @@ public abstract class AbstractCellEnvironmentModel<
     }
     return sb.toString();
   }
-
-  protected abstract ENT_TYPE[] getTypeValues();
 }

@@ -1,35 +1,25 @@
 package org.mechaverse.simulation.common.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import java.util.HashMap;
 import java.util.Map;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
-import java.io.Serializable;
 
 
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "EntityModel", namespace = "http://www.mechaverse.org/simulation/api/model",
-    propOrder = {"id", "x", "y", "energy", "maxEnergy", "age", "direction", "data"})
-public class EntityModel implements Serializable {
+@JsonTypeInfo(use=Id.NAME)
+public abstract class EntityModel<ENT_TYPE extends Enum<ENT_TYPE>> {
 
-  private final static long serialVersionUID = -1L;
-  @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model")
   protected String id;
-  @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model")
   private int x;
-  @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model")
   private int y;
-  @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model")
   private int energy;
-  @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model")
   private int maxEnergy;
-  @XmlElement(namespace = "http://www.mechaverse.org/simulation/ant/api/model")
   private long age;
-  @XmlElement(namespace = "http://www.mechaverse.org/simulation/api/model")
-  protected Direction direction;
+  private Direction direction;
 
+  @JsonProperty
   private Map<String, byte[]> data = new HashMap<>();
 
   public EntityModel() {}
@@ -163,4 +153,8 @@ public class EntityModel implements Serializable {
   public boolean dataContainsKey(String key) {
     return data.containsKey(key);
   }
+
+  @JsonIgnore
+  public abstract ENT_TYPE getType();
+
 }

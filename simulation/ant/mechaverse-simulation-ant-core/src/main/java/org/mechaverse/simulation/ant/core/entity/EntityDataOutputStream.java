@@ -20,7 +20,7 @@ public class EntityDataOutputStream extends DataOutputStream {
   }
 
   public void writeEntity(EntityModel entity) throws IOException {
-    writeShort(EntityUtil.getType(entity).ordinal());
+    writeShort(entity.getType().ordinal());
     writeUTF(entity.getId());
     writeInt(entity.getX());
     writeInt(entity.getY());

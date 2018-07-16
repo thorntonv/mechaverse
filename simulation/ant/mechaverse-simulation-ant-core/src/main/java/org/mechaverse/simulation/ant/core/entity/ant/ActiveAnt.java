@@ -3,9 +3,8 @@ package org.mechaverse.simulation.ant.core.entity.ant;
 import java.io.IOException;
 import java.util.Arrays;
 import org.apache.commons.math3.random.RandomGenerator;
-import org.mechaverse.simulation.ant.core.Cell;
-import org.mechaverse.simulation.ant.core.CellEnvironment;
-import org.mechaverse.simulation.ant.core.entity.ActiveEntity;
+import org.mechaverse.simulation.ant.core.model.Cell;
+import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.ant.core.entity.EntityUtil;
 import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.ant.core.model.EntityType;
@@ -13,6 +12,7 @@ import org.mechaverse.simulation.ant.core.model.Pheromone;
 import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.common.model.EntityModel;
+import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.common.util.SimulationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +23,8 @@ import org.springframework.beans.factory.annotation.Value;
  * the environment and is able to perform actions.
  */
 
-public final class ActiveAnt implements ActiveEntity {
+public final class ActiveAnt implements
+    org.mechaverse.simulation.common.ActiveEntity<SimulationModel, AntSimulationState, EntityType, Cell, CellEnvironment> {
 
   public static final String OUTPUT_REPLAY_DATA_KEY = "outputReplayData";
 

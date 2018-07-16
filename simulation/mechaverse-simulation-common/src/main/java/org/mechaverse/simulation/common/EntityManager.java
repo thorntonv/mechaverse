@@ -22,8 +22,4 @@ public interface EntityManager<
 
   void addObserver(EntityManager.Observer<SIM_MODEL, ENT_MODEL> observer);
   void removeObserver(EntityManager.Observer<SIM_MODEL, ENT_MODEL> observer);
-
-//  ENT_TYPE getType(ENT_MODEL entity);
-//
-//  ENT_TYPE[] getTypeValues();
 }

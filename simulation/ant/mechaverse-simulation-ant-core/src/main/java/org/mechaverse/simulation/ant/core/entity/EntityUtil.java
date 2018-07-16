@@ -29,9 +29,9 @@ public class EntityUtil {
    * cells in higher. Entities in the same cell are ordered first by type based on the
    * {@link EntityType} ordinal value and then by id.
    */
-  public static final Ordering<EntityModel> ENTITY_ORDERING = new Ordering<EntityModel>() {
+  public static final Ordering<EntityModel<EntityType>> ENTITY_ORDERING = new Ordering<EntityModel<EntityType>>() {
     @Override
-    public int compare(EntityModel left, EntityModel right) {
+    public int compare(EntityModel<EntityType> left, EntityModel<EntityType> right) {
       if (left.getY() < right.getY()) {
         return -1;
       } else if (left.getY() > right.getY()) {
@@ -42,8 +42,8 @@ public class EntityUtil {
       } else if (left.getX() > right.getX()) {
         return 1;
       }
-      EntityType leftType = EntityUtil.getType(left);
-      EntityType rightType = EntityUtil.getType(right);
+      EntityType leftType = left.getType();
+      EntityType rightType = right.getType();
       if (leftType.ordinal() < rightType.ordinal()) {
         return -1;
       } else if (leftType.ordinal() > rightType.ordinal()) {
@@ -52,30 +52,6 @@ public class EntityUtil {
       return left.getId().compareTo(right.getId());
     }
   };
-
-  /**
-   * Returns the {@link EntityType} of the given {@link EntityModel}.
-   */
-  public static EntityType getType(EntityModel entity) {
-    if (entity instanceof Ant) {
-      return EntityType.ANT;
-    } else if (entity instanceof Barrier) {
-      return EntityType.BARRIER;
-    } else if (entity instanceof Conduit) {
-      return EntityType.CONDUIT;
-    } else if (entity instanceof Dirt) {
-      return EntityType.DIRT;
-    } else if (entity instanceof Food) {
-      return EntityType.FOOD;
-    } else if (entity instanceof Nest) {
-      return EntityType.NEST;
-    } else if (entity instanceof Pheromone) {
-      return EntityType.PHEROMONE;
-    } else if (entity instanceof Rock) {
-      return EntityType.ROCK;
-    }
-    return null;
-  }
 
   /**
    * Returns a new {@link EntityModel} instance of the given type.

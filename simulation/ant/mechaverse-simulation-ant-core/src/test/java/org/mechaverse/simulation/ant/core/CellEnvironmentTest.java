@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.common.model.EnvironmentModel;
 import org.mockito.Mock;

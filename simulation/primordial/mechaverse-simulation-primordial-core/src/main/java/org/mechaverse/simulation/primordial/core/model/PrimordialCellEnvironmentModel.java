@@ -5,7 +5,7 @@ import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.primordial.core.entity.EntityUtil;
 
 public class PrimordialCellEnvironmentModel extends
-    AbstractCellEnvironmentModel<EntityModel, EntityType, PrimordialCellModel> {
+    AbstractCellEnvironmentModel<EntityModel<EntityType>, EntityType, PrimordialCellModel> {
 
   @Override
   protected PrimordialCellModel[][] createCells() {
@@ -18,7 +18,7 @@ public class PrimordialCellEnvironmentModel extends
   }
 
   @Override
-  protected EntityType[] getTypeValues() {
+  public EntityType[] getEntityTypes() {
     return EntityUtil.ENTITY_TYPES;
   }
 }
