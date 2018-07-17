@@ -1,33 +1,23 @@
-package org.mechaverse.simulation.ant.core;
+package org.mechaverse.simulation.common.cellautomaton.environment;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.common.model.Direction;
-import org.mechaverse.simulation.common.model.EnvironmentModel;
-import org.mockito.Mock;
+import org.mechaverse.simulation.common.util.TestCellEnvironmentModel;
 import org.mockito.runners.MockitoJUnitRunner;
 
-/**
- * Unit test for {@link CellEnvironment}.
- */
 @RunWith(MockitoJUnitRunner.class)
-public class CellEnvironmentTest {
+public class AbstractCellEnvironmentModelTest {
 
   // TODO(thorntonv): Implement additional tests.
 
-  @Mock
-  EnvironmentModel mockEnvironmentModel;
-
   @Test
   public void getDirection() {
-    when(mockEnvironmentModel.getWidth()).thenReturn(100);
-    when(mockEnvironmentModel.getHeight()).thenReturn(100);
-
-    CellEnvironment env = new CellEnvironment(mockEnvironmentModel);
+    TestCellEnvironmentModel env = new TestCellEnvironmentModel();
+    env.setWidth(200);
+    env.setHeight(200);
     assertEquals(Direction.NORTH, env.getDirection(env.getCell(50, 0), env.getCell(25, 0)));
     assertEquals(Direction.SOUTH, env.getDirection(env.getCell(25, 0), env.getCell(50, 0)));
     assertEquals(Direction.EAST, env.getDirection(env.getCell(0, 50), env.getCell(0, 75)));

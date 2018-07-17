@@ -1,7 +1,6 @@
-package org.mechaverse.simulation.ant.core.module;
+package org.mechaverse.simulation.ant.core.environment;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.mechaverse.simulation.ant.core.AbstractAntEnvironmentBehavior;
 import org.mechaverse.simulation.ant.core.model.AntSimulationModel;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.ant.core.model.EntityType;
@@ -14,7 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
  * A module that periodically decays pheromones. The granularity of this implementation is more
  * coarse than decaying each pheromone every update, but its performance is significantly better.
  */
-public class PheromoneDecayModule extends AbstractAntEnvironmentBehavior {
+public class PheromoneDecayBehavior extends AbstractAntEnvironmentBehavior {
 
   @Value("#{properties['pheromoneDecayInterval']}") private int decayInterval;
 

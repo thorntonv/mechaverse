@@ -14,7 +14,7 @@ public class Ant extends EntityModel<EntityType> implements Serializable {
 
   private final static long serialVersionUID = -1L;
   @XmlElement(namespace = "http://www.mechaverse.org/simulation/ant/api/model")
-  private EntityModel carriedEntity;
+  private EntityModel<EntityType> carriedEntity;
 
   public Ant() {}
 
@@ -24,7 +24,7 @@ public class Ant extends EntityModel<EntityType> implements Serializable {
    * @return possible object is
    * {@link EntityModel }
    */
-  public EntityModel getCarriedEntity() {
+  public EntityModel<EntityType> getCarriedEntity() {
     return carriedEntity;
   }
 
@@ -34,7 +34,7 @@ public class Ant extends EntityModel<EntityType> implements Serializable {
    * @param value allowed object is
    *              {@link EntityModel }
    */
-  public void setCarriedEntity(EntityModel value) {
+  public void setCarriedEntity(EntityModel<EntityType> value) {
     this.carriedEntity = value;
   }
 

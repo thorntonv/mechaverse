@@ -19,12 +19,12 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mechaverse.simulation.ant.core.environment.AntReproductionBehavior;
 import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.common.model.EnvironmentModel;
 import org.mechaverse.simulation.ant.core.model.Nest;
 import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.common.EntityManager;
-import org.mechaverse.simulation.ant.core.entity.EntityDataInputStream;
 import org.mechaverse.simulation.common.genetic.GeneticData;
 import org.mechaverse.simulation.common.genetic.GeneticDataStore;
 import org.mechaverse.simulation.common.genetic.GeneticRecombinator;
@@ -34,7 +34,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 /**
- * Unit test for {@link AntReproductionModule}.
+ * Unit test for {@link AntReproductionBehavior}.
  */
 @RunWith(MockitoJUnitRunner.class)
 public class AntReproductionModuleTest {
@@ -46,12 +46,12 @@ public class AntReproductionModuleTest {
   @Mock private EntityManager mockEntityManager;
   @Mock private GeneticRecombinator mockGeneticRecombinator;
 
-  private AntReproductionModule module;
+  private AntReproductionBehavior module;
   private RandomGenerator random;
 
   @Before
   public void setUp() {
-    module = new AntReproductionModule(mockGeneticRecombinator);
+    module = new AntReproductionBehavior(mockGeneticRecombinator);
     random = RandomUtil.newGenerator(AntReproductionModuleTest.class.getName().hashCode());
   }
 
@@ -152,7 +152,7 @@ public class AntReproductionModuleTest {
     module.updateState(state, env, mockEntityManager);
 
     try(EntityDataInputStream replayDataIn = new EntityDataInputStream(new ByteArrayInputStream(
-        state.getReplayDataStore().get(AntReproductionReplayModule.ANT_GENERATION_DATA_KEY)))) {
+        state.getReplayDataStore().get(AntReproductionReplayBehavior.ANT_GENERATION_DATA_KEY)))) {
       assertEquals(10, replayDataIn.readLong());
       assertEquals(1, replayDataIn.readInt());
       assertEntitiesEqual(antCaptor.getAllValues().get(0), replayDataIn.readEntity());

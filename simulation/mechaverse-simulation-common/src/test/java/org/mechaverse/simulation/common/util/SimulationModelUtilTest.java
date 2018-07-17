@@ -9,16 +9,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.zip.GZIPInputStream;
 import org.junit.Test;
-import org.mechaverse.simulation.common.cellautomaton.environment.AbstractCellEnvironmentModel;
-import org.mechaverse.simulation.common.cellautomaton.environment.AbstractCellModel;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.SimulationModel;
 
 public class SimulationModelUtilTest {
-
-  public enum TestEntityType {
-    ENTITY1, ENTITY2
-  }
 
   @JsonTypeName("TestEntity1")
   public static class TestEntity1 extends EntityModel<TestEntityType> {
@@ -59,35 +53,8 @@ public class SimulationModelUtilTest {
   }
 
 
-  @JsonTypeName("TestCellModel")
-  public static class TestCellModel extends AbstractCellModel<EntityModel<TestEntityType>, TestEntityType> {
-
-    public TestCellModel(int row, int column) {
-      super(row, column);
-    }
-  }
 
   private static final String TEST_JSON = "{\"id\":\"abc\",\"environment\":{\"@type\":\"TestCellEnvironmentModel\",\"width\":10,\"height\":10,\"entities\":[{\"@type\":\"TestEntity1\",\"id\":\"e1\",\"x\":3,\"y\":2,\"energy\":0,\"maxEnergy\":0,\"age\":0,\"data\":{},\"field1\":101},{\"@type\":\"TestEntity2\",\"id\":\"e2\",\"x\":3,\"y\":5,\"energy\":0,\"maxEnergy\":0,\"age\":0,\"data\":{},\"field2\":\"testStr\"}]},\"subEnvironments\":[],\"iteration\":0,\"data\":{\"key1\":\"dGVzdFZhbHVlMQ==\"}}";
-
-  @JsonTypeName("TestCellEnvironmentModel")
-  public static class TestCellEnvironmentModel extends
-      AbstractCellEnvironmentModel<EntityModel<TestEntityType>, TestEntityType, TestCellModel> {
-
-    @Override
-    protected TestCellModel[][] createCells() {
-      return new TestCellModel[getHeight()][getWidth()];
-    }
-
-    @Override
-    protected TestCellModel createCell(int row, int column) {
-      return new TestCellModel(row, column);
-    }
-
-    @Override
-    public TestEntityType[] getEntityTypes() {
-      return TestEntityType.values();
-    }
-  }
 
   @Test
   public void testSerialize() throws IOException {

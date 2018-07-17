@@ -30,7 +30,7 @@ import org.mechaverse.simulation.ant.core.AntSimulationTestUtil;
 import org.mechaverse.simulation.ant.core.model.Cell;
 import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.common.EntityManager;
-import org.mechaverse.simulation.ant.core.entity.ant.ActiveAnt.AntBehavior;
+import org.mechaverse.simulation.ant.core.entity.ant.AntEntity.AntBehavior;
 import org.mechaverse.simulation.ant.core.entity.ant.AntInput.SensorInfo;
 import org.mechaverse.simulation.common.model.MoveDirection;
 import org.mechaverse.simulation.common.model.TurnDirection;
@@ -41,7 +41,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * Unit test for {@link ActiveAnt}.
+ * Unit test for {@link AntEntity}.
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ActiveAntTest {
@@ -74,12 +74,12 @@ public class ActiveAntTest {
   @Captor
   private ArgumentCaptor<AntInput> inputCaptor;
 
-  private ActiveAnt activeAnt;
+  private AntEntity activeAnt;
   private RandomGenerator random;
 
   @Before
   public void setUp() {
-    activeAnt = new ActiveAnt(mockAntEntity, mockAntBehavior);
+    activeAnt = new AntEntity(mockAntEntity, mockAntBehavior);
     random = RandomUtil.newGenerator(ActiveAntTest.class.getName().hashCode());
 
     when(mockAntEntity.getId()).thenReturn("001");
@@ -140,7 +140,7 @@ public class ActiveAntTest {
     when(mockAntEntity.getCarriedEntity()).thenReturn(mockRock);
     when(mockAntEntity.getEnergy()).thenReturn(1).thenReturn(0);
     when(mockEnvironment.getCell(mockAntEntity)).thenReturn(mockCell);
-    activeAnt = new ActiveAnt(mockAntEntity, mockAntBehavior);
+    activeAnt = new AntEntity(mockAntEntity, mockAntBehavior);
     activeAnt.performAction(mockEnvironment, mockEntityManager, random);
     verify(mockAntEntity).setEnergy(0);
     verify(mockEntityManager).removeEntity(activeAnt.getEntity());
@@ -377,7 +377,7 @@ public class ActiveAntTest {
     when(mockAntEntity.getCarriedEntity()).thenReturn(mockFood);
     when(mockAntEntity.getX()).thenReturn(123);
     when(mockAntEntity.getY()).thenReturn(321);
-    activeAnt = new ActiveAnt(mockAntEntity, mockAntBehavior);
+    activeAnt = new AntEntity(mockAntEntity, mockAntBehavior);
 
     AntOutput output = new AntOutput();
     output.setMoveDirection(MoveDirection.FORWARD);
@@ -495,7 +495,7 @@ public class ActiveAntTest {
   @Test
   public void drop_food() {
     when(mockAntEntity.getCarriedEntity()).thenReturn(mockFood);
-    activeAnt = new ActiveAnt(mockAntEntity, mockAntBehavior);
+    activeAnt = new AntEntity(mockAntEntity, mockAntBehavior);
     AntOutput output = new AntOutput();
     output.setPickUpOrDrop(true);
     mockOutput(output);
@@ -509,7 +509,7 @@ public class ActiveAntTest {
   @Test
   public void drop_rock() {
     when(mockAntEntity.getCarriedEntity()).thenReturn(mockRock);
-    activeAnt = new ActiveAnt(mockAntEntity, mockAntBehavior);
+    activeAnt = new AntEntity(mockAntEntity, mockAntBehavior);
     AntOutput output = new AntOutput();
     output.setPickUpOrDrop(true);
     mockOutput(output);
@@ -525,7 +525,7 @@ public class ActiveAntTest {
     when(mockAntEntity.getCarriedEntity()).thenReturn(mockFood);
     when(mockCell.getEntity(EntityType.FOOD)).thenReturn(mockFood);
     when(mockFrontCell.getEntity(EntityType.FOOD)).thenReturn(mockFood);
-    activeAnt = new ActiveAnt(mockAntEntity, mockAntBehavior);
+    activeAnt = new AntEntity(mockAntEntity, mockAntBehavior);
     AntOutput output = new AntOutput();
     output.setPickUpOrDrop(true);
     mockOutput(output);
@@ -540,7 +540,7 @@ public class ActiveAntTest {
   public void drop_atEnvironmentBorder() {
     when(mockEnvironment.getCellInDirection(mockCell, Direction.EAST)).thenReturn(null);
     when(mockAntEntity.getCarriedEntity()).thenReturn(mockRock);
-    activeAnt = new ActiveAnt(mockAntEntity, mockAntBehavior);
+    activeAnt = new AntEntity(mockAntEntity, mockAntBehavior);
     AntOutput output = new AntOutput();
     output.setPickUpOrDrop(true);
     mockOutput(output);
@@ -608,7 +608,7 @@ public class ActiveAntTest {
   @Test
   public void consume_carriedFood() {
     when(mockAntEntity.getCarriedEntity()).thenReturn(mockFood);
-    activeAnt = new ActiveAnt(mockAntEntity, mockAntBehavior);
+    activeAnt = new AntEntity(mockAntEntity, mockAntBehavior);
     when(mockAntEntity.getMaxEnergy()).thenReturn(100);
     when(mockAntEntity.getEnergy()).thenReturn(50);
     when(mockFood.getEnergy()).thenReturn(45);
@@ -674,7 +674,7 @@ public class ActiveAntTest {
     AntSimulationState state = new AntSimulationState();
     activeAnt.updateState(state);
     assertArrayEquals(out.toByteArray(),
-        state.getEntityReplayDataStore(mockAntEntity).get(ActiveAnt.OUTPUT_REPLAY_DATA_KEY));
+        state.getEntityReplayDataStore(mockAntEntity).get(AntEntity.OUTPUT_REPLAY_DATA_KEY));
 
     // The output replay data is cleared when the state is set.
     activeAnt.setState(new AntSimulationState());
@@ -688,7 +688,7 @@ public class ActiveAntTest {
 
     activeAnt.updateState(state);
     assertArrayEquals(out.toByteArray(),
-        state.getEntityReplayDataStore(mockAntEntity).get(ActiveAnt.OUTPUT_REPLAY_DATA_KEY));
+        state.getEntityReplayDataStore(mockAntEntity).get(AntEntity.OUTPUT_REPLAY_DATA_KEY));
   }
 
   private void mockEntityAtCellInDirection(

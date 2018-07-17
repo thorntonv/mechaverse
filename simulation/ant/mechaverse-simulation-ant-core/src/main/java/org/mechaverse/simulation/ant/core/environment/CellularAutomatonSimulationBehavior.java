@@ -1,7 +1,6 @@
-package org.mechaverse.simulation.ant.core.module;
+package org.mechaverse.simulation.ant.core.environment;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.mechaverse.simulation.ant.core.AbstractAntEnvironmentBehavior;
 import org.mechaverse.simulation.ant.core.model.AntSimulationModel;
 import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.common.EntityManager;
@@ -13,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * An environment module that updates simulated cellular automata before active entity actions are
  * performed.
  */
-public class CellularAutomatonSimulationModule extends AbstractAntEnvironmentBehavior {
+public class CellularAutomatonSimulationBehavior extends AbstractAntEnvironmentBehavior {
 
   @Autowired private ObjectFactory<CellularAutomatonSimulator> simulatorFactory;
   private CellularAutomatonSimulator simulator;

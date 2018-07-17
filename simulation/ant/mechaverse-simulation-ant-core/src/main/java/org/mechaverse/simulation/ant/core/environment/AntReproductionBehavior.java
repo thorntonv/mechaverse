@@ -1,40 +1,32 @@
-package org.mechaverse.simulation.ant.core.module;
+package org.mechaverse.simulation.ant.core.environment;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.util.Pair;
-import org.mechaverse.simulation.ant.core.AbstractAntEnvironmentBehavior;
 import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.ant.core.model.AntSimulationModel;
-import org.mechaverse.simulation.common.EnvironmentBehavior;
-import org.mechaverse.simulation.common.model.EntityModel;
-import org.mechaverse.simulation.ant.core.model.EntityType;
-import org.mechaverse.simulation.ant.core.model.Nest;
 import org.mechaverse.simulation.ant.core.model.Cell;
 import org.mechaverse.simulation.ant.core.model.CellEnvironment;
+import org.mechaverse.simulation.ant.core.model.EntityType;
+import org.mechaverse.simulation.ant.core.model.Nest;
 import org.mechaverse.simulation.common.EntityManager;
-import org.mechaverse.simulation.ant.core.entity.EntityDataOutputStream;
 import org.mechaverse.simulation.common.genetic.CutAndSpliceCrossoverGeneticRecombinator;
 import org.mechaverse.simulation.common.genetic.GeneticData;
 import org.mechaverse.simulation.common.genetic.GeneticDataStore;
 import org.mechaverse.simulation.common.genetic.GeneticRecombinator;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.util.SimulationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 
 /**
  * An environment simulation module that maintains a target ant population size.
@@ -42,7 +34,7 @@ import com.google.common.collect.ImmutableList;
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 @SuppressWarnings("WeakerAccess")
-public class AntReproductionModule extends AbstractAntEnvironmentBehavior {
+public class AntReproductionBehavior extends AbstractAntEnvironmentBehavior {
 
   /**
    * Calculates the fitness of a set of ants.
@@ -91,7 +83,7 @@ public class AntReproductionModule extends AbstractAntEnvironmentBehavior {
 
   // TODO(thorntonv): Support multiple nests and nests of different types.
 
-  private static final Logger logger = LoggerFactory.getLogger(AntReproductionModule.class);
+  private static final Logger logger = LoggerFactory.getLogger(AntReproductionBehavior.class);
 
   @Value("#{properties['antMaxCount']}") private int antMaxCount;
   @Value("#{properties['antInitialEnergy']}") private int antInitialEnergy;
@@ -105,35 +97,18 @@ public class AntReproductionModule extends AbstractAntEnvironmentBehavior {
   private final GeneticRecombinator geneticRecombinator;
   private final AntFitnessCalculator fitnessCalculator = new SimpleAntFitnessCalculator();
 
-  private ByteArrayOutputStream antGenerationReplayDataByteOut;
-  private EntityDataOutputStream antGenerationReplayDataOut;
 
-
-  public AntReproductionModule() {
+  public AntReproductionBehavior() {
     this(new CutAndSpliceCrossoverGeneticRecombinator());
   }
 
-  public AntReproductionModule(GeneticRecombinator geneticRecombinator) {
+  public AntReproductionBehavior(GeneticRecombinator geneticRecombinator) {
     this.geneticRecombinator = geneticRecombinator;
   }
 
   @Override
-  public void setState(AntSimulationModel state, CellEnvironment env, EntityManager entityManager) {
-    antGenerationReplayDataByteOut = new ByteArrayOutputStream(64 * 1024);
-    antGenerationReplayDataOut = new EntityDataOutputStream(antGenerationReplayDataByteOut);
-  }
-
-  @Override
-  public void updateState(AntSimulationModel state, CellEnvironment env,
-      EntityManager entityManager) {
-    // Store the ant generation data.
-    state.getReplayDataStore().put(AntReproductionReplayModule.ANT_GENERATION_DATA_KEY,
-        antGenerationReplayDataByteOut.toByteArray());
-  }
-
-  @Override
   public void beforeUpdate(AntSimulationModel state, CellEnvironment env,
-      EntityManager entityManager, RandomGenerator random) {
+      EntityManager<AntSimulationModel, EntityModel<EntityType>> entityManager, RandomGenerator random) {
     if (ants.size() < antMaxCount && nest != null) {
       Cell nestCell = env.getCell(nest);
       int row = random.nextInt(maxGeneratedAntNestDistance * 2) - maxGeneratedAntNestDistance
@@ -145,9 +120,8 @@ public class AntReproductionModule extends AbstractAntEnvironmentBehavior {
         Cell cell = env.getCell(row, col);
         if (cell.getEntity(EntityType.ANT) == null) {
           Ant ant = generateAnt(state, random);
-          cell.setEntity(ant, EntityType.ANT);
+          cell.setEntity(ant);
           entityManager.addEntity(ant);
-          writeAntGenerationReplayData(ImmutableList.of(ant), state);
         }
       }
     }
@@ -183,10 +157,10 @@ public class AntReproductionModule extends AbstractAntEnvironmentBehavior {
     }
 
     // Get the parents genetic information.
-    GeneticDataStore parent1GeneticDataStore = state.getEntityGeneticDataStore(parent1);
-    GeneticDataStore parent2GeneticDataStore = state.getEntityGeneticDataStore(parent2);
+    GeneticDataStore parent1GeneticDataStore = new GeneticDataStore(parent1);
+    GeneticDataStore parent2GeneticDataStore = new GeneticDataStore(parent2);
 
-    GeneticDataStore childGeneticDataStore = state.getEntityGeneticDataStore(ant);
+    GeneticDataStore childGeneticDataStore = new GeneticDataStore(ant);
     for (String key : parent1GeneticDataStore.keySet()) {
       GeneticData parent1GeneticData = parent1GeneticDataStore.get(key);
       GeneticData parent2GeneticData = parent2GeneticDataStore.get(key);
@@ -234,21 +208,5 @@ public class AntReproductionModule extends AbstractAntEnvironmentBehavior {
       }
     }
     return reproductiveAnts;
-  }
-
-  private void writeAntGenerationReplayData(List<Ant> ants, AntSimulationModel state) {
-    // Write ant generation replay data.
-    if (antGenerationReplayDataOut != null) {
-      try {
-        antGenerationReplayDataOut.writeLong(state.getIteration());
-        // Write entity count.
-        antGenerationReplayDataOut.writeInt(ants.size());
-        for(Ant ant : ants) {
-          antGenerationReplayDataOut.writeEntity(ant);
-        }
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    }
   }
 }

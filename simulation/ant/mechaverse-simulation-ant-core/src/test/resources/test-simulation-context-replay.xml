@@ -33,10 +33,10 @@
     </constructor-arg>
   </bean>
 
-  <bean id="replayModule" class="org.mechaverse.simulation.ant.core.module.ReplayModule" scope="prototype" />
-  <bean id="foodGenerationModule" class="org.mechaverse.simulation.ant.core.module.FoodGenerationModule" scope="prototype" />
-  <bean id="pheromoneDecayModule" class="org.mechaverse.simulation.ant.core.module.PheromoneDecayModule" scope="prototype" />
-  <bean id="antReproductionReplayModule" class="org.mechaverse.simulation.ant.core.module.AntReproductionReplayModule" scope="prototype" />
+  <bean id="replayModule" class="org.mechaverse.simulation.ant.core.module.ReplayBehavior" scope="prototype" />
+  <bean id="foodGenerationModule" class="org.mechaverse.simulation.ant.core.environment.FoodGenerationBehavior" scope="prototype" />
+  <bean id="pheromoneDecayModule" class="org.mechaverse.simulation.ant.core.environment.PheromoneDecayBehavior" scope="prototype" />
+  <bean id="antReproductionReplayModule" class="org.mechaverse.simulation.ant.core.environment.AntReproductionReplayBehavior" scope="prototype" />
 
   <util:list id="modules" value-type="org.mechaverse.simulation.ant.core.module.AntSimulationModule" scope="prototype">
     <ref bean="replayModule" />

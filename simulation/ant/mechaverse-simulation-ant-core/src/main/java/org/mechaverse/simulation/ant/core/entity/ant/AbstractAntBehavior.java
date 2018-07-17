@@ -1,78 +1,39 @@
 package org.mechaverse.simulation.ant.core.entity.ant;
 
-import java.io.IOException;
-import java.util.Arrays;
 import org.apache.commons.math3.random.RandomGenerator;
-import org.mechaverse.simulation.ant.core.model.Cell;
-import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.ant.core.entity.EntityUtil;
 import org.mechaverse.simulation.ant.core.model.Ant;
+import org.mechaverse.simulation.ant.core.model.AntSimulationModel;
+import org.mechaverse.simulation.ant.core.model.Cell;
+import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.model.Pheromone;
+import org.mechaverse.simulation.common.EntityBehavior;
 import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.common.model.EntityModel;
-import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.common.util.SimulationUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
-/**
- * An ant that active in the simulation. An active ant receives sensory information about itself and
- * the environment and is able to perform actions.
- */
-
-public final class ActiveAnt implements
-    org.mechaverse.simulation.common.ActiveEntity<SimulationModel, AntSimulationState, EntityType, Cell, CellEnvironment> {
-
-  public static final String OUTPUT_REPLAY_DATA_KEY = "outputReplayData";
-
-  /**
-   * Determines the action an ant should take based on the input.
-   */
-  public interface AntBehavior {
-
-    void setEntity(Ant entity);
-
-    /**
-     * Sets the current input.
-     */
-    void setInput(AntInput input, RandomGenerator random);
-
-    /**
-     * Returns output values based on the current input.
-     */
-    AntOutput getOutput(RandomGenerator random);
-
-    void onRemoveEntity();
-
-    void setState(AntSimulationState state);
-    void updateState(AntSimulationState state);
-  }
+public abstract class AbstractAntBehavior implements EntityBehavior<AntSimulationModel, CellEnvironment, EntityModel<EntityType>> {
 
   private static final EntityType[] CARRIABLE_ENTITY_TYPES =
       {EntityType.DIRT, EntityType.FOOD,EntityType.ROCK};
 
-  private static final Logger logger = LoggerFactory.getLogger(ActiveAnt.class);
+  private Ant entity;
+  private EntityType carriedEntityType = EntityType.NONE;
+  private final AntInput input = new AntInput();
 
   @Value("#{properties['pheromoneInitialEnergy']}") private int pheromoneInitialEnergy;
   private int leavePheromoneEnergyCost = 2;
   private int pickUpEnergyCost = 1;
-  
-  private final Ant entity;
-  private final AntBehavior behavior;
-  private EntityType carriedEntityType = EntityType.NONE;
-  private final AntInput input = new AntInput();
-  private AntOutputDataOutputStream outputReplayDataOutputStream = new AntOutputDataOutputStream();
 
-  public ActiveAnt(Ant entity, AntBehavior behavior) {
+  public Ant getModel() {
+    return entity;
+  }
+
+  void setModel(Ant entity) {
     this.entity = entity;
-    this.behavior = behavior;
-    behavior.setEntity(entity);
-    if (entity.getCarriedEntity() != null) {
-      this.carriedEntityType = EntityUtil.getType(entity.getCarriedEntity());
-    }
   }
 
   @Override
@@ -161,18 +122,14 @@ public final class ActiveAnt implements
       Pheromone pheromone = (Pheromone) pheromoneEntity;
       input.setPheromoneType(pheromone.getValue());
     }
-    behavior.setInput(input, random);
+    setInput(input, random);
   }
 
   @Override
-  public void performAction(CellEnvironment env, EntityManager entityManager,
+  public void performAction(CellEnvironment env,
+      EntityManager<AntSimulationModel, EntityModel<EntityType>> entityManager,
       RandomGenerator random) {
-    AntOutput output = behavior.getOutput(random);
-
-    try {
-      outputReplayDataOutputStream.writeAntOutput(output);
-      logger.trace("Recorded output {} for ant {}", Arrays.toString(output.getData()), entity.getId());
-    } catch (IOException ignored) {}
+    AntOutput output = getOutput(random);
 
     Cell cell = env.getCell(entity);
     Cell frontCell = env.getCellInDirection(cell, entity.getDirection());
@@ -181,8 +138,8 @@ public final class ActiveAnt implements
 
     entity.setEnergy(entity.getEnergy() - 1);
     if (entity.getEnergy() <= 0) {
-      behavior.onRemoveEntity();
-      entityManager.removeEntity(this.getEntity());
+      onRemoveEntity();
+      entityManager.removeEntity(this.getModel());
 
       // Attempt to drop the carried entity.
       if (entity.getCarriedEntity() != null) {
@@ -246,41 +203,24 @@ public final class ActiveAnt implements
         SimulationUtil.turnCCW(entity);
         break;
     }
+
   }
 
-  @Override
-  public Ant getEntity() {
-    return entity;
-  }
+  /**
+   * Sets the current input.
+   */
+  protected abstract void setInput(AntInput input, RandomGenerator random);
 
-  @Override
-  public EntityType getType() {
-    return EntityType.ANT;
-  }
+  /**
+   * Returns output values based on the current input.
+   */
+  protected abstract AntOutput getOutput(RandomGenerator random);
 
-  @Override
-  public void setState(AntSimulationState state) {
-    behavior.setState(state);
-    // Output replay data will contain all outputs since the state was last set.
-    outputReplayDataOutputStream = new AntOutputDataOutputStream();
-  }
+  protected void onRemoveEntity() {}
 
-  @Override
-  public void updateState(AntSimulationState state) {
-    behavior.updateState(state);
-    try {
-      outputReplayDataOutputStream.close();
-      state.getEntityReplayDataStore(entity).put(
-        OUTPUT_REPLAY_DATA_KEY, outputReplayDataOutputStream.toByteArray());
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
+  void setState(AntSimulationModel state) {}
 
-  @Override
-  public void onRemoveEntity() {
-    behavior.onRemoveEntity();
-  }
+  void updateState(AntSimulationModel state) {}
 
   private boolean move(Cell fromCell, Cell toCell, CellEnvironment env) {
     if (toCell != null && canMoveToCell(toCell)) {
@@ -300,7 +240,7 @@ public final class ActiveAnt implements
   private boolean pickup(Cell cell) {
     if(cell != null) {
       for (EntityType type : CARRIABLE_ENTITY_TYPES) {
-        EntityModel carriableEntity = cell.getEntity(type);
+        EntityModel<EntityType> carriableEntity = cell.getEntity(type);
         if (carriableEntity != null) {
           cell.removeEntity(type);
           entity.setCarriedEntity(carriableEntity);
@@ -322,8 +262,8 @@ public final class ActiveAnt implements
   private boolean drop(Cell cell) {
     // The cell must not already have an entity of the given type.
     if (cell != null && cell.getEntity(carriedEntityType) == null) {
-      EntityModel carriedEntity = entity.getCarriedEntity();
-      cell.setEntity(carriedEntity, carriedEntityType);
+      EntityModel<EntityType> carriedEntity = entity.getCarriedEntity();
+      cell.setEntity(carriedEntity);
       entity.setCarriedEntity(null);
       carriedEntityType = EntityType.NONE;
       return true;
@@ -331,7 +271,8 @@ public final class ActiveAnt implements
     return false;
   }
 
-  private void leavePheromone(Cell cell, int type, EntityManager entityManager) {
+  private void leavePheromone(Cell cell, int type,
+      EntityManager<AntSimulationModel, EntityModel<EntityType>> entityManager) {
     int energy = entity.getEnergy();
     if (energy > leavePheromoneEnergyCost) {
       entity.setEnergy(energy - leavePheromoneEnergyCost);
@@ -341,16 +282,17 @@ public final class ActiveAnt implements
       pheromone.setEnergy(pheromoneInitialEnergy);
       pheromone.setMaxEnergy(pheromoneInitialEnergy);
 
-      EntityModel existingPheromone = cell.getEntity(EntityType.PHEROMONE);
+      EntityModel<EntityType> existingPheromone = cell.getEntity(EntityType.PHEROMONE);
       if (existingPheromone != null) {
         entityManager.removeEntity(existingPheromone);
       }
-      cell.setEntity(pheromone, EntityType.PHEROMONE);
+      cell.setEntity(pheromone);
       entityManager.addEntity(pheromone);
     }
   }
 
-  private boolean consumeFood(EntityModel food, EntityManager entityManager) {
+  private boolean consumeFood(EntityModel<EntityType> food,
+      EntityManager<AntSimulationModel, EntityModel<EntityType>> entityManager) {
     if (food != null) {
       addEnergy(food.getEnergy());
       entityManager.removeEntity(food);

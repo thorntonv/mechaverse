@@ -1,13 +1,11 @@
-package org.mechaverse.simulation.ant.core.module;
+package org.mechaverse.simulation.ant.core.environment;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.mechaverse.simulation.ant.core.AbstractAntEnvironmentBehavior;
 import org.mechaverse.simulation.ant.core.model.AntSimulationModel;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.model.Food;
 import org.mechaverse.simulation.ant.core.entity.EntityUtil;
-import org.mechaverse.simulation.ant.core.AntSimulationEnvironmentGenerator;
 import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.common.AbstractProbabilisticEnvironmentModelGenerator.EntityDistribution;
@@ -23,7 +21,7 @@ import com.google.common.collect.Table;
 /**
  * Generates clusters of food to maintain a minimum quantity of food.
  */
-public class FoodGenerationModule extends AbstractAntEnvironmentBehavior {
+public class FoodGenerationBehavior extends AbstractAntEnvironmentBehavior {
 
   /**
    * {@link ProbabilisticLocalGenerator} that generates a cluster of food.
@@ -57,7 +55,7 @@ public class FoodGenerationModule extends AbstractAntEnvironmentBehavior {
     }
   }
 
-  private static Logger logger = LoggerFactory.getLogger(FoodGenerationModule.class);
+  private static Logger logger = LoggerFactory.getLogger(FoodGenerationBehavior.class);
 
   @Value("#{properties['foodMinCount']}") private int minFoodCount;
   @Value("#{properties['foodClusterRadius']}") private int foodClusterRadius;

@@ -16,17 +16,16 @@ import org.junit.runner.RunWith;
 import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.ant.core.model.EntityType;
-import org.mechaverse.simulation.ant.core.AntSimulationEnvironmentGenerator;
+import org.mechaverse.simulation.ant.core.environment.AntSimulationEnvironmentGenerator;
 import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.common.EntityManager;
-import org.mechaverse.simulation.ant.core.entity.EntityDataOutputStream;
 import org.mechaverse.simulation.common.util.RandomUtil;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * Unit test for {@link AntReproductionReplayModule}.
+ * Unit test for {@link AntReproductionReplayBehavior}.
  */
 @RunWith(MockitoJUnitRunner.class)
 public class AntReproductionReplayModuleTest {
@@ -41,14 +40,14 @@ public class AntReproductionReplayModuleTest {
   private AntSimulationState state;
   private CellEnvironment environment;
   private RandomGenerator random;
-  private AntReproductionReplayModule antReproductionReplayModule;
+  private AntReproductionReplayBehavior antReproductionReplayModule;
 
   @Before
   public void setUp() {
     this.random = RandomUtil.newGenerator(ReplayRecorderModuleTest.class.hashCode());
     this.state = AntSimulationImpl.randomState(new AntSimulationEnvironmentGenerator(), random);
     this.environment = new CellEnvironment(state.getModel().getEnvironment());
-    this.antReproductionReplayModule = new AntReproductionReplayModule();
+    this.antReproductionReplayModule = new AntReproductionReplayBehavior();
   }
 
   @Test
@@ -63,7 +62,7 @@ public class AntReproductionReplayModuleTest {
     }
 
     state.getReplayDataStore().put(
-        AntReproductionReplayModule.ANT_GENERATION_DATA_KEY, byteOut.toByteArray());
+        AntReproductionReplayBehavior.ANT_GENERATION_DATA_KEY, byteOut.toByteArray());
     antReproductionReplayModule.setState(state, environment, mockEntityManager);
 
     state.getModel().setIteration(1);
@@ -90,7 +89,7 @@ public class AntReproductionReplayModuleTest {
     }
 
     state.getReplayDataStore().put(
-        AntReproductionReplayModule.ANT_GENERATION_DATA_KEY, byteOut.toByteArray());
+        AntReproductionReplayBehavior.ANT_GENERATION_DATA_KEY, byteOut.toByteArray());
     antReproductionReplayModule.setState(state, environment, mockEntityManager);
 
     state.getModel().setIteration(1);
@@ -121,7 +120,7 @@ public class AntReproductionReplayModuleTest {
     }
 
     state.getReplayDataStore().put(
-        AntReproductionReplayModule.ANT_GENERATION_DATA_KEY, byteOut.toByteArray());
+        AntReproductionReplayBehavior.ANT_GENERATION_DATA_KEY, byteOut.toByteArray());
     antReproductionReplayModule.setState(state, environment, mockEntityManager);
 
     ArgumentCaptor<EntityModel> entityCaptor = ArgumentCaptor.forClass(EntityModel.class);

@@ -57,11 +57,11 @@
     </constructor-arg>
   </bean>
 
-  <bean id="replayRecorderModule" class="org.mechaverse.simulation.ant.core.module.ReplayRecorderModule" scope="prototype" />
-  <bean id="foodGenerationModule" class="org.mechaverse.simulation.ant.core.module.FoodGenerationModule" scope="prototype" />
-  <bean id="pheromoneDecayModule" class="org.mechaverse.simulation.ant.core.module.PheromoneDecayModule" scope="prototype" />
-  <bean id="antReproductionModule" class="org.mechaverse.simulation.ant.core.module.AntReproductionModule" scope="prototype" />
-  <bean id="cellularAutomatonModule" class="org.mechaverse.simulation.ant.core.module.CellularAutomatonSimulationModule" lazy-init="true" />
+  <bean id="replayRecorderModule" class="org.mechaverse.simulation.ant.core.environment.ReplayRecorderBehavior" scope="prototype" />
+  <bean id="foodGenerationModule" class="org.mechaverse.simulation.ant.core.environment.FoodGenerationBehavior" scope="prototype" />
+  <bean id="pheromoneDecayModule" class="org.mechaverse.simulation.ant.core.environment.PheromoneDecayBehavior" scope="prototype" />
+  <bean id="antReproductionModule" class="org.mechaverse.simulation.ant.core.environment.AntReproductionBehavior" scope="prototype" />
+  <bean id="cellularAutomatonModule" class="org.mechaverse.simulation.ant.core.environment.CellularAutomatonSimulationBehavior" lazy-init="true" />
 
   <util:list id="modules" value-type="org.mechaverse.simulation.ant.core.module.AntSimulationModule" scope="prototype">
     <ref bean="replayRecorderModule" />

@@ -1,15 +1,12 @@
 package org.mechaverse.simulation.ant.core.entity.ant;
 
 import java.util.Arrays;
-
 import org.apache.commons.math3.random.RandomGenerator;
-import org.mechaverse.simulation.ant.core.model.Ant;
-import org.mechaverse.simulation.ant.core.entity.ant.ActiveAnt.AntBehavior;
+import org.mechaverse.simulation.ant.core.model.AntSimulationModel;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorDataSource;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel;
-import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 import org.mechaverse.simulation.common.genetic.GeneticData;
 import org.mechaverse.simulation.common.genetic.GeneticDataStore;
 import org.mechaverse.simulation.common.util.ArrayUtil;
@@ -17,9 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link AntBehavior} implementation that is based on a simulated cellular automaton.
+ * A {@link AbstractAntBehavior} implementation that is based on a simulated cellular automaton.
  */
-public class CellularAutomatonAntBehavior implements AntBehavior {
+public class CellularAutomatonAntBehavior extends AbstractAntBehavior {
 
   public static final String AUTOMATON_STATE_KEY = "cellularAutomatonState";
   public static final String AUTOMATON_OUTPUT_MAP_KEY = "cellularAutomatonOutputMap";
@@ -27,14 +24,12 @@ public class CellularAutomatonAntBehavior implements AntBehavior {
 
   private static final Logger logger = LoggerFactory.getLogger(CellularAutomatonAntBehavior.class);
 
-  private Ant entity;
   private final int automatonIndex;
   private final int[] antOutputData;
   private final int[] automatonOutputData;
   private int[] bitOutputMap;
   private final AntOutput output = new AntOutput();
   private final int[] automatonState;
-  private SimulationDataStore dataStore;
   private GeneticDataStore geneticDataStore;
   private boolean stateSet = false;
   private final CellularAutomatonSimulationModel model;
@@ -52,11 +47,6 @@ public class CellularAutomatonAntBehavior implements AntBehavior {
     this.bitOutputMap = new int[simulator.getAutomatonOutputSize()];
     this.automatonIndex = simulator.getAllocator().allocate();
     this.automatonState = new int[simulator.getAutomatonStateSize()];
-  }
-
-  @Override
-  public void setEntity(Ant entity) {
-    this.entity = entity;
   }
 
   @Override
@@ -95,7 +85,7 @@ public class CellularAutomatonAntBehavior implements AntBehavior {
   }
 
   @Override
-  public void setState(AntSimulationState state) {
+  public void setState(AntSimulationModel state) {
     this.dataStore = state.getEntityDataStore(entity);
     this.geneticDataStore = state.getEntityGeneticDataStore(entity);
 
@@ -105,7 +95,7 @@ public class CellularAutomatonAntBehavior implements AntBehavior {
       int[] automatonState = ArrayUtil.toIntArray(stateBytes);
       simulator.setAutomatonState(automatonIndex, automatonState);
       stateSet = true;
-      logger.trace("setState {} automatonState = {}", entity.getId(),
+      logger.trace("setState {} automatonState = {}", getModel().getId(),
           Arrays.hashCode(automatonState));
     }
 
@@ -121,12 +111,12 @@ public class CellularAutomatonAntBehavior implements AntBehavior {
   }
 
   @Override
-  public void updateState(AntSimulationState state) {
+  public void updateState(AntSimulationModel state) {
     if(stateSet) {
       simulator.getAutomatonState(automatonIndex, automatonState);
       state.getEntityDataStore(entity)
           .put(AUTOMATON_STATE_KEY, ArrayUtil.toByteArray(automatonState));
-      logger.trace("updateState {} automatonState = {}", entity.getId(),
+      logger.trace("updateState {} automatonState = {}", getModel().getId(),
           Arrays.hashCode(automatonState));
     }
   }
@@ -144,7 +134,7 @@ public class CellularAutomatonAntBehavior implements AntBehavior {
     int[] automatonState = geneticDataGenerator.getCellularAutomatonState(geneticDataStore);
     simulator.setAutomatonState(automatonIndex, automatonState);
     dataStore.put(AUTOMATON_STATE_KEY, ArrayUtil.toByteArray(automatonState));
-    logger.trace("initializeCellularAutomaton {} automatonState = {}", entity.getId(),
+    logger.trace("initializeCellularAutomaton {} automatonState = {}", getModel().getId(),
         Arrays.hashCode(automatonState));
 
     // Cellular automaton output map.

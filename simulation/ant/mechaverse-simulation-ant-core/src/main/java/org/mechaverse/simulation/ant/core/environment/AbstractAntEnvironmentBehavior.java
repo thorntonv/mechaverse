@@ -1,4 +1,4 @@
-package org.mechaverse.simulation.ant.core;
+package org.mechaverse.simulation.ant.core.environment;
 
 import org.mechaverse.simulation.ant.core.model.AntSimulationModel;
 import org.mechaverse.simulation.ant.core.model.CellEnvironment;

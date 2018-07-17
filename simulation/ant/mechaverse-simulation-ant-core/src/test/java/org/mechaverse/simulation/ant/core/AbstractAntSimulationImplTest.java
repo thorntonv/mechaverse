@@ -12,6 +12,7 @@ import java.io.IOException;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.Before;
 import org.junit.Test;
+import org.mechaverse.simulation.ant.core.environment.AntSimulationEnvironmentGenerator;
 import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.common.model.EntityModel;

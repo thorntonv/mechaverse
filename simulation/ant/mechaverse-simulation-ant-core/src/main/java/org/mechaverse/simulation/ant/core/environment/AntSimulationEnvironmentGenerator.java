@@ -1,4 +1,4 @@
-package org.mechaverse.simulation.ant.core;
+package org.mechaverse.simulation.ant.core.environment;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableTable;
