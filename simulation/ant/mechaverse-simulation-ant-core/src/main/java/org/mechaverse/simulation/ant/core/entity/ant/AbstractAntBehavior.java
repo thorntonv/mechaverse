@@ -20,7 +20,7 @@ public abstract class AbstractAntBehavior implements EntityBehavior<AntSimulatio
   private static final EntityType[] CARRIABLE_ENTITY_TYPES =
       {EntityType.DIRT, EntityType.FOOD,EntityType.ROCK};
 
-  private Ant entity;
+  protected Ant entity;
   private EntityType carriedEntityType = EntityType.NONE;
   private final AntInput input = new AntInput();
 

@@ -11,9 +11,10 @@ import org.mechaverse.simulation.common.util.SimulationUtil;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
 import org.mechaverse.simulation.primordial.core.model.PrimordialCellEnvironmentModel;
 import org.mechaverse.simulation.primordial.core.model.PrimordialCellModel;
+import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel;
 
 public abstract class AbstractPrimordialEntityBehavior implements
-    EntityBehavior<SimulationModel, PrimordialCellEnvironmentModel, EntityModel> {
+    EntityBehavior<PrimordialSimulationModel, PrimordialCellEnvironmentModel, EntityModel<EntityType>> {
 
   private final PrimordialEntityInput input = new PrimordialEntityInput();
   protected final EntityModel entity;
@@ -67,8 +68,9 @@ public abstract class AbstractPrimordialEntityBehavior implements
   }
 
   @Override
-  public void performAction(PrimordialCellEnvironmentModel env, EntityManager<SimulationModel, EntityModel> entityManager,
-      RandomGenerator random) {
+  public void performAction(PrimordialCellEnvironmentModel env,
+          EntityManager<PrimordialSimulationModel, EntityModel<EntityType>> entityManager,
+          RandomGenerator random) {
     PrimordialEntityOutput output = getOutput(random);
     PrimordialCellModel cell = env.getCell(entity);
     PrimordialCellModel frontCell = env.getCellInDirection(cell, entity.getDirection());

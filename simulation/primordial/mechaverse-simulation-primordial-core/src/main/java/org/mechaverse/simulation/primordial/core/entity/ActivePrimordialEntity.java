@@ -2,10 +2,10 @@ package org.mechaverse.simulation.primordial.core.entity;
 
 import org.mechaverse.simulation.common.Entity;
 import org.mechaverse.simulation.common.model.EntityModel;
-import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
 import org.mechaverse.simulation.primordial.core.model.PrimordialCellEnvironmentModel;
 import org.mechaverse.simulation.primordial.core.model.PrimordialEntityModel;
+import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel;
 
 /**
  * An primordial that active in the simulation. An active primordial receives sensory information
@@ -13,7 +13,7 @@ import org.mechaverse.simulation.primordial.core.model.PrimordialEntityModel;
  */
 
 public final class ActivePrimordialEntity implements
-    Entity<SimulationModel, PrimordialCellEnvironmentModel, EntityModel, EntityType> {
+    Entity<PrimordialSimulationModel, PrimordialCellEnvironmentModel, EntityModel<EntityType>, EntityType> {
 
   private final PrimordialEntityModel entity;
   private final AbstractPrimordialEntityBehavior behavior;
@@ -30,22 +30,17 @@ public final class ActivePrimordialEntity implements
   }
 
   @Override
-  public EntityType getType() {
-    return EntityType.ENTITY;
-  }
-
-  @Override
   public AbstractPrimordialEntityBehavior getBehavior() {
     return behavior;
   }
 
   @Override
-  public void setState(SimulationModel state) {
+  public void setState(PrimordialSimulationModel state) {
     behavior.setState(state);
   }
 
   @Override
-  public void updateState(SimulationModel state) {
+  public void updateState(PrimordialSimulationModel state) {
     behavior.updateState(state);
   }
 

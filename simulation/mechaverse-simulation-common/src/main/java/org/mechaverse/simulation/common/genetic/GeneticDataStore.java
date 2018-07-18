@@ -22,7 +22,7 @@ public class GeneticDataStore {
   private final String keyPrefix;
 
   public GeneticDataStore(final EntityModel entityModel) {
-    this(entityModel, null);
+    this(entityModel, "geneticData");
   }
 
   public GeneticDataStore(final EntityModel entityModel, final String keyPrefix) {
