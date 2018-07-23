@@ -24,8 +24,8 @@ import org.mechaverse.simulation.common.model.EnvironmentModel;
  */
 @SuppressWarnings("WeakerAccess")
 public abstract class AbstractProbabilisticEnvironmentModelGenerator<
-    ENV_MODEL extends EnvironmentModel,
-    ENT_MODEL extends EntityModel,
+    ENV_MODEL extends EnvironmentModel<ENT_MODEL, ENT_TYPE>,
+    ENT_MODEL extends EntityModel<ENT_TYPE>,
     ENT_TYPE extends Enum<ENT_TYPE>> implements EnvironmentModelGenerator<ENV_MODEL, ENT_MODEL, ENT_TYPE> {
 
   /**

@@ -12,5 +12,14 @@ public interface EntityBehavior<
     ENT_TYPE extends Enum<ENT_TYPE>> {
 
   void updateInput(ENV_MODEL env, RandomGenerator random);
-  void performAction(ENV_MODEL env, EntityManager<SIM_MODEL, ENT_MODEL> entityManager, RandomGenerator random);
+
+  void performAction(ENV_MODEL env,
+          EntityManager<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE> entityManager,
+          RandomGenerator random);
+
+  void setState(SIM_MODEL state);
+
+  void updateState(SIM_MODEL state);
+
+  void onRemoveEntity();
 }

@@ -5,16 +5,15 @@ import org.mechaverse.simulation.common.EntityBehavior;
 import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.common.model.EntityModel;
-import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.common.util.SimulationModelUtil;
 import org.mechaverse.simulation.common.util.SimulationUtil;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
-import org.mechaverse.simulation.primordial.core.model.PrimordialCellEnvironmentModel;
+import org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel;
 import org.mechaverse.simulation.primordial.core.model.PrimordialCellModel;
 import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel;
 
 public abstract class AbstractPrimordialEntityBehavior implements
-    EntityBehavior<PrimordialSimulationModel, PrimordialCellEnvironmentModel, EntityModel<EntityType>> {
+    EntityBehavior<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> {
 
   private final PrimordialEntityInput input = new PrimordialEntityInput();
   protected final EntityModel entity;
@@ -25,7 +24,7 @@ public abstract class AbstractPrimordialEntityBehavior implements
   }
 
   @Override
-  public void updateInput(PrimordialCellEnvironmentModel env, RandomGenerator random) {
+  public void updateInput(PrimordialEnvironmentModel env, RandomGenerator random) {
     input.resetToDefault();
     input.setEnergy(entity.getEnergy(), entity.getMaxEnergy());
 
@@ -68,8 +67,8 @@ public abstract class AbstractPrimordialEntityBehavior implements
   }
 
   @Override
-  public void performAction(PrimordialCellEnvironmentModel env,
-          EntityManager<PrimordialSimulationModel, EntityModel<EntityType>> entityManager,
+  public void performAction(PrimordialEnvironmentModel env,
+          EntityManager<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> entityManager,
           RandomGenerator random) {
     PrimordialEntityOutput output = getOutput(random);
     PrimordialCellModel cell = env.getCell(entity);
@@ -115,10 +114,6 @@ public abstract class AbstractPrimordialEntityBehavior implements
     }
   }
 
-  public abstract void setState(SimulationModel state);
-
-  public abstract void updateState(SimulationModel state);
-
   /**
    * Sets the current input.
    */
@@ -129,9 +124,7 @@ public abstract class AbstractPrimordialEntityBehavior implements
    */
   protected abstract PrimordialEntityOutput getOutput(RandomGenerator random);
 
-  protected abstract void onRemoveEntity();
-
-  private boolean move(PrimordialCellModel fromCell, PrimordialCellModel toCell, PrimordialCellEnvironmentModel env) {
+  private boolean move(PrimordialCellModel fromCell, PrimordialCellModel toCell, PrimordialEnvironmentModel env) {
     if (toCell != null && canMoveToCell(toCell)) {
       env.moveEntityToCell(EntityType.ENTITY, fromCell, toCell);
       return true;

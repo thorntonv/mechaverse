@@ -1,8 +1,6 @@
 package org.mechaverse.gwt.server;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.zip.GZIPInputStream;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -12,10 +10,8 @@ import javax.servlet.http.HttpSessionListener;
 
 import org.mechaverse.gwt.shared.MechaverseGwtRpcService;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
-import org.mechaverse.simulation.ant.core.util.AntSimulationModelUtil;
 import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.common.Simulation;
-import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore.MemorySimulationDataStoreInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
@@ -80,12 +76,7 @@ public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
 
   @Override
   public SimulationModel getModel() throws Exception {
-    Simulation service = getSimulation();
-    synchronized (service) {
-      byte[] modelData = service.getState().get(AntSimulationState.MODEL_KEY);
-      return AntSimulationModelUtil.deserialize(new GZIPInputStream(
-          new ByteArrayInputStream(modelData)));
-    }
+    return getSimulation().getState();
   }
 
   @Override

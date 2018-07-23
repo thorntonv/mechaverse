@@ -62,7 +62,7 @@ public class CheckerboardPatternSimulation {
   }
 
   private static class Simulation
-      extends SimpleSimulation<CheckerboardPatternEntity, SimulationModel> {
+      extends SimpleSimulation<CheckerboardPatternEntity> {
 
     public Simulation(SimpleSimulationConfig<CheckerboardPatternEntity, SimulationModel> config) {
         super(new SimulationModel(), config);

@@ -19,7 +19,7 @@ public class PheromoneDecayBehavior extends AbstractAntEnvironmentBehavior {
 
   @Override
   public void beforeUpdate(AntSimulationModel model, CellEnvironment env,
-      EntityManager<AntSimulationModel, EntityModel<EntityType>> entityManager, RandomGenerator random) {
+      EntityManager<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> entityManager, RandomGenerator random) {
     if (model.getIteration() % decayInterval == 0) {
       decayPheromones(decayInterval, env, entityManager);
     }
@@ -30,7 +30,7 @@ public class PheromoneDecayBehavior extends AbstractAntEnvironmentBehavior {
    * removed.
    */
   public void decayPheromones(int decayAmount, CellEnvironment env,
-      EntityManager<AntSimulationModel, EntityModel<EntityType>> entityManager) {
+          EntityManager<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> entityManager) {
     for (int row = 0; row < env.getHeight(); row++) {
       for (int col = 0; col < env.getWidth(); col++) {
         Cell cell = env.getCell(row, col);

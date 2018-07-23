@@ -1,6 +1,6 @@
 package org.mechaverse.simulation.experimental.simple;
 
-import static org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_STATE_KEY;
+import static org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY;
 
 import java.util.UUID;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticData;
@@ -50,7 +50,7 @@ public abstract class SimpleCellularAutomatonEntity extends EntityModel {
   public void setGeneticDataStore(GeneticDataStore geneticDataStore) {
     this.geneticDataStore = geneticDataStore;
     this.cellularAutomatonGeneticData = new CellularAutomatonGeneticData(
-        geneticDataStore.get(CELLULAR_AUTOMATON_STATE_KEY), getCellularAutomatonModel());
+        geneticDataStore.get(CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY), getCellularAutomatonModel());
   }
 
   public CellularAutomatonGeneticData getCellularAutomatonGeneticData() {

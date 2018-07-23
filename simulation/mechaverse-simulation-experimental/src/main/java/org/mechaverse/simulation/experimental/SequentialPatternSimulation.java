@@ -85,7 +85,7 @@ public class SequentialPatternSimulation {
   }
 
   private static class Simulation
-      extends SimpleSimulation<SequentialPatternEntity, SimulationModel> {
+      extends SimpleSimulation<SequentialPatternEntity> {
 
     public Simulation(SimpleSimulationConfig<SequentialPatternEntity, SimulationModel> config) {
       super(new SimulationModel(), config);

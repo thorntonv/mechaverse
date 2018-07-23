@@ -26,7 +26,7 @@ import org.mechaverse.simulation.common.util.RandomUtil;
 public class AntSimulationEnvironmentGenerator
     extends AbstractProbabilisticEnvironmentModelGenerator<CellEnvironment, EntityModel<EntityType>, EntityType> {
 
-  private final EntityManager<AntSimulationModel, EntityModel<EntityType>> entityManager;
+  private final EntityManager<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> entityManager;
   private final Function<EntityType, EntityModel<EntityType>> entityFactory;
 
   public static ProbabilisticLocalGenerator<EntityType> newRockGenerator(RandomGenerator random) {
@@ -38,12 +38,12 @@ public class AntSimulationEnvironmentGenerator
   }
 
   public AntSimulationEnvironmentGenerator(
-      EntityManager<AntSimulationModel, EntityModel<EntityType>> entityManager, RandomGenerator random) {
+      EntityManager<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> entityManager, RandomGenerator random) {
     this(EntityUtil::newEntity, entityManager, random);
   }
 
   public AntSimulationEnvironmentGenerator(Function<EntityType, EntityModel<EntityType>> entityFactory,
-      EntityManager<AntSimulationModel, EntityModel<EntityType>> entityManager, RandomGenerator random) {
+          EntityManager<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> entityManager, RandomGenerator random) {
     super(ImmutableList.of(newRockGenerator(random)));
 
     this.entityFactory = entityFactory;

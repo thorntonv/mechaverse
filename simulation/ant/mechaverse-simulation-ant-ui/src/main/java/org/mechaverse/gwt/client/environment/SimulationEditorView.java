@@ -3,6 +3,7 @@ package org.mechaverse.gwt.client.environment;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.common.model.EnvironmentModel;
 
 import com.google.gwt.core.client.GWT;
@@ -96,7 +97,7 @@ public class SimulationEditorView extends ResizeComposite {
     }
   }
 
-  public void setEnvironment(EnvironmentModel environment) {
+  public void setEnvironment(CellEnvironment environment) {
     environmentEditorView.setEnvironment(environment);
   }
 

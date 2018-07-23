@@ -1,25 +1,25 @@
 package org.mechaverse.simulation.common;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.mechaverse.simulation.common.EntityManager.Observer;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.EnvironmentModel;
 import org.mechaverse.simulation.common.model.SimulationModel;
 
 public interface Environment<
-    SIM_MODEL extends SimulationModel,
-    ENV_MODEL extends EnvironmentModel,
-    ENT_MODEL extends EntityModel> {
+        SIM_MODEL extends SimulationModel<ENV_MODEL, ENT_MODEL, ENT_TYPE>,
+        ENV_MODEL extends EnvironmentModel<ENT_MODEL, ENT_TYPE>,
+        ENT_MODEL extends EntityModel<ENT_TYPE>,
+        ENT_TYPE extends Enum<ENT_TYPE>> {
 
   ENV_MODEL getModel();
 
-  void updateState(SIM_MODEL model);
+  void setState(SIM_MODEL simulationModel);
 
-  void setState(SIM_MODEL model);
+  void update(SIM_MODEL simulationModel, RandomGenerator random);
 
-  void update(SIM_MODEL model, RandomGenerator random);
+  void updateState(SIM_MODEL simulationModel);
 
-  void addObserver(Observer<SIM_MODEL, ENT_MODEL> observer);
+  void addObserver(EntityManager.Observer<SIM_MODEL, ENT_MODEL> observer);
 
   void close();
 }

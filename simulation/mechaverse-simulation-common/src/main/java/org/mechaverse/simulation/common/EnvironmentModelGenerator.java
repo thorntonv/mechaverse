@@ -16,8 +16,8 @@ import org.mechaverse.simulation.common.model.EnvironmentModel;
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 public interface EnvironmentModelGenerator<
-    ENV_MODEL extends EnvironmentModel,
-    ENT_MODEL extends EntityModel,
+    ENV_MODEL extends EnvironmentModel<ENT_MODEL, ENT_TYPE>,
+    ENT_MODEL extends EntityModel<ENT_TYPE>,
     ENT_TYPE extends Enum<ENT_TYPE>> {
 
   /**

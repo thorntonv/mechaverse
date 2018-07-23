@@ -4,10 +4,11 @@ import java.util.Iterator;
 
 import org.mechaverse.gwt.common.client.util.UUID;
 import org.mechaverse.gwt.shared.MechaverseGwtRpcServiceAsync;
-import org.mechaverse.simulation.common.util.SimulationModelUtil;
+import org.mechaverse.simulation.ant.core.model.CellEnvironment;
+import org.mechaverse.simulation.ant.core.model.EntityType;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.EnvironmentModel;
 import org.mechaverse.simulation.common.model.SimulationModel;
-
 import com.google.common.base.Preconditions;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -47,7 +48,7 @@ public class SimulationEditorPresenter {
   private long iteration;
 
   private String environmentId;
-  private SimulationModel state;
+  private SimulationModel<CellEnvironment, EntityModel<EntityType>, EntityType> state;
   private final EnvironmentEditorPresenter environmentEditorPresenter;
   private final SimulationEditorView view;
 
@@ -83,13 +84,13 @@ public class SimulationEditorPresenter {
   public void setState(SimulationModel state) {
     this.state = state;
     setEnvironment(environmentId);
-    view.setAvailableEnvironments(SimulationModelUtil.getEnvironments(state));
+    view.setAvailableEnvironments(state.getEnvironments());
   }
 
   public void createNewEnvironment() {
     Preconditions.checkNotNull(state);
 
-    final EnvironmentModel newEnvironment = new EnvironmentModel();
+    final CellEnvironment newEnvironment = new CellEnvironment();
     newEnvironment.setId(UUID.uuid().toLowerCase());
     newEnvironment.setWidth(25);
     newEnvironment.setHeight(25);
@@ -132,7 +133,7 @@ public class SimulationEditorPresenter {
   public void deleteEnvironment() {
     Preconditions.checkNotNull(state);
 
-    Iterator<EnvironmentModel> environmentIt = state.getSubEnvironments().iterator();
+    Iterator<CellEnvironment> environmentIt = state.getSubEnvironments().iterator();
     while (environmentIt.hasNext()) {
       EnvironmentModel env = environmentIt.next();
       if (env.getId().equalsIgnoreCase(environmentId)) {
@@ -155,9 +156,9 @@ public class SimulationEditorPresenter {
     Preconditions.checkNotNull(state);
 
     this.environmentId = environmentId;
-    EnvironmentModel env = state.getEnvironment();
+    CellEnvironment env = state.getEnvironment();
     if (environmentId != null) {
-      env = SimulationModelUtil.getEnvironment(state, environmentId);
+      env = state.getEnvironment(environmentId);
       if (env == null) {
         env = state.getEnvironment();
       }

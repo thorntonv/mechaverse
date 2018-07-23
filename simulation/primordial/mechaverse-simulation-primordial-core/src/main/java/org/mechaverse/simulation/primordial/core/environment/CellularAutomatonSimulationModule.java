@@ -4,8 +4,9 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
 import org.mechaverse.simulation.common.model.EntityModel;
-import org.mechaverse.simulation.common.model.SimulationModel;
-import org.mechaverse.simulation.primordial.core.model.PrimordialCellEnvironmentModel;
+import org.mechaverse.simulation.primordial.core.model.EntityType;
+import org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel;
+import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -20,9 +21,9 @@ public class CellularAutomatonSimulationModule extends PrimordialEnvironmentBeha
   private CellularAutomatonSimulator simulator;
 
   @Override
-  public void beforePerformAction(SimulationModel state,
-      PrimordialCellEnvironmentModel environmentModel,
-      EntityManager<SimulationModel, EntityModel> entityManager, RandomGenerator random) {
+  public void beforePerformAction(PrimordialSimulationModel state,
+      PrimordialEnvironmentModel environmentModel,
+      EntityManager<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> entityManager, RandomGenerator random) {
     if (simulator == null) {
       // Lazily load the cellular automaton simulator.
       simulator = simulatorFactory.getObject();

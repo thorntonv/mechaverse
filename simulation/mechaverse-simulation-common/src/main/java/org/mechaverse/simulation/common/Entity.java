@@ -13,8 +13,4 @@ public interface Entity<
   ENT_MODEL getModel();
 
   EntityBehavior<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE> getBehavior();
-
-  void setState(SIM_MODEL state);
-  void updateState(SIM_MODEL state);
-  void onRemoveEntity();
 }

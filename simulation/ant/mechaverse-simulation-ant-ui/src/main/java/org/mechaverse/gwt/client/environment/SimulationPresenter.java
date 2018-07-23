@@ -3,6 +3,9 @@ package org.mechaverse.gwt.client.environment;
 import org.mechaverse.gwt.client.manager.ManagerClientFactory;
 import org.mechaverse.gwt.common.client.webconsole.NotificationBar;
 import org.mechaverse.gwt.shared.MechaverseGwtRpcServiceAsync;
+import org.mechaverse.simulation.ant.core.model.CellEnvironment;
+import org.mechaverse.simulation.ant.core.model.EntityType;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.SimulationModel;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -156,7 +159,7 @@ public class SimulationPresenter extends AbstractActivity {
     panel.setWidget(view);
   }
 
-  public void setState(SimulationModel state) {
+  public void setState(SimulationModel<CellEnvironment, EntityModel<EntityType>, EntityType> state) {
     view.setEnvironment(state.getEnvironment());
   }
 

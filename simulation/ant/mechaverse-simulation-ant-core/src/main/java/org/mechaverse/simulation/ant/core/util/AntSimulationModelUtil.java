@@ -14,8 +14,8 @@ public class AntSimulationModelUtil {
       new Class[] {SimulationModel.class, CellEnvironment.class, Ant.class, Barrier.class,
           Conduit.class, Dirt.class, Food.class, Nest.class, Pheromone.class, Rock.class};
 
-  public static SimulationModel deserialize(InputStream in) throws IOException {
-    return SimulationModelUtil.deserialize(in, CLASSES_TO_BE_BOUND);
+  public static AntSimulationModel deserialize(InputStream in) throws IOException {
+    return SimulationModelUtil.deserialize(in, CLASSES_TO_BE_BOUND, AntSimulationModel.class);
   }
 
   public static void serialize(SimulationModel model, OutputStream out) throws IOException {

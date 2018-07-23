@@ -46,7 +46,7 @@ public class SimpleAntSimulation {
     }
   }
 
-  private static class Simulation extends SimpleSimulation<SimpleAntEntity, SimulationModel> {
+  private static class Simulation extends SimpleSimulation<SimpleAntEntity> {
 
     public Simulation(SimpleSimulationConfig<SimpleAntEntity, SimulationModel> config) {
       super(new SimulationModel(), config);

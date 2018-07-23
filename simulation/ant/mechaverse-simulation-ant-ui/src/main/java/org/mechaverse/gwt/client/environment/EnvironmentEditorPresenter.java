@@ -3,14 +3,12 @@ package org.mechaverse.gwt.client.environment;
 import org.mechaverse.gwt.common.client.util.UUID;
 import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.ant.core.model.Barrier;
-import org.mechaverse.simulation.common.model.Direction;
-import org.mechaverse.simulation.common.model.EntityModel;
-import org.mechaverse.simulation.common.model.EnvironmentModel;
-import org.mechaverse.simulation.ant.core.model.Food;
-import org.mechaverse.simulation.ant.core.model.Rock;
 import org.mechaverse.simulation.ant.core.model.Cell;
 import org.mechaverse.simulation.ant.core.model.CellEnvironment;
-
+import org.mechaverse.simulation.ant.core.model.Food;
+import org.mechaverse.simulation.ant.core.model.Rock;
+import org.mechaverse.simulation.common.model.Direction;
+import org.mechaverse.simulation.common.model.EntityModel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -30,8 +28,8 @@ public class EnvironmentEditorPresenter implements EnvironmentView.Observer, IsW
     view.getEnvironmentView().addObserver(this);
   }
 
-  public void setEnvironment(EnvironmentModel environment) {
-    this.cells = new CellEnvironment(environment);
+  public void setEnvironment(CellEnvironment environment) {
+    this.cells = environment;
     view.setEnvironment(environment);
     view.getEnvironmentView().update();
   }
@@ -66,7 +64,6 @@ public class EnvironmentEditorPresenter implements EnvironmentView.Observer, IsW
       cell.setEntity(newEntity);
     }
 
-    cells.updateModel();
     view.getEnvironmentView().update();
   }
 
@@ -75,7 +72,6 @@ public class EnvironmentEditorPresenter implements EnvironmentView.Observer, IsW
     Cell cell = cells.getCell(row, column);
     cell.clear();
 
-    cells.updateModel();
     view.getEnvironmentView().update();
   }
 

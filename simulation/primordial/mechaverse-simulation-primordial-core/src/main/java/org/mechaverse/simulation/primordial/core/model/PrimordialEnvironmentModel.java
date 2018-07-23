@@ -4,7 +4,7 @@ import org.mechaverse.simulation.common.cellautomaton.environment.AbstractCellEn
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.primordial.core.entity.EntityUtil;
 
-public class PrimordialCellEnvironmentModel extends
+public class PrimordialEnvironmentModel extends
     AbstractCellEnvironmentModel<EntityModel<EntityType>, EntityType, PrimordialCellModel> {
 
   @Override

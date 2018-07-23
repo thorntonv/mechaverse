@@ -111,7 +111,7 @@ public class MagicSquareSimulation {
   }
 
   private static class Simulation
-      extends SimpleSimulation<MagicSquareEntity, SimulationModel> {
+      extends SimpleSimulation<MagicSquareEntity> {
 
     public Simulation(SimpleSimulationConfig<MagicSquareEntity, SimulationModel> config) {
       super(new SimulationModel(), config);

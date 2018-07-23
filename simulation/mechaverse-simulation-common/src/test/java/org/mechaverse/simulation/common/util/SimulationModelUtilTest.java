@@ -1,16 +1,17 @@
 package org.mechaverse.simulation.common.util;
 
-import static org.junit.Assert.assertEquals;
-
-import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.google.common.io.CharStreams;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.zip.GZIPInputStream;
+
 import org.junit.Test;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.SimulationModel;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.google.common.io.CharStreams;
+
+import static org.junit.Assert.*;
 
 public class SimulationModelUtilTest {
 
@@ -84,9 +85,8 @@ public class SimulationModelUtilTest {
 
   @Test
   public void testDeserialize() throws IOException {
-
     SimulationModel simulationModel = SimulationModelUtil.deserialize(new ByteArrayInputStream(TEST_JSON.getBytes()), new Class[]{
-        TestCellEnvironmentModel.class, TestEntity1.class, TestEntity2.class});
+        TestCellEnvironmentModel.class, TestEntity1.class, TestEntity2.class}, SimulationModel.class);
 
     assertEquals("abc", simulationModel.getId());
     assertEquals(2, simulationModel.getEnvironment().getEntities().size());

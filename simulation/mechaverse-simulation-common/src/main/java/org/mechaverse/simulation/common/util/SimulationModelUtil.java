@@ -34,14 +34,14 @@ public final class SimulationModelUtil {
     out.close();
   }
 
-  public static SimulationModel deserialize(InputStream in, Class[] classesToBeBound) throws IOException {
+  public static <SIM_MODEL extends SimulationModel> SIM_MODEL deserialize(InputStream in, Class[] classesToBeBound, Class<SIM_MODEL> simulationModelClass) throws IOException {
     if (in == null) {
-      return new SimulationModel();
+      return null;
     }
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     objectMapper.registerSubtypes(classesToBeBound);
-    return objectMapper.readValue(in, SimulationModel.class);
+    return objectMapper.readValue(in, simulationModelClass);
   }
 
   /**

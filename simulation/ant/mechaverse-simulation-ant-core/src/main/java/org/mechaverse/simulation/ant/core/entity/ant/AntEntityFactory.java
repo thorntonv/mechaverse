@@ -7,7 +7,7 @@ import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.common.EntityFactory;
 import org.mechaverse.simulation.common.model.EntityModel;
 
-public class AntEntityFactory implements EntityFactory<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType, AbstractAntEntity> {
+public class AntEntityFactory implements EntityFactory<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> {
 
   @Override
   public Optional<AbstractAntEntity> create(EntityModel<EntityType> entityModel) {

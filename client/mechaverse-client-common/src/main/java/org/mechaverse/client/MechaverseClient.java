@@ -14,9 +14,8 @@ import org.mechaverse.service.manager.api.MechaverseManager;
 import org.mechaverse.service.manager.api.model.Task;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
 import org.mechaverse.simulation.common.Simulation;
-import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore.MemorySimulationDataStoreInputStream;
-import org.mechaverse.simulation.common.datastore.SimulationDataStore;
-import org.mechaverse.simulation.common.datastore.SimulationDataStoreInputStream;
+import org.mechaverse.simulation.common.model.SimulationModel;
+import org.mechaverse.simulation.common.util.SimulationModelUtil;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -106,45 +105,38 @@ public class MechaverseClient {
         instanceIdx, task.getSimulationId(), task.getInstanceId(), task.getIteration());
 
     try(AbstractApplicationContext ctx = getApplicationContext()) {
-      SimulationDataStore state;
       Simulation simulation = createSimulation(ctx);
       if (task.getIteration() >= 0) {
         // Get the state from the storage service.
         logSubOperationStart("Retrieving simulation state");
         InputStream in = storageService.getState(
             task.getSimulationId(), task.getInstanceId(), task.getIteration());
-        MemorySimulationDataStoreInputStream stateIn = new MemorySimulationDataStoreInputStream(in);
 
-        try {
-          state = stateIn.readDataStore();
-        } finally {
-          stateIn.close();
-          in.close();
-        }
+        // TODO(thorntonv): FIX ME!!!!!!!!!
+        simulation.setState(SimulationModelUtil.deserialize(in, null, SimulationModel.class));
 
         logOperationDone();
       } else {
         // Generate a new state.
         logSubOperationStart("Generating initial simulation state");
-        state = simulation.generateRandomState();
+        simulation.setState(simulation.generateRandomState());
         logOperationDone();
       }
 
       if (task.getIterationCount() > 0) {
         logSubOperationStart("Performing " + task.getIterationCount() + " iterations");
-        simulation.setState(state);
         long startTime = System.nanoTime();
         simulation.step(task.getIterationCount());
         long runTime =
             TimeUnit.MILLISECONDS.convert(System.nanoTime() - startTime, TimeUnit.NANOSECONDS);
-        state = simulation.getState();
         logOperationDone(runTime);
       }
 
       // Submit result.
       logSubOperationStart("Submitting result");
 
-      manager.submitResult(task.getId(), SimulationDataStoreInputStream.newInputStream(state));
+      // TODO(thorntonv): FIX ME !!!!!!!
+      manager.submitResult(task.getId(), null);
       logOperationDone();
     } catch (Throwable ex) {
       printErrorMessage(ex);

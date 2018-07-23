@@ -15,7 +15,7 @@ import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.util.SimulationUtil;
 import org.springframework.beans.factory.annotation.Value;
 
-public abstract class AbstractAntBehavior implements EntityBehavior<AntSimulationModel, CellEnvironment, EntityModel<EntityType>> {
+public abstract class AbstractAntBehavior implements EntityBehavior<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> {
 
   private static final EntityType[] CARRIABLE_ENTITY_TYPES =
       {EntityType.DIRT, EntityType.FOOD,EntityType.ROCK};
@@ -127,7 +127,7 @@ public abstract class AbstractAntBehavior implements EntityBehavior<AntSimulatio
 
   @Override
   public void performAction(CellEnvironment env,
-      EntityManager<AntSimulationModel, EntityModel<EntityType>> entityManager,
+      EntityManager<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> entityManager,
       RandomGenerator random) {
     AntOutput output = getOutput(random);
 
@@ -216,11 +216,14 @@ public abstract class AbstractAntBehavior implements EntityBehavior<AntSimulatio
    */
   protected abstract AntOutput getOutput(RandomGenerator random);
 
-  protected void onRemoveEntity() {}
+  @Override
+  public void onRemoveEntity() {}
 
-  void setState(AntSimulationModel state) {}
+  @Override
+  public void setState(AntSimulationModel state) {}
 
-  void updateState(AntSimulationModel state) {}
+  @Override
+  public void updateState(AntSimulationModel state) {}
 
   private boolean move(Cell fromCell, Cell toCell, CellEnvironment env) {
     if (toCell != null && canMoveToCell(toCell)) {
@@ -272,7 +275,7 @@ public abstract class AbstractAntBehavior implements EntityBehavior<AntSimulatio
   }
 
   private void leavePheromone(Cell cell, int type,
-      EntityManager<AntSimulationModel, EntityModel<EntityType>> entityManager) {
+      EntityManager<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> entityManager) {
     int energy = entity.getEnergy();
     if (energy > leavePheromoneEnergyCost) {
       entity.setEnergy(energy - leavePheromoneEnergyCost);
@@ -292,7 +295,7 @@ public abstract class AbstractAntBehavior implements EntityBehavior<AntSimulatio
   }
 
   private boolean consumeFood(EntityModel<EntityType> food,
-      EntityManager<AntSimulationModel, EntityModel<EntityType>> entityManager) {
+      EntityManager<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> entityManager) {
     if (food != null) {
       addEnergy(food.getEnergy());
       entityManager.removeEntity(food);

@@ -73,7 +73,7 @@ public class FoodGenerationBehavior extends AbstractAntEnvironmentBehavior {
 
   @Override
   public void beforeUpdate(AntSimulationModel state, CellEnvironment env,
-      EntityManager<AntSimulationModel, EntityModel<EntityType>> entityManager, RandomGenerator random) {
+       EntityManager<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> entityManager, RandomGenerator random) {
     if (foodCount < minFoodCount) {
       int row = random.nextInt(env.getHeight());
       int col = random.nextInt(env.getWidth());

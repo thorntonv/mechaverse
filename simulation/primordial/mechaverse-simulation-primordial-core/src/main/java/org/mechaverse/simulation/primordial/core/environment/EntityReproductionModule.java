@@ -10,9 +10,10 @@ import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.common.util.SimulationUtil;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
-import org.mechaverse.simulation.primordial.core.model.PrimordialCellEnvironmentModel;
+import org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel;
 import org.mechaverse.simulation.primordial.core.model.PrimordialCellModel;
 import org.mechaverse.simulation.primordial.core.model.PrimordialEntityModel;
+import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,8 +41,9 @@ public class EntityReproductionModule extends PrimordialEnvironmentBehavior {
   }
 
   @Override
-  public void beforeUpdate(SimulationModel state, PrimordialCellEnvironmentModel env,
-      EntityManager<SimulationModel, EntityModel> entityManager, RandomGenerator random) {
+  public void beforeUpdate(PrimordialSimulationModel state, PrimordialEnvironmentModel env,
+      EntityManager<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> entityManager,
+          RandomGenerator random) {
     if (entities.size() < entityMaxCount) {
       int row = random.nextInt(env.getHeight());
       int col = random.nextInt(env.getWidth());
@@ -68,14 +70,14 @@ public class EntityReproductionModule extends PrimordialEnvironmentBehavior {
   }
 
   @Override
-  public void onAddEntity(EntityModel entity, SimulationModel state) {
+  public void onAddEntity(EntityModel<EntityType> entity, PrimordialSimulationModel state) {
     if (entity instanceof PrimordialEntityModel) {
       entities.add((PrimordialEntityModel) entity);
     }
   }
 
   @Override
-  public void onRemoveEntity(EntityModel entity, SimulationModel state) {
+  public void onRemoveEntity(EntityModel<EntityType> entity, PrimordialSimulationModel state) {
     if (entity instanceof PrimordialEntityModel) {
       entities.remove(entity);
     }

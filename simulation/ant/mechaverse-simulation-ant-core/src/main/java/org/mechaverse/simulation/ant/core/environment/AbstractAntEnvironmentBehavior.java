@@ -7,5 +7,5 @@ import org.mechaverse.simulation.common.AbstractEnvironmentBehavior;
 import org.mechaverse.simulation.common.model.EntityModel;
 
 public abstract class AbstractAntEnvironmentBehavior extends
-    AbstractEnvironmentBehavior<AntSimulationModel, CellEnvironment, EntityModel<EntityType>> {
+    AbstractEnvironmentBehavior<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> {
 }

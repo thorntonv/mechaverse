@@ -142,7 +142,7 @@ public class MajoritySimulation {
     }
   }
 
-  private static class Simulation extends SimpleSimulation<MajorityEntity, SimulationModel> {
+  private static class Simulation extends SimpleSimulation<MajorityEntity> {
 
     public Simulation(SimpleSimulationConfig<MajorityEntity, SimulationModel> config) {
       super(new SimulationModel(), config);

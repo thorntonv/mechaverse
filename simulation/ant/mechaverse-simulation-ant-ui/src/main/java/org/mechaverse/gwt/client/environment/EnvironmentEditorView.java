@@ -1,7 +1,6 @@
 package org.mechaverse.gwt.client.environment;
 
-import org.mechaverse.simulation.common.model.EnvironmentModel;
-
+import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -27,7 +26,7 @@ public class EnvironmentEditorView extends ResizeComposite {
     initWidget(uiBinder.createAndBindUi(this));
   }
 
-  public void setEnvironment(EnvironmentModel environment) {
+  public void setEnvironment(CellEnvironment environment) {
     environmentView.setEnvironment(environment);
   }
 

@@ -1,13 +1,12 @@
 package org.mechaverse.simulation.ant.core.environment;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.util.Pair;
@@ -18,6 +17,7 @@ import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.model.Nest;
 import org.mechaverse.simulation.common.EntityManager;
+import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator;
 import org.mechaverse.simulation.common.genetic.CutAndSpliceCrossoverGeneticRecombinator;
 import org.mechaverse.simulation.common.genetic.GeneticData;
 import org.mechaverse.simulation.common.genetic.GeneticDataStore;
@@ -27,6 +27,8 @@ import org.mechaverse.simulation.common.util.SimulationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 
 /**
  * An environment simulation module that maintains a target ant population size.
@@ -108,7 +110,7 @@ public class AntReproductionBehavior extends AbstractAntEnvironmentBehavior {
 
   @Override
   public void beforeUpdate(AntSimulationModel state, CellEnvironment env,
-      EntityManager<AntSimulationModel, EntityModel<EntityType>> entityManager, RandomGenerator random) {
+      EntityManager<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> entityManager, RandomGenerator random) {
     if (ants.size() < antMaxCount && nest != null) {
       Cell nestCell = env.getCell(nest);
       int row = random.nextInt(maxGeneratedAntNestDistance * 2) - maxGeneratedAntNestDistance
@@ -161,7 +163,7 @@ public class AntReproductionBehavior extends AbstractAntEnvironmentBehavior {
     GeneticDataStore parent2GeneticDataStore = new GeneticDataStore(parent2);
 
     GeneticDataStore childGeneticDataStore = new GeneticDataStore(ant);
-    for (String key : parent1GeneticDataStore.keySet()) {
+    for (String key : CellularAutomatonGeneticDataGenerator.KEY_SET) {
       GeneticData parent1GeneticData = parent1GeneticDataStore.get(key);
       GeneticData parent2GeneticData = parent2GeneticDataStore.get(key);
       GeneticData childData = geneticRecombinator.recombine(

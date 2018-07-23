@@ -1,21 +1,22 @@
 package org.mechaverse.simulation.primordial.core.environment;
 
-import com.google.common.collect.ImmutableTable;
-import com.google.common.collect.Table;
 import java.util.function.Function;
+
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.AbstractProbabilisticEnvironmentModelGenerator.EntityDistribution;
 import org.mechaverse.simulation.common.AbstractProbabilisticEnvironmentModelGenerator.ProbabilisticLocalGenerator;
 import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.common.model.EntityModel;
-import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.primordial.core.entity.EntityUtil;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
 import org.mechaverse.simulation.primordial.core.model.Food;
-import org.mechaverse.simulation.primordial.core.model.PrimordialCellEnvironmentModel;
+import org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel;
+import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import com.google.common.collect.ImmutableTable;
+import com.google.common.collect.Table;
 
 /**
  * Generates clusters of food to maintain a minimum quantity of food.
@@ -63,8 +64,8 @@ public class FoodGenerationModule extends PrimordialEnvironmentBehavior {
   private int foodCount = 0;
 
   @Override
-  public void beforeUpdate(SimulationModel state, PrimordialCellEnvironmentModel env,
-      EntityManager<SimulationModel, EntityModel> entityManager, RandomGenerator random) {
+  public void beforeUpdate(PrimordialSimulationModel state, PrimordialEnvironmentModel env,
+          EntityManager<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> entityManager, RandomGenerator random) {
     if (foodCount < minFoodCount) {
       int row = random.nextInt(env.getHeight());
       int col = random.nextInt(env.getWidth());
@@ -85,14 +86,14 @@ public class FoodGenerationModule extends PrimordialEnvironmentBehavior {
   }
 
   @Override
-  public void onAddEntity(EntityModel entity, SimulationModel state) {
+  public void onAddEntity(EntityModel entity, PrimordialSimulationModel state) {
     if (entity instanceof Food) {
       foodCount++;
     }
   }
 
   @Override
-  public void onRemoveEntity(EntityModel entity, SimulationModel state) {
+  public void onRemoveEntity(EntityModel entity, PrimordialSimulationModel state) {
     if (entity instanceof Food) {
       foodCount--;
     }

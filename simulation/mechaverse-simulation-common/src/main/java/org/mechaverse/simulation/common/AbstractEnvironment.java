@@ -1,41 +1,43 @@
 package org.mechaverse.simulation.common;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.EnvironmentModel;
 import org.mechaverse.simulation.common.model.SimulationModel;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 
 /**
  * Simulates an environment.
  */
+@SuppressWarnings("unused")
 public abstract class AbstractEnvironment<
-    SIM_MODEL extends SimulationModel<ENV_MODEL, ENT_MODEL, ENT_TYPE>,
-    ENV_MODEL extends EnvironmentModel<ENT_MODEL, ENT_TYPE>,
-    ENT_MODEL extends EntityModel<ENT_TYPE>,
-    ENT_TYPE extends Enum<ENT_TYPE>,
-    ENT extends Entity<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE>>
-    implements Environment<SIM_MODEL, ENV_MODEL, ENT_MODEL>, EntityManager<SIM_MODEL, ENT_MODEL>, AutoCloseable {
+        SIM_MODEL extends SimulationModel<ENV_MODEL, ENT_MODEL, ENT_TYPE>,
+        ENV_MODEL extends EnvironmentModel<ENT_MODEL, ENT_TYPE>,
+        ENT_MODEL extends EntityModel<ENT_TYPE>,
+        ENT_TYPE extends Enum<ENT_TYPE>>
+        implements Environment<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE>,
+        EntityManager<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE>, AutoCloseable {
 
   private final String environmentId;
   private SIM_MODEL simulationModel;
   private ENV_MODEL environmentModel;
-  private final Map<String, ENT> activeEntities = new LinkedHashMap<>();
+  private final Map<String, Entity<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE>> activeEntities = new LinkedHashMap<>();
   private final Set<Observer<SIM_MODEL, ENT_MODEL>> observers = Sets.newLinkedHashSet();
-  private final EntityFactory<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE, ENT> entityFactory;
-  private final List<EnvironmentBehavior<SIM_MODEL, ENV_MODEL, ENT_MODEL>> behaviors;
+  private final EntityFactory<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE> entityFactory;
+  private final List<EnvironmentBehavior<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE>> behaviors;
 
-  private AbstractEnvironment(String environmentId,
-      List<EnvironmentBehavior<SIM_MODEL, ENV_MODEL, ENT_MODEL>> behaviors,
-      EntityFactory<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE, ENT> entityFactory) {
+  protected AbstractEnvironment(String environmentId,
+      List<EnvironmentBehavior<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE>> behaviors,
+      EntityFactory<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE> entityFactory) {
     this.environmentId = Preconditions.checkNotNull(environmentId);
     this.behaviors = Preconditions.checkNotNull(behaviors);
     this.entityFactory = Preconditions.checkNotNull(entityFactory);
@@ -44,53 +46,36 @@ public abstract class AbstractEnvironment<
   public void update(SIM_MODEL simulationModel, RandomGenerator random) {
     this.simulationModel = simulationModel;
 
-    for (EnvironmentBehavior<SIM_MODEL, ENV_MODEL, ENT_MODEL> behavior : behaviors) {
-      behavior.beforeUpdate(simulationModel, environmentModel, this, random);
-    }
+    behaviors.forEach(behavior -> behavior.beforeUpdate(simulationModel, environmentModel, this, random));
 
     // Create a copy of the active entities because entities may be added or removed during the
     // update.
-    List<ENT> activeEntityList = new ArrayList<>(activeEntities.values());
+    List<Entity<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE>> activeEntityList = new ArrayList<>(activeEntities.values());
 
-    for (ENT entity : activeEntityList) {
-      entity.getBehavior().updateInput(environmentModel, random);
-    }
+    activeEntityList.forEach(activeEntity -> activeEntity.getBehavior().updateInput(environmentModel, random));
 
-    for (EnvironmentBehavior<SIM_MODEL, ENV_MODEL, ENT_MODEL> behavior : behaviors) {
-      behavior.beforePerformAction(simulationModel, environmentModel, this, random);
-    }
+    behaviors.forEach(behavior -> behavior.beforePerformAction(simulationModel, environmentModel, this, random));
 
-    for (ENT entity : activeEntityList) {
-      entity.getBehavior().performAction(environmentModel, this, random);
-    }
+    activeEntityList.forEach(activeEntity -> activeEntity.getBehavior().performAction(environmentModel, this, random));
 
-    for (EnvironmentBehavior<SIM_MODEL, ENV_MODEL, ENT_MODEL> behavior : behaviors) {
-      behavior.afterUpdate(simulationModel, environmentModel, this, random);
-    }
+    behaviors.forEach(behavior -> behavior.afterUpdate(simulationModel, environmentModel, this, random));
   }
 
+  @Override
   public void setState(SIM_MODEL simulationModel) {
     cleanUp();
 
     this.simulationModel = simulationModel;
 
-    for (EnvironmentBehavior<SIM_MODEL, ENV_MODEL, ENT_MODEL> behavior : behaviors) {
-      behavior.setState(simulationModel, environmentModel, this);
-    }
+    behaviors.forEach(behavior -> behavior.setState(simulationModel, environmentModel, this));
 
     this.environmentModel = simulationModel.getEnvironment(environmentId);
 
-    for (ENT_MODEL entityModel : environmentModel.getEntities()) {
-      addEntity(entityModel);
-    }
+    environmentModel.getEntities().forEach(this::addEntity);
 
-    for (ENT entity : activeEntities.values()) {
-      entity.setState(simulationModel);
-    }
+    activeEntities.values().forEach(activeEntity -> activeEntity.getBehavior().setState(simulationModel));
 
-    for(EnvironmentBehavior<SIM_MODEL, ENV_MODEL, ENT_MODEL> behavior : behaviors) {
-      addObserver(behavior);
-    }
+    behaviors.forEach(this::addObserver);
   }
 
   @Override
@@ -99,38 +84,30 @@ public abstract class AbstractEnvironment<
   }
 
   public void updateState(SIM_MODEL simulationModel) {
-    for (EnvironmentBehavior<SIM_MODEL, ENV_MODEL, ENT_MODEL> behavior : behaviors) {
-      behavior.updateState(simulationModel, environmentModel, this);
-    }
-    for (ENT activeEntity : activeEntities.values()) {
-      activeEntity.updateState(simulationModel);
-    }
+    behaviors.forEach(behavior -> behavior.updateState(simulationModel, environmentModel, this));
+    activeEntities.values().forEach(activeEntity -> activeEntity.getBehavior().updateState(simulationModel));
   }
 
   @Override
   public void addEntity(ENT_MODEL entityModel) {
-    Optional<ENT> entity = entityFactory.create(entityModel);
+    Optional<? extends Entity<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE>> entity = entityFactory.create(entityModel);
 
     if (entity.isPresent()) {
       if (simulationModel != null) {
-        entity.get().setState(simulationModel);
+        entity.get().getBehavior().setState(simulationModel);
       }
       activeEntities.put(entityModel.getId(), entity.get());
     }
-    for (Observer<SIM_MODEL, ENT_MODEL> observer : observers) {
-      observer.onAddEntity(entityModel, simulationModel);
-    }
+    observers.forEach(observer -> observer.onAddEntity(entityModel, simulationModel));
   }
 
   @Override
   public void removeEntity(ENT_MODEL entity) {
-    ENT activeEntity = activeEntities.remove(entity.getId());
+    Entity<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE> activeEntity = activeEntities.remove(entity.getId());
     if(activeEntity != null) {
-      activeEntity.updateState(simulationModel);
+      activeEntity.getBehavior().updateState(simulationModel);
     }
-    for (Observer<SIM_MODEL, ENT_MODEL> observer : observers) {
-      observer.onRemoveEntity(entity, simulationModel);
-    }
+    observers.forEach(observer -> observer.onRemoveEntity(entity, simulationModel));
   }
 
   public Iterable<ENT_MODEL> getEntities() {
@@ -141,9 +118,7 @@ public abstract class AbstractEnvironment<
   public void addObserver(EntityManager.Observer<SIM_MODEL, ENT_MODEL> observer) {
     observers.add(observer);
 
-    for (ENT_MODEL entity : getEntities()) {
-      observer.onAddEntity(entity, simulationModel);
-    }
+    getEntities().forEach(entity -> observer.onAddEntity(entity, simulationModel));
   }
 
   @Override
@@ -160,9 +135,7 @@ public abstract class AbstractEnvironment<
     observers.removeAll(behaviors);
 
     // Clean up the active entities.
-    for (Entity entity : activeEntities.values()) {
-      entity.onRemoveEntity();
-    }
+    activeEntities.values().forEach(activeEntity -> activeEntity.getBehavior().onRemoveEntity());
     activeEntities.clear();
   }
 }

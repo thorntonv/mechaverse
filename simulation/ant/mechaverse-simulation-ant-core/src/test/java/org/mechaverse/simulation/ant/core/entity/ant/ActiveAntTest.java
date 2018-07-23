@@ -1,37 +1,21 @@
 package org.mechaverse.simulation.ant.core.entity.ant;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mechaverse.simulation.ant.core.entity.ant.AntInput.SensorInfo;
 import org.mechaverse.simulation.ant.core.model.Ant;
-import org.mechaverse.simulation.common.model.Direction;
-import org.mechaverse.simulation.common.model.EntityModel;
+import org.mechaverse.simulation.ant.core.model.Cell;
+import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.model.Food;
 import org.mechaverse.simulation.ant.core.model.Nest;
 import org.mechaverse.simulation.ant.core.model.Pheromone;
 import org.mechaverse.simulation.ant.core.model.Rock;
-import org.mechaverse.simulation.ant.core.AntSimulationTestUtil;
-import org.mechaverse.simulation.ant.core.model.Cell;
-import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.common.EntityManager;
-import org.mechaverse.simulation.ant.core.entity.ant.AntEntity.AntBehavior;
-import org.mechaverse.simulation.ant.core.entity.ant.AntInput.SensorInfo;
+import org.mechaverse.simulation.common.model.Direction;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.MoveDirection;
 import org.mechaverse.simulation.common.model.TurnDirection;
 import org.mechaverse.simulation.common.util.RandomUtil;
@@ -39,6 +23,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit test for {@link AntEntity}.
@@ -49,7 +38,7 @@ public class ActiveAntTest {
   @Mock
   private Ant mockAntEntity;
   @Mock
-  private AntBehavior mockAntBehavior;
+  private AbstractAntBehavior mockAntBehavior;
   @Mock
   private CellEnvironment mockEnvironment;
   @Mock
@@ -79,7 +68,7 @@ public class ActiveAntTest {
 
   @Before
   public void setUp() {
-    activeAnt = new AntEntity(mockAntEntity, mockAntBehavior);
+    activeAnt = new AntEntity(mockAntBehavior);
     random = RandomUtil.newGenerator(ActiveAntTest.class.getName().hashCode());
 
     when(mockAntEntity.getId()).thenReturn("001");
@@ -92,19 +81,19 @@ public class ActiveAntTest {
 
   @Test
   public void getEntity() {
-    assertEquals(mockAntEntity, activeAnt.getEntity());
+    assertEquals(mockAntEntity, activeAnt.getModel());
   }
 
   @Test
   public void getEntityType() {
-    assertEquals(EntityType.ANT, activeAnt.getType());
+    assertEquals(EntityType.ANT, activeAnt.getModel().getType());
   }
 
   @Test
   public void age() {
     when(mockAntEntity.getAge()).thenReturn(100L);
     mockOutput(new AntOutput());
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
+    activeAnt.getBehavior().performAction(mockEnvironment, mockEntityManager, random);
     verify(mockAntEntity).setAge(101L);
   }
 
@@ -112,7 +101,7 @@ public class ActiveAntTest {
   public void energyLevel() {
     when(mockAntEntity.getEnergy()).thenReturn(75);
     when(mockAntEntity.getMaxEnergy()).thenReturn(100);
-    activeAnt.updateInput(mockEnvironment, random);
+    activeAnt.getBehavior().updateInput(mockEnvironment, random);
     verify(mockAntBehavior).setInput(inputCaptor.capture(), eq(random));
     assertEquals(5, inputCaptor.getValue().getEnergyLevel());
   }
@@ -120,7 +109,7 @@ public class ActiveAntTest {
   @Test
   public void performAction_energyConsumed() {
     mockOutput(new AntOutput());
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
+    activeAnt.getBehavior().performAction(mockEnvironment, mockEntityManager, random);
     verify(mockAntEntity).setEnergy(9);
   }
 
@@ -128,9 +117,9 @@ public class ActiveAntTest {
   public void performAction_noEnergy() {
     mockOutput(new AntOutput());
     when(mockAntEntity.getEnergy()).thenReturn(1).thenReturn(0);
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
+    activeAnt.getBehavior().performAction(mockEnvironment, mockEntityManager, random);
     verify(mockAntEntity).setEnergy(0);
-    verify(mockEntityManager).removeEntity(activeAnt.getEntity());
+    verify(mockEntityManager).removeEntity(activeAnt.getModel());
     verify(mockAntBehavior).onRemoveEntity();
   }
 
@@ -140,18 +129,18 @@ public class ActiveAntTest {
     when(mockAntEntity.getCarriedEntity()).thenReturn(mockRock);
     when(mockAntEntity.getEnergy()).thenReturn(1).thenReturn(0);
     when(mockEnvironment.getCell(mockAntEntity)).thenReturn(mockCell);
-    activeAnt = new AntEntity(mockAntEntity, mockAntBehavior);
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
+    activeAnt = new AntEntity(mockAntBehavior);
+    activeAnt.getBehavior().performAction(mockEnvironment, mockEntityManager, random);
     verify(mockAntEntity).setEnergy(0);
-    verify(mockEntityManager).removeEntity(activeAnt.getEntity());
+    verify(mockEntityManager).removeEntity(activeAnt.getModel());
     verify(mockAntBehavior).onRemoveEntity();
-    verify(mockCell).setEntity(mockRock, EntityType.ROCK);
+    verify(mockCell).setEntity(mockRock);
   }
 
   @Test
   public void direction() {
     when(mockAntEntity.getDirection()).thenReturn(Direction.SOUTH_WEST);
-    activeAnt.updateInput(mockEnvironment, random);
+    activeAnt.getBehavior().updateInput(mockEnvironment, random);
     verify(mockAntBehavior).setInput(inputCaptor.capture(), eq(random));
     assertEquals(Direction.SOUTH_WEST, inputCaptor.getValue().getDirection());
   }
@@ -159,7 +148,7 @@ public class ActiveAntTest {
   @Test
   public void cellSensor_empty() {
     when(mockCell.getEntity(EntityType.ANT)).thenReturn(mockAntEntity);
-    activeAnt.updateInput(mockEnvironment, random);
+    activeAnt.getBehavior().updateInput(mockEnvironment, random);
     verify(mockAntBehavior).setInput(inputCaptor.capture(), eq(random));
     assertEquals(EntityType.NONE, inputCaptor.getValue().getCellSensor());
   }
@@ -169,7 +158,7 @@ public class ActiveAntTest {
     when(mockCell.getEntity(EntityType.FOOD)).thenReturn(mockFood);
     when(mockCell.getEntity(EntityType.ANT)).thenReturn(mockAntEntity);
 
-    activeAnt.updateInput(mockEnvironment, random);
+    activeAnt.getBehavior().updateInput(mockEnvironment, random);
     verify(mockAntBehavior).setInput(inputCaptor.capture(), eq(random));
 
     assertEquals(EntityType.FOOD, inputCaptor.getValue().getCellSensor());
@@ -177,7 +166,7 @@ public class ActiveAntTest {
 
   @Test
   public void frontCellSensor_empty() {
-    activeAnt.updateInput(mockEnvironment, random);
+    activeAnt.getBehavior().updateInput(mockEnvironment, random);
     verify(mockAntBehavior).setInput(inputCaptor.capture(), eq(random));
     assertEquals(EntityType.NONE, inputCaptor.getValue().getFrontSensor().getEntityType());
   }
@@ -185,7 +174,7 @@ public class ActiveAntTest {
   @Test
   public void frontCellSensor_noCell() {
     when(mockEnvironment.getCellInDirection(mockCell, Direction.EAST)).thenReturn(null);
-    activeAnt.updateInput(mockEnvironment, random);
+    activeAnt.getBehavior().updateInput(mockEnvironment, random);
     verify(mockAntBehavior).setInput(inputCaptor.capture(), eq(random));
     assertNull(inputCaptor.getValue().getFrontSensor().getEntityType());
   }
@@ -197,7 +186,7 @@ public class ActiveAntTest {
     when(mockAnt.getDirection()).thenReturn(Direction.WEST);
     when(mockAnt.getId()).thenReturn("test");
 
-    activeAnt.updateInput(mockEnvironment, random);
+    activeAnt.getBehavior().updateInput(mockEnvironment, random);
     verify(mockAntBehavior).setInput(inputCaptor.capture(), eq(random));
 
     verifySensorInfo(inputCaptor.getValue().getFrontSensor(),
@@ -208,7 +197,7 @@ public class ActiveAntTest {
   public void frontCellSensor_food() {
     when(mockFrontCell.getEntity()).thenReturn(mockFood);
     when(mockFrontCell.getEntityType()).thenReturn(EntityType.FOOD);
-    activeAnt.updateInput(mockEnvironment, random);
+    activeAnt.getBehavior().updateInput(mockEnvironment, random);
     verify(mockAntBehavior).setInput(inputCaptor.capture(), eq(random));
     assertEquals(EntityType.FOOD, inputCaptor.getValue().getFrontSensor().getEntityType());
   }
@@ -216,7 +205,7 @@ public class ActiveAntTest {
   @Test
   public void frontLeftCellSensor_food() {
     mockEntityAtCellInDirection(EntityType.FOOD, mockFood, mockCell, Direction.NORTH_EAST);
-    activeAnt.updateInput(mockEnvironment, random);
+    activeAnt.getBehavior().updateInput(mockEnvironment, random);
     verify(mockAntBehavior).setInput(inputCaptor.capture(), eq(random));
     assertEquals(EntityType.FOOD, inputCaptor.getValue().getFrontLeftSensor().getEntityType());
   }
@@ -224,14 +213,14 @@ public class ActiveAntTest {
   @Test
   public void frontLeftCellSensor_empty() {
     mockEntityAtCellInDirection(null, null, mockCell, Direction.NORTH_EAST);
-    activeAnt.updateInput(mockEnvironment, random);
+    activeAnt.getBehavior().updateInput(mockEnvironment, random);
     verify(mockAntBehavior).setInput(inputCaptor.capture(), eq(random));
     assertEquals(EntityType.NONE, inputCaptor.getValue().getFrontLeftSensor().getEntityType());
   }
 
   @Test
   public void frontLeftCellSensor_noCell() {
-    activeAnt.updateInput(mockEnvironment, random);
+    activeAnt.getBehavior().updateInput(mockEnvironment, random);
     verify(mockAntBehavior).setInput(inputCaptor.capture(), eq(random));
     assertNull(inputCaptor.getValue().getFrontLeftSensor().getEntityType());
   }
@@ -239,7 +228,7 @@ public class ActiveAntTest {
   @Test
   public void frontRightCellSensor_food() {
     mockEntityAtCellInDirection(EntityType.FOOD, mockFood, mockCell, Direction.SOUTH_EAST);
-    activeAnt.updateInput(mockEnvironment, random);
+    activeAnt.getBehavior().updateInput(mockEnvironment, random);
     verify(mockAntBehavior).setInput(inputCaptor.capture(), eq(random));
     assertEquals(EntityType.FOOD, inputCaptor.getValue().getFrontRightSensor().getEntityType());
   }
@@ -247,14 +236,14 @@ public class ActiveAntTest {
   @Test
   public void frontRightCellSensor_empty() {
     mockEntityAtCellInDirection(null, null, mockCell, Direction.SOUTH_EAST);
-    activeAnt.updateInput(mockEnvironment, random);
+    activeAnt.getBehavior().updateInput(mockEnvironment, random);
     verify(mockAntBehavior).setInput(inputCaptor.capture(), eq(random));
     assertEquals(EntityType.NONE, inputCaptor.getValue().getFrontRightSensor().getEntityType());
   }
 
   @Test
   public void frontRightCellSensor_noCell() {
-    activeAnt.updateInput(mockEnvironment, random);
+    activeAnt.getBehavior().updateInput(mockEnvironment, random);
     verify(mockAntBehavior).setInput(inputCaptor.capture(), eq(random));
     assertNull(inputCaptor.getValue().getFrontRightSensor().getEntityType());
   }
@@ -262,7 +251,7 @@ public class ActiveAntTest {
   @Test
   public void leftCellSensor_food() {
     mockEntityAtCellInDirection(EntityType.FOOD, mockFood, mockCell, Direction.NORTH);
-    activeAnt.updateInput(mockEnvironment, random);
+    activeAnt.getBehavior().updateInput(mockEnvironment, random);
     verify(mockAntBehavior).setInput(inputCaptor.capture(), eq(random));
     assertEquals(EntityType.FOOD, inputCaptor.getValue().getLeftSensor().getEntityType());
   }
@@ -270,14 +259,14 @@ public class ActiveAntTest {
   @Test
   public void leftCellSensor_empty() {
     mockEntityAtCellInDirection(null, null, mockCell, Direction.NORTH);
-    activeAnt.updateInput(mockEnvironment, random);
+    activeAnt.getBehavior().updateInput(mockEnvironment, random);
     verify(mockAntBehavior).setInput(inputCaptor.capture(), eq(random));
     assertEquals(EntityType.NONE, inputCaptor.getValue().getLeftSensor().getEntityType());
   }
 
   @Test
   public void leftCellSensor_noCell() {
-    activeAnt.updateInput(mockEnvironment, random);
+    activeAnt.getBehavior().updateInput(mockEnvironment, random);
     verify(mockAntBehavior).setInput(inputCaptor.capture(), eq(random));
     assertNull(inputCaptor.getValue().getLeftSensor().getEntityType());
   }
@@ -285,7 +274,7 @@ public class ActiveAntTest {
   @Test
   public void rightCellSensor_food() {
     mockEntityAtCellInDirection(EntityType.FOOD, mockFood, mockCell, Direction.SOUTH);
-    activeAnt.updateInput(mockEnvironment, random);
+    activeAnt.getBehavior().updateInput(mockEnvironment, random);
     verify(mockAntBehavior).setInput(inputCaptor.capture(), eq(random));
     assertEquals(EntityType.FOOD, inputCaptor.getValue().getRightSensor().getEntityType());
   }
@@ -293,21 +282,21 @@ public class ActiveAntTest {
   @Test
   public void rightCellSensor_empty() {
     mockEntityAtCellInDirection(null, null, mockCell, Direction.SOUTH);
-    activeAnt.updateInput(mockEnvironment, random);
+    activeAnt.getBehavior().updateInput(mockEnvironment, random);
     verify(mockAntBehavior).setInput(inputCaptor.capture(), eq(random));
     assertEquals(EntityType.NONE, inputCaptor.getValue().getRightSensor().getEntityType());
   }
 
   @Test
   public void rightCellSensor_noCell() {
-    activeAnt.updateInput(mockEnvironment, random);
+    activeAnt.getBehavior().updateInput(mockEnvironment, random);
     verify(mockAntBehavior).setInput(inputCaptor.capture(), eq(random));
     assertNull(inputCaptor.getValue().getRightSensor().getEntityType());
   }
 
   @Test
   public void pheromoneSensor_noPheromone() {
-    activeAnt.updateInput(mockEnvironment, random);
+    activeAnt.getBehavior().updateInput(mockEnvironment, random);
     verify(mockAntBehavior).setInput(inputCaptor.capture(), eq(random));
     assertEquals(0, inputCaptor.getValue().getPheromoneType());
   }
@@ -316,7 +305,7 @@ public class ActiveAntTest {
   public void pheromoneSensor() {
     when(mockCell.getEntity(EntityType.PHEROMONE)).thenReturn(mockPheromone);
     when(mockPheromone.getValue()).thenReturn(3);
-    activeAnt.updateInput(mockEnvironment, random);
+    activeAnt.getBehavior().updateInput(mockEnvironment, random);
 
     verify(mockAntBehavior).setInput(inputCaptor.capture(), eq(random));
     assertEquals(3, inputCaptor.getValue().getPheromoneType());
@@ -328,7 +317,7 @@ public class ActiveAntTest {
     output.setMoveDirection(MoveDirection.FORWARD);
     mockOutput(output);
 
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
+    activeAnt.getBehavior().performAction(mockEnvironment, mockEntityManager, random);
 
     verify(mockEnvironment).moveEntityToCell(EntityType.ANT, mockCell, mockFrontCell);
   }
@@ -340,7 +329,7 @@ public class ActiveAntTest {
     output.setMoveDirection(MoveDirection.FORWARD);
     mockOutput(output);
 
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
+    activeAnt.getBehavior().performAction(mockEnvironment, mockEntityManager, random);
 
     verify(mockEnvironment, never()).moveEntityToCell(
         any(EntityType.class), any(Cell.class), any(Cell.class));
@@ -353,7 +342,7 @@ public class ActiveAntTest {
     output.setMoveDirection(MoveDirection.FORWARD);
     mockOutput(output);
 
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
+    activeAnt.getBehavior().performAction(mockEnvironment, mockEntityManager, random);
 
     verify(mockEnvironment, never()).moveEntityToCell(
         any(EntityType.class), any(Cell.class), any(Cell.class));
@@ -366,7 +355,7 @@ public class ActiveAntTest {
     output.setMoveDirection(MoveDirection.FORWARD);
     mockOutput(output);
 
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
+    activeAnt.getBehavior().performAction(mockEnvironment, mockEntityManager, random);
 
     verify(mockEnvironment, never()).moveEntityToCell(
         any(EntityType.class), any(Cell.class), any(Cell.class));
@@ -377,13 +366,13 @@ public class ActiveAntTest {
     when(mockAntEntity.getCarriedEntity()).thenReturn(mockFood);
     when(mockAntEntity.getX()).thenReturn(123);
     when(mockAntEntity.getY()).thenReturn(321);
-    activeAnt = new AntEntity(mockAntEntity, mockAntBehavior);
+    activeAnt = new AntEntity(mockAntBehavior);
 
     AntOutput output = new AntOutput();
     output.setMoveDirection(MoveDirection.FORWARD);
     mockOutput(output);
 
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
+    activeAnt.getBehavior().performAction(mockEnvironment, mockEntityManager, random);
 
     verify(mockFood).setX(123);
     verify(mockFood).setY(321);
@@ -396,7 +385,7 @@ public class ActiveAntTest {
     output.setTurnDirection(TurnDirection.CLOCKWISE);
     mockOutput(output);
 
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
+    activeAnt.getBehavior().performAction(mockEnvironment, mockEntityManager, random);
 
     verify(mockAntEntity, times(1)).setDirection(any(Direction.class));
     verify(mockAntEntity).setDirection(Direction.SOUTH_EAST);
@@ -408,7 +397,7 @@ public class ActiveAntTest {
     output.setTurnDirection(TurnDirection.COUNTERCLOCKWISE);
     mockOutput(output);
 
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
+    activeAnt.getBehavior().performAction(mockEnvironment, mockEntityManager, random);
 
     verify(mockAntEntity).setDirection(any(Direction.class));
     verify(mockAntEntity).setDirection(Direction.NORTH_EAST);
@@ -420,7 +409,7 @@ public class ActiveAntTest {
     output.setTurnDirection(TurnDirection.NONE);
     mockOutput(output);
 
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
+    activeAnt.getBehavior().performAction(mockEnvironment, mockEntityManager, random);
 
     verify(mockAntEntity, never()).setDirection(any(Direction.class));
   }
@@ -432,7 +421,7 @@ public class ActiveAntTest {
     output.setPickUpOrDrop(true);
     mockOutput(output);
 
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
+    activeAnt.getBehavior().performAction(mockEnvironment, mockEntityManager, random);
 
     verify(mockCell).removeEntity(EntityType.FOOD);
     verify(mockAntEntity).setCarriedEntity(mockFood);
@@ -447,7 +436,7 @@ public class ActiveAntTest {
     output.setPickUpOrDrop(true);
     mockOutput(output);
 
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
+    activeAnt.getBehavior().performAction(mockEnvironment, mockEntityManager, random);
 
     verify(mockFrontCell).removeEntity(EntityType.ROCK);
     verify(mockAntEntity).setCarriedEntity(mockRock);
@@ -461,7 +450,7 @@ public class ActiveAntTest {
     output.setPickUpOrDrop(true);
     mockOutput(output);
 
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
+    activeAnt.getBehavior().performAction(mockEnvironment, mockEntityManager, random);
 
     verify(mockCell, never()).removeEntity(any(EntityType.class));
     verify(mockAntEntity, never()).setCarriedEntity(any(EntityModel.class));
@@ -474,7 +463,7 @@ public class ActiveAntTest {
     output.setPickUpOrDrop(true);
     mockOutput(output);
 
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
+    activeAnt.getBehavior().performAction(mockEnvironment, mockEntityManager, random);
 
     verify(mockCell, never()).removeEntity(any(EntityType.class));
     verify(mockAntEntity, never()).setCarriedEntity(any(EntityModel.class));
@@ -486,37 +475,37 @@ public class ActiveAntTest {
     output.setPickUpOrDrop(true);
     mockOutput(output);
 
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
+    activeAnt.getBehavior().performAction(mockEnvironment, mockEntityManager, random);
 
-    verify(mockCell, never()).setEntity(any(EntityModel.class), any(EntityType.class));
+    verify(mockCell, never()).setEntity(any(EntityModel.class));
     verify(mockAntEntity, never()).setCarriedEntity(any(EntityModel.class));
   }
 
   @Test
   public void drop_food() {
     when(mockAntEntity.getCarriedEntity()).thenReturn(mockFood);
-    activeAnt = new AntEntity(mockAntEntity, mockAntBehavior);
+    activeAnt = new AntEntity(mockAntBehavior);
     AntOutput output = new AntOutput();
     output.setPickUpOrDrop(true);
     mockOutput(output);
 
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
+    activeAnt.getBehavior().performAction(mockEnvironment, mockEntityManager, random);
 
-    verify(mockCell).setEntity(mockFood, EntityType.FOOD);
+    verify(mockCell).setEntity(mockFood);
     verify(mockAntEntity).setCarriedEntity(null);
   }
 
   @Test
   public void drop_rock() {
     when(mockAntEntity.getCarriedEntity()).thenReturn(mockRock);
-    activeAnt = new AntEntity(mockAntEntity, mockAntBehavior);
+    activeAnt = new AntEntity(mockAntBehavior);
     AntOutput output = new AntOutput();
     output.setPickUpOrDrop(true);
     mockOutput(output);
 
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
+    activeAnt.getBehavior().performAction(mockEnvironment, mockEntityManager, random);
 
-    verify(mockFrontCell).setEntity(mockRock, EntityType.ROCK);
+    verify(mockFrontCell).setEntity(mockRock);
     verify(mockAntEntity).setCarriedEntity(null);
   }
 
@@ -525,14 +514,14 @@ public class ActiveAntTest {
     when(mockAntEntity.getCarriedEntity()).thenReturn(mockFood);
     when(mockCell.getEntity(EntityType.FOOD)).thenReturn(mockFood);
     when(mockFrontCell.getEntity(EntityType.FOOD)).thenReturn(mockFood);
-    activeAnt = new AntEntity(mockAntEntity, mockAntBehavior);
+    activeAnt = new AntEntity(mockAntBehavior);
     AntOutput output = new AntOutput();
     output.setPickUpOrDrop(true);
     mockOutput(output);
 
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
+    activeAnt.getBehavior().performAction(mockEnvironment, mockEntityManager, random);
 
-    verify(mockCell, never()).setEntity(any(EntityModel.class), any(EntityType.class));
+    verify(mockCell, never()).setEntity(any(EntityModel.class));
     verify(mockAntEntity, never()).setCarriedEntity(any(EntityModel.class));
   }
 
@@ -540,14 +529,14 @@ public class ActiveAntTest {
   public void drop_atEnvironmentBorder() {
     when(mockEnvironment.getCellInDirection(mockCell, Direction.EAST)).thenReturn(null);
     when(mockAntEntity.getCarriedEntity()).thenReturn(mockRock);
-    activeAnt = new AntEntity(mockAntEntity, mockAntBehavior);
+    activeAnt = new AntEntity(mockAntBehavior);
     AntOutput output = new AntOutput();
     output.setPickUpOrDrop(true);
     mockOutput(output);
 
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
+    activeAnt.getBehavior().performAction(mockEnvironment, mockEntityManager, random);
 
-    verify(mockCell, never()).setEntity(any(EntityModel.class), any(EntityType.class));
+    verify(mockCell, never()).setEntity(any(EntityModel.class));
     verify(mockAntEntity, never()).setCarriedEntity(any(EntityModel.class));
   }
 
@@ -560,10 +549,10 @@ public class ActiveAntTest {
     output.setPheromoneType(4);
     mockOutput(output);
 
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
+    activeAnt.getBehavior().performAction(mockEnvironment, mockEntityManager, random);
 
     ArgumentCaptor<Pheromone> pheromoneCaptor = ArgumentCaptor.forClass(Pheromone.class);
-    verify(mockCell).setEntity(pheromoneCaptor.capture(), eq(EntityType.PHEROMONE));
+    verify(mockCell).setEntity(pheromoneCaptor.capture());
     verify(mockEntityManager).addEntity(pheromoneCaptor.getValue());
     assertEquals(4, pheromoneCaptor.getValue().getValue());
   }
@@ -583,7 +572,7 @@ public class ActiveAntTest {
     output.setConsume(true);
     mockOutput(output);
 
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
+    activeAnt.getBehavior().performAction(mockEnvironment, mockEntityManager, random);
 
     verify(mockAntEntity).setEnergy(49);
   }
@@ -599,7 +588,7 @@ public class ActiveAntTest {
     output.setConsume(true);
     mockOutput(output);
 
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
+    activeAnt.getBehavior().performAction(mockEnvironment, mockEntityManager, random);
 
     verify(mockAntEntity).setEnergy(90);
     verify(mockEntityManager).removeEntity(mockFood);
@@ -608,7 +597,7 @@ public class ActiveAntTest {
   @Test
   public void consume_carriedFood() {
     when(mockAntEntity.getCarriedEntity()).thenReturn(mockFood);
-    activeAnt = new AntEntity(mockAntEntity, mockAntBehavior);
+    activeAnt = new AntEntity(mockAntBehavior);
     when(mockAntEntity.getMaxEnergy()).thenReturn(100);
     when(mockAntEntity.getEnergy()).thenReturn(50);
     when(mockFood.getEnergy()).thenReturn(45);
@@ -617,7 +606,7 @@ public class ActiveAntTest {
     output.setConsume(true);
     mockOutput(output);
 
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
+    activeAnt.getBehavior().performAction(mockEnvironment, mockEntityManager, random);
 
     verify(mockAntEntity).setEnergy(95);
     verify(mockEntityManager).removeEntity(mockFood);
@@ -635,7 +624,7 @@ public class ActiveAntTest {
     output.setConsume(true);
     mockOutput(output);
 
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
+    activeAnt.getBehavior().performAction(mockEnvironment, mockEntityManager, random);
 
     verify(mockAntEntity).setEnergy(100);
     verify(mockNest).setEnergy(150);
@@ -652,43 +641,10 @@ public class ActiveAntTest {
     output.setConsume(true);
     mockOutput(output);
 
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
+    activeAnt.getBehavior().performAction(mockEnvironment, mockEntityManager, random);
 
     verify(mockAntEntity).setEnergy(70);
     verify(mockNest).setEnergy(0);
-  }
-
-  @Test
-  public void outputReplayData() throws IOException {
-    AntOutputDataOutputStream out = new AntOutputDataOutputStream();
-    List<AntOutput> expectedOutputs = new ArrayList<>();
-    for (int cnt = 1; cnt <= 100; cnt++) {
-      AntOutput antOutput = AntSimulationTestUtil.randomAntOutput(random);
-      out.writeAntOutput(antOutput);
-      expectedOutputs.add(antOutput);
-      mockOutput(antOutput);
-      activeAnt.performAction(mockEnvironment, mockEntityManager, random);
-    }
-    out.close();
-
-    AntSimulationState state = new AntSimulationState();
-    activeAnt.updateState(state);
-    assertArrayEquals(out.toByteArray(),
-        state.getEntityReplayDataStore(mockAntEntity).get(AntEntity.OUTPUT_REPLAY_DATA_KEY));
-
-    // The output replay data is cleared when the state is set.
-    activeAnt.setState(new AntSimulationState());
-
-    out = new AntOutputDataOutputStream();
-    AntOutput antOutput = AntSimulationTestUtil.randomAntOutput(random);
-    out.writeAntOutput(antOutput);
-    mockOutput(antOutput);
-    activeAnt.performAction(mockEnvironment, mockEntityManager, random);
-    out.close();
-
-    activeAnt.updateState(state);
-    assertArrayEquals(out.toByteArray(),
-        state.getEntityReplayDataStore(mockAntEntity).get(AntEntity.OUTPUT_REPLAY_DATA_KEY));
   }
 
   private void mockEntityAtCellInDirection(
