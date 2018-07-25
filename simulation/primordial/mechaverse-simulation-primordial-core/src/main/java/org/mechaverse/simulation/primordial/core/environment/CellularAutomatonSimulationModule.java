@@ -1,7 +1,7 @@
 package org.mechaverse.simulation.primordial.core.environment;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.mechaverse.simulation.common.EntityManager;
+import org.mechaverse.simulation.common.Environment;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
@@ -22,8 +22,8 @@ public class CellularAutomatonSimulationModule extends PrimordialEnvironmentBeha
 
   @Override
   public void beforePerformAction(PrimordialSimulationModel state,
-      PrimordialEnvironmentModel environmentModel,
-      EntityManager<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> entityManager, RandomGenerator random) {
+      Environment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> env,
+          RandomGenerator random) {
     if (simulator == null) {
       // Lazily load the cellular automaton simulator.
       simulator = simulatorFactory.getObject();

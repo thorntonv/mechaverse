@@ -9,7 +9,7 @@ import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.model.Pheromone;
 import org.mechaverse.simulation.common.EntityBehavior;
-import org.mechaverse.simulation.common.EntityManager;
+import org.mechaverse.simulation.common.Environment;
 import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.util.SimulationUtil;
@@ -126,27 +126,27 @@ public abstract class AbstractAntBehavior implements EntityBehavior<AntSimulatio
   }
 
   @Override
-  public void performAction(CellEnvironment env,
-      EntityManager<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> entityManager,
+  public void performAction(Environment<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> env,
       RandomGenerator random) {
     AntOutput output = getOutput(random);
-
-    Cell cell = env.getCell(entity);
-    Cell frontCell = env.getCellInDirection(cell, entity.getDirection());
+    CellEnvironment envModel = env.getModel();
+    Cell cell = envModel.getCell(entity);
+    Cell frontCell = envModel.getCellInDirection(cell, entity.getDirection());
 
     entity.setAge(entity.getAge() + 1);
 
     entity.setEnergy(entity.getEnergy() - 1);
     if (entity.getEnergy() <= 0) {
       onRemoveEntity();
-      entityManager.removeEntity(this.getModel());
+      env.removeEntity(this.getModel());
 
       // Attempt to drop the carried entity.
       if (entity.getCarriedEntity() != null) {
         if (!drop(cell)) {
           if (!drop(frontCell)) {
             // Unable to drop the carried entity. Remove the entity occupying the cell and drop.
-            entityManager.removeEntity(entity.getCarriedEntity());
+
+            env.removeEntity(entity.getCarriedEntity());
           }
         }
       }
@@ -157,11 +157,11 @@ public abstract class AbstractAntBehavior implements EntityBehavior<AntSimulatio
     if (output.shouldConsume()) {
       if(carriedEntityType == EntityType.FOOD) {
         // Consume food that the ant is carrying.
-        if(consumeFood(entity.getCarriedEntity(), entityManager)) {
+        if(consumeFood(entity.getCarriedEntity(), env)) {
           entity.setCarriedEntity(null);
           carriedEntityType = EntityType.NONE;
         }
-      } else if (consumeFood(cell.getEntity(EntityType.FOOD), entityManager)) {
+      } else if (consumeFood(cell.getEntity(EntityType.FOOD), env)) {
       } else if (consumeFoodFromNest(cell.getEntity(EntityType.NEST))) {}
     }
 
@@ -176,7 +176,7 @@ public abstract class AbstractAntBehavior implements EntityBehavior<AntSimulatio
 
     // Leave pheromone action.
     if (output.shouldLeavePheromone()) {
-      leavePheromone(cell, output.getPheromoneType(), entityManager);
+      leavePheromone(cell, output.getPheromoneType(), env);
     }
 
     // Move action.
@@ -184,11 +184,11 @@ public abstract class AbstractAntBehavior implements EntityBehavior<AntSimulatio
       case NONE:
         break;
       case FORWARD:
-        move(cell, frontCell, env);
+        move(cell, frontCell, envModel);
         break;
       case BACKWARD:
-        move(cell, env.getCellInDirection(cell,
-            SimulationUtil.oppositeDirection(entity.getDirection())), env);
+        move(cell, envModel.getCellInDirection(cell,
+            SimulationUtil.oppositeDirection(entity.getDirection())), envModel);
         break;
     }
 
@@ -275,7 +275,7 @@ public abstract class AbstractAntBehavior implements EntityBehavior<AntSimulatio
   }
 
   private void leavePheromone(Cell cell, int type,
-      EntityManager<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> entityManager) {
+      Environment<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> env) {
     int energy = entity.getEnergy();
     if (energy > leavePheromoneEnergyCost) {
       entity.setEnergy(energy - leavePheromoneEnergyCost);
@@ -287,18 +287,18 @@ public abstract class AbstractAntBehavior implements EntityBehavior<AntSimulatio
 
       EntityModel<EntityType> existingPheromone = cell.getEntity(EntityType.PHEROMONE);
       if (existingPheromone != null) {
-        entityManager.removeEntity(existingPheromone);
+        env.removeEntity(existingPheromone);
       }
       cell.setEntity(pheromone);
-      entityManager.addEntity(pheromone);
+      env.addEntity(pheromone);
     }
   }
 
   private boolean consumeFood(EntityModel<EntityType> food,
-      EntityManager<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> entityManager) {
+      Environment<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> env) {
     if (food != null) {
       addEnergy(food.getEnergy());
-      entityManager.removeEntity(food);
+      env.removeEntity(food);
       return true;
     }
     return false;

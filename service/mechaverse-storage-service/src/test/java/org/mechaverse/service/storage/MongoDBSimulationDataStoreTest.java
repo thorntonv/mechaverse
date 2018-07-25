@@ -1,20 +1,18 @@
 package org.mechaverse.service.storage;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-
 import java.io.IOException;
 import java.util.Collections;
 
-import org.junit.*;
-import org.mechaverse.simulation.common.datastore.SimulationDataStore;
-
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.mechaverse.simulation.common.SimulationDataStore;
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
-
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.MongodProcess;
 import de.flapdoodle.embed.mongo.MongodStarter;
@@ -22,6 +20,8 @@ import de.flapdoodle.embed.mongo.config.IMongodConfig;
 import de.flapdoodle.embed.mongo.config.MongodConfigBuilder;
 import de.flapdoodle.embed.mongo.config.Net;
 import de.flapdoodle.embed.mongo.distribution.Version;
+
+import static org.junit.Assert.*;
 
 /**
  * 

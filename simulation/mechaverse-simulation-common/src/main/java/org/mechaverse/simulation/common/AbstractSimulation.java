@@ -1,10 +1,9 @@
 package org.mechaverse.simulation.common;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.EnvironmentModel;
@@ -12,9 +11,10 @@ import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.common.util.RandomUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.google.common.base.Preconditions;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
-public class AbstractSimulation<
+public abstract class AbstractSimulation<
     SIM_MODEL extends SimulationModel<ENV_MODEL, ENT_MODEL, ENT_TYPE>,
     ENV_MODEL extends EnvironmentModel<ENT_MODEL, ENT_TYPE>,
     ENT_MODEL extends EntityModel<ENT_TYPE>,
@@ -98,9 +98,14 @@ public class AbstractSimulation<
     return environments;
   }
 
-  @VisibleForTesting
-  public void addObserver(EntityManager.Observer<SIM_MODEL, ENT_MODEL> observer) {
+  @Override
+  public void addObserver(SimulationObserver<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE> observer) {
     environments.forEach(env -> env.addObserver(observer));
+  }
+
+  @Override
+  public void removeObserver(final SimulationObserver<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE> observer) {
+    environments.forEach(env -> env.removeObserver(observer));
   }
 
   @Override

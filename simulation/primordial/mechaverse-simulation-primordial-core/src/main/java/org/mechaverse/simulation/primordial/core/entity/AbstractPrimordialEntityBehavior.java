@@ -2,7 +2,6 @@ package org.mechaverse.simulation.primordial.core.entity;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.EntityBehavior;
-import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.util.SimulationModelUtil;

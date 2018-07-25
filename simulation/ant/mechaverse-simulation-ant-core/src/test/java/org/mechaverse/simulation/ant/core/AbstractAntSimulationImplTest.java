@@ -10,9 +10,10 @@ import org.junit.Test;
 import org.mechaverse.simulation.ant.core.entity.EntityUtil;
 import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.ant.core.model.AntSimulationModel;
+import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.util.AntSimulationModelUtil;
-import org.mechaverse.simulation.common.EntityManager;
+import org.mechaverse.simulation.common.SimulationObserver;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.util.RandomUtil;
 import org.slf4j.Logger;
@@ -21,7 +22,6 @@ import org.springframework.beans.factory.annotation.Value;
 
 import static org.junit.Assert.*;
 import static org.mechaverse.simulation.ant.core.AntSimulationTestUtil.assertModelsEqual;
-import static org.mechaverse.simulation.common.util.ArrayUtil.toByteArray;
 
 /**
  * Unit test for the ant simulation.
@@ -46,23 +46,24 @@ public abstract class AbstractAntSimulationImplTest {
     }
   }
 
-  private static class EntityTypeCountObserver implements EntityManager.Observer<AntSimulationModel, EntityModel<EntityType>> {
+  private static class EntityTypeCountObserver implements SimulationObserver<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> {
 
     private EntityTypeCounter entityTypeCounter = new EntityTypeCounter();
 
     @Override
-    public void onAddEntity(EntityModel entity, AntSimulationModel state) {
+    public void onAddEntity(EntityModel<EntityType> entity, AntSimulationModel state, CellEnvironment envModel) {
       entityTypeCounter.addEntity(entity);
     }
 
     @Override
-    public void onRemoveEntity(EntityModel entity, AntSimulationModel state) {
+    public void onRemoveEntity(EntityModel<EntityType> entity, AntSimulationModel state, CellEnvironment envModel) {
       entityTypeCounter.removeEntity(entity);
     }
 
     public int getEntityCount(EntityType type) {
       return entityTypeCounter.getEntityCount(type);
     }
+
   }
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractAntSimulationImplTest.class);

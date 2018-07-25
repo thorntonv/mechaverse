@@ -5,6 +5,7 @@ import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.EnvironmentModel;
 import org.mechaverse.simulation.common.model.SimulationModel;
 
+@SuppressWarnings("unused")
 public interface Environment<
         SIM_MODEL extends SimulationModel<ENV_MODEL, ENT_MODEL, ENT_TYPE>,
         ENV_MODEL extends EnvironmentModel<ENT_MODEL, ENT_TYPE>,
@@ -19,7 +20,13 @@ public interface Environment<
 
   void updateState(SIM_MODEL simulationModel);
 
-  void addObserver(EntityManager.Observer<SIM_MODEL, ENT_MODEL> observer);
+  void addEntity(ENT_MODEL entity);
+
+  void removeEntity(ENT_MODEL entity);
+
+  void addObserver(SimulationObserver<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE> observer);
+
+  void removeObserver(SimulationObserver<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE> observer);
 
   void close();
 }

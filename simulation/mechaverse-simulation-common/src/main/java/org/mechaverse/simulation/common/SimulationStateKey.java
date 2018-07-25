@@ -3,6 +3,7 @@ package org.mechaverse.simulation.common;
 /**
  * A key that identifies a simulation state.
  */
+@SuppressWarnings("unused")
 public final class SimulationStateKey {
 
   private final String simulationId;

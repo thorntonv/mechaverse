@@ -1,20 +1,20 @@
 package org.mechaverse.simulation.ant.core.environment;
 
+import java.util.function.Function;
+
 import org.apache.commons.math3.random.RandomGenerator;
+import org.mechaverse.simulation.ant.core.entity.EntityUtil;
 import org.mechaverse.simulation.ant.core.model.AntSimulationModel;
-import org.mechaverse.simulation.common.model.EntityModel;
+import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.model.Food;
-import org.mechaverse.simulation.ant.core.entity.EntityUtil;
-import org.mechaverse.simulation.ant.core.model.CellEnvironment;
-import org.mechaverse.simulation.common.EntityManager;
 import org.mechaverse.simulation.common.AbstractProbabilisticEnvironmentModelGenerator.EntityDistribution;
 import org.mechaverse.simulation.common.AbstractProbabilisticEnvironmentModelGenerator.ProbabilisticLocalGenerator;
+import org.mechaverse.simulation.common.Environment;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-
-import java.util.function.Function;
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Table;
 
@@ -64,19 +64,18 @@ public class FoodGenerationBehavior extends AbstractAntEnvironmentBehavior {
   private int foodCount = 0;
 
   @Override
-  public void setState(AntSimulationModel state, CellEnvironment env, EntityManager entityManager) {
-  }
+  public void setState(AntSimulationModel state, Environment environment) {}
 
   @Override
-  public void updateState(AntSimulationModel state, CellEnvironment env,
-      EntityManager entityManager) {}
+  public void updateState(AntSimulationModel state, Environment environment) {}
 
   @Override
-  public void beforeUpdate(AntSimulationModel state, CellEnvironment env,
-       EntityManager<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> entityManager, RandomGenerator random) {
+  public void beforeUpdate(AntSimulationModel state,
+       Environment<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> env, RandomGenerator random) {
     if (foodCount < minFoodCount) {
-      int row = random.nextInt(env.getHeight());
-      int col = random.nextInt(env.getWidth());
+      CellEnvironment envModel = env.getModel();
+      int row = random.nextInt(envModel.getHeight());
+      int col = random.nextInt(envModel.getWidth());
 
       logger.debug("Generating food at ({}, {})", row, col);
 
@@ -88,20 +87,20 @@ public class FoodGenerationBehavior extends AbstractAntEnvironmentBehavior {
         }
         return entity;
       };
-      new AntSimulationEnvironmentGenerator(entityFactory, entityManager, random).apply(
-          FoodLocalGenerator.newInstance(1, foodClusterRadius, random), env, row, col, random);
+      new AntSimulationEnvironmentGenerator(entityFactory, env, random).apply(
+          FoodLocalGenerator.newInstance(1, foodClusterRadius, random), envModel, row, col, random);
     }
   }
 
   @Override
-  public void onAddEntity(EntityModel entity, AntSimulationModel state) {
+  public void onAddEntity(EntityModel<EntityType> entity, AntSimulationModel state, CellEnvironment environment) {
     if (entity instanceof Food) {
       foodCount++;
     }
   }
 
   @Override
-  public void onRemoveEntity(EntityModel entity, AntSimulationModel state) {
+  public void onRemoveEntity(EntityModel<EntityType> entity, AntSimulationModel state, CellEnvironment environment) {
     if (entity instanceof Food) {
       foodCount--;
     }

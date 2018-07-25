@@ -16,7 +16,7 @@ import org.mechaverse.simulation.ant.core.model.Cell;
 import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.model.Nest;
-import org.mechaverse.simulation.common.EntityManager;
+import org.mechaverse.simulation.common.Environment;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator;
 import org.mechaverse.simulation.common.genetic.CutAndSpliceCrossoverGeneticRecombinator;
 import org.mechaverse.simulation.common.genetic.GeneticData;
@@ -109,21 +109,22 @@ public class AntReproductionBehavior extends AbstractAntEnvironmentBehavior {
   }
 
   @Override
-  public void beforeUpdate(AntSimulationModel state, CellEnvironment env,
-      EntityManager<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> entityManager, RandomGenerator random) {
+  public void beforeUpdate(AntSimulationModel state,
+      Environment<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> env, RandomGenerator random) {
+    CellEnvironment envModel = env.getModel();
     if (ants.size() < antMaxCount && nest != null) {
-      Cell nestCell = env.getCell(nest);
+      Cell nestCell = envModel.getCell(nest);
       int row = random.nextInt(maxGeneratedAntNestDistance * 2) - maxGeneratedAntNestDistance
           + nestCell.getRow();
       int col = random.nextInt(maxGeneratedAntNestDistance * 2) - maxGeneratedAntNestDistance
           + nestCell.getColumn();
 
-      if(env.hasCell(row, col)) {
-        Cell cell = env.getCell(row, col);
+      if(envModel.hasCell(row, col)) {
+        Cell cell = envModel.getCell(row, col);
         if (cell.getEntity(EntityType.ANT) == null) {
           Ant ant = generateAnt(state, random);
           cell.setEntity(ant);
-          entityManager.addEntity(ant);
+          env.addEntity(ant);
         }
       }
     }
@@ -178,7 +179,7 @@ public class AntReproductionBehavior extends AbstractAntEnvironmentBehavior {
   }
 
   @Override
-  public void onAddEntity(EntityModel entity, AntSimulationModel state) {
+  public void onAddEntity(EntityModel entity, AntSimulationModel state, CellEnvironment environment) {
     if (entity instanceof Ant) {
       ants.add((Ant) entity);
     } else if (entity instanceof Nest) {
@@ -187,7 +188,7 @@ public class AntReproductionBehavior extends AbstractAntEnvironmentBehavior {
   }
 
   @Override
-  public void onRemoveEntity(EntityModel entity, AntSimulationModel state) {
+  public void onRemoveEntity(EntityModel entity, AntSimulationModel state, CellEnvironment environment) {
     if (entity instanceof Ant) {
       ants.remove(entity);
     } else if (entity instanceof Nest) {

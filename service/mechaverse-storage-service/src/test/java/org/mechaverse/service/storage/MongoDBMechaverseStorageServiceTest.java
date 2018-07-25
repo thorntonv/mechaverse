@@ -9,10 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.junit.*;
-import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore;
-import org.mechaverse.simulation.common.datastore.SimulationDataStore;
-import org.mechaverse.simulation.common.datastore.SimulationDataStoreInputStream;
-import org.mechaverse.simulation.common.datastore.SimulationDataStoreOutputStream;
+import org.mechaverse.simulation.common.SimulationDataStore;
 
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.MongodProcess;

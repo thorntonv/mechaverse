@@ -13,6 +13,7 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
 import org.apache.commons.math3.util.Pair;
 import org.mechaverse.simulation.common.Simulation;
+import org.mechaverse.simulation.common.SimulationObserver;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticRecombinator;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonMutator;
@@ -96,6 +97,14 @@ public class SimpleSimulation<E extends SimpleCellularAutomatonEntity> implement
     for (int cnt = 1; cnt <= stepCount; cnt++) {
       step();
     }
+  }
+
+  @Override
+  public void addObserver(final SimulationObserver observer) {
+  }
+
+  @Override
+  public void removeObserver(final SimulationObserver observer) {
   }
 
   public void step(int stepCount, double targetFitness) {

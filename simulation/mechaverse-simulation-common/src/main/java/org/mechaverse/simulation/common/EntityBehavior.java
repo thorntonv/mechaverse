@@ -13,9 +13,7 @@ public interface EntityBehavior<
 
   void updateInput(ENV_MODEL env, RandomGenerator random);
 
-  void performAction(ENV_MODEL env,
-          EntityManager<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE> entityManager,
-          RandomGenerator random);
+  void performAction(Environment<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE> environment, RandomGenerator random);
 
   void setState(SIM_MODEL state);
 

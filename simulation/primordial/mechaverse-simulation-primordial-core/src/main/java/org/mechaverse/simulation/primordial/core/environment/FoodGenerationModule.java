@@ -5,7 +5,7 @@ import java.util.function.Function;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.AbstractProbabilisticEnvironmentModelGenerator.EntityDistribution;
 import org.mechaverse.simulation.common.AbstractProbabilisticEnvironmentModelGenerator.ProbabilisticLocalGenerator;
-import org.mechaverse.simulation.common.EntityManager;
+import org.mechaverse.simulation.common.Environment;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.primordial.core.entity.EntityUtil;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
@@ -64,36 +64,38 @@ public class FoodGenerationModule extends PrimordialEnvironmentBehavior {
   private int foodCount = 0;
 
   @Override
-  public void beforeUpdate(PrimordialSimulationModel state, PrimordialEnvironmentModel env,
-          EntityManager<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> entityManager, RandomGenerator random) {
+  public void beforeUpdate(PrimordialSimulationModel state,
+          Environment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> env,
+          RandomGenerator random) {
+    PrimordialEnvironmentModel envModel = env.getModel();
     if (foodCount < minFoodCount) {
-      int row = random.nextInt(env.getHeight());
-      int col = random.nextInt(env.getWidth());
+      int row = random.nextInt(envModel.getHeight());
+      int col = random.nextInt(envModel.getWidth());
 
       logger.debug("Generating food at ({}, {})", row, col);
 
-      Function<EntityType, EntityModel> entityFactory = entityType -> {
-        EntityModel entity = EntityUtil.newEntity(entityType);
+      Function<EntityType, EntityModel<EntityType>> entityFactory = entityType -> {
+        EntityModel<EntityType> entity = EntityUtil.newEntity(entityType);
         if (entity != null && entityType == EntityType.FOOD) {
           entity.setEnergy(foodInitialEnergy);
           entity.setMaxEnergy(foodInitialEnergy);
         }
         return entity;
       };
-      new PrimordialSimulationEnvironmentGenerator(entityFactory, entityManager).apply(
-          FoodLocalGenerator.newInstance(1, foodClusterRadius, random), env, row, col, random);
+      new PrimordialSimulationEnvironmentGenerator(entityFactory, env).apply(
+          FoodLocalGenerator.newInstance(1, foodClusterRadius, random), envModel, row, col, random);
     }
   }
 
   @Override
-  public void onAddEntity(EntityModel entity, PrimordialSimulationModel state) {
+  public void onAddEntity(EntityModel entity, PrimordialSimulationModel state, PrimordialEnvironmentModel envModel) {
     if (entity instanceof Food) {
       foodCount++;
     }
   }
 
   @Override
-  public void onRemoveEntity(EntityModel entity, PrimordialSimulationModel state) {
+  public void onRemoveEntity(EntityModel entity, PrimordialSimulationModel state, PrimordialEnvironmentModel envModel) {
     if (entity instanceof Food) {
       foodCount--;
     }

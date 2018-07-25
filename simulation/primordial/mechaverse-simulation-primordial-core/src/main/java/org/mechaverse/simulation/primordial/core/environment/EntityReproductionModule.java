@@ -5,7 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 import org.apache.commons.math3.random.RandomGenerator;
-import org.mechaverse.simulation.common.EntityManager;
+import org.mechaverse.simulation.common.Environment;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.common.util.SimulationUtil;
@@ -41,19 +41,20 @@ public class EntityReproductionModule extends PrimordialEnvironmentBehavior {
   }
 
   @Override
-  public void beforeUpdate(PrimordialSimulationModel state, PrimordialEnvironmentModel env,
-      EntityManager<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> entityManager,
+  public void beforeUpdate(PrimordialSimulationModel state,
+      Environment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> env,
           RandomGenerator random) {
+    final PrimordialEnvironmentModel envModel = env.getModel();
     if (entities.size() < entityMaxCount) {
-      int row = random.nextInt(env.getHeight());
-      int col = random.nextInt(env.getWidth());
+      int row = random.nextInt(envModel.getHeight());
+      int col = random.nextInt(envModel.getWidth());
 
-      if (env.hasCell(row, col)) {
-        PrimordialCellModel cell = env.getCell(row, col);
+      if (envModel.hasCell(row, col)) {
+        PrimordialCellModel cell = envModel.getCell(row, col);
         if (cell.getEntity(EntityType.ENTITY) == null) {
           PrimordialEntityModel entity = generateRandomEntity(state, random);
           cell.setEntity(entity);
-          entityManager.addEntity(entity);
+          env.addEntity(entity);
         }
       }
     }
@@ -70,14 +71,16 @@ public class EntityReproductionModule extends PrimordialEnvironmentBehavior {
   }
 
   @Override
-  public void onAddEntity(EntityModel<EntityType> entity, PrimordialSimulationModel state) {
+  public void onAddEntity(EntityModel<EntityType> entity, PrimordialSimulationModel state,
+          PrimordialEnvironmentModel envModel) {
     if (entity instanceof PrimordialEntityModel) {
       entities.add((PrimordialEntityModel) entity);
     }
   }
 
   @Override
-  public void onRemoveEntity(EntityModel<EntityType> entity, PrimordialSimulationModel state) {
+  public void onRemoveEntity(EntityModel<EntityType> entity, PrimordialSimulationModel state,
+          PrimordialEnvironmentModel envModel) {
     if (entity instanceof PrimordialEntityModel) {
       entities.remove(entity);
     }

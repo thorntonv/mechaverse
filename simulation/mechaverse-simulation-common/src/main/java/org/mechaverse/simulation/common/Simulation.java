@@ -33,4 +33,7 @@ public interface Simulation<
    */
   void step(int stepCount);
 
+  void addObserver(SimulationObserver<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE> observer);
+
+  void removeObserver(SimulationObserver<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE> observer);
 }

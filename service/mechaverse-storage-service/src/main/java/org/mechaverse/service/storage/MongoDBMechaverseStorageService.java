@@ -3,10 +3,8 @@ package org.mechaverse.service.storage;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.mechaverse.service.storage.MongoDBSimulationDataStore.MongoDBSimulationDataStoreInputStream;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
-import org.mechaverse.simulation.common.datastore.SimulationDataStore;
-import org.mechaverse.simulation.common.datastore.SimulationDataStoreInputStream;
+import org.mechaverse.simulation.common.SimulationDataStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -129,7 +127,8 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
           instanceId, iteration), ex);
     }
 
-    return SimulationDataStoreInputStream.newInputStream(store);
+    // TODO(thorntonv): FIX !!!!!!
+    return null;
   }
 
   @Override
@@ -146,11 +145,7 @@ public class MongoDBMechaverseStorageService implements MechaverseStorageService
 
     ensureDatabaseSetup();
 
-    try (MongoDBSimulationDataStoreInputStream stream = new MongoDBSimulationDataStoreInputStream(
-        stateInput, mongoDatabase, simulationId,
-        instanceId, iteration)) {
-      stream.readDataStore();
-    }
+    // TODO(thorntonv): FIX ME !!!!!!
   }
 
   @Override

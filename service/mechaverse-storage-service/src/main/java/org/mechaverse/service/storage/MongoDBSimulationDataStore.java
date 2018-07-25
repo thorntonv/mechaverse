@@ -1,15 +1,10 @@
 package org.mechaverse.service.storage;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.mechaverse.simulation.common.datastore.AbstractSimulationDataStore;
-import org.mechaverse.simulation.common.datastore.SimulationDataStore;
-import org.mechaverse.simulation.common.datastore.SimulationDataStoreInputStream;
-
-import java.util.function.Supplier;
+import org.mechaverse.simulation.common.SimulationDataStore;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCursor;
@@ -49,7 +44,8 @@ import com.mongodb.MongoException;
  *
  * @author Dusty Hendrickson (dhendrickson@mechaverse.org)
  */
-public class MongoDBSimulationDataStore extends AbstractSimulationDataStore {
+@SuppressWarnings("WeakerAccess")
+public class MongoDBSimulationDataStore implements SimulationDataStore {
 
   // Constants
   private static final String mongoCollectionName = "SimulationDataStores";
@@ -63,34 +59,6 @@ public class MongoDBSimulationDataStore extends AbstractSimulationDataStore {
   private String simulationId;
   private String instanceId;
   private long iteration;
-
-  /**
-   * A {@link SimulationDataStoreInputStream} implementation utilizing
-   * {@link MongoDBSimulationDataStore}.
-   */
-  public static final class MongoDBSimulationDataStoreInputStream
-      extends SimulationDataStoreInputStream {
-
-    /**
-     * Generates a supplier for the given database and state parameters. This process will delete an
-     * existing store and recreate it.
-     */
-    private static Supplier<SimulationDataStore> getSupplier(final DB mongoDatabase,
-        final String simulationId, final String instanceId, long iteration) throws IOException {
-      MongoDBSimulationDataStore.delete(mongoDatabase, simulationId, instanceId, iteration);
-      MongoDBSimulationDataStore.create(mongoDatabase, simulationId, instanceId, iteration);
-      final SimulationDataStore store =
-          new MongoDBSimulationDataStore(mongoDatabase, simulationId, instanceId, iteration);
-
-      return () -> store;
-    }
-
-    public MongoDBSimulationDataStoreInputStream(InputStream in, final DB mongoDatabase,
-        final String simulationId, final String instanceId, final long iteration)
-        throws IOException {
-      super(in, getSupplier(mongoDatabase, simulationId, instanceId, iteration));
-    }
-  }
 
   /**
    * Creates a MongoDB store for the given parameters.
@@ -274,10 +242,5 @@ public class MongoDBSimulationDataStore extends AbstractSimulationDataStore {
     long count = mongoDatabase.getCollection(mongoCollectionName).getCount(query);
 
     return (int) count;
-  }
-
-  @Override
-  public Set<String> keysWithPrefix(String prefix) {
-    throw new UnsupportedOperationException();
   }
 }

@@ -6,7 +6,7 @@ import java.util.function.Function;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.AbstractProbabilisticEnvironmentModelGenerator;
-import org.mechaverse.simulation.common.EntityManager;
+import org.mechaverse.simulation.common.Environment;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.primordial.core.entity.EntityUtil;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
@@ -23,24 +23,24 @@ import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel
 public class PrimordialSimulationEnvironmentGenerator
     extends AbstractProbabilisticEnvironmentModelGenerator<PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> {
 
-  private final EntityManager<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> entityManager;
-  private final Function<EntityType, EntityModel> entityFactory;
+  private final Environment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> environment;
+  private final Function<EntityType, EntityModel<EntityType>> entityFactory;
 
   public PrimordialSimulationEnvironmentGenerator() {
     this(null);
   }
 
   public PrimordialSimulationEnvironmentGenerator(
-          EntityManager<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> entityManager) {
-    this(EntityUtil::newEntity, entityManager);
+          Environment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> environment) {
+    this(EntityUtil::newEntity, environment);
   }
 
-  public PrimordialSimulationEnvironmentGenerator(Function<EntityType, EntityModel> entityFactory,
-          EntityManager<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> entityManager) {
+  public PrimordialSimulationEnvironmentGenerator(Function<EntityType, EntityModel<EntityType>> entityFactory,
+          Environment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> environment) {
     super(Collections.emptyList());
 
     this.entityFactory = entityFactory;
-    this.entityManager = entityManager;
+    this.environment = environment;
   }
 
   public PrimordialEnvironmentModel generate(RandomGenerator randomGenerator) {
@@ -58,16 +58,16 @@ public class PrimordialSimulationEnvironmentGenerator
   }
 
   @Override
-  protected EntityModel addEntity(EntityType entityType, int row, int column,
+  protected EntityModel<EntityType> addEntity(EntityType entityType, int row, int column,
       PrimordialEnvironmentModel env) {
     if (env.hasCell(row, column)) {
       PrimordialCellModel cell = env.getCell(row, column);
 
       if (cell.isEmpty()) {
-        EntityModel entity = entityFactory.apply(entityType);
+        EntityModel<EntityType> entity = entityFactory.apply(entityType);
         env.addEntity(entity, cell);
-        if (entityManager != null) {
-          entityManager.addEntity(entity);
+        if (environment != null) {
+          environment.addEntity(entity);
         }
         return entity;
       }

@@ -9,11 +9,13 @@ import org.junit.runner.RunWith;
 import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.ant.core.model.AntSimulationModel;
 import org.mechaverse.simulation.ant.core.model.CellEnvironment;
+import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.model.Nest;
-import org.mechaverse.simulation.common.EntityManager;
+import org.mechaverse.simulation.common.Environment;
 import org.mechaverse.simulation.common.genetic.GeneticData;
 import org.mechaverse.simulation.common.genetic.GeneticDataStore;
 import org.mechaverse.simulation.common.genetic.GeneticRecombinator;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.util.ArrayUtil;
 import org.mechaverse.simulation.common.util.RandomUtil;
 import org.mockito.ArgumentCaptor;
@@ -35,7 +37,7 @@ public class AntReproductionModuleTest {
 
   private static final String TEST_GENETIC_DATA_KEY = "testKey";
 
-  @Mock private EntityManager mockEntityManager;
+  @Mock private Environment<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> mockEnv;
   @Mock private GeneticRecombinator mockGeneticRecombinator;
 
   private AntReproductionBehavior module;
@@ -52,11 +54,11 @@ public class AntReproductionModuleTest {
     AntSimulationModel state = new AntSimulationModel();
     CellEnvironment env = newEnvironment();
     Ant ant = module.generateRandomAnt(state, random);
-    module.onAddEntity(ant, state);
+    module.onAddEntity(ant, state, env);
     module.setAntMaxCount(1);
-    module.beforeUpdate(state, env, mockEntityManager, random);
+    module.beforeUpdate(state, mockEnv, random);
 
-    verifyZeroInteractions(mockEntityManager);
+    verifyZeroInteractions(mockEnv);
     verifyZeroInteractions(mockGeneticRecombinator);
   }
 
@@ -65,10 +67,10 @@ public class AntReproductionModuleTest {
     AntSimulationModel state = new AntSimulationModel();
     CellEnvironment env = newEnvironment();
     module.setAntMaxCount(5);
-    module.beforeUpdate(state, env, mockEntityManager, random);
+    module.beforeUpdate(state, mockEnv, random);
 
     ArgumentCaptor<Ant> antCaptor = ArgumentCaptor.forClass(Ant.class);
-    verify(mockEntityManager).addEntity(antCaptor.capture());
+    verify(mockEnv).addEntity(antCaptor.capture());
     assertNotNull(env.getCell(antCaptor.getValue()));
     verifyZeroInteractions(mockGeneticRecombinator);
   }
@@ -83,12 +85,12 @@ public class AntReproductionModuleTest {
     GeneticDataStore parent1GeneticData =
         randomGeneticDataStore(new GeneticDataStore(parent1));
 
-    module.onAddEntity(parent1, state);
+    module.onAddEntity(parent1, state, env);
 
     Ant parent2 = module.generateRandomAnt(state, random);
     GeneticDataStore parent2GeneticData =
         randomGeneticDataStore(new GeneticDataStore(parent2));
-    module.onAddEntity(parent2, state);
+    module.onAddEntity(parent2, state, env);
 
     GeneticDataStore childGeneticData = randomGeneticDataStore(new GeneticDataStore(new Ant()));
 
@@ -96,10 +98,10 @@ public class AntReproductionModuleTest {
         any(GeneticData.class), any(GeneticData.class), eq(random)))
             .thenReturn(childGeneticData.get(TEST_GENETIC_DATA_KEY));
 
-    module.beforeUpdate(state, env, mockEntityManager, random);
+    module.beforeUpdate(state, mockEnv, random);
 
     ArgumentCaptor<Ant> childCaptor = ArgumentCaptor.forClass(Ant.class);
-    verify(mockEntityManager).addEntity(childCaptor.capture());
+    verify(mockEnv).addEntity(childCaptor.capture());
 
     Ant child = childCaptor.getValue();
     assertNotNull(child);
@@ -133,7 +135,7 @@ public class AntReproductionModuleTest {
     nest.setX(20);
     nest.setY(20);
     env.getEntities().add(nest);
-    module.onAddEntity(nest, new AntSimulationModel());
+    module.onAddEntity(nest, new AntSimulationModel(), env);
     return env;
   }
 
