@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.mechaverse.service.storage.api.MechaverseStorageService;
-import org.mechaverse.simulation.common.SimulationDataStore;
+import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

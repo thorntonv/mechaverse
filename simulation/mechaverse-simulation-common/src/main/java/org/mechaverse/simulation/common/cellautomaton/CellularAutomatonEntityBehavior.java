@@ -36,7 +36,7 @@ public class CellularAutomatonEntityBehavior<
 
     private static final Logger logger = LoggerFactory.getLogger(CellularAutomatonEntityBehavior.class);
 
-    private final ENT_MODEL entity;
+    private ENT_MODEL entity;
     private final int automatonIndex;
     private final int[] outputData;
     private final int[] automatonOutputData;
@@ -49,10 +49,8 @@ public class CellularAutomatonEntityBehavior<
     private CellularAutomatonGeneticDataGenerator geneticDataGenerator =
             new CellularAutomatonGeneticDataGenerator();
 
-    public CellularAutomatonEntityBehavior(
-            ENT_MODEL entity, int outputDataSize, CellularAutomatonDescriptorDataSource dataSource,
+    public CellularAutomatonEntityBehavior(int outputDataSize, CellularAutomatonDescriptorDataSource dataSource,
             CellularAutomatonSimulator simulator) {
-        this.entity = entity;
         this.model = dataSource.getSimulationModel();
         this.simulator = simulator;
         this.outputData = new int[outputDataSize];
@@ -62,9 +60,13 @@ public class CellularAutomatonEntityBehavior<
         this.automatonState = new int[simulator.getAutomatonStateSize()];
     }
 
+    public void setEntity(ENT_MODEL entity) {
+        this.entity = entity;
+    }
+
     public void setInput(int[] input, RandomGenerator random) {
         if (!stateSet) {
-            if (geneticDataStore.contains(CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY)) {
+            if (!geneticDataStore.contains(CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY)) {
                 generateGeneticData(random);
             }
 

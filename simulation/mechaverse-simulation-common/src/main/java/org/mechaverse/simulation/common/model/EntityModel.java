@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 
 @JsonTypeInfo(use=Id.NAME)
-public abstract class EntityModel<ENT_TYPE extends Enum<ENT_TYPE>> {
+public abstract class EntityModel<ENT_TYPE extends Enum<ENT_TYPE>> implements Serializable {
 
   protected String id;
   private int x;

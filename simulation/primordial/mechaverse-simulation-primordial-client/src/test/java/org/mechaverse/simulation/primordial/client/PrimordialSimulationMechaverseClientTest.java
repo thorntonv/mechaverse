@@ -1,11 +1,5 @@
 package org.mechaverse.simulation.primordial.client;
 
-import static org.junit.Assert.assertTrue;
-import static org.mechaverse.simulation.common.datastore.SimulationDataStoreOutputStream.toByteArray;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.UUID;
@@ -19,14 +13,20 @@ import org.mechaverse.service.manager.api.MechaverseManager;
 import org.mechaverse.service.manager.api.model.Task;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
 import org.mechaverse.simulation.common.model.EntityModel;
-import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore;
-import org.mechaverse.simulation.common.datastore.SimulationDataStore;
+import org.mechaverse.simulation.primordial.core.model.EntityType;
+import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel;
+import org.mechaverse.simulation.primordial.core.util.PrimordialSimulationModelUtil;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit test for {@link PrimordialSimulationMechaverseClient}.
@@ -57,10 +57,10 @@ public class PrimordialSimulationMechaverseClientTest {
     task.setIteration(300);
     task.setIterationCount(100);
 
-    SimulationDataStore state = PrimordialSimulationImpl.randomState();
+    PrimordialSimulationModel state = new PrimordialSimulationModel();
     when(mockStorageService.getState(
         task.getSimulationId(), task.getInstanceId(), task.getIteration()))
-            .thenReturn(new ByteArrayInputStream(toByteArray(state)));
+            .thenReturn(new ByteArrayInputStream(PrimordialSimulationModelUtil.serialize(state)));
 
     client.executeTask(task);
 
@@ -70,12 +70,10 @@ public class PrimordialSimulationMechaverseClientTest {
     byte[] newState = IOUtils.toByteArray(stateIn.getValue());
     assertTrue(newState.length > 0);
 
-    PrimordialSimulationState stateData =
-        new PrimordialSimulationState(MemorySimulationDataStore.fromByteArray(newState));
-    assertTrue(getEntityCount(stateData.getModel().getEnvironment().getEntities()) > 0);
+    assertTrue(getEntityCount(state.getEnvironment().getEntities()) > 0);
   }
 
-  private int getEntityCount(Iterable<EntityModel> entities) {
+  private int getEntityCount(Iterable<EntityModel<EntityType>> entities) {
     int count = 0;
     for(EntityModel entity : entities) {
       count++;

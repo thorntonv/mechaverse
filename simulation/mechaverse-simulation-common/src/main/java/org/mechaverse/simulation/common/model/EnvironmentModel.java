@@ -3,6 +3,8 @@ package org.mechaverse.simulation.common.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +12,7 @@ import java.util.List;
 @JsonTypeInfo(use=Id.NAME)
 public abstract class EnvironmentModel<
     ENT_MODEL extends EntityModel<ENT_TYPE>,
-    ENT_TYPE extends Enum<ENT_TYPE>> {
+    ENT_TYPE extends Enum<ENT_TYPE>> implements Serializable {
 
   private String id;
   private int width;

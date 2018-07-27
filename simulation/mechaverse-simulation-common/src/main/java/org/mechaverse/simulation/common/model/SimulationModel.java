@@ -3,6 +3,8 @@ package org.mechaverse.simulation.common.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Lists;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,7 +15,7 @@ import java.util.Map;
 public class SimulationModel<
     ENV_MODEL extends EnvironmentModel<ENT_MODEL, ENT_TYPE>,
     ENT_MODEL extends EntityModel<ENT_TYPE>,
-    ENT_TYPE extends Enum<ENT_TYPE>> {
+    ENT_TYPE extends Enum<ENT_TYPE>> implements Serializable {
 
   protected String id;
   protected ENV_MODEL environment;

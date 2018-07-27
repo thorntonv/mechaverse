@@ -21,7 +21,6 @@ public abstract class AbstractAntBehavior implements EntityBehavior<AntSimulatio
       {EntityType.DIRT, EntityType.FOOD,EntityType.ROCK};
 
   protected Ant entity;
-  private EntityType carriedEntityType = EntityType.NONE;
   private final AntInput input = new AntInput();
 
   @Value("#{properties['pheromoneInitialEnergy']}") private int pheromoneInitialEnergy;
@@ -41,7 +40,7 @@ public abstract class AbstractAntBehavior implements EntityBehavior<AntSimulatio
     input.resetToDefault();
     input.setEnergy(entity.getEnergy(), entity.getMaxEnergy());
     input.setDirection(entity.getDirection());
-    input.setCarriedEntityType(carriedEntityType);
+    input.setCarriedEntityType(getCarriedEntityType());
 
     // Cell sensor.
     Cell cell = env.getCell(entity);
@@ -155,11 +154,10 @@ public abstract class AbstractAntBehavior implements EntityBehavior<AntSimulatio
 
     // Consume action.
     if (output.shouldConsume()) {
-      if(carriedEntityType == EntityType.FOOD) {
+      if(getCarriedEntityType() == EntityType.FOOD) {
         // Consume food that the ant is carrying.
         if(consumeFood(entity.getCarriedEntity(), env)) {
           entity.setCarriedEntity(null);
-          carriedEntityType = EntityType.NONE;
         }
       } else if (consumeFood(cell.getEntity(EntityType.FOOD), env)) {
       } else if (consumeFoodFromNest(cell.getEntity(EntityType.NEST))) {}
@@ -167,10 +165,10 @@ public abstract class AbstractAntBehavior implements EntityBehavior<AntSimulatio
 
     // Pickup / Drop action.
     if (output.shouldPickUpOrDrop()) {
-      if (carriedEntityType == EntityType.NONE) {
+      if (getCarriedEntityType() == EntityType.NONE) {
         if (pickup(cell)) {} else if (pickup(frontCell)) {}
       } else {
-        if (carriedEntityType == EntityType.FOOD && drop(cell)) {} else if (drop(frontCell)) {}
+        if (getCarriedEntityType() == EntityType.FOOD && drop(cell)) {} else if (drop(frontCell)) {}
       }
     }
 
@@ -247,7 +245,6 @@ public abstract class AbstractAntBehavior implements EntityBehavior<AntSimulatio
         if (carriableEntity != null) {
           cell.removeEntity(type);
           entity.setCarriedEntity(carriableEntity);
-          this.carriedEntityType = type;
           carriableEntity.setX(entity.getX());
           carriableEntity.setY(entity.getY());
 
@@ -264,11 +261,10 @@ public abstract class AbstractAntBehavior implements EntityBehavior<AntSimulatio
 
   private boolean drop(Cell cell) {
     // The cell must not already have an entity of the given type.
-    if (cell != null && cell.getEntity(carriedEntityType) == null) {
+    if (cell != null && cell.getEntity(getCarriedEntityType()) == null) {
       EntityModel<EntityType> carriedEntity = entity.getCarriedEntity();
       cell.setEntity(carriedEntity);
       entity.setCarriedEntity(null);
-      carriedEntityType = EntityType.NONE;
       return true;
     }
     return false;
@@ -325,5 +321,9 @@ public abstract class AbstractAntBehavior implements EntityBehavior<AntSimulatio
   private void addEnergy(int amount) {
     int energy = entity.getEnergy() + amount;
     entity.setEnergy(energy <= entity.getMaxEnergy() ? energy : entity.getMaxEnergy());
+  }
+
+  private EntityType getCarriedEntityType() {
+    return entity.getCarriedEntity() != null ? entity.getCarriedEntity().getType() : EntityType.NONE;
   }
 }

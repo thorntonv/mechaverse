@@ -40,8 +40,10 @@ public class CellularAutomatonAntBehaviorTest {
   private static final int TEST_AUTOMATON_OUTPUT_SIZE_BYTES =
       CellularAutomatonSimulationUtil.outputSizeInBytes(TEST_AUTOMATON_OUTPUT_SIZE);
 
-  @Mock private CellularAutomatonSimulator mockSimulator;
-  @Mock private CellularAutomatonAllocator mockAllocator;
+  @Mock
+  private CellularAutomatonSimulator mockSimulator;
+  @Mock
+  private CellularAutomatonAllocator mockAllocator;
 
   private Ant ant;
   private CellularAutomatonAntBehavior behavior;

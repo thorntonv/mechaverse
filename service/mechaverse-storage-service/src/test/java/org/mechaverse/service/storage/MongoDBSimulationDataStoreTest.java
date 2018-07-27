@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mechaverse.simulation.common.SimulationDataStore;
+import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.DB;
 import com.mongodb.MongoClient;

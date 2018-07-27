@@ -1,7 +1,6 @@
 package org.mechaverse.simulation.primordial.core.entity;
 
 import org.mechaverse.simulation.common.model.Direction;
-import org.mechaverse.simulation.primordial.core.entity.EntityUtil;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
 
 /**

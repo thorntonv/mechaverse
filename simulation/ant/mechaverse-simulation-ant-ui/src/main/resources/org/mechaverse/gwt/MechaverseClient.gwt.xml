@@ -7,7 +7,7 @@
   <inherits name="org.mechaverse.gwt.common"/>
   <inherits name="org.mechaverse.simulation.ant.core"/>
   <inherits name="org.mechaverse.simulation.common.model"/>
-
+  <inherits name="org.mechaverse.simulation.common.cellautomaton.environment" />
   <entry-point class='org.mechaverse.gwt.client.MechaverseClient' />
 
   <source path='client' />

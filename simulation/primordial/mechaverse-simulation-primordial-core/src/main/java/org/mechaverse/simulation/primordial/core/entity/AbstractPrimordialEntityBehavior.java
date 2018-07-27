@@ -2,6 +2,7 @@ package org.mechaverse.simulation.primordial.core.entity;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.EntityBehavior;
+import org.mechaverse.simulation.common.Environment;
 import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.util.SimulationModelUtil;
@@ -11,14 +12,14 @@ import org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentMode
 import org.mechaverse.simulation.primordial.core.model.PrimordialCellModel;
 import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel;
 
+@SuppressWarnings("WeakerAccess")
 public abstract class AbstractPrimordialEntityBehavior implements
     EntityBehavior<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> {
 
   private final PrimordialEntityInput input = new PrimordialEntityInput();
-  protected final EntityModel entity;
+  protected final EntityModel<EntityType> entity;
 
-  protected AbstractPrimordialEntityBehavior(
-      EntityModel entity) {
+  protected AbstractPrimordialEntityBehavior(EntityModel<EntityType> entity) {
     this.entity = entity;
   }
 
@@ -66,25 +67,25 @@ public abstract class AbstractPrimordialEntityBehavior implements
   }
 
   @Override
-  public void performAction(PrimordialEnvironmentModel env,
-          EntityManager<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> entityManager,
+  public void performAction(Environment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> env,
           RandomGenerator random) {
+    final PrimordialEnvironmentModel envModel = env.getModel();
     PrimordialEntityOutput output = getOutput(random);
-    PrimordialCellModel cell = env.getCell(entity);
-    PrimordialCellModel frontCell = env.getCellInDirection(cell, entity.getDirection());
+    PrimordialCellModel cell = envModel.getCell(entity);
+    PrimordialCellModel frontCell = envModel.getCellInDirection(cell, entity.getDirection());
 
     entity.setAge(entity.getAge() + 1);
 
     entity.setEnergy(entity.getEnergy() - 1);
     if (entity.getEnergy() <= 0) {
       onRemoveEntity();
-      entityManager.removeEntity(entity);
+      env.removeEntity(entity);
       return;
     }
 
     // Consume action.
     if (output.shouldConsume()) {
-      consumeFood(cell.getEntity(EntityType.FOOD), entityManager);
+      consumeFood(cell.getEntity(EntityType.FOOD), env);
     }
 
     // Move action.
@@ -92,11 +93,11 @@ public abstract class AbstractPrimordialEntityBehavior implements
       case NONE:
         break;
       case FORWARD:
-        move(cell, frontCell, env);
+        move(cell, frontCell, envModel);
         break;
       case BACKWARD:
-        move(cell, env.getCellInDirection(cell,
-            SimulationUtil.oppositeDirection(entity.getDirection())), env);
+        move(cell, envModel.getCellInDirection(cell,
+            SimulationUtil.oppositeDirection(entity.getDirection())), envModel);
         break;
     }
 
@@ -136,10 +137,11 @@ public abstract class AbstractPrimordialEntityBehavior implements
     return !cell.hasEntity(EntityType.ENTITY) && !cell.hasEntity(EntityType.BARRIER);
   }
 
-  private boolean consumeFood(EntityModel food, EntityManager entityManager) {
+  private boolean consumeFood(EntityModel<EntityType> food,
+          Environment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> env) {
     if (food != null) {
       addEnergy(food.getEnergy());
-      entityManager.removeEntity(food);
+      env.removeEntity(food);
       return true;
     }
     return false;

@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.mechaverse.simulation.common.SimulationDataStore;
+import org.mechaverse.simulation.common.datastore.AbstractSimulationDataStore;
+import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCursor;
@@ -45,7 +46,7 @@ import com.mongodb.MongoException;
  * @author Dusty Hendrickson (dhendrickson@mechaverse.org)
  */
 @SuppressWarnings("WeakerAccess")
-public class MongoDBSimulationDataStore implements SimulationDataStore {
+public class MongoDBSimulationDataStore extends AbstractSimulationDataStore {
 
   // Constants
   private static final String mongoCollectionName = "SimulationDataStores";
