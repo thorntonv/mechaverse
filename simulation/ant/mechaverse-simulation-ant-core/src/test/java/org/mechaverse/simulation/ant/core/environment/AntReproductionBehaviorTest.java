@@ -1,7 +1,18 @@
 package org.mechaverse.simulation.ant.core.environment;
 
-import java.util.Arrays;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.anyObject;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +23,7 @@ import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.model.Nest;
 import org.mechaverse.simulation.common.Environment;
+import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator;
 import org.mechaverse.simulation.common.genetic.GeneticData;
 import org.mechaverse.simulation.common.genetic.GeneticDataStore;
 import org.mechaverse.simulation.common.genetic.GeneticRecombinator;
@@ -22,43 +34,36 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
-
 /**
  * Unit test for {@link AntReproductionBehavior}.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class AntReproductionModuleTest {
+public class AntReproductionBehaviorTest {
 
   // TODO(thorntonv): Add test to ensure that only ants of reproductive age reproduce.
-
-  private static final String TEST_GENETIC_DATA_KEY = "testKey";
 
   @Mock private Environment<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> mockEnv;
   @Mock private GeneticRecombinator mockGeneticRecombinator;
 
-  private AntReproductionBehavior module;
+  private AntReproductionBehavior reproductionBehavior;
   private RandomGenerator random;
 
   @Before
   public void setUp() {
-    module = new AntReproductionBehavior(mockGeneticRecombinator);
-    random = RandomUtil.newGenerator(AntReproductionModuleTest.class.getName().hashCode());
+    reproductionBehavior = new AntReproductionBehavior(mockGeneticRecombinator);
+    random = RandomUtil.newGenerator(AntReproductionBehaviorTest.class.getName().hashCode());
   }
 
   @Test
   public void beforeUpdate_antMaxCount() {
     AntSimulationModel state = new AntSimulationModel();
     CellEnvironment env = newEnvironment();
-    Ant ant = module.generateRandomAnt(state, random);
-    module.onAddEntity(ant, state, env);
-    module.setAntMaxCount(1);
-    module.beforeUpdate(state, mockEnv, random);
+    Ant ant = reproductionBehavior.generateRandomAnt(state, random);
+    reproductionBehavior.onAddEntity(ant, state, env);
+    reproductionBehavior.setAntMaxCount(1);
+    reproductionBehavior.beforeUpdate(state, mockEnv, random);
 
-    verifyZeroInteractions(mockEnv);
+    verify(mockEnv, never()).addEntity(anyObject());
     verifyZeroInteractions(mockGeneticRecombinator);
   }
 
@@ -66,8 +71,9 @@ public class AntReproductionModuleTest {
   public void beforeUpdate_generateRandomAnt() {
     AntSimulationModel state = new AntSimulationModel();
     CellEnvironment env = newEnvironment();
-    module.setAntMaxCount(5);
-    module.beforeUpdate(state, mockEnv, random);
+    when(mockEnv.getModel()).thenReturn(env);
+    reproductionBehavior.setAntMaxCount(5);
+    reproductionBehavior.beforeUpdate(state, mockEnv, random);
 
     ArgumentCaptor<Ant> antCaptor = ArgumentCaptor.forClass(Ant.class);
     verify(mockEnv).addEntity(antCaptor.capture());
@@ -79,26 +85,27 @@ public class AntReproductionModuleTest {
   public void beforeUpdate_generateAnt() {
     AntSimulationModel state = new AntSimulationModel();
     CellEnvironment env = newEnvironment();
-    module.setAntMaxCount(5);
+    when(mockEnv.getModel()).thenReturn(env);
+    reproductionBehavior.setAntMaxCount(5);
 
-    Ant parent1 = module.generateRandomAnt(state, random);
+    Ant parent1 = reproductionBehavior.generateRandomAnt(state, random);
     GeneticDataStore parent1GeneticData =
         randomGeneticDataStore(new GeneticDataStore(parent1));
 
-    module.onAddEntity(parent1, state, env);
+    reproductionBehavior.onAddEntity(parent1, state, env);
 
-    Ant parent2 = module.generateRandomAnt(state, random);
+    Ant parent2 = reproductionBehavior.generateRandomAnt(state, random);
     GeneticDataStore parent2GeneticData =
         randomGeneticDataStore(new GeneticDataStore(parent2));
-    module.onAddEntity(parent2, state, env);
+    reproductionBehavior.onAddEntity(parent2, state, env);
 
     GeneticDataStore childGeneticData = randomGeneticDataStore(new GeneticDataStore(new Ant()));
 
     when(mockGeneticRecombinator.recombine(
         any(GeneticData.class), any(GeneticData.class), eq(random)))
-            .thenReturn(childGeneticData.get(TEST_GENETIC_DATA_KEY));
+            .thenReturn(childGeneticData.get(CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY));
 
-    module.beforeUpdate(state, mockEnv, random);
+    reproductionBehavior.beforeUpdate(state, mockEnv, random);
 
     ArgumentCaptor<Ant> childCaptor = ArgumentCaptor.forClass(Ant.class);
     verify(mockEnv).addEntity(childCaptor.capture());
@@ -107,8 +114,8 @@ public class AntReproductionModuleTest {
     assertNotNull(child);
 
     // Verify that the child genetic data was added to the state.
-    assertEquals(child.getData(TEST_GENETIC_DATA_KEY),
-        childGeneticData.get(TEST_GENETIC_DATA_KEY));
+    assertArrayEquals(child.getData("geneticData." + CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY + ".data"),
+        childGeneticData.get(CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY).getData());
 
     // Verify that recombine was called with the genetic data of the parent ants.
     ArgumentCaptor<GeneticData> geneticDataCaptor1 = ArgumentCaptor.forClass(GeneticData.class);
@@ -116,13 +123,13 @@ public class AntReproductionModuleTest {
     verify(mockGeneticRecombinator).recombine(geneticDataCaptor1.capture(),
         geneticDataCaptor2.capture(), eq(random));
     if (Arrays.equals(geneticDataCaptor1.getValue().getData(),
-        parent1GeneticData.get(TEST_GENETIC_DATA_KEY).getData())) {
-      assertArrayEquals(parent2GeneticData.get(TEST_GENETIC_DATA_KEY).getData(),
+        parent1GeneticData.get(CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY).getData())) {
+      assertArrayEquals(parent2GeneticData.get(CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY).getData(),
           geneticDataCaptor2.getValue().getData());
     } else {
-      assertArrayEquals(parent1GeneticData.get(TEST_GENETIC_DATA_KEY).getData(),
+      assertArrayEquals(parent1GeneticData.get(CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY).getData(),
         geneticDataCaptor2.getValue().getData());
-      assertArrayEquals(parent2GeneticData.get(TEST_GENETIC_DATA_KEY).getData(),
+      assertArrayEquals(parent2GeneticData.get(CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY).getData(),
         geneticDataCaptor1.getValue().getData());
     }
   }
@@ -135,14 +142,16 @@ public class AntReproductionModuleTest {
     nest.setX(20);
     nest.setY(20);
     env.getEntities().add(nest);
-    module.onAddEntity(nest, new AntSimulationModel(), env);
+    reproductionBehavior.onAddEntity(nest, new AntSimulationModel(), env);
     return env;
   }
 
   private GeneticDataStore randomGeneticDataStore(GeneticDataStore geneticData) {
-    geneticData.put(TEST_GENETIC_DATA_KEY, new GeneticData(RandomUtil.randomBytes(100, random),
-        ArrayUtil.toIntArray(RandomUtil.randomBytes(400, random)),
-            ArrayUtil.toIntArray(RandomUtil.randomBytes(24, random))));
+    for(String type : CellularAutomatonGeneticDataGenerator.KEY_SET) {
+      geneticData.put(type, new GeneticData(RandomUtil.randomBytes(100, random),
+          ArrayUtil.toIntArray(RandomUtil.randomBytes(400, random)),
+          ArrayUtil.toIntArray(RandomUtil.randomBytes(24, random))));
+    }
     return geneticData;
   }
 }

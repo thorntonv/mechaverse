@@ -125,6 +125,14 @@ public abstract class AbstractCellEnvironmentModel<
     return entities;
   }
 
+  @Override
+  public void remove(ENT_MODEL entity) {
+    C cell = getCell(entity);
+    if (cell != null) {
+      cell.removeEntity(entity);
+    }
+  }
+
   protected abstract C[][] createCells();
 
   protected abstract C createCell(int row, int column);

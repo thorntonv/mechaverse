@@ -55,18 +55,17 @@ public class CellularAutomatonAntBehaviorTest {
 
   @Before
   public void setUp() {
+    ant = new Ant();
+    ant.setId("001");
+
     when(mockSimulator.getAllocator()).thenReturn(mockAllocator);
     when(mockAllocator.allocate()).thenReturn(0);
     when(mockSimulator.getAutomatonStateSize()).thenReturn(TEST_AUTOMATON_STATE_SIZE);
     when(mockSimulator.getAutomatonOutputSize()).thenReturn(TEST_AUTOMATON_OUTPUT_SIZE);
     input = new AntInput();
     random = RandomUtil.newGenerator(CellularAutomatonAntBehavior.class.getName().hashCode());
-    behavior = new CellularAutomatonAntBehavior(descriptorDataSource, mockSimulator);
+    behavior = new CellularAutomatonAntBehavior(ant, descriptorDataSource, mockSimulator);
     state = new AntSimulationModel();
-
-    ant = new Ant();
-    ant.setId("001");
-    behavior.setModel(ant);
   }
 
   @Test

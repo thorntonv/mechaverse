@@ -6,34 +6,33 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mechaverse.simulation.ant.core.entity.ant.CellularAutomatonAntBehavior;
 import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.ant.core.model.AntSimulationModel;
+import org.mechaverse.simulation.ant.core.spring.AntSimulationConfig;
+import org.mechaverse.simulation.ant.core.spring.SimpleAntSimulationConfig;
 import org.mechaverse.simulation.common.Simulation;
 import org.mechaverse.simulation.common.model.EntityModel;
+import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.*;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = {AntSimulationConfig.class})
 public class CellularAutomatonAntSimulationImplTest extends AbstractAntSimulationImplTest {
 
-  private List<AbstractApplicationContext> contexts = new ArrayList<>();
-
-  @After
-  public void cleanUp() {
-    for (AbstractApplicationContext context : contexts) {
-      context.close();
-    }
-    contexts.clear();
-  }
+  @Autowired
+  private ObjectFactory<AntSimulationImpl> simulationImplFactory;
 
   @Override
   protected AntSimulationImpl newSimulationImpl() {
-    AbstractApplicationContext context =
-        new ClassPathXmlApplicationContext("test-simulation-context-cellautomaton.xml");
-    contexts.add(context);
-    return (AntSimulationImpl) context.getBean(Simulation.class);
+    return simulationImplFactory.getObject();
   }
 
   @Override

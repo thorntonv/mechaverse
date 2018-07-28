@@ -32,10 +32,10 @@ public abstract class AbstractEnvironment<
   private final Map<String, Entity<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE>> activeEntities = new LinkedHashMap<>();
   private final Set<SimulationObserver<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE>> observers = Sets.newLinkedHashSet();
   private final EntityFactory<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE> entityFactory;
-  private final List<EnvironmentBehavior<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE>> behaviors;
+  private final List<? extends EnvironmentBehavior<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE>> behaviors;
 
   protected AbstractEnvironment(String environmentId,
-      List<EnvironmentBehavior<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE>> behaviors,
+      List<? extends EnvironmentBehavior<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE>> behaviors,
       EntityFactory<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE> entityFactory) {
     this.environmentId = Preconditions.checkNotNull(environmentId);
     this.behaviors = Preconditions.checkNotNull(behaviors);
@@ -106,6 +106,8 @@ public abstract class AbstractEnvironment<
     if(activeEntity != null) {
       activeEntity.getBehavior().updateState(simulationModel);
     }
+    environmentModel.remove(entity);
+
     observers.forEach(observer -> observer.onRemoveEntity(entity, simulationModel, environmentModel));
   }
 

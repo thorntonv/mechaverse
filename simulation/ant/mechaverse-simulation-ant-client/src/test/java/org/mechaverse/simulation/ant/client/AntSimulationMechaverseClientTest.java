@@ -17,9 +17,11 @@ import org.mechaverse.simulation.ant.core.AntSimulationImpl;
 import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.ant.core.model.AntSimulationModel;
 import org.mechaverse.simulation.ant.core.model.EntityType;
+import org.mechaverse.simulation.ant.core.spring.AntSimulationConfig;
 import org.mechaverse.simulation.ant.core.util.AntSimulationModelUtil;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,11 +37,15 @@ import static org.mockito.Mockito.when;
  * Unit test for {@link AntSimulationMechaverseClient}.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("/test-context.xml")
+@ContextConfiguration(classes = AntSimulationConfig.class)
 public class AntSimulationMechaverseClientTest {
 
-  @Autowired private MechaverseManager mockManager;
-  @Autowired private MechaverseStorageService mockStorageService;
+  @Mock
+  private MechaverseManager mockManager;
+  @Mock
+  private MechaverseStorageService mockStorageService;
+  @Autowired
+  private AntSimulationImpl simulation;
 
   private MechaverseClient client;
 
@@ -60,11 +66,10 @@ public class AntSimulationMechaverseClientTest {
     task.setIteration(300);
     task.setIterationCount(100);
 
-    AntSimulationImpl simulation = new AntSimulationImpl();
     AntSimulationModel state = simulation.generateRandomState();
     when(mockStorageService.getState(
         task.getSimulationId(), task.getInstanceId(), task.getIteration()))
-            .thenReturn(new ByteArrayInputStream(AntSimulationModelUtil.serialize(state)));
+        .thenReturn(new ByteArrayInputStream(AntSimulationModelUtil.serialize(state)));
 
     client.executeTask(task);
 
@@ -74,14 +79,15 @@ public class AntSimulationMechaverseClientTest {
     byte[] newState = IOUtils.toByteArray(stateIn.getValue());
     assertTrue(newState.length > 0);
 
-    AntSimulationModel stateData = AntSimulationModelUtil.deserialize(new GZIPInputStream(new ByteArrayInputStream(newState)));
+    AntSimulationModel stateData = AntSimulationModelUtil
+        .deserialize(new GZIPInputStream(new ByteArrayInputStream(newState)));
     assertTrue(getAntCount(stateData.getEnvironment().getEntities()) > 0);
   }
 
   private int getAntCount(Iterable<EntityModel<EntityType>> entities) {
     int count = 0;
-    for(EntityModel entity : entities) {
-      if(entity instanceof Ant) {
+    for (EntityModel entity : entities) {
+      if (entity instanceof Ant) {
         count++;
       }
     }

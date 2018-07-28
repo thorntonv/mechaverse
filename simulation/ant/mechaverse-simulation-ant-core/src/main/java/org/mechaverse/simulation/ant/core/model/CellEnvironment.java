@@ -9,20 +9,6 @@ public class CellEnvironment extends
 
   private Direction[][] nestDirectionIndex;
 
-  public CellEnvironment() {
-    for (EntityModel entity : getEntities()) {
-      if (entity instanceof Nest) {
-        Cell nestCell = getCell(entity);
-        nestDirectionIndex = new Direction[getHeight()][getWidth()];
-        for (int row = 0; row < getHeight(); row++) {
-          for (int col = 0; col < getWidth(); col++) {
-            nestDirectionIndex[row][col] = getDirection(getCells()[row][col], nestCell);
-          }
-        }
-      }
-    }
-  }
-
   @Override
   protected Cell[][] createCells() {
     return new Cell[getHeight()][getWidth()];
@@ -34,6 +20,19 @@ public class CellEnvironment extends
   }
 
   public Direction getNestDirection(Cell fromCell) {
+    if(nestDirectionIndex == null) {
+      for (EntityModel entity : getEntities()) {
+        if (entity instanceof Nest) {
+          Cell nestCell = getCell(entity);
+          nestDirectionIndex = new Direction[getHeight()][getWidth()];
+          for (int row = 0; row < getHeight(); row++) {
+            for (int col = 0; col < getWidth(); col++) {
+              nestDirectionIndex[row][col] = getDirection(getCells()[row][col], nestCell);
+            }
+          }
+        }
+      }
+    }
     return nestDirectionIndex[fromCell.getRow()][fromCell.getColumn()];
   }
 

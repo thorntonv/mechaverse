@@ -1,6 +1,7 @@
 package org.mechaverse.simulation.ant.core.entity.ant;
 
 import org.apache.commons.math3.random.RandomGenerator;
+import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.common.model.MoveDirection;
@@ -18,6 +19,10 @@ public class SimpleAntBehavior extends AbstractAntBehavior {
 
   private TurnDirection turnDirection = TurnDirection.NONE;
   private boolean leavePheromone = false;
+
+  public SimpleAntBehavior(Ant entity) {
+    super(entity);
+  }
 
   @Override
   public void setInput(AntInput input, RandomGenerator random) {

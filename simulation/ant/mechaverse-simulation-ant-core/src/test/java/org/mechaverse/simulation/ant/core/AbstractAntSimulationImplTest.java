@@ -1,9 +1,13 @@
 package org.mechaverse.simulation.ant.core;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mechaverse.simulation.ant.core.AntSimulationTestUtil.assertModelsEqual;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.zip.GZIPInputStream;
-
 import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,10 +22,6 @@ import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.util.RandomUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-
-import static org.junit.Assert.*;
-import static org.mechaverse.simulation.ant.core.AntSimulationTestUtil.assertModelsEqual;
 
 /**
  * Unit test for the ant simulation.
@@ -68,9 +68,6 @@ public abstract class AbstractAntSimulationImplTest {
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractAntSimulationImplTest.class);
 
-  @Value("#{properties['antMaxCount']}") private int antMaxCount;
-  @Value("#{properties['foodMinCount']}") private int minFoodCount;
-
   private RandomGenerator random;
 
   protected abstract AntSimulationImpl newSimulationImpl();
@@ -88,7 +85,7 @@ public abstract class AbstractAntSimulationImplTest {
   }
 
   @Test
-  public void simulate() throws IOException {
+  public void simulate() {
     AntSimulationImpl simulation = newSimulationImpl();
     simulation.setState(simulation.generateRandomState());
 

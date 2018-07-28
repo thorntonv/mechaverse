@@ -1,5 +1,6 @@
 package org.mechaverse.simulation.ant.core.entity.ant;
 
+import com.google.common.base.Preconditions;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.core.entity.EntityUtil;
 import org.mechaverse.simulation.ant.core.model.Ant;
@@ -13,26 +14,25 @@ import org.mechaverse.simulation.common.Environment;
 import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.util.SimulationUtil;
-import org.springframework.beans.factory.annotation.Value;
 
 public abstract class AbstractAntBehavior implements EntityBehavior<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> {
 
   private static final EntityType[] CARRIABLE_ENTITY_TYPES =
       {EntityType.DIRT, EntityType.FOOD,EntityType.ROCK};
 
-  protected Ant entity;
+  protected final Ant entity;
   private final AntInput input = new AntInput();
 
-  @Value("#{properties['pheromoneInitialEnergy']}") private int pheromoneInitialEnergy;
+  private int pheromoneInitialEnergy;
   private int leavePheromoneEnergyCost = 2;
   private int pickUpEnergyCost = 1;
 
-  public Ant getModel() {
-    return entity;
+  protected AbstractAntBehavior(Ant entity) {
+    this.entity = Preconditions.checkNotNull(entity);
   }
 
-  void setModel(Ant entity) {
-    this.entity = entity;
+  public Ant getModel() {
+    return entity;
   }
 
   @Override
@@ -218,7 +218,9 @@ public abstract class AbstractAntBehavior implements EntityBehavior<AntSimulatio
   public void onRemoveEntity() {}
 
   @Override
-  public void setState(AntSimulationModel state) {}
+  public void setState(AntSimulationModel state) {
+    pheromoneInitialEnergy = state.getPheromoneInitialEnergy();
+  }
 
   @Override
   public void updateState(AntSimulationModel state) {}

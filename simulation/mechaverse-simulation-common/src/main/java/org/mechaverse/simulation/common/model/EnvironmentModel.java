@@ -3,7 +3,6 @@ package org.mechaverse.simulation.common.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -98,4 +97,8 @@ public abstract class EnvironmentModel<
 
   @JsonIgnore
   public abstract ENT_TYPE[] getEntityTypes();
+
+  public void remove(ENT_MODEL entity) {
+    entities.remove(entity);
+  }
 }

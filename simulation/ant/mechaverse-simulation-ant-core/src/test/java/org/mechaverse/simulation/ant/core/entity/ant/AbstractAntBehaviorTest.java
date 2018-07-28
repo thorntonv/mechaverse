@@ -1,5 +1,13 @@
 package org.mechaverse.simulation.ant.core.entity.ant;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,10 +33,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
-
 /**
  * Unit test for {@link AntEntity}.
  */
@@ -39,6 +43,10 @@ public class AbstractAntBehaviorTest {
 
     private AntInput input;
     private AntOutput output;
+
+    TestAntBehavior(Ant entity) {
+      super(entity);
+    }
 
     @Override
     protected void setInput(final AntInput input, final RandomGenerator random) {
@@ -80,8 +88,7 @@ public class AbstractAntBehaviorTest {
 
   @Before
   public void setUp() {
-    antBehavior = Mockito.spy(new TestAntBehavior());
-    antBehavior.setModel(mockAntEntity);
+    antBehavior = Mockito.spy(new TestAntBehavior(mockAntEntity));
 
     random = RandomUtil.newGenerator(AbstractAntBehaviorTest.class.getName().hashCode());
 

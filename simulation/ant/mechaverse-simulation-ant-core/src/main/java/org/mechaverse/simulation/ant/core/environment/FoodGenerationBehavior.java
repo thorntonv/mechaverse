@@ -1,7 +1,8 @@
 package org.mechaverse.simulation.ant.core.environment;
 
+import com.google.common.collect.ImmutableTable;
+import com.google.common.collect.Table;
 import java.util.function.Function;
-
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.core.entity.EntityUtil;
 import org.mechaverse.simulation.ant.core.model.AntSimulationModel;
@@ -14,9 +15,6 @@ import org.mechaverse.simulation.common.Environment;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import com.google.common.collect.ImmutableTable;
-import com.google.common.collect.Table;
 
 /**
  * Generates clusters of food to maintain a minimum quantity of food.
@@ -57,14 +55,18 @@ public class FoodGenerationBehavior extends AbstractAntEnvironmentBehavior {
 
   private static Logger logger = LoggerFactory.getLogger(FoodGenerationBehavior.class);
 
-  @Value("#{properties['foodMinCount']}") private int minFoodCount;
-  @Value("#{properties['foodClusterRadius']}") private int foodClusterRadius;
-  @Value("#{properties['foodInitialEnergy']}") private int foodInitialEnergy;
+  private int minFoodCount;
+  private int foodClusterRadius;
+  private int foodInitialEnergy;
 
   private int foodCount = 0;
 
   @Override
-  public void setState(AntSimulationModel state, Environment environment) {}
+  public void setState(AntSimulationModel state, Environment environment) {
+    minFoodCount = state.getFoodMinCount();
+    foodClusterRadius = state.getFoodClusterRadius();
+    foodInitialEnergy = state.getFoodInitialEnergy();
+  }
 
   @Override
   public void updateState(AntSimulationModel state, Environment environment) {}

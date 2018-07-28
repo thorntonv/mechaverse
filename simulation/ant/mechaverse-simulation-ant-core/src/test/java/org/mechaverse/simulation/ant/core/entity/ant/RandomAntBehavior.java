@@ -1,6 +1,7 @@
 package org.mechaverse.simulation.ant.core.entity.ant;
 
 import org.apache.commons.math3.random.RandomGenerator;
+import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.common.util.RandomUtil;
 
 /**
@@ -10,6 +11,10 @@ public class RandomAntBehavior extends SimpleAntBehavior {
 
   private final AntOutput output = new AntOutput();
   private final int[] data = new int[AntOutput.DATA_SIZE];
+
+  protected RandomAntBehavior(Ant entity) {
+    super(entity);
+  }
 
   @Override
   public AntOutput getOutput(RandomGenerator random) {

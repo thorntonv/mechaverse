@@ -10,10 +10,6 @@ import org.mechaverse.simulation.common.model.EntityModel;
 
 public class AntSimulationImpl extends AbstractSimulation<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> {
 
-    public AntSimulationImpl() {
-        this(new AntSimulationModelGenerator(), new AntEnvironmentFactory());
-    }
-
     public AntSimulationImpl(
             final SimulationModelGenerator<AntSimulationModel> simulationModelGenerator,
             final EnvironmentFactory<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> environmentFactory) {

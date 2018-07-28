@@ -14,7 +14,7 @@ public abstract class AbstractSimulationModelGenerator<
     ENT_TYPE extends Enum<ENT_TYPE>>
     implements SimulationModelGenerator<SIM_MODEL> {
 
-  private static final int DEFAULT_SUB_ENVIRONMENT_COUNT = 1;
+  private static final int DEFAULT_SUB_ENVIRONMENT_COUNT = 0;
 
   private final int subEnvironmentCount;
   private final EnvironmentModelGenerator<ENV_MODEL, ENT_MODEL, ENT_TYPE> environmentModelGenerator;

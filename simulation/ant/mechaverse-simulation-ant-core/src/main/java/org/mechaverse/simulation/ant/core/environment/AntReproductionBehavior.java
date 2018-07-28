@@ -1,12 +1,18 @@
 package org.mechaverse.simulation.ant.core.environment;
 
+import static org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_BIT_OUTPUT_MAP_GENETIC_DATA_KEY;
+import static org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_OUTPUT_MAP_GENETIC_DATA_KEY;
+import static org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.util.Pair;
@@ -17,7 +23,6 @@ import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.ant.core.model.Nest;
 import org.mechaverse.simulation.common.Environment;
-import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator;
 import org.mechaverse.simulation.common.genetic.CutAndSpliceCrossoverGeneticRecombinator;
 import org.mechaverse.simulation.common.genetic.GeneticData;
 import org.mechaverse.simulation.common.genetic.GeneticDataStore;
@@ -26,9 +31,6 @@ import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.util.SimulationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
 
 /**
  * An environment simulation module that maintains a target ant population size.
@@ -87,9 +89,9 @@ public class AntReproductionBehavior extends AbstractAntEnvironmentBehavior {
 
   private static final Logger logger = LoggerFactory.getLogger(AntReproductionBehavior.class);
 
-  @Value("#{properties['antMaxCount']}") private int antMaxCount;
-  @Value("#{properties['antInitialEnergy']}") private int antInitialEnergy;
-  @Value("#{properties['antMinReproductiveAge']}") private int antMinReproductiveAge;
+  private int antMaxCount;
+  private int antInitialEnergy;
+  private int antMinReproductiveAge;
 
   // TODO(thorntonv): Determine if this should be a simulation property.
   private int maxGeneratedAntNestDistance = 15;
@@ -106,6 +108,15 @@ public class AntReproductionBehavior extends AbstractAntEnvironmentBehavior {
 
   public AntReproductionBehavior(GeneticRecombinator geneticRecombinator) {
     this.geneticRecombinator = geneticRecombinator;
+  }
+
+  @Override
+  public void setState(AntSimulationModel state,
+      Environment<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> environment) {
+    super.setState(state, environment);
+    antMaxCount = state.getAntMaxCount();
+    antInitialEnergy = state.getAntInitialEnergy();
+    antMinReproductiveAge = state.getAntMinReproductiveAge();
   }
 
   @Override
@@ -164,12 +175,25 @@ public class AntReproductionBehavior extends AbstractAntEnvironmentBehavior {
     GeneticDataStore parent2GeneticDataStore = new GeneticDataStore(parent2);
 
     GeneticDataStore childGeneticDataStore = new GeneticDataStore(ant);
-    for (String key : CellularAutomatonGeneticDataGenerator.KEY_SET) {
+    for (String key : ImmutableSet.of(CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY)) {
+      if (!parent1GeneticDataStore.contains(key) || !parent2GeneticDataStore.contains(key)) {
+        continue;
+      }
       GeneticData parent1GeneticData = parent1GeneticDataStore.get(key);
       GeneticData parent2GeneticData = parent2GeneticDataStore.get(key);
       GeneticData childData = geneticRecombinator.recombine(
           parent1GeneticData, parent2GeneticData, random);
       childGeneticDataStore.put(key, childData);
+    }
+
+    for (String key : ImmutableSet.of(
+        CELLULAR_AUTOMATON_OUTPUT_MAP_GENETIC_DATA_KEY,
+        CELLULAR_AUTOMATON_BIT_OUTPUT_MAP_GENETIC_DATA_KEY)) {
+      if (!parent1GeneticDataStore.contains(key) || !parent2GeneticDataStore.contains(key)) {
+        continue;
+      }
+      GeneticData parent1GeneticData = parent1GeneticDataStore.get(key);
+      childGeneticDataStore.put(key, parent1GeneticData);
     }
 
     logger.debug("Generated child ant {} with parents {} and {}",

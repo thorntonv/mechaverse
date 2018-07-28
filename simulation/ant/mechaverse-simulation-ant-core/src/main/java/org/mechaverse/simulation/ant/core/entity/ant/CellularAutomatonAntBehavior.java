@@ -23,15 +23,11 @@ public class CellularAutomatonAntBehavior extends AbstractAntBehavior {
   private final AntOutput output = new AntOutput();
   private final CellularAutomatonEntityBehavior<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> cellularAutomatonEntityBehavior;
 
-  public CellularAutomatonAntBehavior(
+  public CellularAutomatonAntBehavior(Ant entity,
       CellularAutomatonDescriptorDataSource dataSource, CellularAutomatonSimulator simulator) {
-    this.cellularAutomatonEntityBehavior = new CellularAutomatonEntityBehavior<>(AntOutput.DATA_SIZE, dataSource, simulator);
-  }
-
-  @Override
-  void setModel(final Ant entity) {
-    super.setModel(entity);
-    cellularAutomatonEntityBehavior.setEntity(entity);
+    super(entity);
+    this.cellularAutomatonEntityBehavior = new CellularAutomatonEntityBehavior<>(
+        entity, AntOutput.DATA_SIZE, dataSource, simulator);
   }
 
   @Override
