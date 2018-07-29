@@ -1,17 +1,18 @@
 package org.mechaverse.simulation.common.util;
 
+import static org.junit.Assert.assertEquals;
+
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.google.common.io.CharStreams;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.zip.GZIPInputStream;
-
+import java.util.zip.GZIPOutputStream;
 import org.junit.Test;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.SimulationModel;
-import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.google.common.io.CharStreams;
-
-import static org.junit.Assert.*;
 
 public class SimulationModelUtilTest {
 
@@ -85,7 +86,7 @@ public class SimulationModelUtilTest {
 
   @Test
   public void testDeserialize() throws IOException {
-    SimulationModel simulationModel = SimulationModelUtil.deserialize(new ByteArrayInputStream(TEST_JSON.getBytes()), new Class[]{
+    SimulationModel simulationModel = SimulationModelUtil.deserialize(toBytes(TEST_JSON), new Class[]{
         TestCellEnvironmentModel.class, TestEntity1.class, TestEntity2.class}, SimulationModel.class);
 
     assertEquals("abc", simulationModel.getId());
@@ -94,5 +95,13 @@ public class SimulationModelUtilTest {
 
   private String toString(byte[] serialized) throws IOException {
     return CharStreams.toString(new InputStreamReader(new GZIPInputStream(new ByteArrayInputStream(serialized))));
+  }
+
+  private byte[] toBytes(String jsonString) throws IOException {
+    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+    try(GZIPOutputStream out = new GZIPOutputStream(byteOut)) {
+      out.write(jsonString.getBytes());
+    }
+    return byteOut.toByteArray();
   }
 }

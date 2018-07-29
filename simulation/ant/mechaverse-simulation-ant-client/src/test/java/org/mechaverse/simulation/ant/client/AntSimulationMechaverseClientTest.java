@@ -1,14 +1,15 @@
 package org.mechaverse.simulation.ant.client;
 
-import java.io.ByteArrayInputStream;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.io.InputStream;
 import java.util.UUID;
-import java.util.zip.GZIPInputStream;
-
-import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mechaverse.client.MechaverseClient;
 import org.mechaverse.service.manager.api.MechaverseManager;
 import org.mechaverse.service.manager.api.model.Task;
@@ -17,35 +18,27 @@ import org.mechaverse.simulation.ant.core.AntSimulationImpl;
 import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.ant.core.model.AntSimulationModel;
 import org.mechaverse.simulation.ant.core.model.EntityType;
-import org.mechaverse.simulation.ant.core.spring.AntSimulationConfig;
 import org.mechaverse.simulation.ant.core.util.AntSimulationModelUtil;
+import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore;
+import org.mechaverse.simulation.common.datastore.SimulationDataStore;
+import org.mechaverse.simulation.common.datastore.SimulationDataStoreInputStream;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * Unit test for {@link AntSimulationMechaverseClient}.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = AntSimulationConfig.class)
 public class AntSimulationMechaverseClientTest {
 
   @Mock
   private MechaverseManager mockManager;
   @Mock
   private MechaverseStorageService mockStorageService;
-  @Autowired
-  private AntSimulationImpl simulation;
 
   private MechaverseClient client;
 
@@ -58,6 +51,31 @@ public class AntSimulationMechaverseClientTest {
   }
 
   @Test
+  public void executeTask_initialState() throws Exception {
+    Task task = new Task();
+    task.setId(123L);
+    task.setSimulationId(UUID.randomUUID().toString());
+    task.setInstanceId(UUID.randomUUID().toString());
+    task.setIteration(-1);
+    task.setIterationCount(100);
+
+    client.executeTask(task);
+
+    ArgumentCaptor<InputStream> stateIn = ArgumentCaptor.forClass(InputStream.class);
+    verify(mockManager).submitResult(eq(task.getId()), stateIn.capture());
+
+    SimulationDataStore simulationDataStore = new SimulationDataStoreInputStream(
+        stateIn.getValue(), MemorySimulationDataStore::new).readDataStore();
+
+    assertTrue(simulationDataStore.size() > 0);
+
+    AntSimulationModel finalState = AntSimulationModelUtil
+        .deserialize(simulationDataStore.get(SimulationDataStore.STATE_KEY));
+    assertEquals(100, finalState.getIteration());
+    assertTrue(getAntCount(finalState.getEnvironment().getEntities()) > 0);
+  }
+
+  @Test
   public void executeTask() throws Exception {
     Task task = new Task();
     task.setId(123L);
@@ -66,22 +84,30 @@ public class AntSimulationMechaverseClientTest {
     task.setIteration(300);
     task.setIterationCount(100);
 
+    AntSimulationImpl simulation = getApplicationContext().getBean(AntSimulationImpl.class);
     AntSimulationModel state = simulation.generateRandomState();
+    SimulationDataStore simulationDataStore = new MemorySimulationDataStore();
+    state.setIteration(300);
+    simulationDataStore.put(SimulationDataStore.STATE_KEY, AntSimulationModelUtil.serialize(state));
     when(mockStorageService.getState(
         task.getSimulationId(), task.getInstanceId(), task.getIteration()))
-        .thenReturn(new ByteArrayInputStream(AntSimulationModelUtil.serialize(state)));
+        .thenReturn(SimulationDataStoreInputStream.newInputStream(simulationDataStore));
 
     client.executeTask(task);
 
     ArgumentCaptor<InputStream> stateIn = ArgumentCaptor.forClass(InputStream.class);
     verify(mockManager).submitResult(eq(task.getId()), stateIn.capture());
 
-    byte[] newState = IOUtils.toByteArray(stateIn.getValue());
-    assertTrue(newState.length > 0);
 
-    AntSimulationModel stateData = AntSimulationModelUtil
-        .deserialize(new GZIPInputStream(new ByteArrayInputStream(newState)));
-    assertTrue(getAntCount(stateData.getEnvironment().getEntities()) > 0);
+    simulationDataStore = new SimulationDataStoreInputStream(
+        stateIn.getValue(), MemorySimulationDataStore::new).readDataStore();
+
+    assertTrue(simulationDataStore.size() > 0);
+
+    AntSimulationModel finalState = AntSimulationModelUtil
+        .deserialize(simulationDataStore.get(SimulationDataStore.STATE_KEY));
+    assertEquals(400, finalState.getIteration());
+    assertTrue(getAntCount(finalState.getEnvironment().getEntities()) > 0);
   }
 
   private int getAntCount(Iterable<EntityModel<EntityType>> entities) {
@@ -92,5 +118,9 @@ public class AntSimulationMechaverseClientTest {
       }
     }
     return count;
+  }
+
+  protected AbstractApplicationContext getApplicationContext() {
+    return new ClassPathXmlApplicationContext("simulation-context.xml");
   }
 }

@@ -5,9 +5,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mechaverse.simulation.ant.core.AntSimulationTestUtil.assertModelsEqual;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.zip.GZIPInputStream;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.Before;
 import org.junit.Test;
@@ -113,8 +111,8 @@ public abstract class AbstractAntSimulationImplTest {
 
     byte[] initialState = AntSimulationModelUtil.serialize(simulation1.generateRandomState());
     assertNotEquals(simulation1, simulation2);
-    simulation1.setState(AntSimulationModelUtil.deserialize(new GZIPInputStream(new ByteArrayInputStream(initialState))));
-    simulation2.setState(AntSimulationModelUtil.deserialize(new GZIPInputStream(new ByteArrayInputStream(initialState))));
+    simulation1.setState(AntSimulationModelUtil.deserialize(initialState));
+    simulation2.setState(AntSimulationModelUtil.deserialize(initialState));
 
     for (int cnt = 0; cnt < smallTestIterationCount(); cnt++) {
       simulation1.step();
@@ -125,9 +123,9 @@ public abstract class AbstractAntSimulationImplTest {
 
     byte[] state = AntSimulationModelUtil.serialize(simulation1.getState());
     simulation1 = newSimulationImpl();
-    simulation1.setState(AntSimulationModelUtil.deserialize(new GZIPInputStream(new ByteArrayInputStream(state))));
+    simulation1.setState(AntSimulationModelUtil.deserialize(state));
     simulation2 = newSimulationImpl();
-    simulation2.setState(AntSimulationModelUtil.deserialize(new GZIPInputStream(new ByteArrayInputStream(state))));
+    simulation2.setState(AntSimulationModelUtil.deserialize(state));
 
     for (int cnt = 0; cnt < smallTestIterationCount(); cnt++) {
       simulation1.step();

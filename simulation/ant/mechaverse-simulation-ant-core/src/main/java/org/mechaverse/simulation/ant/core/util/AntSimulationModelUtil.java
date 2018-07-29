@@ -1,12 +1,18 @@
 package org.mechaverse.simulation.ant.core.util;
 
-import org.mechaverse.simulation.ant.core.model.*;
+import java.io.IOException;
+import org.mechaverse.simulation.ant.core.model.Ant;
+import org.mechaverse.simulation.ant.core.model.AntSimulationModel;
+import org.mechaverse.simulation.ant.core.model.Barrier;
+import org.mechaverse.simulation.ant.core.model.CellEnvironment;
+import org.mechaverse.simulation.ant.core.model.Conduit;
+import org.mechaverse.simulation.ant.core.model.Dirt;
+import org.mechaverse.simulation.ant.core.model.Food;
+import org.mechaverse.simulation.ant.core.model.Nest;
+import org.mechaverse.simulation.ant.core.model.Pheromone;
+import org.mechaverse.simulation.ant.core.model.Rock;
 import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.common.util.SimulationModelUtil;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 public class AntSimulationModelUtil {
 
@@ -14,12 +20,8 @@ public class AntSimulationModelUtil {
       new Class[] {SimulationModel.class, CellEnvironment.class, Ant.class, Barrier.class,
           Conduit.class, Dirt.class, Food.class, Nest.class, Pheromone.class, Rock.class};
 
-  public static AntSimulationModel deserialize(InputStream in) throws IOException {
-    return SimulationModelUtil.deserialize(in, CLASSES_TO_BE_BOUND, AntSimulationModel.class);
-  }
-
-  public static void serialize(SimulationModel model, OutputStream out) throws IOException {
-    SimulationModelUtil.serialize(model, out);
+  public static AntSimulationModel deserialize(byte[] data) throws IOException {
+    return SimulationModelUtil.deserialize(data, CLASSES_TO_BE_BOUND, AntSimulationModel.class);
   }
 
   public static byte[] serialize(SimulationModel model) throws IOException {

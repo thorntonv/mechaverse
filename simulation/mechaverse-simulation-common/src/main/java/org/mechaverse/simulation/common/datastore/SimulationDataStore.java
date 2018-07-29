@@ -10,6 +10,7 @@ import java.util.Set;
 public interface SimulationDataStore {
 
   String KEY_SEPARATOR = ".";
+  String STATE_KEY = "state";
 
   /**
    * Returns the data associated with the given key.

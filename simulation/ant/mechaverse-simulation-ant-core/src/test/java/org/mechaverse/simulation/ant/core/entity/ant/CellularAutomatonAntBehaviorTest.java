@@ -1,5 +1,14 @@
 package org.mechaverse.simulation.ant.core.entity.ant;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,10 +31,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
-
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
 
 /**
  * Unit test for {@link CellularAutomatonAntBehavior}.
@@ -50,8 +55,7 @@ public class CellularAutomatonAntBehaviorTest {
   private AntInput input;
   private RandomGenerator random;
   private AntSimulationModel state;
-  private CellularAutomatonDescriptorDataSource descriptorDataSource =
-      new SimulationStateCellularAutomatonDescriptor();
+  private CellularAutomatonDescriptorDataSource descriptorDataSource;
 
   @Before
   public void setUp() {
@@ -64,8 +68,9 @@ public class CellularAutomatonAntBehaviorTest {
     when(mockSimulator.getAutomatonOutputSize()).thenReturn(TEST_AUTOMATON_OUTPUT_SIZE);
     input = new AntInput();
     random = RandomUtil.newGenerator(CellularAutomatonAntBehavior.class.getName().hashCode());
-    behavior = new CellularAutomatonAntBehavior(ant, descriptorDataSource, mockSimulator);
     state = new AntSimulationModel();
+    descriptorDataSource = new SimulationStateCellularAutomatonDescriptor(state);
+    behavior = new CellularAutomatonAntBehavior(ant, descriptorDataSource, mockSimulator);
   }
 
   @Test

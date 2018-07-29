@@ -8,14 +8,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.mechaverse.common.MechaverseConfig;
 import org.mechaverse.service.manager.api.MechaverseManager;
 import org.mechaverse.service.manager.api.model.Task;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
 import org.mechaverse.simulation.common.Simulation;
-import org.mechaverse.simulation.common.model.SimulationModel;
-import org.mechaverse.simulation.common.util.SimulationModelUtil;
+import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore;
+import org.mechaverse.simulation.common.datastore.SimulationDataStore;
+import org.mechaverse.simulation.common.datastore.SimulationDataStoreInputStream;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -112,8 +112,9 @@ public class MechaverseClient {
         InputStream in = storageService.getState(
             task.getSimulationId(), task.getInstanceId(), task.getIteration());
 
-        // TODO(thorntonv): FIX ME!!!!!!!!!
-        simulation.setState(SimulationModelUtil.deserialize(in, null, SimulationModel.class));
+        SimulationDataStore simulationDataStore =
+            new SimulationDataStoreInputStream(in, MemorySimulationDataStore::new).readDataStore();
+        simulation.setStateData(simulationDataStore.get(SimulationDataStore.STATE_KEY));
 
         logOperationDone();
       } else {
@@ -135,8 +136,10 @@ public class MechaverseClient {
       // Submit result.
       logSubOperationStart("Submitting result");
 
-      // TODO(thorntonv): FIX ME !!!!!!!
-      manager.submitResult(task.getId(), null);
+      byte[] stateData = simulation.getStateData();
+      MemorySimulationDataStore simulationDataStore = new MemorySimulationDataStore();
+      simulationDataStore.put(SimulationDataStore.STATE_KEY, stateData);
+      manager.submitResult(task.getId(), SimulationDataStoreInputStream.newInputStream(simulationDataStore));
       logOperationDone();
     } catch (Throwable ex) {
       printErrorMessage(ex);

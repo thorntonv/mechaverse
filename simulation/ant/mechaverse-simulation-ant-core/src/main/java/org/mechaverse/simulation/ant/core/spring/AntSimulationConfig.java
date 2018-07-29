@@ -19,21 +19,18 @@ import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.ant.core.model.AntSimulationModel;
 import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.ant.core.model.EntityType;
-import org.mechaverse.simulation.common.EntityFactory;
 import org.mechaverse.simulation.common.EnvironmentFactory;
 import org.mechaverse.simulation.common.SimulationModelGenerator;
-import org.mechaverse.simulation.common.cellautomaton.SimulationStateCellularAutomatonDescriptor;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorDataSource;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.opencl.CompositeOpenClCellularAutomatonSimulatorFactory;
 import org.mechaverse.simulation.common.model.EntityModel;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 
 @Configuration
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class AntSimulationConfig {
 
   private static final int ANT_MAX_COUNT = 500;
@@ -63,11 +60,6 @@ public class AntSimulationConfig {
   }
 
   @Bean
-  public CellularAutomatonDescriptorDataSource cellularAutomatonDescriptorDataSource() {
-    return new SimulationStateCellularAutomatonDescriptor();
-  }
-
-  @Bean
   @Scope("prototype")
   public FoodGenerationBehavior foodGenerationBehavior() {
     return new FoodGenerationBehavior();
@@ -93,36 +85,33 @@ public class AntSimulationConfig {
 
   @Bean
   @Scope("prototype")
-  public EnvironmentFactory<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> environmentFactory(
-      EntityFactory<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> entityFactory) {
+  public EnvironmentFactory<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> environmentFactory() {
+    CellularAutomatonSimulationBehavior cellularAutomatonBehavior = cellularAutomatonSimulationBehavior();
     List<AbstractAntEnvironmentBehavior> environmentBehaviors = ImmutableList.of(
         foodGenerationBehavior(),
         pheromoneDecayBehavior(),
         antReproductionBehavior(),
-        cellularAutomatonSimulationBehavior());
-    return new AntEnvironmentFactory(environmentBehaviors, entityFactory);
+        cellularAutomatonBehavior);
+    return new AntEnvironmentFactory(environmentBehaviors, entityFactory(cellularAutomatonBehavior));
   }
 
   @Bean
   @Scope("prototype")
-  public CellularAutomatonSimulator cellularAutomatonSimulator(
-      CellularAutomatonDescriptorDataSource descriptorDataSource) {
-    return new CompositeOpenClCellularAutomatonSimulatorFactory(4, 125, AntInput.DATA_SIZE, 32,
+  public Function<CellularAutomatonDescriptorDataSource, CellularAutomatonSimulator> cellularAutomatonSimulator() {
+    return descriptorDataSource -> new CompositeOpenClCellularAutomatonSimulatorFactory(
+        4, 125, AntInput.DATA_SIZE, 32,
         descriptorDataSource).getObject();
   }
 
-  @Bean
-  @Scope("prototype")
-  public AntEntityFactory entityFactory(Function<Ant, AntEntity> antEntityFactory) {
-    return new AntEntityFactory(antEntityFactory);
+  private AntEntityFactory entityFactory(
+      CellularAutomatonSimulationBehavior cellularAutomatonBehavior) {
+    return new AntEntityFactory(antEntityFactory(cellularAutomatonBehavior));
   }
 
-  @Bean
-  @Scope("prototype")
-  public Function<Ant, AntEntity> antEntityFactory(
-      CellularAutomatonDescriptorDataSource descriptorDataSource,
-      CellularAutomatonSimulator simulator) {
-    return (ant) -> new AntEntity(
-        new CellularAutomatonAntBehavior(ant, descriptorDataSource, simulator));
+  private Function<Ant, AntEntity> antEntityFactory(
+      CellularAutomatonSimulationBehavior cellularAutomatonBehavior) {
+    return (ant) -> new AntEntity(new CellularAutomatonAntBehavior(ant,
+        cellularAutomatonBehavior.getDescriptorDataSource(),
+        cellularAutomatonBehavior.getSimulator()));
   }
 }

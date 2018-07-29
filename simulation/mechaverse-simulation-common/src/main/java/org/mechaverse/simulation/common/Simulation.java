@@ -1,5 +1,6 @@
 package org.mechaverse.simulation.common;
 
+import java.io.IOException;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.EnvironmentModel;
 import org.mechaverse.simulation.common.model.SimulationModel;
@@ -22,6 +23,10 @@ public interface Simulation<
    * Sets the state of the simulation.
    */
   void setState(SIM_MODEL model) throws Exception;
+
+  byte[] getStateData() throws IOException;
+
+  void setStateData(byte[] stateData) throws Exception;
 
   /**
    * Generates a random state.

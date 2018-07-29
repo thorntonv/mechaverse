@@ -1,5 +1,10 @@
 package org.mechaverse.simulation.experimental.simple;
 
+import static org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_OUTPUT_MAP_GENETIC_DATA_KEY;
+import static org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY;
+
+import com.google.common.collect.Sets;
+import gnu.trove.map.TObjectDoubleMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.IdentityHashMap;
@@ -8,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
 import org.apache.commons.math3.util.Pair;
@@ -27,11 +31,6 @@ import org.mechaverse.simulation.common.genetic.selection.SelectionStrategy;
 import org.mechaverse.simulation.common.genetic.selection.SelectionUtil;
 import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.common.util.ArrayUtil;
-import com.google.common.collect.Sets;
-import gnu.trove.map.TObjectDoubleMap;
-
-import static org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_OUTPUT_MAP_GENETIC_DATA_KEY;
-import static org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY;
 
 /**
  * A base class for simple simulations.
@@ -84,8 +83,13 @@ public class SimpleSimulation<E extends SimpleCellularAutomatonEntity> implement
 
   @Override
   public void setState(SimulationModel model) {
-      throw new UnsupportedOperationException();
-    }
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void setStateData(byte[] data) {
+    throw new UnsupportedOperationException();
+  }
 
   @Override
   public SimulationModel generateRandomState() {
@@ -105,6 +109,11 @@ public class SimpleSimulation<E extends SimpleCellularAutomatonEntity> implement
 
   @Override
   public void removeObserver(final SimulationObserver observer) {
+  }
+
+  @Override
+  public byte[] getStateData() {
+    throw new UnsupportedOperationException();
   }
 
   public void step(int stepCount, double targetFitness) {

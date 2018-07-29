@@ -1,7 +1,7 @@
 package org.mechaverse.simulation.common.cellautomaton;
 
+import com.google.common.base.Preconditions;
 import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
-import org.mechaverse.simulation.common.Simulation;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorDataSource;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorReader;
 import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel;
@@ -9,7 +9,6 @@ import org.mechaverse.simulation.common.cellautomaton.simulation.generator.Cellu
 import org.mechaverse.simulation.common.model.SimulationModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * A {@link CellularAutomatonDescriptorDataSource} implementation that loads a
@@ -23,11 +22,15 @@ public class SimulationStateCellularAutomatonDescriptor
   private static final Logger logger =
       LoggerFactory.getLogger(SimulationStateCellularAutomatonDescriptor.class);
 
-  @Autowired private Simulation simulation;
+  private SimulationModel state;
 
   private CellularAutomatonDescriptor descriptor;
   private CellularAutomatonSimulationModel model;
   private String defaultDescriptorResourceName = "boolean4.xml";
+
+  public SimulationStateCellularAutomatonDescriptor(SimulationModel state) {
+    this.state = Preconditions.checkNotNull(state);
+  }
 
   public void setDefaultDescriptorResourceName(String defaultDescriptorResourceName) {
       this.defaultDescriptorResourceName = defaultDescriptorResourceName;
@@ -51,7 +54,6 @@ public class SimulationStateCellularAutomatonDescriptor
 
   private void loadDescriptor() {
     try {
-      SimulationModel state = simulation.getState();
       if (state.dataContainsKey(DESCRIPTOR_XML_KEY)) {
         descriptor = CellularAutomatonDescriptorReader.read(state.getData(DESCRIPTOR_XML_KEY));
       }

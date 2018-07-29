@@ -1,12 +1,9 @@
 package org.mechaverse.simulation.ant.core;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-import com.google.common.io.ByteStreams;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.zip.GZIPInputStream;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.ant.core.entity.EntityUtil;
 import org.mechaverse.simulation.ant.core.entity.ant.AntOutput;
@@ -46,13 +43,7 @@ public class AntSimulationTestUtil {
       env.getEntities().sort(EntityUtil.ENTITY_ORDERING);
     }
 
-    ByteArrayOutputStream model1ByteOut = new ByteArrayOutputStream(16 * 1024);
-    ByteArrayOutputStream model2ByteOut = new ByteArrayOutputStream(16 * 1024);
-
-    AntSimulationModelUtil.serialize(expected, model1ByteOut);
-    AntSimulationModelUtil.serialize(actual, model2ByteOut);
-
-    assertEquals(model1ByteOut.toString(), model2ByteOut.toString());
+    assertArrayEquals(AntSimulationModelUtil.serialize(expected), AntSimulationModelUtil.serialize(actual));
   }
 
   public static void assertEntitiesEqual(EntityModel expected, EntityModel actual) {
@@ -70,9 +61,5 @@ public class AntSimulationTestUtil {
       antOutputData[idx] = random.nextInt(Short.MAX_VALUE);
     }
     return new AntOutput(antOutputData);
-  }
-
-  public static byte[] decompress(byte[] data) throws IOException {
-    return ByteStreams.toByteArray(new GZIPInputStream(new ByteArrayInputStream(data)));
   }
 }
