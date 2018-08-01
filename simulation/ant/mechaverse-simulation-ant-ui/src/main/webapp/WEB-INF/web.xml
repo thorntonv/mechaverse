@@ -18,8 +18,8 @@
   </listener>
 
   <servlet>
-    <servlet-name>mechaverseServlet</servlet-name>
-    <servlet-class>org.mechaverse.gwt.server.MechaverseGwtRpcServiceImpl</servlet-class>
+    <servlet-name>simulationServlet</servlet-name>
+    <servlet-class>org.mechaverse.gwt.server.SimulationGwtRpcServiceImpl</servlet-class>
   </servlet>
 
   <servlet>
@@ -43,7 +43,7 @@
   </servlet-mapping>
 
   <listener>
-    <listener-class>org.mechaverse.gwt.server.MechaverseGwtRpcServiceImpl</listener-class>
+    <listener-class>org.mechaverse.gwt.server.SimulationGwtRpcServiceImpl</listener-class>
   </listener>
 
   <welcome-file-list>

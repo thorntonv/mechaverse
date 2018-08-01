@@ -11,11 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
-import org.mechaverse.gwt.shared.MechaverseGwtRpcService;
+import org.mechaverse.gwt.shared.SimulationGwtRpcService;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
-import org.mechaverse.simulation.ant.core.spring.AntSimulationConfig;
 import org.mechaverse.simulation.ant.core.ui.AntSimulationImageProvider;
-import org.mechaverse.simulation.ant.core.util.AntSimulationModelUtil;
 import org.mechaverse.simulation.common.Simulation;
 import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore;
 import org.mechaverse.simulation.common.datastore.SimulationDataStore;
@@ -25,17 +23,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
- * Implementation of {@link MechaverseGwtRpcService} which forwards requests to the REST service.
+ * Implementation of {@link SimulationGwtRpcService} which forwards requests to the REST service.
  */
-public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
-        implements MechaverseGwtRpcService, HttpSessionListener {
+public class SimulationGwtRpcServiceImpl extends RemoteServiceServlet
+        implements SimulationGwtRpcService, HttpSessionListener {
 
     private static final long serialVersionUID = 1349327476429682957L;
 
@@ -43,7 +41,7 @@ public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
     private static final String SIMULATION_CONTEXT_KEY = "simulation-context";
     private static final String STORAGE_SERVICE_KEY = "storage-service";
 
-    private static final Logger logger = LoggerFactory.getLogger(MechaverseGwtRpcServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(SimulationGwtRpcServiceImpl.class);
 
     @Autowired
     private ObjectFactory<MechaverseStorageService> storageServiceClientFactory;
@@ -67,7 +65,7 @@ public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
                         new MemorySimulationDataStore.MemorySimulationDataStoreInputStream(in);
                 try {
                     SimulationDataStore dataStore = stateIn.readDataStore();
-                    simulation.setState(AntSimulationModelUtil.deserialize(dataStore.get("model")));
+                    simulation.setStateData(dataStore.get("model"));
                 } finally {
                     in.close();
                     stateIn.close();
@@ -103,13 +101,17 @@ public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
         }
     }
 
+    private void createSimulation(String type) {
+
+    }
+
     private Simulation getSimulation() {
         HttpServletRequest request = this.getThreadLocalRequest();
         Simulation service = (Simulation) request.getSession(true)
                 .getAttribute(SIMULATION_SERVICE_KEY);
         if (service == null) {
-            AnnotationConfigApplicationContext ctx =
-                    new AnnotationConfigApplicationContext(AntSimulationConfig.class);
+            ClassPathXmlApplicationContext ctx =
+                new ClassPathXmlApplicationContext("simulation-context-replay.xml");
             service = ctx.getBean(Simulation.class);
             request.getSession().setAttribute(SIMULATION_SERVICE_KEY, service);
             request.getSession().setAttribute(SIMULATION_CONTEXT_KEY, ctx);

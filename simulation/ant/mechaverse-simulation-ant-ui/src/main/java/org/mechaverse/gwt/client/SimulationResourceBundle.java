@@ -9,16 +9,12 @@ import com.google.gwt.resources.client.CssResource;
  *
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
-public interface AntSimulationResourceBundle extends ClientBundle {
+public interface SimulationResourceBundle extends ClientBundle {
 
-  AntSimulationResourceBundle INSTANCE =
-      GWT.create(AntSimulationResourceBundle.class);
+  SimulationResourceBundle INSTANCE =
+      GWT.create(SimulationResourceBundle.class);
 
   interface Style extends CssResource {
-
-    String entityToolbar();
-    String entityButton();
-    String entityButtonSelected();
 
     String environmentPanel();
   }

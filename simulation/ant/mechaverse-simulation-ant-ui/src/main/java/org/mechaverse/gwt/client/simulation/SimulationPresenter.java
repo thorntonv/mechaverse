@@ -1,8 +1,8 @@
-package org.mechaverse.gwt.client.environment;
+package org.mechaverse.gwt.client.simulation;
 
 import org.mechaverse.gwt.client.manager.ManagerClientFactory;
 import org.mechaverse.gwt.common.client.webconsole.NotificationBar;
-import org.mechaverse.gwt.shared.MechaverseGwtRpcServiceAsync;
+import org.mechaverse.gwt.shared.SimulationGwtRpcServiceAsync;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.dom.client.ScrollEvent;
 import com.google.gwt.event.dom.client.ScrollHandler;
@@ -93,8 +93,8 @@ public class SimulationPresenter extends AbstractActivity {
             }
 
             @Override
-            public void onSuccess(final String result) {
-              view.setStateImage(result);
+            public void onSuccess(final String base64Image) {
+              view.setStateImage(base64Image);
               finishUpdate();
             }
           });
@@ -113,8 +113,8 @@ public class SimulationPresenter extends AbstractActivity {
     }
   }
 
-  private final MechaverseGwtRpcServiceAsync service =
-      MechaverseGwtRpcServiceAsync.Util.getInstance();
+  private final SimulationGwtRpcServiceAsync service =
+      SimulationGwtRpcServiceAsync.Util.getInstance();
 
   private final UpdateTimer updateTimer = new UpdateTimer();
   private final NotificationBar notificationBar;

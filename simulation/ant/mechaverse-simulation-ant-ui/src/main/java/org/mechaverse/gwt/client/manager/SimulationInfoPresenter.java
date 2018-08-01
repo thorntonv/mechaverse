@@ -1,6 +1,6 @@
 package org.mechaverse.gwt.client.manager;
 
-import org.mechaverse.gwt.client.environment.SimulationPresenter.SimulationPlace;
+import org.mechaverse.gwt.client.simulation.SimulationPresenter.SimulationPlace;
 import org.mechaverse.gwt.common.client.webconsole.NotificationBar;
 import org.mechaverse.gwt.common.shared.ManagerGwtRpcServiceAsync;
 import org.mechaverse.service.manager.api.model.InstanceInfo;

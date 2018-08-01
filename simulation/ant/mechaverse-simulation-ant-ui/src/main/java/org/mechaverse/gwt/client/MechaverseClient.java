@@ -52,7 +52,7 @@ public class MechaverseClient implements EntryPoint {
   }
 
   protected static void ensureCssInjected() {
-    AntSimulationResourceBundle.INSTANCE.css().ensureInjected();
+    SimulationResourceBundle.INSTANCE.css().ensureInjected();
     WebConsoleResourceBundle.INSTANCE.css().ensureInjected();
     TableResources.INSTANCE.cellTableStyle().ensureInjected();
   }

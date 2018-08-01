@@ -7,7 +7,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  * The client side stub for the RPC service.
  */
 @RemoteServiceRelativePath("service")
-public interface MechaverseGwtRpcService extends RemoteService {
+public interface SimulationGwtRpcService extends RemoteService {
 
   void loadState(String simulationId, String instanceId, long iteration)
       throws Exception;

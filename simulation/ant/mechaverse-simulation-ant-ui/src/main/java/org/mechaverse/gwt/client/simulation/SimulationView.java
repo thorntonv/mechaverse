@@ -1,4 +1,4 @@
-package org.mechaverse.gwt.client.environment;
+package org.mechaverse.gwt.client.simulation;
 
 import org.mechaverse.gwt.client.manager.ManagerDashboardPresenter.ManagerDashboardPlace;
 import org.mechaverse.gwt.common.client.webconsole.BasicNavMenu;
