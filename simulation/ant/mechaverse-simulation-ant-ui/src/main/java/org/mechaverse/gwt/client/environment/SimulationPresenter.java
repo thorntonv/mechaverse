@@ -3,11 +3,6 @@ package org.mechaverse.gwt.client.environment;
 import org.mechaverse.gwt.client.manager.ManagerClientFactory;
 import org.mechaverse.gwt.common.client.webconsole.NotificationBar;
 import org.mechaverse.gwt.shared.MechaverseGwtRpcServiceAsync;
-import org.mechaverse.simulation.ant.core.model.CellEnvironment;
-import org.mechaverse.simulation.ant.core.model.EntityType;
-import org.mechaverse.simulation.common.model.EntityModel;
-import org.mechaverse.simulation.common.model.SimulationModel;
-
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.dom.client.ScrollEvent;
 import com.google.gwt.event.dom.client.ScrollHandler;
@@ -65,7 +60,6 @@ public class SimulationPresenter extends AbstractActivity {
   protected class UpdateTimer extends Timer {
 
     private boolean inProgress = false;
-    private boolean readyForUpdate = false;
 
     @Override
     public void run() {
@@ -74,12 +68,10 @@ public class SimulationPresenter extends AbstractActivity {
       }
 
       if (inProgress) {
-        readyForUpdate = true;
         return;
       }
 
       inProgress = true;
-      readyForUpdate = false;
       schedule(UPDATE_INTERVAL);
 
       service.step(new AsyncCallback<Void>() {
@@ -92,17 +84,17 @@ public class SimulationPresenter extends AbstractActivity {
 
         @Override
         public void onSuccess(Void result) {
-          service.getModel(new AsyncCallback<SimulationModel>() {
+          service.getStateImage(new AsyncCallback<String>() {
             @Override
-            public void onFailure(Throwable ex) {
-              notificationBar.showError("Get model failed: " + ex.getClass().getName() + ": "
-                  + ex.getMessage());
+            public void onFailure(final Throwable ex) {
+              notificationBar.showError("Get state image: " + ex.getClass().getName() + ": "
+                      + ex.getMessage());
               finishUpdate();
             }
 
             @Override
-            public void onSuccess(SimulationModel state) {
-              setState(state);
+            public void onSuccess(final String result) {
+              view.setStateImage(result);
               finishUpdate();
             }
           });
@@ -113,14 +105,11 @@ public class SimulationPresenter extends AbstractActivity {
     @Override
     public void cancel() {
       super.cancel();
-      readyForUpdate = false;
     }
 
     private void finishUpdate() {
       inProgress = false;
-      if (readyForUpdate) {
-        schedule(0);
-      }
+      schedule(0);
     }
   }
 
@@ -159,27 +148,22 @@ public class SimulationPresenter extends AbstractActivity {
     panel.setWidget(view);
   }
 
-  public void setState(SimulationModel<CellEnvironment, EntityModel<EntityType>, EntityType> state) {
-    view.setEnvironment(state.getEnvironment());
-  }
-
   public SimulationView getView() {
     return view;
   }
 
   private void loadState(String simulationId, String instanceId, long iteration) {
     notificationBar.showLoading();
-    service.loadState(simulationId, instanceId, iteration, new AsyncCallback<SimulationModel>() {
+    service.loadState(simulationId, instanceId, iteration, new AsyncCallback<Void>() {
       @Override
       public void onFailure(Throwable ex) {
         notificationBar.showError(ex.getMessage());
       }
 
       @Override
-      public void onSuccess(SimulationModel model) {
+      public void onSuccess(Void retVal) {
         notificationBar.hide();
         updateTimer.schedule(UPDATE_INTERVAL);
-        setState(model);
       }
     });
   }

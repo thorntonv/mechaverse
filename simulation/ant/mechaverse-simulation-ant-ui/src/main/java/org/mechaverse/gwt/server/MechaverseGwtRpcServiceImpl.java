@@ -1,8 +1,10 @@
 package org.mechaverse.gwt.server;
 
-import java.io.ByteArrayInputStream;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.zip.GZIPInputStream;
+import java.util.Base64;
+import javax.imageio.ImageIO;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -11,17 +13,20 @@ import javax.servlet.http.HttpSessionListener;
 
 import org.mechaverse.gwt.shared.MechaverseGwtRpcService;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
+import org.mechaverse.simulation.ant.core.spring.AntSimulationConfig;
+import org.mechaverse.simulation.ant.core.ui.AntSimulationImageProvider;
 import org.mechaverse.simulation.ant.core.util.AntSimulationModelUtil;
 import org.mechaverse.simulation.common.Simulation;
 import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore;
 import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 import org.mechaverse.simulation.common.model.SimulationModel;
+import org.mechaverse.simulation.common.ui.SimulationRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -30,107 +35,110 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
  * Implementation of {@link MechaverseGwtRpcService} which forwards requests to the REST service.
  */
 public class MechaverseGwtRpcServiceImpl extends RemoteServiceServlet
-    implements MechaverseGwtRpcService, HttpSessionListener {
+        implements MechaverseGwtRpcService, HttpSessionListener {
 
-  private static final long serialVersionUID = 1349327476429682957L;
+    private static final long serialVersionUID = 1349327476429682957L;
 
-  private static final String SIMULATION_SERVICE_KEY = "simulation-service";
-  private static final String SIMULATION_CONTEXT_KEY = "simulation-context";
-  private static final String STORAGE_SERVICE_KEY = "storage-service";
+    private static final String SIMULATION_SERVICE_KEY = "simulation-service";
+    private static final String SIMULATION_CONTEXT_KEY = "simulation-context";
+    private static final String STORAGE_SERVICE_KEY = "storage-service";
 
-  private static final Logger logger = LoggerFactory.getLogger(MechaverseGwtRpcServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(MechaverseGwtRpcServiceImpl.class);
 
-  @Autowired private ObjectFactory<MechaverseStorageService> storageServiceClientFactory;
+    @Autowired
+    private ObjectFactory<MechaverseStorageService> storageServiceClientFactory;
 
-  @Override
-  public void init(ServletConfig config) throws ServletException {
-    super.init(config);
-    WebApplicationContext context =
-        WebApplicationContextUtils.getWebApplicationContext(getServletContext());
-    context.getAutowireCapableBeanFactory().autowireBean(this);
-  }
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        WebApplicationContext context =
+                WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+        context.getAutowireCapableBeanFactory().autowireBean(this);
+    }
 
-  @Override
-  public SimulationModel loadState(String simulationId, String instanceId, long iteration)
-      throws Exception {
-    try {
-      Simulation service = getSimulation();
-      synchronized (service) {
-        InputStream in = getStorageService().getState(simulationId, instanceId, iteration);
-        MemorySimulationDataStore.MemorySimulationDataStoreInputStream stateIn = new MemorySimulationDataStore.MemorySimulationDataStoreInputStream(in);
+    @Override
+    public void loadState(String simulationId, String instanceId, long iteration)
+            throws Exception {
         try {
-          SimulationDataStore dataStore = stateIn.readDataStore();
-          service.setState(AntSimulationModelUtil.deserialize(new GZIPInputStream(new ByteArrayInputStream(dataStore.get("model")))));
-          return getModel();
-        } finally {
-          in.close();
-          stateIn.close();
+            Simulation simulation = getSimulation();
+            synchronized (simulation) {
+                InputStream in = getStorageService().getState(simulationId, instanceId, iteration);
+                MemorySimulationDataStore.MemorySimulationDataStoreInputStream stateIn =
+                        new MemorySimulationDataStore.MemorySimulationDataStoreInputStream(in);
+                try {
+                    SimulationDataStore dataStore = stateIn.readDataStore();
+                    simulation.setState(AntSimulationModelUtil.deserialize(dataStore.get("model")));
+                } finally {
+                    in.close();
+                    stateIn.close();
+                }
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throw t;
         }
-      }
-    } catch (Throwable t) {
-      t.printStackTrace();
-      throw t;
     }
-  }
 
-  @Override
-  public void saveState(String simulationId, String instanceId, long iteration) {
-    // TODO(thorntonv): Implement method.
-  }
+    @Override
+    public String getStateImage() throws Exception {
+        Simulation service = getSimulation();
+        SimulationRenderer renderer = new SimulationRenderer(new AntSimulationImageProvider(), 24);
+        SimulationModel simulationModel = service.getState();
+        BufferedImage image = renderer.draw(simulationModel, simulationModel.getEnvironment());
 
-  @Override
-  public SimulationModel getModel() throws Exception {
-    return getSimulation().getState();
-  }
-
-  @Override
-  public void setModel(SimulationModel state) {
-    // TODO(thorntonv): Implement method.
-  }
-
-  @Override
-  public void step() {
-    Simulation service = getSimulation();
-    synchronized (service) {
-      service.step(1);
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        ImageIO.write(image, "png", byteOut);
+        byteOut.flush();
+        byte[] imageBytes = byteOut.toByteArray();
+        byteOut.close();
+        Base64.Encoder encoder = Base64.getEncoder();
+        return "data:image/png;base64," + encoder.encodeToString(imageBytes);
     }
-  }
 
-  private Simulation getSimulation() {
-    HttpServletRequest request = this.getThreadLocalRequest();
-    Simulation service = (Simulation) request.getSession(true)
-        .getAttribute(SIMULATION_SERVICE_KEY);
-    if (service == null) {
-      ClassPathXmlApplicationContext ctx =
-          new ClassPathXmlApplicationContext("simulation-context-replay.xml");
-      service = ctx.getBean(Simulation.class);
-      request.getSession().setAttribute(SIMULATION_SERVICE_KEY, service);
-      request.getSession().setAttribute(SIMULATION_CONTEXT_KEY, ctx);
+    @Override
+    public void step() {
+        Simulation service = getSimulation();
+        synchronized (service) {
+            service.step(1);
+        }
     }
-    return service;
-  }
 
-  private MechaverseStorageService getStorageService() {
-    HttpServletRequest request = this.getThreadLocalRequest();
-    MechaverseStorageService service = (MechaverseStorageService) request.getSession(true)
-        .getAttribute(STORAGE_SERVICE_KEY);
-    if (service == null) {
-      service = storageServiceClientFactory.getObject();
-      request.getSession().setAttribute(STORAGE_SERVICE_KEY, service);
+    private Simulation getSimulation() {
+        HttpServletRequest request = this.getThreadLocalRequest();
+        Simulation service = (Simulation) request.getSession(true)
+                .getAttribute(SIMULATION_SERVICE_KEY);
+        if (service == null) {
+            AnnotationConfigApplicationContext ctx =
+                    new AnnotationConfigApplicationContext(AntSimulationConfig.class);
+            service = ctx.getBean(Simulation.class);
+            request.getSession().setAttribute(SIMULATION_SERVICE_KEY, service);
+            request.getSession().setAttribute(SIMULATION_CONTEXT_KEY, ctx);
+        }
+        return service;
     }
-    return service;
-  }
 
-  @Override
-  public void sessionCreated(HttpSessionEvent event) {}
-
-  @Override
-  public void sessionDestroyed(HttpSessionEvent event) {
-    AbstractApplicationContext ctx =
-        (AbstractApplicationContext) event.getSession().getAttribute(SIMULATION_CONTEXT_KEY);
-    if (ctx != null) {
-      logger.debug("sessionDestroyed");
-      ctx.close();
+    private MechaverseStorageService getStorageService() {
+        HttpServletRequest request = this.getThreadLocalRequest();
+        MechaverseStorageService service = (MechaverseStorageService) request.getSession(true)
+                .getAttribute(STORAGE_SERVICE_KEY);
+        if (service == null) {
+            service = storageServiceClientFactory.getObject();
+            request.getSession().setAttribute(STORAGE_SERVICE_KEY, service);
+        }
+        return service;
     }
-  }
+
+    @Override
+    public void sessionCreated(HttpSessionEvent event) {
+    }
+
+    @Override
+    public void sessionDestroyed(HttpSessionEvent event) {
+        AbstractApplicationContext ctx =
+                (AbstractApplicationContext) event.getSession().getAttribute(SIMULATION_CONTEXT_KEY);
+        if (ctx != null) {
+            logger.debug("sessionDestroyed");
+            ctx.close();
+        }
+    }
 }

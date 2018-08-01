@@ -1,7 +1,5 @@
 package org.mechaverse.gwt.shared;
 
-import org.mechaverse.simulation.common.model.SimulationModel;
-
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -11,12 +9,10 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("service")
 public interface MechaverseGwtRpcService extends RemoteService {
 
-  SimulationModel loadState(String simulationId, String instanceId, long iteration)
+  void loadState(String simulationId, String instanceId, long iteration)
       throws Exception;
 
-  void saveState(String simulationId, String instanceId, long iteration);
+  String getStateImage() throws Exception;
 
-  SimulationModel getModel() throws Exception;
-  void setModel(SimulationModel model);
   void step();
 }
