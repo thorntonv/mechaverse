@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,6 +41,12 @@ public class AntSimulationVisualizerTest {
         );
     }
 
+    @After
+    public void tearDown() {
+        visualizer.dispose();
+        visualizer = null;
+    }
+    
     @Test
     public void testUpdate() throws IOException {
         byte[] stateData = simulation.getStateData();
@@ -52,7 +59,7 @@ public class AntSimulationVisualizerTest {
         Stopwatch stopwatch = Stopwatch.createStarted();
         byte[] stateData = simulation.getStateData();
         visualizer.start();
-        assertTrue(stopwatch.elapsed(TimeUnit.SECONDS) < RUN_TIME_SECONDS + 1);
+        assertTrue(stopwatch.elapsed(TimeUnit.SECONDS) < RUN_TIME_SECONDS + 3);
         assertNotEquals(Arrays.hashCode(stateData), Arrays.hashCode(simulation.getStateData()));
     }
 }
