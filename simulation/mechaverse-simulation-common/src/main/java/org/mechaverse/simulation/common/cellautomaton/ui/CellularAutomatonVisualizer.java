@@ -4,6 +4,7 @@ import java.util.function.Function;
 import org.apache.commons.math3.util.Pair;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomaton;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomaton.Cell;
+import org.mechaverse.simulation.common.ui.util.BufferedImageView;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;

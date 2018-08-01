@@ -53,7 +53,7 @@ public class AntSimulationEnvironmentGenerator
 
   @Override
   public CellEnvironment generate(RandomGenerator random) {
-    return generate(200, 200, random);
+    return generate(100, 100, random);
   }
 
   @Override

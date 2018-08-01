@@ -1,5 +1,7 @@
 package org.mechaverse.simulation.common;
 
+import java.util.UUID;
+
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.EnvironmentModel;
@@ -34,6 +36,7 @@ public abstract class AbstractSimulationModelGenerator<
   @Override
   public SIM_MODEL generate(RandomGenerator random) {
     SIM_MODEL model = createModel();
+    model.setId(UUID.randomUUID().toString());
     model.setIteration(0);
     model.setEnvironment(environmentModelGenerator.generate(random));
     for (int cnt = 1; cnt <= subEnvironmentCount; cnt++) {

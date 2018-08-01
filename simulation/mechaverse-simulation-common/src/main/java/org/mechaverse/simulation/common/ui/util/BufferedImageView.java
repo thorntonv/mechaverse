@@ -1,10 +1,8 @@
-package org.mechaverse.simulation.common.cellautomaton.ui;
+package org.mechaverse.simulation.common.ui.util;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.image.BufferedImage;
-
-import javax.swing.JPanel;
+import javax.swing.*;
 
 public class BufferedImageView extends JPanel {
 
