@@ -28,18 +28,13 @@
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>mechaverseServlet</servlet-name>
-    <url-pattern>/MechaverseClient/service</url-pattern>
+    <servlet-name>simulationServlet</servlet-name>
+    <url-pattern>/MechaverseClient/simulation</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>managerServlet</servlet-name>
     <url-pattern>/MechaverseClient/manager</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>mechaverseServlet</servlet-name>
-    <url-pattern>/org.mechaverse.gwt.MechaverseClientJUnit/mechaverse</url-pattern>
   </servlet-mapping>
 
   <listener>

@@ -15,6 +15,7 @@
   
   <modules>
     <module>mechaverse-simulation-common</module>
+    <module>mechaverse-simulation-ui</module>
     <module>mechaverse-simulation-benchmark</module>
     <module>mechaverse-simulation-experimental</module>
     <module>ant</module>

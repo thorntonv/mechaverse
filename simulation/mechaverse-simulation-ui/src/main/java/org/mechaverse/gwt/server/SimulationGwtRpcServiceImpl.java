@@ -13,11 +13,11 @@ import javax.servlet.http.HttpSessionListener;
 
 import org.mechaverse.gwt.shared.SimulationGwtRpcService;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
-import org.mechaverse.simulation.ant.core.ui.AntSimulationImageProvider;
 import org.mechaverse.simulation.common.Simulation;
 import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore;
 import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 import org.mechaverse.simulation.common.model.SimulationModel;
+import org.mechaverse.simulation.common.ui.SimulationImageProvider;
 import org.mechaverse.simulation.common.ui.SimulationRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,20 +57,14 @@ public class SimulationGwtRpcServiceImpl extends RemoteServiceServlet
     @Override
     public void loadState(String simulationId, String instanceId, long iteration)
             throws Exception {
-        try {
-            Simulation simulation = getSimulation();
-            synchronized (simulation) {
-                InputStream in = getStorageService().getState(simulationId, instanceId, iteration);
-                MemorySimulationDataStore.MemorySimulationDataStoreInputStream stateIn =
-                        new MemorySimulationDataStore.MemorySimulationDataStoreInputStream(in);
-                try {
-                    SimulationDataStore dataStore = stateIn.readDataStore();
-                    simulation.setStateData(dataStore.get("model"));
-                } finally {
-                    in.close();
-                    stateIn.close();
-                }
-            }
+        try (InputStream in = getStorageService().getState(simulationId, instanceId, iteration)) {
+//            MemorySimulationDataStore.MemorySimulationDataStoreInputStream stateIn =
+//                    new MemorySimulationDataStore.MemorySimulationDataStoreInputStream(in);
+//            SimulationDataStore dataStore = stateIn.readDataStore();
+//            String contextConfigName = new String(dataStore.get("contextConfigName"));
+            Simulation simulation = createSimulation("ant-simulation-context.xml");
+//            simulation.setStateData(dataStore.get("model"));
+            simulation.setState(simulation.generateRandomState());
         } catch (Throwable t) {
             t.printStackTrace();
             throw t;
@@ -79,9 +73,13 @@ public class SimulationGwtRpcServiceImpl extends RemoteServiceServlet
 
     @Override
     public String getStateImage() throws Exception {
-        Simulation service = getSimulation();
-        SimulationRenderer renderer = new SimulationRenderer(new AntSimulationImageProvider(), 24);
-        SimulationModel simulationModel = service.getState();
+        Simulation simulation = getSimulation();
+        SimulationImageProvider imageProvider = getSimulationImageProvider();
+        if(simulation == null || imageProvider == null) {
+            throw new Exception("Simulation not initialized");
+        }
+        SimulationRenderer renderer = new SimulationRenderer(imageProvider, imageProvider.getCellImageSize());
+        SimulationModel simulationModel = simulation.getState();
         BufferedImage image = renderer.draw(simulationModel, simulationModel.getEnvironment());
 
         ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
@@ -101,22 +99,20 @@ public class SimulationGwtRpcServiceImpl extends RemoteServiceServlet
         }
     }
 
-    private void createSimulation(String type) {
-
+    private Simulation createSimulation(String contextConfigName) {
+        HttpServletRequest request = this.getThreadLocalRequest();
+        ClassPathXmlApplicationContext ctx =
+                new ClassPathXmlApplicationContext(contextConfigName);
+        Simulation simulation = ctx.getBean(Simulation.class);
+        request.getSession().setAttribute(SIMULATION_SERVICE_KEY, simulation);
+        request.getSession().setAttribute(SIMULATION_CONTEXT_KEY, ctx);
+        return simulation;
     }
 
     private Simulation getSimulation() {
         HttpServletRequest request = this.getThreadLocalRequest();
-        Simulation service = (Simulation) request.getSession(true)
+        return (Simulation) request.getSession(true)
                 .getAttribute(SIMULATION_SERVICE_KEY);
-        if (service == null) {
-            ClassPathXmlApplicationContext ctx =
-                new ClassPathXmlApplicationContext("simulation-context-replay.xml");
-            service = ctx.getBean(Simulation.class);
-            request.getSession().setAttribute(SIMULATION_SERVICE_KEY, service);
-            request.getSession().setAttribute(SIMULATION_CONTEXT_KEY, ctx);
-        }
-        return service;
     }
 
     private MechaverseStorageService getStorageService() {
@@ -128,6 +124,16 @@ public class SimulationGwtRpcServiceImpl extends RemoteServiceServlet
             request.getSession().setAttribute(STORAGE_SERVICE_KEY, service);
         }
         return service;
+    }
+
+    private SimulationImageProvider getSimulationImageProvider() {
+        HttpServletRequest request = this.getThreadLocalRequest();
+        ClassPathXmlApplicationContext appContext = (ClassPathXmlApplicationContext) request.getSession(true)
+                .getAttribute(SIMULATION_CONTEXT_KEY);
+        if (appContext != null) {
+            return appContext.getBean(SimulationImageProvider.class);
+        }
+        return null;
     }
 
     @Override
