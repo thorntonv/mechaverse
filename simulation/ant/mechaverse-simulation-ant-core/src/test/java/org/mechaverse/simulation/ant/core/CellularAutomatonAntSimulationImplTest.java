@@ -1,23 +1,16 @@
 package org.mechaverse.simulation.ant.core;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mechaverse.simulation.ant.core.entity.ant.CellularAutomatonAntBehavior;
 import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.ant.core.model.AntSimulationModel;
 import org.mechaverse.simulation.ant.core.spring.AntSimulationConfig;
-import org.mechaverse.simulation.ant.core.spring.SimpleAntSimulationConfig;
-import org.mechaverse.simulation.common.Simulation;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 

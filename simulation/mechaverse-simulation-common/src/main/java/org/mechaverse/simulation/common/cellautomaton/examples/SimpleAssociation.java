@@ -122,11 +122,8 @@ public class SimpleAssociation extends AbstractCellularAutomaton {
       Entity entity = getEntity();
       String associationId = UUID.randomUUID().toString();
       entity.setAssociationId(associationId);
-      AssociationCentroid centroid = associationCentroidMap.get(associationId);
-      if(centroid == null) {
-        centroid = new AssociationCentroid();
-        associationCentroidMap.put(associationId, centroid);
-      }
+      AssociationCentroid centroid = associationCentroidMap.computeIfAbsent(associationId,
+              k -> new AssociationCentroid());
       Pair<Integer, Integer> position = cells.getCellPosition(this);
       centroid.addCell(position.getFirst(), position.getSecond());
     }

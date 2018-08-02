@@ -14,8 +14,6 @@ import javax.servlet.http.HttpSessionListener;
 import org.mechaverse.gwt.shared.SimulationGwtRpcService;
 import org.mechaverse.service.storage.api.MechaverseStorageService;
 import org.mechaverse.simulation.common.Simulation;
-import org.mechaverse.simulation.common.datastore.MemorySimulationDataStore;
-import org.mechaverse.simulation.common.datastore.SimulationDataStore;
 import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.common.ui.SimulationImageProvider;
 import org.mechaverse.simulation.common.ui.SimulationRenderer;
@@ -25,6 +23,7 @@ import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Service;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -32,6 +31,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 /**
  * Implementation of {@link SimulationGwtRpcService} which forwards requests to the REST service.
  */
+@Service
 public class SimulationGwtRpcServiceImpl extends RemoteServiceServlet
         implements SimulationGwtRpcService, HttpSessionListener {
 

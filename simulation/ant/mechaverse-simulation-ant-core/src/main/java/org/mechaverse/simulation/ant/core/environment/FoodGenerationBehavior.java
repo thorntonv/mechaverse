@@ -82,7 +82,7 @@ public class FoodGenerationBehavior extends AbstractAntEnvironmentBehavior {
       logger.debug("Generating food at ({}, {})", row, col);
 
       Function<EntityType, EntityModel<EntityType>> entityFactory = entityType -> {
-        EntityModel entity = EntityUtil.newEntity(entityType);
+        EntityModel<EntityType> entity = EntityUtil.newEntity(entityType);
         if (entityType == EntityType.FOOD) {
           entity.setEnergy(foodInitialEnergy);
           entity.setMaxEnergy(foodInitialEnergy);

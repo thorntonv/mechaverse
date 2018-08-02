@@ -56,7 +56,7 @@ public class EntityUtil {
   /**
    * Returns a new {@link EntityModel} instance of the given type.
    */
-  public static EntityModel newEntity(EntityType entityType) {
+  public static EntityModel<EntityType> newEntity(EntityType entityType) {
     switch (entityType) {
       case NONE:
         break;

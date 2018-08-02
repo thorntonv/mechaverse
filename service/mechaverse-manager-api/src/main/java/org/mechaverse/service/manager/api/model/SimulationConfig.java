@@ -82,6 +82,6 @@ public class SimulationConfig implements Serializable {
 
   public void setConfigProperties(Set<SimulationConfigProperty> properties) {
     this.configProperties.clear();
-    this.configProperties.addAll(configProperties);
+    this.configProperties.addAll(properties);
   }
 }

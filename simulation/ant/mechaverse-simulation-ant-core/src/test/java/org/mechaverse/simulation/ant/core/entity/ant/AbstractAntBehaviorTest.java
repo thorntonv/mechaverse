@@ -3,6 +3,7 @@ package org.mechaverse.simulation.ant.core.entity.ant;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -441,7 +442,7 @@ public class AbstractAntBehaviorTest {
     antBehavior.performAction(mockEnv, random);
 
     verify(mockCell, never()).removeEntity(any(EntityType.class));
-    verify(mockAntEntity, never()).setCarriedEntity(any(EntityModel.class));
+    verify(mockAntEntity, never()).setCarriedEntity(anyObject());
   }
 
   @Test
@@ -454,7 +455,7 @@ public class AbstractAntBehaviorTest {
     antBehavior.performAction(mockEnv, random);
 
     verify(mockCell, never()).removeEntity(any(EntityType.class));
-    verify(mockAntEntity, never()).setCarriedEntity(any(EntityModel.class));
+    verify(mockAntEntity, never()).setCarriedEntity(anyObject());
   }
 
   @Test
@@ -465,8 +466,8 @@ public class AbstractAntBehaviorTest {
 
     antBehavior.performAction(mockEnv, random);
 
-    verify(mockCell, never()).setEntity(any(EntityModel.class));
-    verify(mockAntEntity, never()).setCarriedEntity(any(EntityModel.class));
+    verify(mockCell, never()).setEntity(anyObject());
+    verify(mockAntEntity, never()).setCarriedEntity(anyObject());
   }
 
   @Test
@@ -510,8 +511,8 @@ public class AbstractAntBehaviorTest {
 
     antBehavior.performAction(mockEnv, random);
 
-    verify(mockCell, never()).setEntity(any(EntityModel.class));
-    verify(mockAntEntity, never()).setCarriedEntity(any(EntityModel.class));
+    verify(mockCell, never()).setEntity(anyObject());
+    verify(mockAntEntity, never()).setCarriedEntity(anyObject());
   }
 
   @Test
@@ -524,8 +525,8 @@ public class AbstractAntBehaviorTest {
 
     antBehavior.performAction(mockEnv, random);
 
-    verify(mockCell, never()).setEntity(any(EntityModel.class));
-    verify(mockAntEntity, never()).setCarriedEntity(any(EntityModel.class));
+    verify(mockCell, never()).setEntity(anyObject());
+    verify(mockAntEntity, never()).setCarriedEntity(anyObject());
   }
 
   @Test
