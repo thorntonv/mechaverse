@@ -1,64 +1,76 @@
 package org.mechaverse.simulation.primordial.core.ui;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import javax.imageio.ImageIO;
 
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.ui.SimulationImageProvider;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
 import org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel;
-import com.google.common.collect.ImmutableSet;
+
+import static java.awt.image.BufferedImage.TYPE_INT_RGB;
 
 @SuppressWarnings("WeakerAccess")
 public class PrimordialSimulationImageProvider implements SimulationImageProvider<PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> {
 
-    private static final String BARRIER_FILENAME = "barrier.png";
-    private static final String DIRT_FILENAME = "dirt.png";
-    private static final String FOOD_FILENAME = "food.png";
-    private static final String ROCK_FILENAME = "rock.png";
-
-    private static final Set<String> IMAGE_FILENAMES = ImmutableSet.<String>builder()
-            .add(DIRT_FILENAME)
-            .add(BARRIER_FILENAME)
-            .add(FOOD_FILENAME)
-            .add(ROCK_FILENAME)
-            .build();
-
-    private final Map<String, BufferedImage> imageMap = new HashMap<>();
-
-    public static final int DEFAULT_CELL_SIZE = 24;
+    public static final int DEFAULT_CELL_SIZE = 12;
 
     private final int cellImageSize;
 
+    private final Map<String, BufferedImage> imageCache = new HashMap<>();
+
     public PrimordialSimulationImageProvider() throws IOException {
-        for (String filename : IMAGE_FILENAMES) {
-            imageMap.put(filename, ImageIO.read(getClass().getClassLoader().getResourceAsStream("images/" + filename)));
-        }
-        cellImageSize = imageMap.get(DIRT_FILENAME).getWidth();
+        cellImageSize = DEFAULT_CELL_SIZE;
     }
 
     @Override
     public BufferedImage getCellBackgroundImage(final PrimordialEnvironmentModel environmentModel,
             final int row, final int column) {
-        return null; // imageMap.get(DIRT_FILENAME);
+
+        BufferedImage image = imageCache.get("cellBackground");
+        if(image != null) {
+            return image;
+        }
+
+        image = createCellImage();
+        Graphics2D g2d = image.createGraphics();
+        g2d.setColor(Color.DARK_GRAY);
+        g2d.fillRect(0, 0, image.getWidth(), image.getHeight());
+        g2d.setColor(new Color(85, 85, 85));
+        g2d.fillRect(1, 1, image.getWidth() - 2, image.getHeight() - 2);
+        imageCache.put("cellBackground", image);
+        return image;
     }
 
     @Override
     public BufferedImage getEntityImage(final EntityModel<EntityType> entityModel,
             final PrimordialEnvironmentModel environmentModel) {
+        String imageCacheKey = entityModel.getType().name();
+        BufferedImage image = imageCache.get(imageCacheKey);
+        if(image != null) {
+            return image;
+        }
+        image = createCellImage();
+        Graphics2D g2d = image.createGraphics();
         switch (entityModel.getType()) {
             case ENTITY:
-                return imageMap.get(FOOD_FILENAME);
+                g2d.setColor(new Color(0, 200, 0, 200));
+                g2d.fillRect(1, 1, image.getWidth() - 2, image.getHeight() - 2);
+                break;
             case BARRIER:
-                return imageMap.get(BARRIER_FILENAME);
+                g2d.setColor(Color.LIGHT_GRAY);
+                g2d.fillRect(0, 0, image.getWidth(), image.getHeight());
+                break;
             case FOOD:
-                return imageMap.get(ROCK_FILENAME);
+                g2d.setColor(new Color(0, 85, 200, 200));
+                g2d.fillRect(1, 1, image.getWidth() - 2, image.getHeight() - 2);
+                break;
         }
-        return null;
+        imageCache.put(imageCacheKey, image);
+        return image;
     }
 
     @Override
@@ -71,4 +83,7 @@ public class PrimordialSimulationImageProvider implements SimulationImageProvide
         return cellImageSize;
     }
 
+    private BufferedImage createCellImage() {
+        return new BufferedImage(DEFAULT_CELL_SIZE, DEFAULT_CELL_SIZE, TYPE_INT_RGB);
+    }
 }

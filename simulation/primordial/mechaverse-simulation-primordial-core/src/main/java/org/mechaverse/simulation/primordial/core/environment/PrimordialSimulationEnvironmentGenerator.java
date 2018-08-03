@@ -44,7 +44,7 @@ public class PrimordialSimulationEnvironmentGenerator
   }
 
   public PrimordialEnvironmentModel generate(RandomGenerator randomGenerator) {
-    return generate(50, 50, randomGenerator);
+    return generate(100, 100, randomGenerator);
   }
 
   @Override

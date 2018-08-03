@@ -16,12 +16,12 @@ public class PrimordialSimulationModelGenerator extends AbstractSimulationModelG
     @Override
     protected PrimordialSimulationModel createModel() {
         PrimordialSimulationModel model = new PrimordialSimulationModel();
-        model.setEntityMaxCount(20);
+        model.setEntityMaxCount(500);
         model.setEntityMinReproductiveAge(10);
-        model.setEntityInitialEnergy(100);
-        model.setFoodClusterRadius(10);
-        model.setFoodMinCount(10);
-        model.setFoodInitialEnergy(50);
+        model.setEntityInitialEnergy(200);
+        model.setFoodClusterRadius(15);
+        model.setFoodMinCount(600);
+        model.setFoodInitialEnergy(100);
         return model;
     }
 }

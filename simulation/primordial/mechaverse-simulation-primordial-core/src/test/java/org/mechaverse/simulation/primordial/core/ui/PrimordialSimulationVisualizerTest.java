@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
 public class PrimordialSimulationVisualizerTest {
 
     private static final int RUN_TIME_SECONDS = 5;
-    private static final int FRAMES_PER_SECOND = 30;
+    private static final int FRAMES_PER_SECOND = 5;
 
     @Autowired
     private PrimordialSimulationImpl simulation;

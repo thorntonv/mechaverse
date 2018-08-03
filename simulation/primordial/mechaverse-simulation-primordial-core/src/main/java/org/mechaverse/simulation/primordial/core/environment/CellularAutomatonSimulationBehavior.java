@@ -21,7 +21,7 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
 
   @Autowired private Function<CellularAutomatonDescriptorDataSource, CellularAutomatonSimulator> simulatorFactory;
   private CellularAutomatonSimulator simulator;
-  private CellularAutomatonDescriptorDataSource descriptorDataSource;
+  private SimulationStateCellularAutomatonDescriptor descriptorDataSource;
 
   @Override
   public void setState(PrimordialSimulationModel state,
@@ -30,6 +30,7 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
     if (simulator == null || descriptorDataSource == null) {
       // Lazily load the cellular automaton simulator.
       descriptorDataSource = new SimulationStateCellularAutomatonDescriptor(state);
+      descriptorDataSource.setDefaultDescriptorResourceName("primordial-automaton-descriptor.xml");
       simulator = simulatorFactory.apply(descriptorDataSource);
     }
   }
