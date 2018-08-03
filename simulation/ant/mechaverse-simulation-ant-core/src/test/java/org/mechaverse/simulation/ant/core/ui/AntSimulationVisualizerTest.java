@@ -1,4 +1,4 @@
-package org.mechaverse.simulation.ant.core;
+package org.mechaverse.simulation.ant.core.ui;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -8,13 +8,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mechaverse.simulation.ant.core.AntSimulationImpl;
 import org.mechaverse.simulation.ant.core.spring.SimpleAntSimulationConfig;
-import org.mechaverse.simulation.ant.core.ui.AntSimulationImageProvider;
-import org.mechaverse.simulation.ant.core.ui.AntSimulationVisualizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import com.google.common.base.Stopwatch;
 
 import static org.junit.Assert.*;

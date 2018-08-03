@@ -1,7 +1,7 @@
 package org.mechaverse.simulation.ant.core.spring;
 
-import com.google.common.collect.ImmutableList;
 import java.util.function.Function;
+
 import org.mechaverse.simulation.ant.core.AntEnvironmentFactory;
 import org.mechaverse.simulation.ant.core.AntSimulationImpl;
 import org.mechaverse.simulation.ant.core.AntSimulationModelGenerator;
@@ -15,13 +15,13 @@ import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.ant.core.model.AntSimulationModel;
 import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.ant.core.model.EntityType;
-import org.mechaverse.simulation.common.EntityFactory;
 import org.mechaverse.simulation.common.EnvironmentFactory;
 import org.mechaverse.simulation.common.SimulationModelGenerator;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
+import com.google.common.collect.ImmutableList;
 
 @Configuration
 @SuppressWarnings("unused")
@@ -56,7 +56,7 @@ public class SimpleAntSimulationConfig {
   @Bean
   @Scope("prototype")
   public EnvironmentFactory<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> environmentFactory(
-      EntityFactory<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> entityFactory) {
+      AntEntityFactory entityFactory) {
     return new AntEnvironmentFactory(ImmutableList.of(
         new FoodGenerationBehavior(),
         new PheromoneDecayBehavior(),

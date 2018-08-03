@@ -16,10 +16,6 @@ import org.mechaverse.simulation.common.model.EntityModel;
 @SuppressWarnings("WeakerAccess")
 public class CellularAutomatonAntBehavior extends AbstractAntBehavior {
 
-  public static final String AUTOMATON_STATE_KEY = "cellularAutomatonState";
-  public static final String AUTOMATON_OUTPUT_MAP_KEY = "cellularAutomatonOutputMap";
-  public static final String AUTOMATON_BIT_OUTPUT_MAP_KEY = "cellularAutomatonBitOutputMap";
-
   private final AntOutput output = new AntOutput();
   private final CellularAutomatonEntityBehavior<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> cellularAutomatonEntityBehavior;
 

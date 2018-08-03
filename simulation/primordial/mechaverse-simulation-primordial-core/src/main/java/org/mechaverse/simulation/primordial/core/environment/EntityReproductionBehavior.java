@@ -1,22 +1,22 @@
 package org.mechaverse.simulation.primordial.core.environment;
 
-import com.google.common.annotations.VisibleForTesting;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
+
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.Environment;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.common.util.SimulationUtil;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
-import org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel;
 import org.mechaverse.simulation.primordial.core.model.PrimordialCellModel;
 import org.mechaverse.simulation.primordial.core.model.PrimordialEntityModel;
+import org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel;
 import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * An environment simulation module that maintains a target entity population size.
@@ -24,20 +24,26 @@ import org.springframework.beans.factory.annotation.Value;
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
 @SuppressWarnings("unused")
-public class EntityReproductionModule extends PrimordialEnvironmentBehavior {
+public class EntityReproductionBehavior extends PrimordialEnvironmentBehavior {
 
-  private static final Logger logger = LoggerFactory.getLogger(EntityReproductionModule.class);
+  private static final Logger logger = LoggerFactory.getLogger(EntityReproductionBehavior.class);
 
-  @Value("#{properties['entityMaxCount']}")
   private int entityMaxCount;
-  @Value("#{properties['entityInitialEnergy']}")
   private int entityInitialEnergy;
-  @Value("#{properties['entityMinReproductiveAge']}")
   private int entityMinReproductiveAge;
 
   private final Set<PrimordialEntityModel> entities = new LinkedHashSet<>();
 
-  public EntityReproductionModule() {
+  public EntityReproductionBehavior() {
+  }
+
+  @Override
+  public void setState(final PrimordialSimulationModel state,
+          final Environment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> environment) {
+    super.setState(state, environment);
+    entityMaxCount = state.getEntityMaxCount();
+    entityInitialEnergy = state.getEntityInitialEnergy();
+    entityMinReproductiveAge = state.getEntityMinReproductiveAge();
   }
 
   @Override

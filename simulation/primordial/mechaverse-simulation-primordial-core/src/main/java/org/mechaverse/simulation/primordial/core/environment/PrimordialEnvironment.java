@@ -1,6 +1,6 @@
 package org.mechaverse.simulation.primordial.core.environment;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.mechaverse.simulation.common.AbstractEnvironment;
 import org.mechaverse.simulation.common.model.EntityModel;
@@ -11,7 +11,8 @@ import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel
 
 public class PrimordialEnvironment extends AbstractEnvironment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> {
 
-    public PrimordialEnvironment(PrimordialEnvironmentModel env) {
-        super(env.getId(), new ArrayList<>(), new PrimordialEntityFactory());
+    public PrimordialEnvironment(PrimordialEnvironmentModel env, List<? extends PrimordialEnvironmentBehavior> environmentBehaviors,
+            PrimordialEntityFactory entityFactory) {
+        super(env.getId(), environmentBehaviors, entityFactory);
     }
 }

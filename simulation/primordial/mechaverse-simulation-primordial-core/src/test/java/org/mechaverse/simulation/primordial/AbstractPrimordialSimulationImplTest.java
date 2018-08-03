@@ -1,28 +1,29 @@
-package org.mechaverse.simulation.ant.core;
+package org.mechaverse.simulation.primordial;
+
+import java.io.IOException;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.Before;
 import org.junit.Test;
-import org.mechaverse.simulation.ant.core.entity.EntityUtil;
-import org.mechaverse.simulation.ant.core.model.Ant;
-import org.mechaverse.simulation.ant.core.model.AntSimulationModel;
-import org.mechaverse.simulation.ant.core.model.CellEnvironment;
-import org.mechaverse.simulation.ant.core.model.EntityType;
-import org.mechaverse.simulation.ant.core.util.AntSimulationModelUtil;
 import org.mechaverse.simulation.common.SimulationObserver;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.util.RandomUtil;
+import org.mechaverse.simulation.primordial.core.PrimordialSimulationImpl;
+import org.mechaverse.simulation.primordial.core.entity.EntityUtil;
+import org.mechaverse.simulation.primordial.core.model.EntityType;
+import org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel;
+import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel;
+import org.mechaverse.simulation.primordial.core.util.PrimordialSimulationModelUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.*;
-import static org.mechaverse.simulation.ant.core.AntSimulationTestUtil.assertModelsEqual;
 
 /**
  * Unit test for the ant simulation.
  */
 @SuppressWarnings("WeakerAccess")
-public abstract class AbstractAntSimulationImplTest {
+public abstract class AbstractPrimordialSimulationImplTest {
 
   private static class EntityTypeCounter {
 
@@ -41,17 +42,17 @@ public abstract class AbstractAntSimulationImplTest {
     }
   }
 
-  private static class EntityTypeCountObserver implements SimulationObserver<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> {
+  private static class EntityTypeCountObserver implements SimulationObserver<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> {
 
     private EntityTypeCounter entityTypeCounter = new EntityTypeCounter();
 
     @Override
-    public void onAddEntity(EntityModel<EntityType> entity, AntSimulationModel state, CellEnvironment envModel) {
+    public void onAddEntity(EntityModel<EntityType> entity, PrimordialSimulationModel state, PrimordialEnvironmentModel envModel) {
       entityTypeCounter.addEntity(entity);
     }
 
     @Override
-    public void onRemoveEntity(EntityModel<EntityType> entity, AntSimulationModel state, CellEnvironment envModel) {
+    public void onRemoveEntity(EntityModel<EntityType> entity, PrimordialSimulationModel state, PrimordialEnvironmentModel envModel) {
       entityTypeCounter.removeEntity(entity);
     }
 
@@ -61,17 +62,17 @@ public abstract class AbstractAntSimulationImplTest {
 
   }
 
-  private static final Logger logger = LoggerFactory.getLogger(AbstractAntSimulationImplTest.class);
+  private static final Logger logger = LoggerFactory.getLogger(AbstractPrimordialSimulationImplTest.class);
 
   private RandomGenerator random;
 
-  protected abstract AntSimulationImpl newSimulationImpl();
+  protected abstract PrimordialSimulationImpl newSimulationImpl();
   protected abstract int testIterationCount();
   protected abstract int smallTestIterationCount();
 
   @Before
   public void setUp() {
-    this.random = RandomUtil.newGenerator(AbstractAntSimulationImplTest.class.getName().hashCode());
+    this.random = RandomUtil.newGenerator(AbstractPrimordialSimulationImplTest.class.getName().hashCode());
   }
 
   @Test
@@ -81,7 +82,7 @@ public abstract class AbstractAntSimulationImplTest {
 
   @Test
   public void simulate() {
-    AntSimulationImpl simulation = newSimulationImpl();
+    PrimordialSimulationImpl simulation = newSimulationImpl();
     simulation.setState(simulation.generateRandomState());
 
     EntityTypeCountObserver entityCountObserver = new EntityTypeCountObserver();
@@ -98,15 +99,15 @@ public abstract class AbstractAntSimulationImplTest {
 
   @Test
   public void randomGeneratorIsDeterministic() {
-    assertEquals(244186240197737350L, random.nextLong());
+    assertEquals(2639974915846087211L, random.nextLong());
   }
 
   @Test
   public void simulate_verifyDeterministic() throws Exception {
-    AntSimulationImpl simulation1 = newSimulationImpl();
-    AntSimulationImpl simulation2 = newSimulationImpl();
+    PrimordialSimulationImpl simulation1 = newSimulationImpl();
+    PrimordialSimulationImpl simulation2 = newSimulationImpl();
 
-    byte[] initialState = AntSimulationModelUtil.serialize(simulation1.generateRandomState());
+    byte[] initialState = PrimordialSimulationModelUtil.serialize(simulation1.generateRandomState());
     assertNotEquals(simulation1, simulation2);
     simulation1.setStateData(initialState);
     simulation2.setStateData(initialState);
@@ -132,17 +133,11 @@ public abstract class AbstractAntSimulationImplTest {
     }
   }
 
-  private void verifyEntityTypeCounts(AntSimulationModel model, EntityTypeCountObserver observer) {
+  private void verifyEntityTypeCounts(PrimordialSimulationModel model, EntityTypeCountObserver observer) {
     EntityTypeCounter counter = new EntityTypeCounter();
 
     for (EntityModel<EntityType> entity : model.getEnvironment().getEntities()) {
       counter.addEntity(entity);
-      if (entity instanceof Ant) {
-        EntityModel carriedEntity = ((Ant) entity).getCarriedEntity();
-        if (carriedEntity != null) {
-          counter.addEntity(carriedEntity);
-        }
-      }
     }
 
     for (EntityType entityType : EntityType.values()) {
@@ -150,5 +145,20 @@ public abstract class AbstractAntSimulationImplTest {
       logger.debug("{} count = {}", entityType.name(), actualCount);
       assertEquals(actualCount, observer.getEntityCount(entityType));
     }
+  }
+
+  public static void assertModelsEqual(PrimordialSimulationModel expected, PrimordialSimulationModel actual)
+          throws IOException {
+    assertEquals(expected.getEnvironment().toString(), actual.getEnvironment().toString());
+
+    // Sort the entities so that order will not cause the comparison to fail.
+    for (PrimordialEnvironmentModel env : expected.getEnvironments()) {
+      env.getEntities().sort(EntityUtil.ENTITY_ORDERING);
+    }
+    for (PrimordialEnvironmentModel env : actual.getEnvironments()) {
+      env.getEntities().sort(EntityUtil.ENTITY_ORDERING);
+    }
+
+    assertArrayEquals(PrimordialSimulationModelUtil.serialize(expected), PrimordialSimulationModelUtil.serialize(actual));
   }
 }

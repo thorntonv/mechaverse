@@ -1,6 +1,8 @@
 package org.mechaverse.simulation.ant.core.environment;
 
 import java.util.List;
+
+import org.mechaverse.simulation.ant.core.entity.ant.AntEntityFactory;
 import org.mechaverse.simulation.ant.core.model.AntSimulationModel;
 import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.ant.core.model.EntityType;
@@ -12,7 +14,7 @@ public class AntEnvironment extends
     AbstractEnvironment<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> {
 
   public AntEnvironment(CellEnvironment env, List<? extends AbstractAntEnvironmentBehavior> environmentBehaviors,
-      EntityFactory<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> entityFactory) {
+      AntEntityFactory entityFactory) {
     super(env.getId(), environmentBehaviors, entityFactory);
   }
 }

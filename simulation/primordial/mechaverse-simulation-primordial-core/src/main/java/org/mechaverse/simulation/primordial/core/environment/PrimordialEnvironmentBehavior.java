@@ -7,5 +7,5 @@ import org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentMode
 import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel;
 
 public abstract class PrimordialEnvironmentBehavior extends
-    AbstractEnvironmentBehavior<PrimordialSimulationModel, PrimordialEnvironmentModel,EntityModel<EntityType>, EntityType> {
+        AbstractEnvironmentBehavior<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> {
 }

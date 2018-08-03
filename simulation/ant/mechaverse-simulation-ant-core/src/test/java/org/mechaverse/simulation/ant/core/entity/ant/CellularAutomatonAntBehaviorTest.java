@@ -4,6 +4,9 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_BIT_OUTPUT_MAP_KEY;
+import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_OUTPUT_MAP_KEY;
+import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_STATE_KEY;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
@@ -80,9 +83,9 @@ public class CellularAutomatonAntBehaviorTest {
 
     // Verify that the cellular automaton state was initialized.
 
-    byte[] automatonState = ant.getData(CellularAutomatonAntBehavior.AUTOMATON_STATE_KEY);
-    byte[] outputMap = ant.getData(CellularAutomatonAntBehavior.AUTOMATON_OUTPUT_MAP_KEY);
-    byte[] bitOutputMap = ant.getData(CellularAutomatonAntBehavior.AUTOMATON_BIT_OUTPUT_MAP_KEY);
+    byte[] automatonState = ant.getData(CELLULAR_AUTOMATON_STATE_KEY);
+    byte[] outputMap = ant.getData(CELLULAR_AUTOMATON_OUTPUT_MAP_KEY);
+    byte[] bitOutputMap = ant.getData(CELLULAR_AUTOMATON_BIT_OUTPUT_MAP_KEY);
 
     CellularAutomatonSimulationModel model = descriptorDataSource.getSimulationModel();
     assertEquals(
@@ -94,7 +97,7 @@ public class CellularAutomatonAntBehaviorTest {
     GeneticDataStore geneticData = new GeneticDataStore(ant);
     assertTrue(geneticData.contains(CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY));
     assertTrue(geneticData.contains(CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_OUTPUT_MAP_GENETIC_DATA_KEY));
-    assertTrue(geneticData.contains(CellularAutomatonAntBehavior.AUTOMATON_BIT_OUTPUT_MAP_KEY));
+    assertTrue(geneticData.contains(CELLULAR_AUTOMATON_BIT_OUTPUT_MAP_KEY));
 
     // Verify that the stored genetic data matches the initial cellular automaton state.
 
@@ -111,7 +114,7 @@ public class CellularAutomatonAntBehaviorTest {
     assertNotNull(outputMapData.getCrossoverSplitPoints());
 
     GeneticData bitOutputMapData =
-        geneticData.get(CellularAutomatonAntBehavior.AUTOMATON_BIT_OUTPUT_MAP_KEY);
+        geneticData.get(CELLULAR_AUTOMATON_BIT_OUTPUT_MAP_KEY);
     assertArrayEquals(bitOutputMap, bitOutputMapData.getData());
     assertNotNull(bitOutputMapData.getCrossoverGroups());
     assertNotNull(bitOutputMapData.getCrossoverSplitPoints());
@@ -132,12 +135,12 @@ public class CellularAutomatonAntBehaviorTest {
         .get(CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_OUTPUT_MAP_GENETIC_DATA_KEY).getData();
 
     assertArrayEquals(
-        expectedState, ant.getData(CellularAutomatonAntBehavior.AUTOMATON_STATE_KEY));
+        expectedState, ant.getData(CELLULAR_AUTOMATON_STATE_KEY));
     assertArrayEquals(expectedOutputMap,
-        ant.getData(CellularAutomatonAntBehavior.AUTOMATON_OUTPUT_MAP_KEY));
+        ant.getData(CELLULAR_AUTOMATON_OUTPUT_MAP_KEY));
     assertArrayEquals(entityGeneticDataStore.get(
-        CellularAutomatonAntBehavior.AUTOMATON_BIT_OUTPUT_MAP_KEY).getData(),
-            ant.getData(CellularAutomatonAntBehavior.AUTOMATON_BIT_OUTPUT_MAP_KEY));
+            CELLULAR_AUTOMATON_BIT_OUTPUT_MAP_KEY).getData(),
+            ant.getData(CELLULAR_AUTOMATON_BIT_OUTPUT_MAP_KEY));
 
     // Verify that the cellular automaton simulator was initialized.
 
@@ -174,7 +177,7 @@ public class CellularAutomatonAntBehaviorTest {
     assertEquals(AntOutput.DATA_SIZE, antOutputData.length);
 
     int[] bitOutputMap = ArrayUtil.toIntArray(
-        geneticData.get(CellularAutomatonAntBehavior.AUTOMATON_BIT_OUTPUT_MAP_KEY).getData());
+        geneticData.get(CELLULAR_AUTOMATON_BIT_OUTPUT_MAP_KEY).getData());
     for (int idx = 0; idx < automatonOutput.length; idx++) {
       assertEquals(((automatonOutput[idx] >> bitOutputMap[idx]) & 1), antOutputData[0] & 1);
       antOutputData[0] >>= 1;
@@ -206,8 +209,8 @@ public class CellularAutomatonAntBehaviorTest {
     byte[] stateBytes = RandomUtil.randomBytes(TEST_AUTOMATON_STATE_SIZE_BYTES, random);
     byte[] outputMapBytes = RandomUtil.randomBytes(TEST_AUTOMATON_OUTPUT_SIZE_BYTES, random);
 
-    ant.putData(CellularAutomatonAntBehavior.AUTOMATON_STATE_KEY, stateBytes);
-    ant.putData(CellularAutomatonAntBehavior.AUTOMATON_OUTPUT_MAP_KEY, outputMapBytes);
+    ant.putData(CELLULAR_AUTOMATON_STATE_KEY, stateBytes);
+    ant.putData(CELLULAR_AUTOMATON_OUTPUT_MAP_KEY, outputMapBytes);
 
     behavior.setState(state);
 
@@ -219,7 +222,7 @@ public class CellularAutomatonAntBehaviorTest {
   public void updateState() {
     final byte[] stateBytes =
         RandomUtil.randomBytes(TEST_AUTOMATON_STATE_SIZE_BYTES, random);
-    ant.putData(CellularAutomatonAntBehavior.AUTOMATON_STATE_KEY, new byte[0]);
+    ant.putData(CELLULAR_AUTOMATON_STATE_KEY, new byte[0]);
 
     final ArgumentCaptor<int[]> stateCaptor = ArgumentCaptor.forClass(int[].class);
     doAnswer((Answer<Void>) invocation -> {
@@ -233,7 +236,7 @@ public class CellularAutomatonAntBehaviorTest {
     behavior.setState(state);
     behavior.updateState(state);
     assertArrayEquals(stateBytes,
-        ant.getData(CellularAutomatonAntBehavior.AUTOMATON_STATE_KEY));
+        ant.getData(CELLULAR_AUTOMATON_STATE_KEY));
   }
 
   private void createGeneticDataStore(GeneticDataStore geneticDataStore) {
@@ -255,7 +258,7 @@ public class CellularAutomatonAntBehaviorTest {
     byte[] bitOutputMapBytes = ArrayUtil.toByteArray(bitOutputMap);
     GeneticData bitOutputMapData =
         new GeneticData(bitOutputMapBytes, new int[bitOutputMapBytes.length], new int[0]);
-    geneticDataStore.put(CellularAutomatonAntBehavior.AUTOMATON_BIT_OUTPUT_MAP_KEY,
+    geneticDataStore.put(CELLULAR_AUTOMATON_BIT_OUTPUT_MAP_KEY,
         bitOutputMapData);
  }
 }

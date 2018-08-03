@@ -1,6 +1,7 @@
 package org.mechaverse.simulation.primordial.core;
 
 import java.io.IOException;
+
 import org.mechaverse.simulation.common.AbstractSimulation;
 import org.mechaverse.simulation.common.EnvironmentFactory;
 import org.mechaverse.simulation.common.SimulationModelGenerator;
@@ -11,10 +12,6 @@ import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel
 import org.mechaverse.simulation.primordial.core.util.PrimordialSimulationModelUtil;
 
 public class PrimordialSimulationImpl extends AbstractSimulation<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> {
-
-    public PrimordialSimulationImpl() {
-        this(new PrimordialSimulationModelGenerator(), new PrimordialEnvironmentFactory());
-    }
 
     public PrimordialSimulationImpl(
             final SimulationModelGenerator<PrimordialSimulationModel> simulationModelGenerator,

@@ -14,14 +14,13 @@ import org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentMode
 import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Table;
 
 /**
  * Generates clusters of food to maintain a minimum quantity of food.
  */
-public class FoodGenerationModule extends PrimordialEnvironmentBehavior {
+public class FoodGenerationBehavior extends PrimordialEnvironmentBehavior {
 
   /**
    * {@link ProbabilisticLocalGenerator} that generates a cluster of food.
@@ -55,13 +54,22 @@ public class FoodGenerationModule extends PrimordialEnvironmentBehavior {
     }
   }
 
-  private static Logger logger = LoggerFactory.getLogger(FoodGenerationModule.class);
+  private static Logger logger = LoggerFactory.getLogger(FoodGenerationBehavior.class);
 
-  @Value("#{properties['foodMinCount']}") private int minFoodCount;
-  @Value("#{properties['foodClusterRadius']}") private int foodClusterRadius;
-  @Value("#{properties['foodInitialEnergy']}") private int foodInitialEnergy;
+  private int minFoodCount;
+  private int foodClusterRadius;
+  private int foodInitialEnergy;
 
   private int foodCount = 0;
+
+  @Override
+  public void setState(final PrimordialSimulationModel state,
+          final Environment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> environment) {
+    super.setState(state, environment);
+    minFoodCount = state.getFoodMinCount();
+    foodClusterRadius = state.getFoodClusterRadius();
+    foodInitialEnergy = state.getFoodInitialEnergy();
+  }
 
   @Override
   public void beforeUpdate(PrimordialSimulationModel state,

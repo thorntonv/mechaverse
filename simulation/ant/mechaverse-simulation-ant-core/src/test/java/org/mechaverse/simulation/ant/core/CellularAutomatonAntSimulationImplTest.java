@@ -15,6 +15,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.*;
+import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_BIT_OUTPUT_MAP_KEY;
+import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_OUTPUT_MAP_KEY;
+import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_STATE_KEY;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {AntSimulationConfig.class})
@@ -50,12 +53,12 @@ public class CellularAutomatonAntSimulationImplTest extends AbstractAntSimulatio
       int antCount = 0;
       for (EntityModel entity : state.getEnvironment().getEntities()) {
         if (entity instanceof Ant) {
-          assertTrue(entity.dataContainsKey((CellularAutomatonAntBehavior.AUTOMATON_STATE_KEY)));
-          assertTrue(entity.getData(CellularAutomatonAntBehavior.AUTOMATON_STATE_KEY).length > 0);
-          assertTrue(entity.dataContainsKey(CellularAutomatonAntBehavior.AUTOMATON_OUTPUT_MAP_KEY));
-          assertTrue(entity.getData(CellularAutomatonAntBehavior.AUTOMATON_OUTPUT_MAP_KEY).length > 0);
-          assertTrue(entity.dataContainsKey(CellularAutomatonAntBehavior.AUTOMATON_BIT_OUTPUT_MAP_KEY));
-          assertTrue(entity.getData(CellularAutomatonAntBehavior.AUTOMATON_BIT_OUTPUT_MAP_KEY).length > 0);
+          assertTrue(entity.dataContainsKey((CELLULAR_AUTOMATON_STATE_KEY)));
+          assertTrue(entity.getData(CELLULAR_AUTOMATON_STATE_KEY).length > 0);
+          assertTrue(entity.dataContainsKey(CELLULAR_AUTOMATON_OUTPUT_MAP_KEY));
+          assertTrue(entity.getData(CELLULAR_AUTOMATON_OUTPUT_MAP_KEY).length > 0);
+          assertTrue(entity.dataContainsKey(CELLULAR_AUTOMATON_BIT_OUTPUT_MAP_KEY));
+          assertTrue(entity.getData(CELLULAR_AUTOMATON_BIT_OUTPUT_MAP_KEY).length > 0);
           antCount++;
         }
       }

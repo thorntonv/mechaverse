@@ -15,44 +15,41 @@ import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel
  */
 public class CellularAutomatonPrimordialEntityBehavior extends AbstractPrimordialEntityBehavior {
 
-  private CellularAutomatonEntityBehavior<
-          PrimordialSimulationModel,
-          PrimordialEnvironmentModel,
-          EntityModel<EntityType>,
-          EntityType> cellAutomatonBehavior;
-
   private PrimordialEntityOutput output = new PrimordialEntityOutput();
+  private CellularAutomatonEntityBehavior<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> cellularAutomatonEntityBehavior;
 
   public CellularAutomatonPrimordialEntityBehavior(
       PrimordialEntityModel entityModel,
       CellularAutomatonDescriptorDataSource dataSource, CellularAutomatonSimulator simulator) {
     super(entityModel);
+    this.cellularAutomatonEntityBehavior = new CellularAutomatonEntityBehavior<>(
+            entity, PrimordialEntityOutput.DATA_SIZE, dataSource, simulator);
   }
 
   @Override
   public void setInput(PrimordialEntityInput input, RandomGenerator random) {
-    cellAutomatonBehavior.setInput(input.getData(), random);
+    cellularAutomatonEntityBehavior.setInput(input.getData(), random);
   }
 
   @Override
   public PrimordialEntityOutput getOutput(RandomGenerator random) {
-    int[] outputData = cellAutomatonBehavior.getOutput(random);
+    int[] outputData = cellularAutomatonEntityBehavior.getOutput(random);
     output.setData(outputData);
     return output;
   }
 
   @Override
   public void onRemoveEntity() {
-    cellAutomatonBehavior.onRemoveEntity();
+    cellularAutomatonEntityBehavior.onRemoveEntity();
   }
 
   @Override
   public void setState(PrimordialSimulationModel state) {
-    cellAutomatonBehavior.setState(state);
+    cellularAutomatonEntityBehavior.setState(state);
   }
 
   @Override
   public void updateState(PrimordialSimulationModel state) {
-    cellAutomatonBehavior.updateState(state);
+    cellularAutomatonEntityBehavior.updateState(state);
   }
 }
