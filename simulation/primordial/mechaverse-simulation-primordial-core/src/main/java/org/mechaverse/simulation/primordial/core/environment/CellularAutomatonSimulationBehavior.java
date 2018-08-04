@@ -7,6 +7,7 @@ import org.mechaverse.simulation.common.Environment;
 import org.mechaverse.simulation.common.cellautomaton.SimulationStateCellularAutomatonDescriptor;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorDataSource;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
+import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator.CellularAutomatonSimulatorParams;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
 import org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel;
@@ -19,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBehavior {
 
-  @Autowired private Function<CellularAutomatonDescriptorDataSource, CellularAutomatonSimulator> simulatorFactory;
+  @Autowired private Function<CellularAutomatonSimulatorParams, CellularAutomatonSimulator> simulatorFactory;
   private CellularAutomatonSimulator simulator;
   private SimulationStateCellularAutomatonDescriptor descriptorDataSource;
 
@@ -31,7 +32,10 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
       // Lazily load the cellular automaton simulator.
       descriptorDataSource = new SimulationStateCellularAutomatonDescriptor(state);
       descriptorDataSource.setDefaultDescriptorResourceName("primordial-automaton-descriptor.xml");
-      simulator = simulatorFactory.apply(descriptorDataSource);
+      CellularAutomatonSimulatorParams params = new CellularAutomatonSimulatorParams();
+      params.numAutomata = state.getEntityMaxCount();
+      params.descriptorDataSource = descriptorDataSource;
+      simulator = simulatorFactory.apply(params);
     }
   }
 

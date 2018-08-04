@@ -1,12 +1,13 @@
 package org.mechaverse.simulation.primordial.core.spring;
 
+import com.google.common.collect.ImmutableList;
+import com.jogamp.opencl.CLPlatform;
 import java.util.List;
 import java.util.function.Function;
-
 import org.mechaverse.simulation.common.SimulationModelGenerator;
-import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorDataSource;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
-import org.mechaverse.simulation.common.cellautomaton.simulation.opencl.CompositeOpenClCellularAutomatonSimulatorFactory;
+import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator.CellularAutomatonSimulatorParams;
+import org.mechaverse.simulation.common.cellautomaton.simulation.opencl.OpenClCellularAutomatonSimulator;
 import org.mechaverse.simulation.primordial.core.PrimordialEnvironmentFactory;
 import org.mechaverse.simulation.primordial.core.PrimordialSimulationImpl;
 import org.mechaverse.simulation.primordial.core.PrimordialSimulationModelGenerator;
@@ -23,7 +24,6 @@ import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
-import com.google.common.collect.ImmutableList;
 
 @Configuration
 @SuppressWarnings({"unused", "WeakerAccess"})
@@ -75,10 +75,9 @@ public class PrimordialSimulationConfig {
 
   @Bean
   @Scope("prototype")
-  public Function<CellularAutomatonDescriptorDataSource, CellularAutomatonSimulator> cellularAutomatonSimulator() {
-    return descriptorDataSource -> new CompositeOpenClCellularAutomatonSimulatorFactory(
-        4, 125, PrimordialEntityInput.DATA_SIZE, 32,
-        descriptorDataSource).getObject();
+  public Function<CellularAutomatonSimulatorParams, CellularAutomatonSimulator> cellularAutomatonSimulatorFactory() {
+    return params -> new OpenClCellularAutomatonSimulator(params.numAutomata, PrimordialEntityInput.DATA_SIZE, 32,
+        CLPlatform.getDefault().getMaxFlopsDevice(), params.descriptorDataSource.getDescriptor());
   }
 
   private PrimordialEntityFactory entityFactory(

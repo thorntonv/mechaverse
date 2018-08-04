@@ -1,28 +1,28 @@
 package org.mechaverse.simulation.primordial.core.ui;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
+import java.awt.Transparency;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.ui.SimulationImageProvider;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
 import org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel;
 
-import static java.awt.image.BufferedImage.TYPE_INT_RGB;
-
 @SuppressWarnings("WeakerAccess")
 public class PrimordialSimulationImageProvider implements SimulationImageProvider<PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> {
 
-    public static final int DEFAULT_CELL_SIZE = 12;
+    public static final int DEFAULT_CELL_SIZE = 8;
 
     private final int cellImageSize;
 
     private final Map<String, BufferedImage> imageCache = new HashMap<>();
 
-    public PrimordialSimulationImageProvider() throws IOException {
+    public PrimordialSimulationImageProvider() {
         cellImageSize = DEFAULT_CELL_SIZE;
     }
 
@@ -57,7 +57,7 @@ public class PrimordialSimulationImageProvider implements SimulationImageProvide
         Graphics2D g2d = image.createGraphics();
         switch (entityModel.getType()) {
             case ENTITY:
-                g2d.setColor(new Color(0, 200, 0, 200));
+                g2d.setColor(new Color(0, 200, 0));
                 g2d.fillRect(1, 1, image.getWidth() - 2, image.getHeight() - 2);
                 break;
             case BARRIER:
@@ -65,7 +65,7 @@ public class PrimordialSimulationImageProvider implements SimulationImageProvide
                 g2d.fillRect(0, 0, image.getWidth(), image.getHeight());
                 break;
             case FOOD:
-                g2d.setColor(new Color(0, 85, 200, 200));
+                g2d.setColor(new Color(0, 85, 200));
                 g2d.fillRect(1, 1, image.getWidth() - 2, image.getHeight() - 2);
                 break;
         }
@@ -84,6 +84,11 @@ public class PrimordialSimulationImageProvider implements SimulationImageProvide
     }
 
     private BufferedImage createCellImage() {
-        return new BufferedImage(DEFAULT_CELL_SIZE, DEFAULT_CELL_SIZE, TYPE_INT_RGB);
+        GraphicsConfiguration config = GraphicsEnvironment
+            .getLocalGraphicsEnvironment()
+            .getDefaultScreenDevice()
+            .getDefaultConfiguration();
+        return config.createCompatibleImage(
+            DEFAULT_CELL_SIZE, DEFAULT_CELL_SIZE, Transparency.OPAQUE);
     }
 }

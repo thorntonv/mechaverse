@@ -83,7 +83,9 @@ public abstract class AbstractPrimordialSimulationImplTest {
   @Test
   public void simulate() {
     PrimordialSimulationImpl simulation = newSimulationImpl();
-    simulation.setState(simulation.generateRandomState());
+    PrimordialSimulationModel model = simulation.generateRandomState();
+    model.setEntityMaxCount(200);
+    simulation.setState(model);
 
     EntityTypeCountObserver entityCountObserver = new EntityTypeCountObserver();
     simulation.addObserver(entityCountObserver);
@@ -107,7 +109,9 @@ public abstract class AbstractPrimordialSimulationImplTest {
     PrimordialSimulationImpl simulation1 = newSimulationImpl();
     PrimordialSimulationImpl simulation2 = newSimulationImpl();
 
-    byte[] initialState = PrimordialSimulationModelUtil.serialize(simulation1.generateRandomState());
+    PrimordialSimulationModel model = simulation1.generateRandomState();
+    model.setEntityMaxCount(200);
+    byte[] initialState = PrimordialSimulationModelUtil.serialize(model);
     assertNotEquals(simulation1, simulation2);
     simulation1.setStateData(initialState);
     simulation2.setStateData(initialState);

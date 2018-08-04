@@ -35,8 +35,13 @@ public class SimulationRenderer<
 
     public BufferedImage draw(SIM_MODEL simulationModel, ENV_MODEL envModel,
             int startRow, int startCol, int rowCount, int colCount) {
-        BufferedImage image = new BufferedImage(colCount * cellSize,
-                rowCount * cellSize, BufferedImage.TYPE_INT_RGB);
+        GraphicsConfiguration config = GraphicsEnvironment
+            .getLocalGraphicsEnvironment()
+            .getDefaultScreenDevice()
+            .getDefaultConfiguration();
+        BufferedImage image = config.createCompatibleImage(
+            colCount * cellSize, rowCount * cellSize, Transparency.TRANSLUCENT);
+
         Graphics2D g2d = image.createGraphics();
         draw(g2d, simulationModel, envModel, startRow, startCol, rowCount, colCount);
         return image;

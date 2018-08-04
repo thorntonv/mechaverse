@@ -25,6 +25,10 @@ public class SimulationModel<
   @JsonProperty
   private Map<String, byte[]> data = new HashMap<>();
 
+  // Allows persistence of entity cellular automaton state (if applicable) to be disabled. This
+  // can significantly increase performance in cases where it is not needed.
+  private boolean persistEntityCellularAutomatonStateEnabled = true;
+
   public SimulationModel() {}
 
   /**
@@ -138,6 +142,15 @@ public class SimulationModel<
 
   public boolean dataContainsKey(String key) {
     return data.containsKey(key);
+  }
+
+  public boolean isPersistEntityCellularAutomatonStateEnabled() {
+    return persistEntityCellularAutomatonStateEnabled;
+  }
+
+  public void setPersistEntityCellularAutomatonStateEnabled(
+      boolean persistEntityCellularAutomatonStateEnabled) {
+    this.persistEntityCellularAutomatonStateEnabled = persistEntityCellularAutomatonStateEnabled;
   }
 
   @JsonIgnore

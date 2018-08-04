@@ -1,8 +1,5 @@
 package org.mechaverse.simulation.primordial;
 
-import java.io.IOException;
-
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mechaverse.simulation.primordial.core.PrimordialSimulationImpl;
 import org.mechaverse.simulation.primordial.core.spring.PrimordialSimulationConfig;
@@ -25,15 +22,11 @@ public class CellularAutomatonPrimordialSimulationImplTest extends AbstractPrimo
 
   @Override
   protected int testIterationCount() {
-    return 1000;
+    return 500;
   }
 
   @Override
   protected int smallTestIterationCount() {
     return 50;
-  }
-
-  @Test
-  public void simulate_verifyEntityState() throws IOException {
   }
 }

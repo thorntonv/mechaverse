@@ -7,6 +7,11 @@ package org.mechaverse.simulation.common.cellautomaton.simulation;
  */
 public interface CellularAutomatonSimulator extends AutoCloseable {
 
+  class CellularAutomatonSimulatorParams {
+    public int numAutomata;
+    public CellularAutomatonDescriptorDataSource descriptorDataSource;
+  }
+
   CellularAutomatonAllocator getAllocator();
   int size();
   int getAutomatonInputSize();

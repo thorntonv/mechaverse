@@ -50,6 +50,8 @@ public class CellularAutomatonPrimordialEntityBehavior extends AbstractPrimordia
 
   @Override
   public void updateState(PrimordialSimulationModel state) {
-    cellularAutomatonEntityBehavior.updateState(state);
+    if (state.isPersistEntityCellularAutomatonStateEnabled()) {
+      cellularAutomatonEntityBehavior.updateState(state);
+    }
   }
 }

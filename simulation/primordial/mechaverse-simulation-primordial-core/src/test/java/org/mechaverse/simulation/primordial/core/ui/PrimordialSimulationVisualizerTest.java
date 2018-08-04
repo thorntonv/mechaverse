@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
 public class PrimordialSimulationVisualizerTest {
 
     private static final int RUN_TIME_SECONDS = 5;
-    private static final int FRAMES_PER_SECOND = 5;
+    private static final int FRAMES_PER_SECOND = 15;
 
     @Autowired
     private PrimordialSimulationImpl simulation;
@@ -34,7 +34,7 @@ public class PrimordialSimulationVisualizerTest {
     public void setUp() throws IOException {
         simulation.setState(simulation.generateRandomState());
         visualizer = new PrimordialSimulationVisualizer(
-                simulation, PrimordialSimulationImageProvider.DEFAULT_CELL_SIZE / 2,
+                simulation, PrimordialSimulationImageProvider.DEFAULT_CELL_SIZE,
                 FRAMES_PER_SECOND, RUN_TIME_SECONDS * FRAMES_PER_SECOND
         );
     }
@@ -53,7 +53,7 @@ public class PrimordialSimulationVisualizerTest {
     }
 
     @Test
-    public void testStart() throws IOException, InterruptedException {
+    public void testStart() throws IOException {
         Stopwatch stopwatch = Stopwatch.createStarted();
         byte[] stateData = simulation.getStateData();
         visualizer.start();

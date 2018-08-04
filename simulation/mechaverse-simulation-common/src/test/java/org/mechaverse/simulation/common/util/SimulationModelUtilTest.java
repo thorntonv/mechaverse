@@ -56,7 +56,7 @@ public class SimulationModelUtilTest {
 
 
 
-  private static final String TEST_JSON = "{\"id\":\"abc\",\"environment\":{\"@type\":\"TestCellEnvironmentModel\",\"width\":10,\"height\":10,\"entities\":[{\"@type\":\"TestEntity1\",\"id\":\"e1\",\"x\":3,\"y\":2,\"energy\":0,\"maxEnergy\":0,\"age\":0,\"data\":{},\"field1\":101},{\"@type\":\"TestEntity2\",\"id\":\"e2\",\"x\":3,\"y\":5,\"energy\":0,\"maxEnergy\":0,\"age\":0,\"data\":{},\"field2\":\"testStr\"}]},\"subEnvironments\":[],\"iteration\":0,\"data\":{\"key1\":\"dGVzdFZhbHVlMQ==\"}}";
+  private static final String TEST_JSON = "{\"id\":\"abc\",\"environment\":{\"@type\":\"TestCellEnvironmentModel\",\"width\":10,\"height\":10,\"entities\":[{\"@type\":\"TestEntity1\",\"id\":\"e1\",\"x\":3,\"y\":2,\"energy\":0,\"maxEnergy\":0,\"age\":0,\"data\":{},\"field1\":101},{\"@type\":\"TestEntity2\",\"id\":\"e2\",\"x\":3,\"y\":5,\"energy\":0,\"maxEnergy\":0,\"age\":0,\"data\":{},\"field2\":\"testStr\"}]},\"subEnvironments\":[],\"iteration\":0,\"data\":{\"key1\":\"dGVzdFZhbHVlMQ==\"},\"persistEntityCellularAutomatonStateEnabled\":true}";
 
   @Test
   public void testSerialize() throws IOException {

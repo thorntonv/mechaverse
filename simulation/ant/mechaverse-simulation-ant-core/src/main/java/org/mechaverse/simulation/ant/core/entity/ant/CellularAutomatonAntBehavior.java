@@ -49,6 +49,8 @@ public class CellularAutomatonAntBehavior extends AbstractAntBehavior {
 
   @Override
   public void updateState(AntSimulationModel state) {
-    cellularAutomatonEntityBehavior.updateState(state);
+    if(state.isPersistEntityCellularAutomatonStateEnabled()) {
+      cellularAutomatonEntityBehavior.updateState(state);
+    }
   }
 }

@@ -47,6 +47,8 @@ public class SimulationVisualizer<SIM_MODEL extends SimulationModel<ENV_MODEL, E
         this.frameCount = frameCount;
         this.simulationComponent = new SimulationViewComponent(simulation, renderer);
 
+        simulation.getState().setPersistEntityCellularAutomatonStateEnabled(false);
+
         initUI();
 
         SwingUtilities.invokeLater(() -> setVisible(true));
@@ -78,12 +80,14 @@ public class SimulationVisualizer<SIM_MODEL extends SimulationModel<ENV_MODEL, E
 
     public void update() {
         try {
-            SwingUtilities.invokeAndWait(() -> simulation.step(1));
+            SwingUtilities.invokeAndWait(() -> {
+                simulation.step(1);
+                SIM_MODEL state = simulation.getState();
+                setTitle("Simulation " + state.getId() + " Iteration #" + state.getIteration());
+                repaintUI();
+            });
         } catch (Exception e) {
         }
-        SIM_MODEL state = simulation.getState();
-        setTitle("Simulation " + state.getId() + " Iteration #" + state.getIteration());
-        repaintUI();
     }
 
     public void repaintUI() {

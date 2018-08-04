@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<CellularAutomatonDescriptor xmlns="http://www.mechaverse.org/cellautomaton/model" 
-    width="1" height="1" iterationsPerUpdate="10">
-
-  <CellType id="input">
-    <Output id="1"><UpdateExpression><![CDATA[{output1}]]></UpdateExpression></Output>
-  </CellType>
+<CellularAutomatonDescriptor xmlns="http://www.mechaverse.org/cellautomaton/model"
+  width="2" height="2" iterationsPerUpdate="20">
 
   <CellType id="boolean4">
     <Var id="nextOutput" />
@@ -56,33 +52,13 @@
       <Cell type="boolean4" />
       <Cell type="boolean4" />
       <Cell type="boolean4" />
-      <Cell type="boolean4" />
-      <Cell type="boolean4" />
     </row>
     <row>
       <Cell type="boolean4" />
       <Cell type="boolean4" />
       <Cell type="boolean4" />
-      <Cell type="boolean4" />
-      <Cell type="boolean4" />
     </row>
     <row>
-      <Cell type="boolean4" />
-      <Cell type="boolean4" />
-      <Cell type="input" />
-      <Cell type="boolean4" />
-      <Cell type="boolean4" />
-    </row>
-    <row>
-      <Cell type="boolean4" />
-      <Cell type="boolean4" />
-      <Cell type="boolean4" />
-      <Cell type="boolean4" />
-      <Cell type="boolean4" />
-    </row>
-    <row>
-      <Cell type="boolean4" />
-      <Cell type="boolean4" />
       <Cell type="boolean4" />
       <Cell type="boolean4" />
       <Cell type="boolean4" />
