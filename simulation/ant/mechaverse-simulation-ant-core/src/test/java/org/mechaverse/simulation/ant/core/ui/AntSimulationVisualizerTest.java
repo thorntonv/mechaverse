@@ -22,42 +22,42 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes = {SimpleAntSimulationConfig.class})
 public class AntSimulationVisualizerTest {
 
-    private static final int RUN_TIME_SECONDS = 4;
-    private static final int FRAMES_PER_SECOND = 30;
+  private static final int RUN_TIME_SECONDS = 4;
+  private static final int FRAMES_PER_SECOND = 30;
 
-    @Autowired
-    private AntSimulationImpl simulation;
+  @Autowired
+  private AntSimulationImpl simulation;
 
-    private AntSimulationVisualizer visualizer;
+  private AntSimulationVisualizer visualizer;
 
-    @Before
-    public void setUp() throws IOException {
-        simulation.setState(simulation.generateRandomState());
-        visualizer = new AntSimulationVisualizer(
-                simulation, AntSimulationImageProvider.DEFAULT_CELL_SIZE / 2,
-                FRAMES_PER_SECOND, RUN_TIME_SECONDS * FRAMES_PER_SECOND
-        );
-    }
+  @Before
+  public void setUp() throws IOException {
+    simulation.setState(simulation.generateRandomState());
+    visualizer = new AntSimulationVisualizer(
+        simulation, AntSimulationImageProvider.DEFAULT_CELL_SIZE / 2,
+        FRAMES_PER_SECOND, RUN_TIME_SECONDS * FRAMES_PER_SECOND
+    );
+  }
 
-    @After
-    public void tearDown() {
-        visualizer.dispose();
-        visualizer = null;
-    }
-    
-    @Test
-    public void testUpdate() throws IOException {
-        byte[] stateData = simulation.getStateData();
-        visualizer.update();
-        assertNotEquals(Arrays.hashCode(stateData), Arrays.hashCode(simulation.getStateData()));
-    }
+  @After
+  public void tearDown() {
+    visualizer.dispose();
+    visualizer = null;
+  }
 
-    @Test
-    public void testStart() throws IOException, InterruptedException {
-        Stopwatch stopwatch = Stopwatch.createStarted();
-        byte[] stateData = simulation.getStateData();
-        visualizer.start();
-        assertTrue(stopwatch.elapsed(TimeUnit.SECONDS) < RUN_TIME_SECONDS + 3);
-        assertNotEquals(Arrays.hashCode(stateData), Arrays.hashCode(simulation.getStateData()));
-    }
+  @Test
+  public void testUpdate() throws IOException {
+    byte[] stateData = simulation.getStateData();
+    visualizer.update();
+    assertNotEquals(Arrays.hashCode(stateData), Arrays.hashCode(simulation.getStateData()));
+  }
+
+  @Test
+  public void testStart() throws IOException, InterruptedException {
+    Stopwatch stopwatch = Stopwatch.createStarted();
+    byte[] stateData = simulation.getStateData();
+    visualizer.start();
+    assertTrue(stopwatch.elapsed(TimeUnit.SECONDS) < RUN_TIME_SECONDS + 3);
+    assertNotEquals(Arrays.hashCode(stateData), Arrays.hashCode(simulation.getStateData()));
+  }
 }

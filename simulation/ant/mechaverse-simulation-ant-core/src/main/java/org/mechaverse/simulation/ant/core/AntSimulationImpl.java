@@ -24,6 +24,11 @@ public class AntSimulationImpl extends AbstractSimulation<AntSimulationModel, Ce
     }
 
     @Override
+    public AntSimulationModel deserializeState(byte[] stateData) throws IOException {
+        return AntSimulationModelUtil.deserialize(stateData);
+    }
+
+    @Override
     public byte[] getStateData() throws IOException {
         return AntSimulationModelUtil.serialize(getState());
     }

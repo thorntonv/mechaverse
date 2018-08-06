@@ -25,6 +25,11 @@ public class PrimordialSimulationImpl extends AbstractSimulation<PrimordialSimul
     }
 
     @Override
+    public PrimordialSimulationModel deserializeState(byte[] stateData) throws IOException {
+        return PrimordialSimulationModelUtil.deserialize(stateData);
+    }
+
+    @Override
     public byte[] getStateData() throws IOException {
         return PrimordialSimulationModelUtil.serialize(getState());
     }

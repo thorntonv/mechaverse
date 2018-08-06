@@ -5,6 +5,7 @@ import static org.mechaverse.simulation.common.cellautomaton.genetic.CellularAut
 
 import com.google.common.collect.Sets;
 import gnu.trove.map.TObjectDoubleMap;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.IdentityHashMap;
@@ -109,6 +110,11 @@ public class SimpleSimulation<E extends SimpleCellularAutomatonEntity> implement
 
   @Override
   public void removeObserver(final SimulationObserver observer) {
+  }
+
+  @Override
+  public SimulationModel deserializeState(byte[] stateData) {
+    throw new UnsupportedOperationException();
   }
 
   @Override
