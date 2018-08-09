@@ -23,7 +23,7 @@ public abstract class AbstractSimulation<
   private static final int DEFAULT_ENVIRONMENT_WIDTH = 175;
   private static final int DEFAULT_ENVIRONMENT_HEIGHT = 175;
 
-  private static final Logger logger = LoggerFactory.getLogger(AbstractSimulation.class);
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private final SimulationModelGenerator<SIM_MODEL> simulationModelGenerator;
   private final EnvironmentFactory<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE> environmentFactory;

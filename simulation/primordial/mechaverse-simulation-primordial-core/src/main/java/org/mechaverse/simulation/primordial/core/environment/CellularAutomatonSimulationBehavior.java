@@ -1,5 +1,6 @@
 package org.mechaverse.simulation.primordial.core.environment;
 
+import com.google.common.base.Preconditions;
 import java.util.function.Function;
 
 import org.apache.commons.math3.random.RandomGenerator;
@@ -28,6 +29,7 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
   public void setState(PrimordialSimulationModel state,
           Environment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> environment) {
     super.setState(state, environment);
+    Preconditions.checkState(state.getEntityMaxCount() > 0);
     if (simulator == null || descriptorDataSource == null) {
       // Lazily load the cellular automaton simulator.
       descriptorDataSource = new SimulationStateCellularAutomatonDescriptor(state);

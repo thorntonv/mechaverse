@@ -1,6 +1,7 @@
 package org.mechaverse.simulation.ant.core.spring;
 
 import com.google.common.collect.ImmutableList;
+import com.jogamp.opencl.CLPlatform;
 import java.util.List;
 import java.util.function.Function;
 import org.mechaverse.simulation.ant.core.AntEnvironmentFactory;
@@ -21,9 +22,9 @@ import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.ant.core.model.EntityType;
 import org.mechaverse.simulation.common.EnvironmentFactory;
 import org.mechaverse.simulation.common.SimulationModelGenerator;
-import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorDataSource;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
-import org.mechaverse.simulation.common.cellautomaton.simulation.opencl.CompositeOpenClCellularAutomatonSimulatorFactory;
+import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator.CellularAutomatonSimulatorParams;
+import org.mechaverse.simulation.common.cellautomaton.simulation.opencl.OpenClCellularAutomatonSimulator;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -97,10 +98,9 @@ public class AntSimulationConfig {
 
   @Bean
   @Scope("prototype")
-  public Function<CellularAutomatonDescriptorDataSource, CellularAutomatonSimulator> cellularAutomatonSimulator() {
-    return descriptorDataSource -> new CompositeOpenClCellularAutomatonSimulatorFactory(
-        4, 125, AntInput.DATA_SIZE, 32,
-        descriptorDataSource).getObject();
+  public Function<CellularAutomatonSimulatorParams, CellularAutomatonSimulator> cellularAutomatonSimulatorFactory() {
+    return params -> new OpenClCellularAutomatonSimulator(params.numAutomata, AntInput.DATA_SIZE, 32,
+        CLPlatform.getDefault().getMaxFlopsDevice(), params.descriptorDataSource.getDescriptor());
   }
 
   private AntEntityFactory entityFactory(

@@ -22,7 +22,10 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.annotations.Threads;
 import org.openjdk.jmh.annotations.Warmup;
+import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 @Fork(value = 1, warmups = 0)
 @Threads(1)
@@ -100,7 +103,11 @@ public class OpenClCellularAutomatonSimulationBenchmark {
     return dummy;
   }
 
-  public static void main(String[] args) throws IOException, RunnerException {
-    org.openjdk.jmh.Main.main(args);
+  public static void main(String[] args) throws RunnerException {
+    Options opt = new OptionsBuilder()
+        .include(OpenClCellularAutomatonSimulationBenchmark.class.getSimpleName())
+        .forks(1)
+        .build();
+    new Runner(opt).run();
   }
 }

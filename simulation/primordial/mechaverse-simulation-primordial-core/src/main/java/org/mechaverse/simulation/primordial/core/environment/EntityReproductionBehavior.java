@@ -51,7 +51,8 @@ public class EntityReproductionBehavior extends PrimordialEnvironmentBehavior {
       Environment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> env,
           RandomGenerator random) {
     final PrimordialEnvironmentModel envModel = env.getModel();
-    while (entities.size() < entityMaxCount) {
+    int cnt = 0;
+    while (entities.size() < entityMaxCount && cnt < entityMaxCount / 10) {
       int row = random.nextInt(envModel.getHeight());
       int col = random.nextInt(envModel.getWidth());
 
@@ -63,6 +64,7 @@ public class EntityReproductionBehavior extends PrimordialEnvironmentBehavior {
           env.addEntity(entity);
         }
       }
+      cnt++;
     }
   }
 

@@ -117,13 +117,15 @@ public class AntReproductionBehavior extends AbstractAntEnvironmentBehavior {
     antMaxCount = state.getAntMaxCount();
     antInitialEnergy = state.getAntInitialEnergy();
     antMinReproductiveAge = state.getAntMinReproductiveAge();
+    maxGeneratedAntNestDistance = (int)(Math.sqrt(antMaxCount) * 1.25);
   }
 
   @Override
   public void beforeUpdate(AntSimulationModel state,
       Environment<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> env, RandomGenerator random) {
     CellEnvironment envModel = env.getModel();
-    if (ants.size() < antMaxCount && nest != null) {
+    int cnt = 0;
+    while (ants.size() < antMaxCount && nest != null && cnt < antMaxCount) {
       Cell nestCell = envModel.getCell(nest);
       int row = random.nextInt(maxGeneratedAntNestDistance * 2) - maxGeneratedAntNestDistance
           + nestCell.getRow();
@@ -138,6 +140,7 @@ public class AntReproductionBehavior extends AbstractAntEnvironmentBehavior {
           env.addEntity(ant);
         }
       }
+      cnt++;
     }
   }
 

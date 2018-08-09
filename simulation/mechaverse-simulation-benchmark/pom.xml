@@ -18,6 +18,16 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.mechaverse.simulation.ant</groupId>
+      <artifactId>mechaverse-simulation-ant-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mechaverse.simulation.primordial</groupId>
+      <artifactId>mechaverse-simulation-primordial-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.openjdk.jmh</groupId>
       <artifactId>jmh-core</artifactId>
       <version>1.19</version>

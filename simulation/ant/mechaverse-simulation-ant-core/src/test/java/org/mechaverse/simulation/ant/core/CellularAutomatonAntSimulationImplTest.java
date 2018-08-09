@@ -1,10 +1,12 @@
 package org.mechaverse.simulation.ant.core;
 
-import java.io.IOException;
+import static org.junit.Assert.assertTrue;
+import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_BIT_OUTPUT_MAP_KEY;
+import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_OUTPUT_MAP_KEY;
+import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_STATE_KEY;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mechaverse.simulation.ant.core.entity.ant.CellularAutomatonAntBehavior;
 import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.ant.core.model.AntSimulationModel;
 import org.mechaverse.simulation.ant.core.spring.AntSimulationConfig;
@@ -13,11 +15,6 @@ import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import static org.junit.Assert.*;
-import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_BIT_OUTPUT_MAP_KEY;
-import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_OUTPUT_MAP_KEY;
-import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_STATE_KEY;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {AntSimulationConfig.class})
@@ -33,7 +30,7 @@ public class CellularAutomatonAntSimulationImplTest extends AbstractAntSimulatio
 
   @Override
   protected int testIterationCount() {
-    return 1000;
+    return 200;
   }
 
   @Override
@@ -42,7 +39,7 @@ public class CellularAutomatonAntSimulationImplTest extends AbstractAntSimulatio
   }
 
   @Test
-  public void simulate_verifyEntityState() throws IOException {
+  public void simulate_verifyEntityState() {
     AntSimulationImpl simulation = newSimulationImpl();
     simulation.setState(simulation.generateRandomState());
 

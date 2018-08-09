@@ -6,6 +6,7 @@ import static org.mechaverse.simulation.common.cellautomaton.genetic.CellularAut
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.anyObject;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -75,7 +76,7 @@ public class AntReproductionBehaviorTest {
     reproductionBehavior.beforeUpdate(state, mockEnv, random);
 
     ArgumentCaptor<Ant> antCaptor = ArgumentCaptor.forClass(Ant.class);
-    verify(mockEnv).addEntity(antCaptor.capture());
+    verify(mockEnv, atLeastOnce()).addEntity(antCaptor.capture());
     assertNotNull(env.getCell(antCaptor.getValue()));
     verifyZeroInteractions(mockGeneticRecombinator);
   }
@@ -107,7 +108,7 @@ public class AntReproductionBehaviorTest {
     reproductionBehavior.beforeUpdate(state, mockEnv, random);
 
     ArgumentCaptor<Ant> childCaptor = ArgumentCaptor.forClass(Ant.class);
-    verify(mockEnv).addEntity(childCaptor.capture());
+    verify(mockEnv, atLeastOnce()).addEntity(childCaptor.capture());
 
     Ant child = childCaptor.getValue();
     assertNotNull(child);
@@ -119,7 +120,7 @@ public class AntReproductionBehaviorTest {
     // Verify that recombine was called with the genetic data of the parent ants.
     ArgumentCaptor<GeneticData> geneticDataCaptor1 = ArgumentCaptor.forClass(GeneticData.class);
     ArgumentCaptor<GeneticData> geneticDataCaptor2 = ArgumentCaptor.forClass(GeneticData.class);
-    verify(mockGeneticRecombinator).recombine(geneticDataCaptor1.capture(),
+    verify(mockGeneticRecombinator, atLeastOnce()).recombine(geneticDataCaptor1.capture(),
         geneticDataCaptor2.capture(), eq(random));
     if (Arrays.equals(geneticDataCaptor1.getValue().getData(),
         parent1GeneticData.get(CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY).getData())) {
