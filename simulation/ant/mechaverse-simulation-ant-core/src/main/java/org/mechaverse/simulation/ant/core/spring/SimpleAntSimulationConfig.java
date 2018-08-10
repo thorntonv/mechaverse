@@ -1,13 +1,16 @@
 package org.mechaverse.simulation.ant.core.spring;
 
+import com.google.common.collect.ImmutableList;
+import java.util.List;
 import java.util.function.Function;
-
 import org.mechaverse.simulation.ant.core.AntEnvironmentFactory;
 import org.mechaverse.simulation.ant.core.AntSimulationImpl;
 import org.mechaverse.simulation.ant.core.AntSimulationModelGenerator;
 import org.mechaverse.simulation.ant.core.entity.ant.AntEntity;
 import org.mechaverse.simulation.ant.core.entity.ant.AntEntityFactory;
 import org.mechaverse.simulation.ant.core.entity.ant.SimpleAntBehavior;
+import org.mechaverse.simulation.ant.core.environment.AbstractAntEnvironmentBehavior;
+import org.mechaverse.simulation.ant.core.environment.AntEnvironment;
 import org.mechaverse.simulation.ant.core.environment.AntReproductionBehavior;
 import org.mechaverse.simulation.ant.core.environment.FoodGenerationBehavior;
 import org.mechaverse.simulation.ant.core.environment.PheromoneDecayBehavior;
@@ -15,13 +18,13 @@ import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.ant.core.model.AntSimulationModel;
 import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.ant.core.model.EntityType;
+import org.mechaverse.simulation.common.Environment;
 import org.mechaverse.simulation.common.EnvironmentFactory;
 import org.mechaverse.simulation.common.SimulationModelGenerator;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
-import com.google.common.collect.ImmutableList;
 
 @Configuration
 @SuppressWarnings("unused")
@@ -55,13 +58,18 @@ public class SimpleAntSimulationConfig {
 
   @Bean
   @Scope("prototype")
-  public EnvironmentFactory<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> environmentFactory(
-      AntEntityFactory entityFactory) {
-    return new AntEnvironmentFactory(ImmutableList.of(
-        new FoodGenerationBehavior(),
-        new PheromoneDecayBehavior(),
-        new AntReproductionBehavior()
-    ), entityFactory);
+  public AntEnvironmentFactory environmentFactory(AntEntityFactory entityFactory) {
+    return new AntEnvironmentFactory(){
+      @Override
+      public Environment<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> create(
+          CellEnvironment environmentModel) {
+        List<AbstractAntEnvironmentBehavior> environmentBehaviors = ImmutableList.of(
+            new FoodGenerationBehavior(),
+            new PheromoneDecayBehavior(),
+            new AntReproductionBehavior());
+        return new AntEnvironment(environmentModel, environmentBehaviors, entityFactory);
+      }
+    };
   }
 
   @Bean

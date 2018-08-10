@@ -6,7 +6,7 @@ import org.mechaverse.simulation.common.model.SimulationModel;
 public class PrimordialSimulationModel
         extends SimulationModel<PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType>
 {
-    private int entityMaxCount;
+    private int entityMaxCountPerEnvironment;
     private int entityInitialEnergy;
     private int entityMinReproductiveAge;
     private int foodMinCount;
@@ -37,12 +37,12 @@ public class PrimordialSimulationModel
         return foodInitialEnergy;
     }
 
-    public int getEntityMaxCount() {
-        return entityMaxCount;
+    public int getEntityMaxCountPerEnvironment() {
+        return entityMaxCountPerEnvironment;
     }
 
-    public void setEntityMaxCount(final int entityMaxCount) {
-        this.entityMaxCount = entityMaxCount;
+    public void setEntityMaxCountPerEnvironment(final int entityMaxCountPerEnvironment) {
+        this.entityMaxCountPerEnvironment = entityMaxCountPerEnvironment;
     }
 
     public int getEntityInitialEnergy() {

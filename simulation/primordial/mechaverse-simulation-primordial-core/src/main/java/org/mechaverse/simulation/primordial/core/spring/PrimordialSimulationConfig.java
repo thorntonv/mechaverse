@@ -4,10 +4,12 @@ import com.google.common.collect.ImmutableList;
 import com.jogamp.opencl.CLPlatform;
 import java.util.List;
 import java.util.function.Function;
+import org.mechaverse.simulation.common.Environment;
 import org.mechaverse.simulation.common.SimulationModelGenerator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator.CellularAutomatonSimulatorParams;
 import org.mechaverse.simulation.common.cellautomaton.simulation.opencl.OpenClCellularAutomatonSimulator;
+import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.primordial.core.PrimordialEnvironmentFactory;
 import org.mechaverse.simulation.primordial.core.PrimordialSimulationImpl;
 import org.mechaverse.simulation.primordial.core.PrimordialSimulationModelGenerator;
@@ -18,8 +20,11 @@ import org.mechaverse.simulation.primordial.core.entity.PrimordialEntityInput;
 import org.mechaverse.simulation.primordial.core.environment.CellularAutomatonSimulationBehavior;
 import org.mechaverse.simulation.primordial.core.environment.EntityReproductionBehavior;
 import org.mechaverse.simulation.primordial.core.environment.FoodGenerationBehavior;
+import org.mechaverse.simulation.primordial.core.environment.PrimordialEnvironment;
 import org.mechaverse.simulation.primordial.core.environment.PrimordialEnvironmentBehavior;
+import org.mechaverse.simulation.primordial.core.model.EntityType;
 import org.mechaverse.simulation.primordial.core.model.PrimordialEntityModel;
+import org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel;
 import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -65,12 +70,19 @@ public class PrimordialSimulationConfig {
   @Bean
   @Scope("prototype")
   public PrimordialEnvironmentFactory environmentFactory() {
-    CellularAutomatonSimulationBehavior cellularAutomatonBehavior = cellularAutomatonSimulationBehavior();
-    List<PrimordialEnvironmentBehavior> environmentBehaviors = ImmutableList.of(
-        foodGenerationBehavior(),
+    return new PrimordialEnvironmentFactory() {
+      @Override
+      public Environment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> create(
+          PrimordialEnvironmentModel environmentModel) {
+        CellularAutomatonSimulationBehavior cellularAutomatonBehavior = cellularAutomatonSimulationBehavior();
+        List<PrimordialEnvironmentBehavior> environmentBehaviors = ImmutableList.of(
+            foodGenerationBehavior(),
             reproductionBehavior(),
-        cellularAutomatonBehavior);
-    return new PrimordialEnvironmentFactory(environmentBehaviors, entityFactory(cellularAutomatonBehavior));
+            cellularAutomatonBehavior);
+        return new PrimordialEnvironment(environmentModel, environmentBehaviors,
+            entityFactory(cellularAutomatonBehavior));
+      }
+    };
   }
 
   @Bean

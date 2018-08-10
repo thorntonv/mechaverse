@@ -30,7 +30,7 @@ public class PrimordialSimulationBenchmark {
   @State(Scope.Benchmark)
   public static class ExecutionPlan {
 
-    @Param(value = {"500", "1024", "2048"}) int numAutomata;
+    @Param(value = {"128", "256", "512", "1024"}) int numAutomata;
 
     private ClassPathXmlApplicationContext appContext;
     private Simulation simulation;
@@ -41,7 +41,7 @@ public class PrimordialSimulationBenchmark {
           new ClassPathXmlApplicationContext("primordial-simulation-context.xml");
       simulation = appContext.getBean(Simulation.class);
       PrimordialSimulationModel model = (PrimordialSimulationModel) simulation.generateRandomState();
-      model.setEntityMaxCount(numAutomata);
+      model.setEntityMaxCountPerEnvironment(numAutomata);
       simulation.setState(model);
     }
 

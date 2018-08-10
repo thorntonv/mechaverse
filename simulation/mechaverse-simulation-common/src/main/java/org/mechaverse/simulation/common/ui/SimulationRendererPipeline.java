@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,6 +29,7 @@ public class SimulationRendererPipeline<SIM_MODEL extends
   static {
     cloner.registerImmutable(Map.class);
   }
+
   private class SimulationUpdateTask implements Runnable {
 
     @Override
@@ -36,8 +38,13 @@ public class SimulationRendererPipeline<SIM_MODEL extends
         try {
           simulation.step(1);
           final SIM_MODEL state = cloner.deepClone(simulation.getState());
-          stateImageQueue.put(executorService.submit(() ->
-              Pair.of(state, renderer.draw(state, state.getEnvironment()))));
+          stateImageQueue.put(executorService.submit(() -> {
+            Map<String, BufferedImage> environmentImages = new ConcurrentHashMap<>();
+            state.getEnvironments().parallelStream().forEach(env ->
+                environmentImages.put(env.getId(),
+                    renderer.draw(state, state.getEnvironment(env.getId()))));
+            return Pair.of(state, environmentImages);
+          }));
         } catch (InterruptedException e) {
           e.printStackTrace();
         }
@@ -48,7 +55,7 @@ public class SimulationRendererPipeline<SIM_MODEL extends
   private ExecutorService executorService = Executors
       .newFixedThreadPool(1);
 
-  private BlockingQueue<Future<Pair<SIM_MODEL, BufferedImage>>> stateImageQueue = new ArrayBlockingQueue<>(
+  private BlockingQueue<Future<Pair<SIM_MODEL, Map<String, BufferedImage>>>> stateImageQueue = new ArrayBlockingQueue<>(
       60);
 
   private AtomicBoolean running = new AtomicBoolean(false);
@@ -75,9 +82,9 @@ public class SimulationRendererPipeline<SIM_MODEL extends
     running.set(false);
   }
 
-  public Pair<SIM_MODEL, BufferedImage> getNextImage()
+  public Pair<SIM_MODEL, Map<String, BufferedImage>> getNextStateImage()
       throws InterruptedException, ExecutionException {
-    Future<Pair<SIM_MODEL, BufferedImage>> result = stateImageQueue.poll();
+    Future<Pair<SIM_MODEL, Map<String, BufferedImage>>> result = stateImageQueue.poll();
     if (result != null) {
       return result.get();
     }
@@ -98,6 +105,7 @@ public class SimulationRendererPipeline<SIM_MODEL extends
 
   @Override
   public void close() throws Exception {
+    stop();
     executorService.shutdown();
     executorService.awaitTermination(10, TimeUnit.SECONDS);
   }

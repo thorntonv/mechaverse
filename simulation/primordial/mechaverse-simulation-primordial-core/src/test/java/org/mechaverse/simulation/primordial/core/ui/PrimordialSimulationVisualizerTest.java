@@ -38,7 +38,6 @@ public class PrimordialSimulationVisualizerTest {
   @Before
   public void setUp() {
     PrimordialSimulationModel model = simulation.generateRandomState();
-    model.setEntityMaxCount(500);
     simulation.setState(model);
     visualizer = new PrimordialSimulationVisualizer(
         simulation, PrimordialSimulationImageProvider.DEFAULT_CELL_SIZE,

@@ -29,13 +29,13 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
   public void setState(PrimordialSimulationModel state,
           Environment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> environment) {
     super.setState(state, environment);
-    Preconditions.checkState(state.getEntityMaxCount() > 0);
+    Preconditions.checkState(state.getEntityMaxCountPerEnvironment() > 0);
     if (simulator == null || descriptorDataSource == null) {
       // Lazily load the cellular automaton simulator.
       descriptorDataSource = new SimulationStateCellularAutomatonDescriptor(state);
       descriptorDataSource.setDefaultDescriptorResourceName("primordial-automaton-descriptor.xml");
       CellularAutomatonSimulatorParams params = new CellularAutomatonSimulatorParams();
-      params.numAutomata = state.getEntityMaxCount();
+      params.numAutomata = state.getEntityMaxCountPerEnvironment();
       params.descriptorDataSource = descriptorDataSource;
       simulator = simulatorFactory.apply(params);
     }

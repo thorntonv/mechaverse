@@ -47,16 +47,16 @@ public abstract class AbstractPrimordialSimulationImplTest {
     private EntityTypeCounter entityTypeCounter = new EntityTypeCounter();
 
     @Override
-    public void onAddEntity(EntityModel<EntityType> entity, PrimordialSimulationModel state, PrimordialEnvironmentModel envModel) {
+    public synchronized void onAddEntity(EntityModel<EntityType> entity, PrimordialSimulationModel state, PrimordialEnvironmentModel envModel) {
       entityTypeCounter.addEntity(entity);
     }
 
     @Override
-    public void onRemoveEntity(EntityModel<EntityType> entity, PrimordialSimulationModel state, PrimordialEnvironmentModel envModel) {
+    public synchronized void onRemoveEntity(EntityModel<EntityType> entity, PrimordialSimulationModel state, PrimordialEnvironmentModel envModel) {
       entityTypeCounter.removeEntity(entity);
     }
 
-    public int getEntityCount(EntityType type) {
+    public synchronized int getEntityCount(EntityType type) {
       return entityTypeCounter.getEntityCount(type);
     }
 
@@ -84,7 +84,7 @@ public abstract class AbstractPrimordialSimulationImplTest {
   public void simulate() {
     PrimordialSimulationImpl simulation = newSimulationImpl();
     PrimordialSimulationModel model = simulation.generateRandomState();
-    model.setEntityMaxCount(200);
+    model.setEntityMaxCountPerEnvironment(50);
     simulation.setState(model);
 
     EntityTypeCountObserver entityCountObserver = new EntityTypeCountObserver();
@@ -110,7 +110,7 @@ public abstract class AbstractPrimordialSimulationImplTest {
     PrimordialSimulationImpl simulation2 = newSimulationImpl();
 
     PrimordialSimulationModel model = simulation1.generateRandomState();
-    model.setEntityMaxCount(200);
+    model.setEntityMaxCountPerEnvironment(50);
     byte[] initialState = PrimordialSimulationModelUtil.serialize(model);
     assertNotEquals(simulation1, simulation2);
     simulation1.setStateData(initialState);
@@ -140,8 +140,10 @@ public abstract class AbstractPrimordialSimulationImplTest {
   private void verifyEntityTypeCounts(PrimordialSimulationModel model, EntityTypeCountObserver observer) {
     EntityTypeCounter counter = new EntityTypeCounter();
 
-    for (EntityModel<EntityType> entity : model.getEnvironment().getEntities()) {
-      counter.addEntity(entity);
+    for(PrimordialEnvironmentModel env : model.getEnvironments()) {
+      for (EntityModel<EntityType> entity : env.getEntities()) {
+        counter.addEntity(entity);
+      }
     }
 
     for (EntityType entityType : EntityType.values()) {

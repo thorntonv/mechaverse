@@ -2,9 +2,12 @@ package org.mechaverse.simulation.common;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import java.util.Map;
 import org.apache.commons.math3.random.RandomGenerator;
+import org.apache.commons.math3.random.Well19937c;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.EnvironmentModel;
 import org.mechaverse.simulation.common.model.SimulationModel;
@@ -82,7 +85,13 @@ public abstract class AbstractSimulation<
 
     random.setSeed(Long.valueOf(model.getSeed()));
 
-    environments.forEach(env -> env.update(model, random));
+    // Create separate random generators for each environment so that the simulation remains deterministic.
+    Map<String, RandomGenerator> environmentRandomGenerators = new HashMap<>();
+    environments.forEach(env -> environmentRandomGenerators
+        .put(env.getModel().getId(), new Well19937c(random.nextLong())));
+
+    environments.parallelStream()
+        .forEach(env -> env.update(model, environmentRandomGenerators.get(env.getModel().getId())));
 
     if (logger.isDebugEnabled()) {
       // Print seed after updating environments in case seed is changed.

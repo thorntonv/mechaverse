@@ -12,6 +12,7 @@ import org.mechaverse.simulation.ant.core.entity.ant.AntEntityFactory;
 import org.mechaverse.simulation.ant.core.entity.ant.AntInput;
 import org.mechaverse.simulation.ant.core.entity.ant.CellularAutomatonAntBehavior;
 import org.mechaverse.simulation.ant.core.environment.AbstractAntEnvironmentBehavior;
+import org.mechaverse.simulation.ant.core.environment.AntEnvironment;
 import org.mechaverse.simulation.ant.core.environment.AntReproductionBehavior;
 import org.mechaverse.simulation.ant.core.environment.CellularAutomatonSimulationBehavior;
 import org.mechaverse.simulation.ant.core.environment.FoodGenerationBehavior;
@@ -20,6 +21,7 @@ import org.mechaverse.simulation.ant.core.model.Ant;
 import org.mechaverse.simulation.ant.core.model.AntSimulationModel;
 import org.mechaverse.simulation.ant.core.model.CellEnvironment;
 import org.mechaverse.simulation.ant.core.model.EntityType;
+import org.mechaverse.simulation.common.Environment;
 import org.mechaverse.simulation.common.EnvironmentFactory;
 import org.mechaverse.simulation.common.SimulationModelGenerator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
@@ -34,15 +36,15 @@ import org.springframework.context.annotation.Scope;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class AntSimulationConfig {
 
-  private static final int ANT_MAX_COUNT = 500;
-  private static final int ANT_INITIAL_ENERGY = 100;
+  private static final int ANT_MAX_COUNT = 256;
+  private static final int ANT_INITIAL_ENERGY = 200;
   private static final int ANT_MIN_REPRODUCTIVE_AGE = 25;
   private static final int FOOD_MIN_COUNT = 1000;
   private static final int FOOD_CLUSTER_RADIUS = 15;
   private static final int FOOD_INITIAL_ENERGY = 10;
   private static final int PHEROMONE_INITIAL_ENERGY = 100;
   private static final int PHEROMONE_DECAY_INTERVAL = 100;
-  private static final int SUB_ENVIRONMENT_COUNT = 0;
+  private static final int SUB_ENVIRONMENT_COUNT = 3;
 
   @Bean
   @Scope("prototype")
@@ -86,14 +88,20 @@ public class AntSimulationConfig {
 
   @Bean
   @Scope("prototype")
-  public EnvironmentFactory<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> environmentFactory() {
-    CellularAutomatonSimulationBehavior cellularAutomatonBehavior = cellularAutomatonSimulationBehavior();
-    List<AbstractAntEnvironmentBehavior> environmentBehaviors = ImmutableList.of(
-        foodGenerationBehavior(),
-        pheromoneDecayBehavior(),
-        antReproductionBehavior(),
-        cellularAutomatonBehavior);
-    return new AntEnvironmentFactory(environmentBehaviors, entityFactory(cellularAutomatonBehavior));
+  public AntEnvironmentFactory environmentFactory() {
+    return new AntEnvironmentFactory(){
+      @Override
+      public Environment<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> create(
+          CellEnvironment environmentModel) {
+        CellularAutomatonSimulationBehavior cellularAutomatonBehavior = cellularAutomatonSimulationBehavior();
+        List<AbstractAntEnvironmentBehavior> environmentBehaviors = ImmutableList.of(
+            foodGenerationBehavior(),
+            pheromoneDecayBehavior(),
+            antReproductionBehavior(),
+            cellularAutomatonBehavior);
+        return new AntEnvironment(environmentModel, environmentBehaviors, entityFactory(cellularAutomatonBehavior));
+      }
+    };
   }
 
   @Bean

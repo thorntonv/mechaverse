@@ -46,19 +46,18 @@ public abstract class AbstractAntSimulationImplTest {
     private EntityTypeCounter entityTypeCounter = new EntityTypeCounter();
 
     @Override
-    public void onAddEntity(EntityModel<EntityType> entity, AntSimulationModel state, CellEnvironment envModel) {
+    public synchronized void onAddEntity(EntityModel<EntityType> entity, AntSimulationModel state, CellEnvironment envModel) {
       entityTypeCounter.addEntity(entity);
     }
 
     @Override
-    public void onRemoveEntity(EntityModel<EntityType> entity, AntSimulationModel state, CellEnvironment envModel) {
+    public synchronized void onRemoveEntity(EntityModel<EntityType> entity, AntSimulationModel state, CellEnvironment envModel) {
       entityTypeCounter.removeEntity(entity);
     }
 
-    public int getEntityCount(EntityType type) {
+    public synchronized int getEntityCount(EntityType type) {
       return entityTypeCounter.getEntityCount(type);
     }
-
   }
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractAntSimulationImplTest.class);
@@ -135,12 +134,14 @@ public abstract class AbstractAntSimulationImplTest {
   private void verifyEntityTypeCounts(AntSimulationModel model, EntityTypeCountObserver observer) {
     EntityTypeCounter counter = new EntityTypeCounter();
 
-    for (EntityModel<EntityType> entity : model.getEnvironment().getEntities()) {
-      counter.addEntity(entity);
-      if (entity instanceof Ant) {
-        EntityModel carriedEntity = ((Ant) entity).getCarriedEntity();
-        if (carriedEntity != null) {
-          counter.addEntity(carriedEntity);
+    for(CellEnvironment env : model.getEnvironments()) {
+      for (EntityModel<EntityType> entity : env.getEntities()) {
+        counter.addEntity(entity);
+        if (entity instanceof Ant) {
+          EntityModel carriedEntity = ((Ant) entity).getCarriedEntity();
+          if (carriedEntity != null) {
+            counter.addEntity(carriedEntity);
+          }
         }
       }
     }

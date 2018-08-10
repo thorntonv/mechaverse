@@ -41,7 +41,7 @@ public class EntityReproductionBehavior extends PrimordialEnvironmentBehavior {
   public void setState(final PrimordialSimulationModel state,
           final Environment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> environment) {
     super.setState(state, environment);
-    entityMaxCount = state.getEntityMaxCount();
+    entityMaxCount = state.getEntityMaxCountPerEnvironment();
     entityInitialEnergy = state.getEntityInitialEnergy();
     entityMinReproductiveAge = state.getEntityMinReproductiveAge();
   }
@@ -52,7 +52,7 @@ public class EntityReproductionBehavior extends PrimordialEnvironmentBehavior {
           RandomGenerator random) {
     final PrimordialEnvironmentModel envModel = env.getModel();
     int cnt = 0;
-    while (entities.size() < entityMaxCount && cnt < entityMaxCount / 10) {
+    while (entities.size() < entityMaxCount && cnt < entityMaxCount) {
       int row = random.nextInt(envModel.getHeight());
       int col = random.nextInt(envModel.getWidth());
 

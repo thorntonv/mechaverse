@@ -3,6 +3,7 @@ package org.mechaverse.simulation.common.ui;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -89,12 +90,12 @@ public class SimulationVisualizer<SIM_MODEL extends SimulationModel<ENV_MODEL, E
 
   public void update() {
     try {
-      final Pair<SIM_MODEL, BufferedImage> stateImage = rendererPipeline.getNextImage();
+      final Pair<SIM_MODEL, Map<String, BufferedImage>> stateImages = rendererPipeline.getNextStateImage();
       SwingUtilities.invokeAndWait(() -> {
-        simulationComponent.setImage(stateImage.getValue());
+        simulationComponent.setImage(stateImages.getValue());
         repaintUI();
-        setTitle("Simulation " + stateImage.getLeft().getId() +
-            " Iteration #" + stateImage.getLeft().getIteration());
+        setTitle("Simulation " + stateImages.getLeft().getId() +
+            " Iteration #" + stateImages.getLeft().getIteration());
       });
     } catch (Exception e) {
     }
