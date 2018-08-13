@@ -5,7 +5,6 @@ import static org.mechaverse.simulation.common.cellautomaton.genetic.CellularAut
 
 import com.google.common.collect.Sets;
 import gnu.trove.map.TObjectDoubleMap;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.IdentityHashMap;
@@ -256,5 +255,9 @@ public class SimpleSimulation<E extends SimpleCellularAutomatonEntity> implement
     entity.setGeneticDataStore(geneticDataStore);
     entity.setCellularAutomaton(new SimulatorCellularAutomaton(
         cellularAutomatonModel, simulator, automatonIndex));
+  }
+
+  @Override
+  public void close() {
   }
 }

@@ -30,33 +30,34 @@ public class CellularAutomatonAntSimulationImplTest extends AbstractAntSimulatio
 
   @Override
   protected int testIterationCount() {
-    return 200;
+    return 1000;
   }
 
   @Override
   protected int smallTestIterationCount() {
-    return 50;
+    return 100;
   }
 
   @Test
   public void simulate_verifyEntityState() {
-    AntSimulationImpl simulation = newSimulationImpl();
-    simulation.setState(simulation.generateRandomState());
+    try (AntSimulationImpl simulation = newSimulationImpl()) {
+      simulation.setState(simulation.generateRandomState());
 
-    for (int cnt = 0; cnt < 25; cnt++) {
-      simulation.step();
-      AntSimulationModel state = simulation.getState();
+      for (int cnt = 0; cnt < 25; cnt++) {
+        simulation.step();
+        AntSimulationModel state = simulation.getState();
 
-      int antCount = 0;
-      for (EntityModel entity : state.getEnvironment().getEntities()) {
-        if (entity instanceof Ant) {
-          assertTrue(entity.dataContainsKey((CELLULAR_AUTOMATON_STATE_KEY)));
-          assertTrue(entity.getData(CELLULAR_AUTOMATON_STATE_KEY).length > 0);
-          assertTrue(entity.dataContainsKey(CELLULAR_AUTOMATON_OUTPUT_MAP_KEY));
-          assertTrue(entity.getData(CELLULAR_AUTOMATON_OUTPUT_MAP_KEY).length > 0);
-          assertTrue(entity.dataContainsKey(CELLULAR_AUTOMATON_BIT_OUTPUT_MAP_KEY));
-          assertTrue(entity.getData(CELLULAR_AUTOMATON_BIT_OUTPUT_MAP_KEY).length > 0);
-          antCount++;
+        int antCount = 0;
+        for (EntityModel entity : state.getEnvironment().getEntities()) {
+          if (entity instanceof Ant) {
+            assertTrue(entity.dataContainsKey((CELLULAR_AUTOMATON_STATE_KEY)));
+            assertTrue(entity.getData(CELLULAR_AUTOMATON_STATE_KEY).length > 0);
+            assertTrue(entity.dataContainsKey(CELLULAR_AUTOMATON_OUTPUT_MAP_KEY));
+            assertTrue(entity.getData(CELLULAR_AUTOMATON_OUTPUT_MAP_KEY).length > 0);
+            assertTrue(entity.dataContainsKey(CELLULAR_AUTOMATON_BIT_OUTPUT_MAP_KEY));
+            assertTrue(entity.getData(CELLULAR_AUTOMATON_BIT_OUTPUT_MAP_KEY).length > 0);
+            antCount++;
+          }
         }
       }
     }

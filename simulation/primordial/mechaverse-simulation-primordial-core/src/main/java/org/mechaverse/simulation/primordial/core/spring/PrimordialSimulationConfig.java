@@ -34,7 +34,6 @@ import org.springframework.context.annotation.Scope;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class PrimordialSimulationConfig {
 
-
   @Bean
   @Scope("prototype")
   public PrimordialSimulationImpl simulation(

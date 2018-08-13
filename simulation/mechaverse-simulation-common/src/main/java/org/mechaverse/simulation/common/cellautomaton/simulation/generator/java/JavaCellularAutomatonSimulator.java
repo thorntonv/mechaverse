@@ -28,25 +28,29 @@ public final class JavaCellularAutomatonSimulator implements CellularAutomatonSi
   private final CellularAutomatonAllocator allocator;
 
   public JavaCellularAutomatonSimulator(int numAutomata, int inputSize, int outputSize,
-      CellularAutomatonDescriptorDataSource dataSource) throws CompileException {
+      CellularAutomatonDescriptorDataSource dataSource)
+      throws CompileException, IllegalAccessException, InstantiationException {
     this(numAutomata, inputSize, outputSize, dataSource.getDescriptor());
   }
 
   public JavaCellularAutomatonSimulator(int numAutomata, int inputSize, int outputSize,
-      CellularAutomatonDescriptor descriptor) throws CompileException {
+      CellularAutomatonDescriptor descriptor)
+      throws CompileException, InstantiationException, IllegalAccessException {
     this(numAutomata, inputSize, outputSize,
         new CellularAutomatonSimulationModelBuilder().buildModel(descriptor));
   }
 
   private JavaCellularAutomatonSimulator(int numAutomata, int inputSize, int outputSize,
-      CellularAutomatonSimulationModel model) throws CompileException {
+      CellularAutomatonSimulationModel model)
+      throws CompileException, IllegalAccessException, InstantiationException {
     Preconditions.checkState(numAutomata > 0);
     this.model = model;
     this.inputSize = inputSize;
     this.outputSize = outputSize;
     this.simulations = new JavaCellularAutomatonSimulation[numAutomata];
+    Class<? extends JavaCellularAutomatonSimulation> simulationClass = compile(model, inputSize, outputSize);
     for (int idx = 0; idx < numAutomata; idx++) {
-      simulations[idx] = compile(model, inputSize, outputSize);
+      simulations[idx] = simulationClass.newInstance();
     }
     allocator = new CellularAutomatonAllocator(numAutomata);
   }
@@ -122,14 +126,14 @@ public final class JavaCellularAutomatonSimulator implements CellularAutomatonSi
   @Override
   public void close() {}
 
-  public static JavaCellularAutomatonSimulation compile(CellularAutomatonDescriptor descriptor,
+  public static Class<? extends JavaCellularAutomatonSimulation> compile(CellularAutomatonDescriptor descriptor,
       int inputSize, int outputSize) throws CompileException {
     CellularAutomatonSimulationModelBuilder modelBuilder =
         new CellularAutomatonSimulationModelBuilder();
     return compile(modelBuilder.buildModel(descriptor), inputSize, outputSize);
   }
 
-  public static JavaCellularAutomatonSimulation compile(CellularAutomatonSimulationModel model,
+  public static Class<? extends JavaCellularAutomatonSimulation> compile(CellularAutomatonSimulationModel model,
       int inputSize, int outputSize) throws CompileException {
     JavaCellularAutomatonGeneratorImpl generator =
         new JavaCellularAutomatonGeneratorImpl(model, inputSize, outputSize);

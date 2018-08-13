@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.math3.random.Well19937c;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mechaverse.simulation.primordial.core.PrimordialSimulationImpl;
+import org.mechaverse.simulation.primordial.core.PrimordialSimulationModelGenerator;
 import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel;
 import org.mechaverse.simulation.primordial.core.spring.PrimordialSimulationConfig;
 import org.slf4j.Logger;
@@ -37,7 +39,11 @@ public class PrimordialSimulationVisualizerTest {
 
   @Before
   public void setUp() {
-    PrimordialSimulationModel model = simulation.generateRandomState();
+    PrimordialSimulationModelGenerator modelGenerator =
+        new PrimordialSimulationModelGenerator(3);
+    PrimordialSimulationModel model = modelGenerator.generate(new Well19937c());
+    model.setEntityMaxCountPerEnvironment(500);
+
     simulation.setState(model);
     visualizer = new PrimordialSimulationVisualizer(
         simulation, PrimordialSimulationImageProvider.DEFAULT_CELL_SIZE,
@@ -49,6 +55,7 @@ public class PrimordialSimulationVisualizerTest {
   public void tearDown() {
     visualizer.dispose();
     visualizer = null;
+    simulation.close();
   }
 
   @Test

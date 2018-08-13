@@ -132,7 +132,7 @@ public final class JavaCompilerUtil {
    * @throws CompileException if an error occurs during compilation
    */
   @SuppressWarnings("unchecked")
-  public static <T> T compile(String implClass, String sourceStr) throws CompileException {
+  public static <T> Class<T> compile(String implClass, String sourceStr) throws CompileException {
     JavaFileObject file = new JavaSourceFromString(implClass, sourceStr);
 
     JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
@@ -148,8 +148,8 @@ public final class JavaCompilerUtil {
     boolean success = task.call();
     if (success) {
       try {
-        return (T) fileManager.getClassLoader(null).loadClass(implClass).newInstance();
-      } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+        return (Class<T>) fileManager.getClassLoader(null).loadClass(implClass);
+      } catch (ClassNotFoundException e) {
         throw new CompileException(diagnostics.getDiagnostics(), e);
       }
     } else {

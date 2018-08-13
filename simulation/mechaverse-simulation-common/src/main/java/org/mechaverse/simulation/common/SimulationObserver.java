@@ -13,4 +13,5 @@ public interface SimulationObserver<SIM_MODEL extends SimulationModel<ENV_MODEL,
 
     void onRemoveEntity(ENT_MODEL entity, SIM_MODEL simulationModel, ENV_MODEL environmentModel);
 
+    void onClose() throws Exception;
 }

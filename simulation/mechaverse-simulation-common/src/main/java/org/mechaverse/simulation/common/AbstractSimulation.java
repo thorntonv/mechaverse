@@ -1,10 +1,10 @@
 package org.mechaverse.simulation.common;
 
+import com.google.common.base.Preconditions;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import java.util.Map;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
@@ -14,7 +14,6 @@ import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.common.util.RandomUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.google.common.base.Preconditions;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
 public abstract class AbstractSimulation<
@@ -127,5 +126,10 @@ public abstract class AbstractSimulation<
     for(int cnt = 1; cnt <= stepCount; cnt++) {
       step();
     }
+  }
+
+  @Override
+  public void close() {
+    environments.forEach(Environment::close);
   }
 }

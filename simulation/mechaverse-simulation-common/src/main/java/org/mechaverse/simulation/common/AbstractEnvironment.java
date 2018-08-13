@@ -14,6 +14,8 @@ import org.mechaverse.simulation.common.model.SimulationModel;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Simulates an environment.
@@ -25,6 +27,8 @@ public abstract class AbstractEnvironment<
         ENT_MODEL extends EntityModel<ENT_TYPE>,
         ENT_TYPE extends Enum<ENT_TYPE>>
         implements Environment<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE>, AutoCloseable {
+
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private final String environmentId;
   private SIM_MODEL simulationModel;
@@ -133,10 +137,16 @@ public abstract class AbstractEnvironment<
   }
 
   private void cleanUp() {
+    observers.forEach(observer -> {
+      try {
+        observer.onClose();
+      } catch (Exception e) {
+        logger.error("Error closing simulation", e);
+      }
+    });
     observers.removeAll(behaviors);
 
     // Clean up the active entities.
-    activeEntities.values().forEach(activeEntity -> activeEntity.getBehavior().onRemoveEntity());
     activeEntities.clear();
   }
 }

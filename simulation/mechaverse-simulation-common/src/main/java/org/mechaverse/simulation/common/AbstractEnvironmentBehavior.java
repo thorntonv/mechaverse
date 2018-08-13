@@ -40,4 +40,7 @@ public abstract class AbstractEnvironmentBehavior<
   @Override
   public void onRemoveEntity(final ENT_MODEL entity, final SIM_MODEL simulationModel,
           final ENV_MODEL environmentModel) {}
+
+  @Override
+  public void onClose() throws Exception {}
 }

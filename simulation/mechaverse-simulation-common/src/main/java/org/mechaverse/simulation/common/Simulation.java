@@ -12,7 +12,7 @@ public interface Simulation<
         SIM_MODEL extends SimulationModel<ENV_MODEL, ENT_MODEL, ENT_TYPE>,
         ENV_MODEL extends EnvironmentModel<ENT_MODEL, ENT_TYPE>,
         ENT_MODEL extends EntityModel<ENT_TYPE>,
-        ENT_TYPE extends Enum<ENT_TYPE>> {
+        ENT_TYPE extends Enum<ENT_TYPE>> extends AutoCloseable {
 
   /**
    * Returns the state of the simulation.

@@ -58,6 +58,9 @@ public abstract class AbstractAntSimulationImplTest {
     public synchronized int getEntityCount(EntityType type) {
       return entityTypeCounter.getEntityCount(type);
     }
+
+    @Override
+    public void onClose() {}
   }
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractAntSimulationImplTest.class);
@@ -75,23 +78,27 @@ public abstract class AbstractAntSimulationImplTest {
 
   @Test
   public void createSimulation() {
-    assertNotNull(newSimulationImpl());
+    try (AntSimulationImpl simulation = newSimulationImpl()) {
+      assertNotNull(simulation);
+    }
   }
 
   @Test
   public void simulate() {
-    AntSimulationImpl simulation = newSimulationImpl();
-    simulation.setState(simulation.generateRandomState());
+    try (AntSimulationImpl simulation = newSimulationImpl()) {
+      simulation.setState(simulation.generateRandomState());
 
-    EntityTypeCountObserver entityCountObserver = new EntityTypeCountObserver();
-    simulation.addObserver(entityCountObserver);
-
-    verifyEntityTypeCounts(simulation.getState(), entityCountObserver);
-
-    for (int cnt = 0; cnt < testIterationCount(); cnt++) {
-      simulation.step();
+      EntityTypeCountObserver entityCountObserver = new EntityTypeCountObserver();
+      simulation.addObserver(entityCountObserver);
 
       verifyEntityTypeCounts(simulation.getState(), entityCountObserver);
+
+      for (int cnt = 0; cnt < testIterationCount(); cnt++) {
+        simulation.step();
+        if (cnt % 10 == 0) {
+          verifyEntityTypeCounts(simulation.getState(), entityCountObserver);
+        }
+      }
     }
   }
 
@@ -102,32 +109,39 @@ public abstract class AbstractAntSimulationImplTest {
 
   @Test
   public void simulate_verifyDeterministic() throws Exception {
-    AntSimulationImpl simulation1 = newSimulationImpl();
-    AntSimulationImpl simulation2 = newSimulationImpl();
+    byte[] state;
+    try (AntSimulationImpl simulation1 = newSimulationImpl();
+        AntSimulationImpl simulation2 = newSimulationImpl()) {
+      byte[] initialState = AntSimulationModelUtil.serialize(simulation1.generateRandomState());
+      assertNotEquals(simulation1, simulation2);
+      simulation1.setStateData(initialState);
+      simulation2.setStateData(initialState);
 
-    byte[] initialState = AntSimulationModelUtil.serialize(simulation1.generateRandomState());
-    assertNotEquals(simulation1, simulation2);
-    simulation1.setStateData(initialState);
-    simulation2.setStateData(initialState);
+      for (int cnt = 0; cnt < smallTestIterationCount(); cnt++) {
+        simulation1.step();
+        simulation2.step();
 
-    for (int cnt = 0; cnt < smallTestIterationCount(); cnt++) {
-      simulation1.step();
-      simulation2.step();
+        if (cnt % 10 == 0) {
+          assertModelsEqual(simulation1.getState(), simulation2.getState());
+        }
+      }
 
-      assertModelsEqual(simulation1.getState(), simulation2.getState());
+      state = simulation1.getStateData();
     }
 
-    byte[] state = simulation1.getStateData();
-    simulation1 = newSimulationImpl();
-    simulation1.setStateData(state);
-    simulation2 = newSimulationImpl();
-    simulation2.setStateData(state);
+    try (AntSimulationImpl simulation1 = newSimulationImpl();
+        AntSimulationImpl simulation2 = newSimulationImpl()) {
+      simulation1.setStateData(state);
+      simulation2.setStateData(state);
 
-    for (int cnt = 0; cnt < smallTestIterationCount(); cnt++) {
-      simulation1.step();
-      simulation2.step();
+      for (int cnt = 0; cnt < smallTestIterationCount(); cnt++) {
+        simulation1.step();
+        simulation2.step();
 
-      assertModelsEqual(simulation1.getState(), simulation2.getState());
+        if (cnt % 10 == 0) {
+          assertModelsEqual(simulation1.getState(), simulation2.getState());
+        }
+      }
     }
   }
 

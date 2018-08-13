@@ -24,7 +24,8 @@ import com.jogamp.opencl.CLPlatform;
 public class CellularAutomatonSimulatorImplsTest {
 
   @Test
-  public void randomRoutingAutomata() throws CompileException {
+  public void randomRoutingAutomata()
+      throws CompileException, InstantiationException, IllegalAccessException {
     int numAutomata = 10;
     CellularAutomatonDescriptor routingDescriptor = CellularAutomatonBuilder.newCellularAutomaton(
         8, 8, Routing3In3OutCellType.newInstance(), 4, 4);
@@ -58,7 +59,8 @@ public class CellularAutomatonSimulatorImplsTest {
   }
 
   public List<CellularAutomatonSimulator> getSimulators(
-      int numAutomata, CellularAutomatonDescriptor descriptor) throws CompileException {
+      int numAutomata, CellularAutomatonDescriptor descriptor)
+      throws CompileException, IllegalAccessException, InstantiationException {
     List<CellularAutomatonSimulator> simulators = new ArrayList<>();
     simulators.add(new JavaCellularAutomatonSimulator(numAutomata,
         JavaCellularAutomatonSimulatorTest.INPUT_SIZE, 

@@ -2,6 +2,7 @@ package org.mechaverse.simulation.common.cellautomaton.simulation.opencl;
 
 import com.jogamp.opencl.*;
 import com.jogamp.opencl.CLMemory.Mem;
+import java.lang.AutoCloseable;
 import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonAllocator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulatorConfig;
@@ -20,7 +21,8 @@ import java.nio.IntBuffer;
  *
  * @author Vance Thornton (thorntonv@mechaverse.org)
  */
-public abstract class AbstractOpenClCellularAutomatonSimulator<B extends Buffer, T> {
+public abstract class AbstractOpenClCellularAutomatonSimulator<B extends Buffer, T> implements
+    AutoCloseable {
 
   public static final String KERNEL_NAME = "cellautomaton_simulation";
 
@@ -238,6 +240,7 @@ public abstract class AbstractOpenClCellularAutomatonSimulator<B extends Buffer,
     finished = false;
   }
 
+  @Override
   public void close() {
     queue.finish();
     inputBuffer.release();
@@ -247,7 +250,7 @@ public abstract class AbstractOpenClCellularAutomatonSimulator<B extends Buffer,
     kernel.release();
     context.release();
 
-    logger.debug("close()");
+    logger.info("close()");
   }
 
   private static String getKernelSource(CellularAutomatonSimulationModel model) {

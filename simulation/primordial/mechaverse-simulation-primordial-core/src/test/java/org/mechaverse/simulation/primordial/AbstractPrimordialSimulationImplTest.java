@@ -16,6 +16,8 @@ import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel
 import org.mechaverse.simulation.primordial.core.util.PrimordialSimulationModelUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
 import static org.junit.Assert.*;
 
@@ -23,6 +25,7 @@ import static org.junit.Assert.*;
  * Unit test for the ant simulation.
  */
 @SuppressWarnings("WeakerAccess")
+@DirtiesContext(classMode= ClassMode.AFTER_EACH_TEST_METHOD)
 public abstract class AbstractPrimordialSimulationImplTest {
 
   private static class EntityTypeCounter {
@@ -60,6 +63,8 @@ public abstract class AbstractPrimordialSimulationImplTest {
       return entityTypeCounter.getEntityCount(type);
     }
 
+    @Override
+    public void onClose() {}
   }
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractPrimordialSimulationImplTest.class);
@@ -82,20 +87,23 @@ public abstract class AbstractPrimordialSimulationImplTest {
 
   @Test
   public void simulate() {
-    PrimordialSimulationImpl simulation = newSimulationImpl();
-    PrimordialSimulationModel model = simulation.generateRandomState();
-    model.setEntityMaxCountPerEnvironment(50);
-    simulation.setState(model);
+    try(PrimordialSimulationImpl simulation = newSimulationImpl()) {
+      PrimordialSimulationModel model = simulation.generateRandomState();
+      model.setEntityMaxCountPerEnvironment(50);
+      simulation.setState(model);
 
-    EntityTypeCountObserver entityCountObserver = new EntityTypeCountObserver();
-    simulation.addObserver(entityCountObserver);
-
-    verifyEntityTypeCounts(simulation.getState(), entityCountObserver);
-
-    for (int cnt = 0; cnt < testIterationCount(); cnt++) {
-      simulation.step();
+      EntityTypeCountObserver entityCountObserver = new EntityTypeCountObserver();
+      simulation.addObserver(entityCountObserver);
 
       verifyEntityTypeCounts(simulation.getState(), entityCountObserver);
+
+      for (int cnt = 0; cnt < testIterationCount(); cnt++) {
+        simulation.step();
+
+        if (cnt % 10 == 0) {
+          verifyEntityTypeCounts(simulation.getState(), entityCountObserver);
+        }
+      }
     }
   }
 
@@ -106,34 +114,23 @@ public abstract class AbstractPrimordialSimulationImplTest {
 
   @Test
   public void simulate_verifyDeterministic() throws Exception {
-    PrimordialSimulationImpl simulation1 = newSimulationImpl();
-    PrimordialSimulationImpl simulation2 = newSimulationImpl();
+    try (PrimordialSimulationImpl simulation1 = newSimulationImpl();
+        PrimordialSimulationImpl simulation2 = newSimulationImpl()) {
+      PrimordialSimulationModel model = simulation1.generateRandomState();
+      model.setEntityMaxCountPerEnvironment(50);
+      byte[] initialState = PrimordialSimulationModelUtil.serialize(model);
+      assertNotEquals(simulation1, simulation2);
+      simulation1.setStateData(initialState);
+      simulation2.setStateData(initialState);
 
-    PrimordialSimulationModel model = simulation1.generateRandomState();
-    model.setEntityMaxCountPerEnvironment(50);
-    byte[] initialState = PrimordialSimulationModelUtil.serialize(model);
-    assertNotEquals(simulation1, simulation2);
-    simulation1.setStateData(initialState);
-    simulation2.setStateData(initialState);
+      for (int cnt = 0; cnt < smallTestIterationCount(); cnt++) {
+        simulation1.step();
+        simulation2.step();
 
-    for (int cnt = 0; cnt < smallTestIterationCount(); cnt++) {
-      simulation1.step();
-      simulation2.step();
-
-      assertModelsEqual(simulation1.getState(), simulation2.getState());
-    }
-
-    byte[] state = simulation1.getStateData();
-    simulation1 = newSimulationImpl();
-    simulation1.setStateData(state);
-    simulation2 = newSimulationImpl();
-    simulation2.setStateData(state);
-
-    for (int cnt = 0; cnt < smallTestIterationCount(); cnt++) {
-      simulation1.step();
-      simulation2.step();
-
-      assertModelsEqual(simulation1.getState(), simulation2.getState());
+        if (cnt % 10 == 0) {
+          assertModelsEqual(simulation1.getState(), simulation2.getState());
+        }
+      }
     }
   }
 

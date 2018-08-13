@@ -3,8 +3,8 @@ package org.mechaverse.simulation.primordial;
 import org.junit.runner.RunWith;
 import org.mechaverse.simulation.primordial.core.PrimordialSimulationImpl;
 import org.mechaverse.simulation.primordial.core.spring.PrimordialSimulationConfig;
-import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -13,20 +13,20 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class CellularAutomatonPrimordialSimulationImplTest extends AbstractPrimordialSimulationImplTest {
 
   @Autowired
-  private ObjectFactory<PrimordialSimulationImpl> simulationImplFactory;
+  private ApplicationContext appContext;
 
   @Override
   protected PrimordialSimulationImpl newSimulationImpl() {
-    return simulationImplFactory.getObject();
+    return appContext.getAutowireCapableBeanFactory().getBean(PrimordialSimulationImpl.class);
   }
 
   @Override
   protected int testIterationCount() {
-    return 500;
+    return 1000;
   }
 
   @Override
   protected int smallTestIterationCount() {
-    return 50;
+    return 100;
   }
 }

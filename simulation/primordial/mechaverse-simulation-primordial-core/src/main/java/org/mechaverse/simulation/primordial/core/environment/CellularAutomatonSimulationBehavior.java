@@ -52,4 +52,11 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
 
   public CellularAutomatonSimulator getSimulator() {
     return simulator;
-  }}
+  }
+
+  @Override
+  public void onClose() throws Exception {
+    super.onClose();
+    simulator.close();
+  }
+}
