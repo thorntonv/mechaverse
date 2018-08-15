@@ -93,11 +93,9 @@ public abstract class AbstractAntSimulationImplTest {
 
       verifyEntityTypeCounts(simulation.getState(), entityCountObserver);
 
-      for (int cnt = 0; cnt < testIterationCount(); cnt++) {
-        simulation.step();
-        if (cnt % 10 == 0) {
-          verifyEntityTypeCounts(simulation.getState(), entityCountObserver);
-        }
+      for (int cnt = 0; cnt < testIterationCount() / 10; cnt++) {
+        simulation.step(10);
+        verifyEntityTypeCounts(simulation.getState(), entityCountObserver);
       }
     }
   }
@@ -117,13 +115,10 @@ public abstract class AbstractAntSimulationImplTest {
       simulation1.setStateData(initialState);
       simulation2.setStateData(initialState);
 
-      for (int cnt = 0; cnt < smallTestIterationCount(); cnt++) {
-        simulation1.step();
-        simulation2.step();
-
-        if (cnt % 10 == 0) {
-          assertModelsEqual(simulation1.getState(), simulation2.getState());
-        }
+      for (int cnt = 0; cnt < smallTestIterationCount() / 10; cnt++) {
+        simulation1.step(10);
+        simulation2.step(10);
+        assertModelsEqual(simulation1.getState(), simulation2.getState());
       }
 
       state = simulation1.getStateData();
@@ -134,13 +129,10 @@ public abstract class AbstractAntSimulationImplTest {
       simulation1.setStateData(state);
       simulation2.setStateData(state);
 
-      for (int cnt = 0; cnt < smallTestIterationCount(); cnt++) {
-        simulation1.step();
-        simulation2.step();
-
-        if (cnt % 10 == 0) {
-          assertModelsEqual(simulation1.getState(), simulation2.getState());
-        }
+      for (int cnt = 0; cnt < smallTestIterationCount() / 10; cnt++) {
+        simulation1.step(10);
+        simulation2.step(10);
+        assertModelsEqual(simulation1.getState(), simulation2.getState());
       }
     }
   }

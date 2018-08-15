@@ -32,6 +32,7 @@ public class AntSimulationBenchmark {
   public static class ExecutionPlan {
 
     @Param(value = {"500", "1024", "2048"}) int numAutomata;
+    @Param(value = {"1", "10", "100", "1000"}) int stepCount;
 
     private ClassPathXmlApplicationContext appContext;
     private Simulation simulation;
@@ -57,7 +58,7 @@ public class AntSimulationBenchmark {
   @OutputTimeUnit(TimeUnit.SECONDS)
   public int run(ExecutionPlan plan) {
     int dummy = 0;
-    plan.simulation.step(1);
+    plan.simulation.step(plan.stepCount);
     return dummy;
   }
 

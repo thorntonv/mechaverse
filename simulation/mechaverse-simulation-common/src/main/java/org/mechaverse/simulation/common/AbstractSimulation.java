@@ -73,35 +73,6 @@ public abstract class AbstractSimulation<
     environments.forEach(env -> env.setState(model));
   }
 
-  public void step() {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Performing iteration {}", model.getIteration());
-    }
-
-    if (model.getSeed() == null) {
-      model.setSeed(String.valueOf(new SecureRandom().nextLong()));
-    }
-
-    random.setSeed(Long.valueOf(model.getSeed()));
-
-    // Create separate random generators for each environment so that the simulation remains deterministic.
-    Map<String, RandomGenerator> environmentRandomGenerators = new HashMap<>();
-    environments.forEach(env -> environmentRandomGenerators
-        .put(env.getModel().getId(), new Well19937c(random.nextLong())));
-
-    environments.parallelStream()
-        .forEach(env -> env.update(model, environmentRandomGenerators.get(env.getModel().getId())));
-
-    if (logger.isDebugEnabled()) {
-      // Print seed after updating environments in case seed is changed.
-      logger.debug("seed = {}", model.getSeed());
-    }
-
-    // Set the seed to be used for the next step.
-    model.setSeed(String.valueOf(random.nextLong()));
-    model.setIteration(model.getIteration()+1);
-  }
-
   public List<Environment<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE>> getEnvironments() {
     return environments;
   }
@@ -123,9 +94,35 @@ public abstract class AbstractSimulation<
 
   @Override
   public void step(int stepCount) {
-    for(int cnt = 1; cnt <= stepCount; cnt++) {
-      step();
+    if (logger.isDebugEnabled()) {
+      logger.debug("Performing iteration {}", model.getIteration());
     }
+
+    if (model.getSeed() == null) {
+      model.setSeed(String.valueOf(new SecureRandom().nextLong()));
+    }
+
+    random.setSeed(Long.valueOf(model.getSeed()));
+
+    // Create separate random generators for each environment so that the simulation remains deterministic.
+    Map<String, RandomGenerator> environmentRandomGenerators = new HashMap<>();
+    environments.forEach(env -> environmentRandomGenerators
+            .put(env.getModel().getId(), new Well19937c(random.nextLong())));
+
+    environments.parallelStream().forEach(env -> {
+      for(int cnt = 1; cnt <= stepCount; cnt++) {
+        env.update(model, environmentRandomGenerators.get(env.getModel().getId()));
+      }
+    });
+
+    if (logger.isDebugEnabled()) {
+      // Print seed after updating environments in case seed is changed.
+      logger.debug("seed = {}", model.getSeed());
+    }
+
+    // Set the seed to be used for the next step.
+    model.setSeed(String.valueOf(random.nextLong()));
+    model.setIteration(model.getIteration()+stepCount);
   }
 
   @Override

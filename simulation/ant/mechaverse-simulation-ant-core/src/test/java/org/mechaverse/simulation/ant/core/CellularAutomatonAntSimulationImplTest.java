@@ -44,7 +44,7 @@ public class CellularAutomatonAntSimulationImplTest extends AbstractAntSimulatio
       simulation.setState(simulation.generateRandomState());
 
       for (int cnt = 0; cnt < 25; cnt++) {
-        simulation.step();
+        simulation.step(1);
         AntSimulationModel state = simulation.getState();
 
         int antCount = 0;
