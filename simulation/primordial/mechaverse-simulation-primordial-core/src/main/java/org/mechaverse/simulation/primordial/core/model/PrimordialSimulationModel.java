@@ -12,6 +12,7 @@ public class PrimordialSimulationModel
     private int foodMinCount;
     private int foodClusterRadius;
     private int foodInitialEnergy;
+    private float mutationRate = .001f;
 
     public int getFoodClusterRadius() {
         return foodClusterRadius;
@@ -59,5 +60,13 @@ public class PrimordialSimulationModel
 
     public void setEntityMinReproductiveAge(final int entityMinReproductiveAge) {
         this.entityMinReproductiveAge = entityMinReproductiveAge;
+    }
+
+    public float getMutationRate() {
+        return mutationRate;
+    }
+
+    public void setMutationRate(float mutationRate) {
+        this.mutationRate = mutationRate;
     }
 }

@@ -4,6 +4,7 @@ import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.Environment;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator;
+import org.mechaverse.simulation.common.genetic.BitMutator;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.common.util.EntityFitnessDistribution;
@@ -29,6 +30,7 @@ public class EntityReproductionBehavior extends PrimordialEnvironmentBehavior {
     private int entityMaxCount;
     private int entityInitialEnergy;
     private int entityMinReproductiveAge;
+    private BitMutator bitMutator;
 
     private final Set<PrimordialEntityModel> entities = new LinkedHashSet<>();
 
@@ -42,6 +44,7 @@ public class EntityReproductionBehavior extends PrimordialEnvironmentBehavior {
         entityMaxCount = state.getEntityMaxCountPerEnvironment();
         entityInitialEnergy = state.getEntityInitialEnergy();
         entityMinReproductiveAge = state.getEntityMinReproductiveAge();
+        bitMutator = new BitMutator(state.getMutationRate());
     }
 
     @Override
@@ -62,14 +65,16 @@ public class EntityReproductionBehavior extends PrimordialEnvironmentBehavior {
                 PrimordialCellModel cell = envModel.getCell(row, col);
                 if (cell.getEntity(EntityType.ENTITY) == null) {
                     PrimordialEntityModel selectedEntity = fitnessDistribution.selectEntity(random);
-                    PrimordialEntityModel entity = generateRandomEntity(state, random);
-                    cell.setEntity(entity);
-                    env.addEntity(entity);
+                    PrimordialEntityModel clone = generateRandomEntity(state, random);
+                    cell.setEntity(clone);
+                    env.addEntity(clone);
 
                     if(selectedEntity != null) {
                         // Copy genetic data to new entity.
                         for (String key : CellularAutomatonGeneticDataGenerator.KEY_SET) {
-                            entity.putData(key, selectedEntity.getData(key));
+                            byte[] cloneData = selectedEntity.getData(key).clone();
+                            bitMutator.mutate(cloneData, random);
+                            clone.putData(key, cloneData);
                         }
                     }
                 }
