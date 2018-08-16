@@ -28,6 +28,9 @@ import static org.junit.Assert.*;
 @DirtiesContext(classMode= ClassMode.AFTER_EACH_TEST_METHOD)
 public abstract class AbstractPrimordialSimulationImplTest {
 
+  private static int STEP_COUNT = 25;
+  private static int ENTITIES_PER_ENVIRONMENT = 250;
+
   private static class EntityTypeCounter {
 
     int[] entityTypeCounts = new int[EntityUtil.ENTITY_TYPES.length];
@@ -89,7 +92,7 @@ public abstract class AbstractPrimordialSimulationImplTest {
   public void simulate() {
     try(PrimordialSimulationImpl simulation = newSimulationImpl()) {
       PrimordialSimulationModel model = simulation.generateRandomState();
-      model.setEntityMaxCountPerEnvironment(50);
+      model.setEntityMaxCountPerEnvironment(ENTITIES_PER_ENVIRONMENT);
       simulation.setState(model);
 
       EntityTypeCountObserver entityCountObserver = new EntityTypeCountObserver();
@@ -97,8 +100,8 @@ public abstract class AbstractPrimordialSimulationImplTest {
 
       verifyEntityTypeCounts(simulation.getState(), entityCountObserver);
 
-      for (int cnt = 0; cnt < testIterationCount() / 10; cnt++) {
-        simulation.step(10);
+      for (int cnt = 0; cnt < testIterationCount() / STEP_COUNT; cnt++) {
+        simulation.step(STEP_COUNT);
 
         verifyEntityTypeCounts(simulation.getState(), entityCountObserver);
       }
@@ -115,15 +118,15 @@ public abstract class AbstractPrimordialSimulationImplTest {
     try (PrimordialSimulationImpl simulation1 = newSimulationImpl();
         PrimordialSimulationImpl simulation2 = newSimulationImpl()) {
       PrimordialSimulationModel model = simulation1.generateRandomState();
-      model.setEntityMaxCountPerEnvironment(50);
+      model.setEntityMaxCountPerEnvironment(ENTITIES_PER_ENVIRONMENT);
       byte[] initialState = PrimordialSimulationModelUtil.serialize(model);
       assertNotEquals(simulation1, simulation2);
       simulation1.setStateData(initialState);
       simulation2.setStateData(initialState);
 
-      for (int cnt = 0; cnt < smallTestIterationCount() / 10; cnt++) {
-        simulation1.step(10);
-        simulation2.step(10);
+      for (int cnt = 0; cnt < smallTestIterationCount() / STEP_COUNT; cnt++) {
+        simulation1.step(STEP_COUNT);
+        simulation2.step(STEP_COUNT);
         assertModelsEqual(simulation1.getState(), simulation2.getState());
       }
     }

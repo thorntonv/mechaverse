@@ -10,7 +10,7 @@ import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel
 public class PrimordialSimulationModelGenerator extends
     AbstractSimulationModelGenerator<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> {
 
-  public static final int DEFAULT_SUB_ENVIRONMENT_COUNT = 31;
+  public static final int DEFAULT_SUB_ENVIRONMENT_COUNT = 7;
 
   public PrimordialSimulationModelGenerator() {
     this(DEFAULT_SUB_ENVIRONMENT_COUNT);
@@ -23,12 +23,13 @@ public class PrimordialSimulationModelGenerator extends
   @Override
   protected PrimordialSimulationModel createModel() {
     PrimordialSimulationModel model = new PrimordialSimulationModel();
-    model.setEntityMaxCountPerEnvironment(2048);
+    model.setEntityMaxCountPerEnvironment(8192);
     model.setEntityMinReproductiveAge(200);
     model.setEntityInitialEnergy(1200);
     model.setFoodClusterRadius(15);
     model.setFoodMinCount(600);
     model.setFoodInitialEnergy(100);
+    model.setMutationRate(.001f);
     return model;
   }
 }

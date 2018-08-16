@@ -12,7 +12,7 @@ public class PrimordialSimulationModel
     private int foodMinCount;
     private int foodClusterRadius;
     private int foodInitialEnergy;
-    private float mutationRate = .001f;
+    private float mutationRate;
 
     public int getFoodClusterRadius() {
         return foodClusterRadius;
