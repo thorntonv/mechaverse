@@ -1,8 +1,6 @@
 package org.mechaverse.simulation.primordial.core.environment;
 
 import com.google.common.base.Preconditions;
-import java.util.function.Function;
-
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.Environment;
 import org.mechaverse.simulation.common.cellautomaton.SimulationStateCellularAutomatonDescriptor;
@@ -14,6 +12,8 @@ import org.mechaverse.simulation.primordial.core.model.EntityType;
 import org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel;
 import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.function.Function;
 
 /**
  * An environment module that updates simulated cellular automata before active entity actions are

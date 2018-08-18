@@ -1,11 +1,15 @@
 package org.mechaverse.simulation.primordial.core.spring;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.math.IntMath;
 import com.jogamp.opencl.CLPlatform;
+
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.function.Function;
 import org.mechaverse.simulation.common.Environment;
 import org.mechaverse.simulation.common.SimulationModelGenerator;
+import org.mechaverse.simulation.common.cellautomaton.simulation.BitwiseCellularAutomatonSimulator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator.CellularAutomatonSimulatorParams;
 import org.mechaverse.simulation.common.cellautomaton.simulation.opencl.OpenClCellularAutomatonSimulator;
@@ -13,10 +17,7 @@ import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.primordial.core.PrimordialEnvironmentFactory;
 import org.mechaverse.simulation.primordial.core.PrimordialSimulationImpl;
 import org.mechaverse.simulation.primordial.core.PrimordialSimulationModelGenerator;
-import org.mechaverse.simulation.primordial.core.entity.CellularAutomatonPrimordialEntityBehavior;
-import org.mechaverse.simulation.primordial.core.entity.PrimordialEntity;
-import org.mechaverse.simulation.primordial.core.entity.PrimordialEntityFactory;
-import org.mechaverse.simulation.primordial.core.entity.PrimordialEntityInput;
+import org.mechaverse.simulation.primordial.core.entity.*;
 import org.mechaverse.simulation.primordial.core.environment.CellularAutomatonSimulationBehavior;
 import org.mechaverse.simulation.primordial.core.environment.EntityReproductionBehavior;
 import org.mechaverse.simulation.primordial.core.environment.FoodGenerationBehavior;
@@ -87,8 +88,10 @@ public class PrimordialSimulationConfig {
   @Bean
   @Scope("prototype")
   public Function<CellularAutomatonSimulatorParams, CellularAutomatonSimulator> cellularAutomatonSimulatorFactory() {
-    return params -> new OpenClCellularAutomatonSimulator(params.numAutomata, PrimordialEntityInput.DATA_SIZE, 32,
-        CLPlatform.getDefault().getMaxFlopsDevice(), params.descriptorDataSource.getDescriptor());
+    return params -> new BitwiseCellularAutomatonSimulator(
+            new OpenClCellularAutomatonSimulator(IntMath.divide(params.numAutomata, Integer.SIZE, RoundingMode.CEILING),
+                    PrimordialEntityInput.DATA_SIZE, PrimordialEntityOutput.DATA_SIZE,
+                    CLPlatform.getDefault().getMaxFlopsDevice(), params.descriptorDataSource.getDescriptor()), 1);
   }
 
   private PrimordialEntityFactory entityFactory(

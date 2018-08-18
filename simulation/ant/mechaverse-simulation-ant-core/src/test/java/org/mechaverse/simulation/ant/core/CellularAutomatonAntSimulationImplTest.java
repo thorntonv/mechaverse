@@ -1,7 +1,6 @@
 package org.mechaverse.simulation.ant.core;
 
 import static org.junit.Assert.assertTrue;
-import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_BIT_OUTPUT_MAP_KEY;
 import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_OUTPUT_MAP_KEY;
 import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_STATE_KEY;
 
@@ -54,8 +53,6 @@ public class CellularAutomatonAntSimulationImplTest extends AbstractAntSimulatio
             assertTrue(entity.getData(CELLULAR_AUTOMATON_STATE_KEY).length > 0);
             assertTrue(entity.dataContainsKey(CELLULAR_AUTOMATON_OUTPUT_MAP_KEY));
             assertTrue(entity.getData(CELLULAR_AUTOMATON_OUTPUT_MAP_KEY).length > 0);
-            assertTrue(entity.dataContainsKey(CELLULAR_AUTOMATON_BIT_OUTPUT_MAP_KEY));
-            assertTrue(entity.getData(CELLULAR_AUTOMATON_BIT_OUTPUT_MAP_KEY).length > 0);
             antCount++;
           }
         }

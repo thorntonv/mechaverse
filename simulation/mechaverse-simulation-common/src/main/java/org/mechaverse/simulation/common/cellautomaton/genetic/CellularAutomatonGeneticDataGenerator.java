@@ -22,12 +22,10 @@ public class CellularAutomatonGeneticDataGenerator {
 
   public static final String CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY = "cellularAutomatonState";
   public static final String CELLULAR_AUTOMATON_OUTPUT_MAP_GENETIC_DATA_KEY = "cellularAutomatonOutputMap";
-  public static final String CELLULAR_AUTOMATON_BIT_OUTPUT_MAP_GENETIC_DATA_KEY = "cellularAutomatonBitOutputMap";
 
   public static final Set<String> KEY_SET = ImmutableSet.of(
           CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY,
-          CELLULAR_AUTOMATON_OUTPUT_MAP_GENETIC_DATA_KEY,
-          CELLULAR_AUTOMATON_BIT_OUTPUT_MAP_GENETIC_DATA_KEY
+          CELLULAR_AUTOMATON_OUTPUT_MAP_GENETIC_DATA_KEY
   );
 
   public void generateGeneticData(GeneticDataStore dataStore,
