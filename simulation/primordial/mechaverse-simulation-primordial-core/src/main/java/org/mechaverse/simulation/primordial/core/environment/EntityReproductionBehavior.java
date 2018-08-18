@@ -72,9 +72,12 @@ public class EntityReproductionBehavior extends PrimordialEnvironmentBehavior {
                     if(selectedEntity != null) {
                         // Copy genetic data to new entity.
                         for (String key : CellularAutomatonGeneticDataGenerator.KEY_SET) {
-                            byte[] cloneData = selectedEntity.getData(key).clone();
-                            bitMutator.mutate(cloneData, random);
-                            clone.putData(key, cloneData);
+                            byte[] data = selectedEntity.getData(key);
+                            if (data != null) {
+                                byte[] cloneData = data.clone();
+                                bitMutator.mutate(cloneData, random);
+                                clone.putData(key, cloneData);
+                            }
                         }
                     }
                 }

@@ -30,6 +30,7 @@ public class CellularAutomatonEntityBehavior<
     ENT_TYPE extends Enum<ENT_TYPE>> {
 
   public static final String CELLULAR_AUTOMATON_STATE_KEY = "cellularAutomatonState";
+  public static final String CELLULAR_AUTOMATON_INPUT_MAP_KEY = "cellularAutomatonInputMap";
   public static final String CELLULAR_AUTOMATON_OUTPUT_MAP_KEY = "cellularAutomatonOutputMap";
 
   private static final Logger logger = LoggerFactory
@@ -45,16 +46,20 @@ public class CellularAutomatonEntityBehavior<
   private final CellularAutomatonSimulator simulator;
   private CellularAutomatonGeneticDataGenerator geneticDataGenerator =
       new CellularAutomatonGeneticDataGenerator();
+  private final boolean inputMapEnabled;
+  private final boolean outputMapEnabled;
 
-  public CellularAutomatonEntityBehavior(ENT_MODEL entity, int outputDataSize,
+  public CellularAutomatonEntityBehavior(ENT_MODEL entity,
       CellularAutomatonDescriptorDataSource dataSource,
-      CellularAutomatonSimulator simulator) {
+      CellularAutomatonSimulator simulator, boolean inputMapEnabled, boolean outputMapEnabled) {
     this.entity = Preconditions.checkNotNull(entity);
     this.model = dataSource.getSimulationModel();
     this.simulator = simulator;
     this.automatonOutputData = new int[simulator.getAutomatonOutputSize()];
     this.automatonIndex = simulator.getAllocator().allocate();
     this.automatonState = new int[simulator.getAutomatonStateSize()];
+    this.inputMapEnabled = inputMapEnabled;
+    this.outputMapEnabled = outputMapEnabled;
   }
 
   public void setEntity(ENT_MODEL entity) {
@@ -97,9 +102,18 @@ public class CellularAutomatonEntityBehavior<
           Arrays.hashCode(automatonState));
     }
 
-    byte[] outputMapBytes = entity.getData(CELLULAR_AUTOMATON_OUTPUT_MAP_KEY);
-    if (outputMapBytes != null) {
-      simulator.setAutomatonOutputMap(automatonIndex, ArrayUtil.toIntArray(outputMapBytes));
+    if (inputMapEnabled) {
+      byte[] inputMapBytes = entity.getData(CELLULAR_AUTOMATON_INPUT_MAP_KEY);
+      if (inputMapBytes != null) {
+        simulator.setAutomatonInputMap(automatonIndex, ArrayUtil.toIntArray(inputMapBytes));
+      }
+    }
+
+    if (outputMapEnabled) {
+      byte[] outputMapBytes = entity.getData(CELLULAR_AUTOMATON_OUTPUT_MAP_KEY);
+      if (outputMapBytes != null) {
+        simulator.setAutomatonOutputMap(automatonIndex, ArrayUtil.toIntArray(outputMapBytes));
+      }
     }
   }
 
@@ -114,7 +128,7 @@ public class CellularAutomatonEntityBehavior<
 
   private void generateGeneticData(RandomGenerator random) {
     geneticDataGenerator.generateGeneticData(geneticDataStore, model,
-        simulator.getAutomatonOutputSize(), random);
+        simulator.getAutomatonInputSize(), simulator.getAutomatonOutputSize(), random);
   }
 
   private void initializeCellularAutomaton() {
@@ -125,10 +139,19 @@ public class CellularAutomatonEntityBehavior<
     logger.trace("initializeCellularAutomaton {} automatonState = {}", entity.getId(),
         Arrays.hashCode(automatonState));
 
+    // Cellular automaton input map.
+    if(inputMapEnabled) {
+      int[] inputMap = geneticDataGenerator.getInputMap(geneticDataStore);
+      simulator.setAutomatonInputMap(automatonIndex, inputMap);
+      entity.putData(CELLULAR_AUTOMATON_INPUT_MAP_KEY, ArrayUtil.toByteArray(inputMap));
+    }
+
     // Cellular automaton output map.
-    int[] outputMap = geneticDataGenerator.getOutputMap(geneticDataStore);
-    simulator.setAutomatonOutputMap(automatonIndex, outputMap);
-    entity.putData(CELLULAR_AUTOMATON_OUTPUT_MAP_KEY, ArrayUtil.toByteArray(outputMap));
+    if(outputMapEnabled) {
+      int[] outputMap = geneticDataGenerator.getOutputMap(geneticDataStore);
+      simulator.setAutomatonOutputMap(automatonIndex, outputMap);
+      entity.putData(CELLULAR_AUTOMATON_OUTPUT_MAP_KEY, ArrayUtil.toByteArray(outputMap));
+    }
   }
 
   private void updateOutputData() {

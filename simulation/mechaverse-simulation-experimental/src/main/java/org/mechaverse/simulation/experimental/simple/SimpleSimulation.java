@@ -234,7 +234,7 @@ public class SimpleSimulation<E extends SimpleCellularAutomatonEntity> implement
   private void generateGeneticData(E entity) {
     GeneticDataStore geneticDataStore = new GeneticDataStore(entity);
     geneticDataGenerator.generateGeneticData(geneticDataStore, cellularAutomatonModel,
-        simulator.getAutomatonOutputSize(), random);
+        simulator.getAutomatonInputSize(), simulator.getAutomatonOutputSize(), random);
   }
 
   private void initializeCellularAutomaton(E entity) {
