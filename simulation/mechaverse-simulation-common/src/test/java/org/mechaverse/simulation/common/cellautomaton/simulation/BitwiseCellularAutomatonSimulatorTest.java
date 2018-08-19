@@ -22,7 +22,7 @@ public class BitwiseCellularAutomatonSimulatorTest {
 
   @Before
   public void setUp() {
-    resetMockSimulator();
+    resetMockSimulator(3);
   }
 
   @Test
@@ -46,8 +46,17 @@ public class BitwiseCellularAutomatonSimulatorTest {
     testSetAutomatonState(
         new int[]{0b010101010100, 0b010101110101, 0b010110110101},
         1,
-        new int[]{0b101, 0b111, 0b1011},
+        new int[]{0b101_01111011},
         new int[]{0b010101010100, 0b010101010101, 0b010101010101},
+        4);
+  }
+
+  @Test
+  public void testGetAutomatonState_bitwiseIndex1_bitsPerEntity4() {
+    testGetAutomatonState(
+        new int[]{0b101_01111011},
+        1,
+        new int[]{0b010101010100, 0b010101110101, 0b010110110101},
         4);
   }
 
@@ -56,9 +65,18 @@ public class BitwiseCellularAutomatonSimulatorTest {
     testSetAutomatonState(
         new int[]{0b0101_01110100, 0b0101_01010101, 0b0101_10010101},
         5,
-        new int[]{0b1, 0b0, 0b0},
+        new int[]{0b100},
         new int[]{0b0101_01010100, 0b0101_01110101, 0b0101_10110101},
 
+        1);
+  }
+
+  @Test
+  public void testGetAutomatonState_bitwiseIndex5_bitsPerEntity1() {
+    testGetAutomatonState(
+        new int[]{0b100},
+        5,
+        new int[]{0b0101_01110100, 0b0101_01010101, 0b0101_10010101},
         1);
   }
 
@@ -67,21 +85,60 @@ public class BitwiseCellularAutomatonSimulatorTest {
     testSetAutomatonState(
         new int[]{0b010111010100, 0b010111100101, 0b010110110101},
         17,
-        new int[]{0b1101, 0b1110, 0b1011},
+        new int[]{0b1101_11101011},
         new int[]{0b010101010100, 0b010101010101, 0b010101010101},
+        4);
+  }
+
+  @Test
+  public void testGetAutomatonState_bitwiseIndex17_bitsPerEntity4() {
+    testGetAutomatonState(
+        new int[]{0b1101_11101011},
+        17,
+        new int[]{0b010111010100, 0b010111100101, 0b010110110101},
+        4);
+  }
+
+  @Test
+  public void testSetAutomatonState_bitwiseIndex17_bitsPerEntity4_size48() {
+    int[] expected = new int[12];
+    int[] inputData = new int[12];
+    for (int idx = 0; idx < expected.length; idx++) {
+      expected[idx] = 0b10100000;
+      inputData[idx] = 0;
+    }
+    testSetAutomatonState(
+        expected,
+        17,
+        new int[]{0b10101010101010101010101010101010, 0b1010101010101010},
+        inputData,
+        4);
+  }
+
+  @Test
+  public void testGetAutomatonState_bitwiseIndex17_bitsPerEntity4_size48() {
+    int[] existingData = new int[12];
+    for (int idx = 0; idx < existingData.length; idx++) {
+      existingData[idx] = 0b10100000;
+    }
+    testGetAutomatonState(
+        new int[]{0b10101010101010101010101010101010, 0b1010101010101010},
+        17,
+        existingData,
         4);
   }
 
   private void testSetAutomatonState(int[] expectedState, int bitwiseAutomatonIndex,
       int[] stateToSet,
       int[] existingState, int bitsPerEntity) {
-    resetMockSimulator();
+    resetMockSimulator(expectedState.length);
     int mockAutomatonIndex = bitwiseAutomatonIndex * bitsPerEntity / Integer.SIZE;
     ArgumentCaptor<int[]> argumentCaptor = ArgumentCaptor.forClass(int[].class);
     doAnswer(copyArrayAnswer(existingState, argumentCaptor))
         .when(mockSimulator).getAutomatonState(eq(mockAutomatonIndex), argumentCaptor.capture());
     BitwiseCellularAutomatonSimulator bitwiseSimulator = new BitwiseCellularAutomatonSimulator(
         mockSimulator, bitsPerEntity);
+    bitwiseSimulator.invalidateCaches();
     bitwiseSimulator.setAutomatonState(bitwiseAutomatonIndex, stateToSet);
     bitwiseSimulator.update();
 
@@ -90,6 +147,23 @@ public class BitwiseCellularAutomatonSimulatorTest {
     assertArrayEquals(expectedState, argumentCaptor.getValue());
   }
 
+  private void testGetAutomatonState(int[] expectedState, int bitwiseAutomatonIndex,
+      int[] existingState, int bitsPerEntity) {
+    resetMockSimulator(existingState.length);
+    int[] stateToGet = new int[expectedState.length];
+    int mockAutomatonIndex = bitwiseAutomatonIndex * bitsPerEntity / Integer.SIZE;
+    ArgumentCaptor<int[]> argumentCaptor = ArgumentCaptor.forClass(int[].class);
+    doAnswer(copyArrayAnswer(existingState, argumentCaptor))
+        .when(mockSimulator).getAutomatonState(eq(mockAutomatonIndex), argumentCaptor.capture());
+    BitwiseCellularAutomatonSimulator bitwiseSimulator = new BitwiseCellularAutomatonSimulator(
+        mockSimulator, bitsPerEntity);
+    bitwiseSimulator.invalidateCaches();
+    bitwiseSimulator.getAutomatonState(bitwiseAutomatonIndex, stateToGet);
+
+    assertArrayEquals(expectedState, stateToGet);
+  }
+
+
   private Answer copyArrayAnswer(int[] value, ArgumentCaptor<int[]> argumentCaptor) {
     return invocation -> {
       System.arraycopy(value, 0, argumentCaptor.getValue(), 0, value.length);
@@ -97,9 +171,9 @@ public class BitwiseCellularAutomatonSimulatorTest {
     };
   }
 
-  private void resetMockSimulator() {
+  private void resetMockSimulator(int stateSize) {
     reset(mockSimulator);
     when(mockSimulator.size()).thenReturn(8);
-    when(mockSimulator.getAutomatonStateSize()).thenReturn(3);
+    when(mockSimulator.getAutomatonStateSize()).thenReturn(stateSize);
   }
 }

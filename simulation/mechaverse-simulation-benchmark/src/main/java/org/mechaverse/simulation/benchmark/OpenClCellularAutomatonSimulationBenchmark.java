@@ -6,8 +6,12 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
 import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
+import org.mechaverse.simulation.common.cellautomaton.simulation.BitwiseCellularAutomatonSimulator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorReader;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulationUtil;
+import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
+import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModel;
+import org.mechaverse.simulation.common.cellautomaton.simulation.generator.CellularAutomatonSimulationModelBuilder;
 import org.mechaverse.simulation.common.cellautomaton.simulation.opencl.OpenClCellularAutomatonSimulator;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -38,15 +42,16 @@ public class OpenClCellularAutomatonSimulationBenchmark {
   @State(Scope.Benchmark)
   public static class ExecutionPlan {
 
-    @Param(value = {"175"}) int iterationsPerUpdate;
-    @Param(value = {"1024"}) int numAutomata;
-    @Param(value = {"16"}) int size;
-    @Param(value = {"8"}) int width;
-    @Param(value = {"8"}) int height;
+    @Param(value = {"20"}) int iterationsPerUpdate;
+    @Param(value = {"2097152"}) int numAutomata;
+    @Param(value = {"6"}) int inputSize;
+    @Param(value = {"4"}) int outputSize;
+    @Param(value = {"2"}) int width;
+    @Param(value = {"2"}) int height;
 
     private int[] input;
     private int[] output;
-    private OpenClCellularAutomatonSimulator simulator;
+    private CellularAutomatonSimulator simulator;
 
     @Setup(Level.Trial)
     public void setUp() throws IOException {
@@ -57,24 +62,31 @@ public class OpenClCellularAutomatonSimulationBenchmark {
       descriptor.setIterationsPerUpdate(iterationsPerUpdate);
       descriptor.setWidth(width);
       descriptor.setHeight(height);
+      CellularAutomatonSimulationModel model = CellularAutomatonSimulationModelBuilder.build(descriptor);
 
       try {
-        simulator = new OpenClCellularAutomatonSimulator(numAutomata, size, size,
+        simulator = new OpenClCellularAutomatonSimulator(numAutomata / Integer.SIZE, inputSize, outputSize,
             CLPlatform.getDefault().getMaxFlopsDevice(), descriptor);
 
-        input = CellularAutomatonSimulationUtil.randomState(size, random);
-        output = CellularAutomatonSimulationUtil.randomState(size, random);
-        int[] ioMap = new int[size];
-        for (int idx = 0; idx < size; idx++) {
-          ioMap[idx] = random.nextInt(simulator.getAutomatonStateSize());
+        simulator = new BitwiseCellularAutomatonSimulator(simulator, 1);
+
+        input = CellularAutomatonSimulationUtil.randomState(simulator.getAutomatonInputSize(), random);
+        output = CellularAutomatonSimulationUtil.randomState(simulator.getAutomatonOutputSize(), random);
+        int[] inputMap = new int[simulator.getAutomatonInputMapSize()];
+        for (int idx = 0; idx < inputMap.length; idx++) {
+          inputMap[idx] = random.nextInt(simulator.getAutomatonStateSize());
+        }
+        int[] outputMap = new int[simulator.getAutomatonOutputMapSize()];
+        for (int idx = 0; idx < inputMap.length; idx++) {
+          inputMap[idx] = random.nextInt(model.getCellOutputStateSize());
         }
 
-        for (int idx = 0; idx < numAutomata; idx++) {
+        for (int idx = 0; idx < simulator.size(); idx++) {
           int[] state = CellularAutomatonSimulationUtil.randomState(
               simulator.getAutomatonStateSize(), random);
           simulator.setAutomatonState(idx, state);
-          simulator.setAutomatonInputMap(idx, ioMap);
-          simulator.setAutomatonOutputMap(idx, ioMap);
+          simulator.setAutomatonInputMap(idx, inputMap);
+          simulator.setAutomatonOutputMap(idx, outputMap);
         }
       } catch (Throwable t) {
         t.printStackTrace();
@@ -82,7 +94,7 @@ public class OpenClCellularAutomatonSimulationBenchmark {
     }
 
     @TearDown(Level.Trial)
-    public void tearDown() {
+    public void tearDown() throws Exception {
       simulator.close();
     }
   }
@@ -93,11 +105,11 @@ public class OpenClCellularAutomatonSimulationBenchmark {
   @OutputTimeUnit(TimeUnit.SECONDS)
   public int run(ExecutionPlan plan) {
     int dummy = 0;
-    for (int idx = 0; idx < plan.numAutomata; idx++) {
+    for (int idx = 0; idx < plan.simulator.size(); idx++) {
       plan.simulator.setAutomatonInput(idx, plan.input);
     }
     plan.simulator.update();
-    for (int idx = 0; idx < plan.numAutomata; idx++) {
+    for (int idx = 0; idx < plan.simulator.size(); idx++) {
       plan.simulator.getAutomatonOutput(idx, plan.output);
       dummy += plan.output[0];
     }

@@ -25,7 +25,7 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-@Fork(value = 1, warmups = 0)
+@Fork(value = 1, warmups = 0, jvmArgs = {"-Xmx10G", "-server"})
 @Threads(1)
 @Warmup(iterations = 1)
 public class PrimordialSimulationBenchmark {
@@ -34,7 +34,7 @@ public class PrimordialSimulationBenchmark {
   public static class ExecutionPlan {
 
     @Param(value = {"7"}) int subEnvironmentCount;
-    @Param(value = {"65536"}) int numEntities;
+    @Param(value = {"262144"}) int numEntities;
     @Param(value = {"25"}) int stepCount;
 
     private ClassPathXmlApplicationContext appContext;

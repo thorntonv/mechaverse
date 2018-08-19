@@ -1,5 +1,7 @@
 package org.mechaverse.simulation.primordial.core.entity;
 
+import com.google.common.math.IntMath;
+import java.math.RoundingMode;
 import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
 
@@ -27,7 +29,7 @@ public final class PrimordialEntityInput {
   }
 
 
-  public static int DATA_SIZE = 6;
+  public static int DATA_SIZE_BITS = 6;
 
   private static final int ENERGY_LEVEL_IDX = 0;
 
@@ -40,7 +42,7 @@ public final class PrimordialEntityInput {
   private final int[] data;
 
   public PrimordialEntityInput() {
-    this(new int[DATA_SIZE]);
+    this(new int[IntMath.divide(DATA_SIZE_BITS, Integer.SIZE, RoundingMode.CEILING)]);
   }
 
   public PrimordialEntityInput(int[] data) {
@@ -48,7 +50,7 @@ public final class PrimordialEntityInput {
   }
 
   public int getEnergyLevel() {
-    return getBits(ENERGY_LEVEL_IDX, 2);
+    return getBits(0, ENERGY_LEVEL_IDX, 2);
   }
 
   /**
@@ -65,7 +67,7 @@ public final class PrimordialEntityInput {
     } else if (energyPercent >= 33) {
       value = 1;
     }
-    setBits(ENERGY_LEVEL_IDX, 2, value);
+    setBits(0, ENERGY_LEVEL_IDX, 2, value);
   }
 
   public SensorInfo getFrontSensor() {
@@ -77,19 +79,19 @@ public final class PrimordialEntityInput {
   }
 
   public boolean getEntitySensor() {
-    return getBits(ENTITY_SENSOR_IDX, 1) == 1;
+    return getBits(0, ENTITY_SENSOR_IDX, 1) == 1;
   }
 
   public void setEntitySensor(boolean nearbyEntity) {
-    setBits(ENTITY_SENSOR_IDX, 1, nearbyEntity ? 1 : 0);
+    setBits(0, ENTITY_SENSOR_IDX, 1, nearbyEntity ? 1 : 0);
   }
 
   public boolean getFoodSensor() {
-    return getBits(FOOD_SENSOR_IDX, 1) == 1;
+    return getBits(0, FOOD_SENSOR_IDX, 1) == 1;
   }
 
   public void setFoodSensor(boolean nearbyFood) {
-    setBits(FOOD_SENSOR_IDX, 1, nearbyFood ? 1 : 0);
+    setBits(0, FOOD_SENSOR_IDX, 1, nearbyFood ? 1 : 0);
   }
 
   public int[] getData() {
@@ -112,30 +114,23 @@ public final class PrimordialEntityInput {
   }
 
   private EntityType getEntityType(int idx) {
-    int entityTypeValue = getBits(idx, 2);
+    int entityTypeValue = getBits(0, idx, 2);
     return entityTypeValue < EntityUtil.ENTITY_TYPES.length ? EntityUtil.ENTITY_TYPES[entityTypeValue] : null;
   }
 
   private void setEntityType(EntityType entityType, int idx) {
     int entityTypeValue = entityType != null ? entityType.ordinal() : 0b11;
-    setBits(idx, 2, entityTypeValue);
+    setBits(0, idx, 2, entityTypeValue);
   }
 
-  private int getBits(int idx, int bitCount) {
-    int value = 0;
-    for (int cnt = 1; cnt <= bitCount; cnt++) {
-      value = (value << 1) | (data[idx] & 0b1);
-      idx++;
-    }
-    return value;
+  private int getBits(int idx, int bitOffset, int bitCount) {
+    int mask = (1 << bitCount) - 1;
+    return data[idx] >>> bitOffset & mask;
   }
 
-  private void setBits(int idx, int bitCount, int value) {
-    idx += bitCount - 1;
-    for (int cnt = 1; cnt <= bitCount; cnt++) {
-      data[idx] = data[idx] & ~0b1 | (value & 0b1);
-      idx--;
-      value >>= 1;
-    }
+  private void setBits(int idx, int bitOffset, int bitCount, int value) {
+    int srcMask = (1 << bitCount) - 1;
+    int destMask = ~(srcMask << bitOffset);
+    data[idx] = (data[idx] & destMask) | ((value & srcMask) << bitOffset);
   }
 }

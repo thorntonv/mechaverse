@@ -1,5 +1,6 @@
 package org.mechaverse.simulation.ant.core.environment;
 
+import static org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_INPUT_MAP_GENETIC_DATA_KEY;
 import static org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_OUTPUT_MAP_GENETIC_DATA_KEY;
 import static org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY;
 
@@ -188,7 +189,9 @@ public class AntReproductionBehavior extends AbstractAntEnvironmentBehavior {
       childGeneticDataStore.put(key, childData);
     }
 
-    for (String key : ImmutableSet.of(CELLULAR_AUTOMATON_OUTPUT_MAP_GENETIC_DATA_KEY)) {
+    for (String key : ImmutableSet.of(
+        CELLULAR_AUTOMATON_INPUT_MAP_GENETIC_DATA_KEY,
+        CELLULAR_AUTOMATON_OUTPUT_MAP_GENETIC_DATA_KEY)) {
       if (!parent1GeneticDataStore.contains(key) || !parent2GeneticDataStore.contains(key)) {
         continue;
       }

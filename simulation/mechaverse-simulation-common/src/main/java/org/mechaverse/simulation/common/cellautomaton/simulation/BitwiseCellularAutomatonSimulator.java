@@ -1,8 +1,11 @@
 package org.mechaverse.simulation.common.cellautomaton.simulation;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
+import com.google.common.math.IntMath;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.function.BiConsumer;
 
@@ -31,7 +34,7 @@ public class BitwiseCellularAutomatonSimulator implements CellularAutomatonSimul
       for (int idx = 0; idx < cache.length; idx++) {
         cache[idx] = new int[stateSize];
       }
-      valid = false;
+      valid = true;
       dirty = false;
     }
 
@@ -42,7 +45,7 @@ public class BitwiseCellularAutomatonSimulator implements CellularAutomatonSimul
       int simulatorAutomatonIndex = getSimulatorAutomatonIndex(index);
       int srcBitOffset = getSimulatorAutomatonBitOffset(index);
       int[] src = cache[simulatorAutomatonIndex];
-      copyIntArrayBits(src, srcBitOffset, bitsPerEntity, state, 0);
+      copyArrayToBits(src, srcBitOffset, state, bitsPerEntity);
     }
 
     public void set(int index, int[] state) {
@@ -52,7 +55,7 @@ public class BitwiseCellularAutomatonSimulator implements CellularAutomatonSimul
       int destBitOffset = getSimulatorAutomatonBitOffset(index);
       int simulatorAutomatonIndex = getSimulatorAutomatonIndex(index);
       int[] dest = cache[simulatorAutomatonIndex];
-      copyIntArrayBits(state, 0, bitsPerEntity, dest, destBitOffset);
+      copyBitsToArray(state, dest, destBitOffset, bitsPerEntity);
       dirty = true;
     }
 
@@ -80,15 +83,37 @@ public class BitwiseCellularAutomatonSimulator implements CellularAutomatonSimul
       return (index * bitsPerEntity) % Integer.SIZE;
     }
 
-    /**
-     * Copies the specified bits from the int values in the src array to the destination array.
-     */
-    private void copyIntArrayBits(int[] src, int srcBitOffset, int srcBitCount, int[] dest,
-        int destBitOffset) {
-      int srcBitMask = ((1 << srcBitCount) - 1) << srcBitOffset;
+    private static void copyBitsToArray(int[] srcBits, int[] destArray, int destBitOffset,
+        int bitsPerEntity) {
+      int srcBitMask = ((1 << bitsPerEntity) - 1);
       int destBitMask = ~(srcBitMask << destBitOffset);
-      for (int idx = 0; idx < src.length; idx++) {
-        dest[idx] = dest[idx] & destBitMask | ((src[idx] & srcBitMask) << destBitOffset);
+      int srcIdx = 0;
+      int srcValue = srcBits[srcIdx];
+      int srcBitCount = Integer.SIZE;
+      for (int idx = destArray.length - 1; idx >= 0; idx--) {
+        destArray[idx] = (destArray[idx] & destBitMask) | ((srcValue & srcBitMask) << destBitOffset);
+        srcValue >>>= bitsPerEntity;
+        srcBitCount -= bitsPerEntity;
+        if (srcBitCount == 0) {
+          srcBitCount = Integer.SIZE;
+          srcValue = srcBits[++srcIdx];
+        }
+      }
+    }
+
+    private static void copyArrayToBits(int[] srcArray, int srcBitOffset, int[] destBits, int bitsPerEntity) {
+      int srcBitMask = ((1 << bitsPerEntity) - 1);
+      int destIdx = 0;
+      int destValue = 0;
+      int destBitCount = 0;
+      for(int idx = 0; idx < srcArray.length; idx++) {
+        destValue = (destValue << bitsPerEntity) | ((srcArray[idx] >>> srcBitOffset) & srcBitMask);
+        destBitCount += bitsPerEntity;
+        if(destBitCount == Integer.SIZE || idx == srcArray.length - 1) {
+          destBitCount = 0;
+          destBits[destIdx++] = destValue;
+          destValue = 0;
+        }
       }
     }
 
@@ -132,8 +157,7 @@ public class BitwiseCellularAutomatonSimulator implements CellularAutomatonSimul
         cellularAutomatonSimulator.size(),
         cellularAutomatonSimulator.getAutomatonInputSize(),
         bitsPerEntity,
-        (index, state) -> {
-        },
+        (index, state) -> {},
         cellularAutomatonSimulator::setAutomatonInput);
 
     outputCache = new AutomatonStateCache(
@@ -141,8 +165,7 @@ public class BitwiseCellularAutomatonSimulator implements CellularAutomatonSimul
         cellularAutomatonSimulator.getAutomatonOutputSize(),
         bitsPerEntity,
         cellularAutomatonSimulator::getAutomatonOutput,
-        (index, state) -> {
-        });
+        (index, state) -> {});
 
     this.caches = ImmutableList.of(stateCache, inputCache, outputCache);
   }
@@ -159,7 +182,7 @@ public class BitwiseCellularAutomatonSimulator implements CellularAutomatonSimul
 
   @Override
   public int getAutomatonInputSize() {
-    return cellularAutomatonSimulator.getAutomatonInputSize();
+    return IntMath.divide(cellularAutomatonSimulator.getAutomatonInputSize(), Integer.SIZE, RoundingMode.CEILING);
   }
 
   @Override
@@ -169,12 +192,12 @@ public class BitwiseCellularAutomatonSimulator implements CellularAutomatonSimul
 
   @Override
   public int getAutomatonStateSize() {
-    return cellularAutomatonSimulator.getAutomatonStateSize();
+    return IntMath.divide(cellularAutomatonSimulator.getAutomatonStateSize(), Integer.SIZE, RoundingMode.CEILING);
   }
 
   @Override
   public int getAutomatonOutputSize() {
-    return cellularAutomatonSimulator.getAutomatonOutputSize();
+    return IntMath.divide(cellularAutomatonSimulator.getAutomatonOutputSize(), Integer.SIZE, RoundingMode.CEILING);
   }
 
   @Override
@@ -226,6 +249,11 @@ public class BitwiseCellularAutomatonSimulator implements CellularAutomatonSimul
 
     stateCache.invalidate();
     outputCache.invalidate();
+  }
+
+  @VisibleForTesting
+  void invalidateCaches() {
+    caches.forEach(AutomatonStateCache::invalidate);
   }
 
   @Override

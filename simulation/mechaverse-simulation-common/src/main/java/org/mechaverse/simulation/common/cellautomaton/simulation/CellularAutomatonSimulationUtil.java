@@ -24,6 +24,10 @@ public class CellularAutomatonSimulationUtil {
     return size * BYTES_PER_INT;
   }
 
+  public static int inputSizeInBytes(int size) {
+    return size * BYTES_PER_INT;
+  }
+
   public static int outputSizeInBytes(int size) {
     return size * BYTES_PER_INT;
   }

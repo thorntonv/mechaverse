@@ -79,6 +79,9 @@ public class EntityReproductionBehavior extends PrimordialEnvironmentBehavior {
                                 clone.putData(key, cloneData);
                             }
                         }
+                        logger.info("Generated clone of entity " + selectedEntity.getId());
+                    } else {
+                        logger.info("Generated new random entity " + clone.getId());
                     }
                 }
             }

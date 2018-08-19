@@ -90,7 +90,7 @@ public class PrimordialSimulationConfig {
   public Function<CellularAutomatonSimulatorParams, CellularAutomatonSimulator> cellularAutomatonSimulatorFactory() {
     return params -> new BitwiseCellularAutomatonSimulator(
             new OpenClCellularAutomatonSimulator(IntMath.divide(params.numAutomata, Integer.SIZE, RoundingMode.CEILING),
-                    PrimordialEntityInput.DATA_SIZE, PrimordialEntityOutput.DATA_SIZE,
+                    PrimordialEntityInput.DATA_SIZE_BITS, PrimordialEntityOutput.DATA_SIZE_BITS,
                     CLPlatform.getDefault().getMaxFlopsDevice(), params.descriptorDataSource.getDescriptor()), 1);
   }
 
