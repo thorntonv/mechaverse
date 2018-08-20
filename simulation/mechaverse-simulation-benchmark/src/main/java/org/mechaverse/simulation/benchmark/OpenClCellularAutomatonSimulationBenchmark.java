@@ -32,9 +32,9 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-@Fork(value = 1, warmups = 0)
+@Fork(value = 1, warmups = 0, jvmArgs = {"-Xmx10G", "-server"})
 @Threads(1)
-@Warmup(iterations = 3)
+@Warmup(iterations = 1)
 public class OpenClCellularAutomatonSimulationBenchmark {
 
   private static final String DESCRIPTOR_XML_FILENAME = "boolean4.xml";
@@ -43,11 +43,12 @@ public class OpenClCellularAutomatonSimulationBenchmark {
   public static class ExecutionPlan {
 
     @Param(value = {"20"}) int iterationsPerUpdate;
-    @Param(value = {"2097152"}) int numAutomata;
+    @Param(value = {"262144"}) int numAutomata;
     @Param(value = {"6"}) int inputSize;
     @Param(value = {"4"}) int outputSize;
     @Param(value = {"2"}) int width;
     @Param(value = {"2"}) int height;
+    @Param(value = {"25"}) int stepCount;
 
     private int[] input;
     private int[] output;
@@ -105,13 +106,15 @@ public class OpenClCellularAutomatonSimulationBenchmark {
   @OutputTimeUnit(TimeUnit.SECONDS)
   public int run(ExecutionPlan plan) {
     int dummy = 0;
-    for (int idx = 0; idx < plan.simulator.size(); idx++) {
-      plan.simulator.setAutomatonInput(idx, plan.input);
-    }
-    plan.simulator.update();
-    for (int idx = 0; idx < plan.simulator.size(); idx++) {
-      plan.simulator.getAutomatonOutput(idx, plan.output);
-      dummy += plan.output[0];
+    for (int cnt = 1; cnt <= plan.stepCount; cnt++) {
+      for (int idx = 0; idx < plan.simulator.size(); idx++) {
+        plan.simulator.setAutomatonInput(idx, plan.input);
+      }
+      plan.simulator.update();
+      for (int idx = 0; idx < plan.simulator.size(); idx++) {
+        plan.simulator.getAutomatonOutput(idx, plan.output);
+        dummy += plan.output[0];
+      }
     }
     return dummy;
   }
