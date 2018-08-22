@@ -13,7 +13,7 @@ import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel
 /**
  * A {@link AbstractPrimordialEntityBehavior} implementation that is based on a simulated cellular automaton.
  */
-public class CellularAutomatonPrimordialEntityBehavior extends AbstractPrimordialEntityBehavior {
+public final class CellularAutomatonPrimordialEntityBehavior extends AbstractPrimordialEntityBehavior {
 
   private PrimordialEntityOutput output = new PrimordialEntityOutput();
   private CellularAutomatonEntityBehavior<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> cellularAutomatonEntityBehavior;

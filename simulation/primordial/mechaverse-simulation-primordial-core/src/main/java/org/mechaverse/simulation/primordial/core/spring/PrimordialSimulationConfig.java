@@ -12,6 +12,7 @@ import org.mechaverse.simulation.common.SimulationModelGenerator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.BitwiseCellularAutomatonSimulator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator.CellularAutomatonSimulatorParams;
+import org.mechaverse.simulation.common.cellautomaton.simulation.NoOpCellularAutomatonSimulator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.opencl.OpenClCellularAutomatonSimulator;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.primordial.core.PrimordialEnvironmentFactory;
@@ -85,13 +86,19 @@ public class PrimordialSimulationConfig {
     };
   }
 
+//  @Bean
+//  @Scope("prototype")
+//  public Function<CellularAutomatonSimulatorParams, CellularAutomatonSimulator> cellularAutomatonSimulatorFactory() {
+//    return params -> new BitwiseCellularAutomatonSimulator(
+//            new OpenClCellularAutomatonSimulator(IntMath.divide(params.numAutomata, Integer.SIZE, RoundingMode.CEILING),
+//                    PrimordialEntityInput.DATA_SIZE_BITS, PrimordialEntityOutput.DATA_SIZE_BITS,
+//                    CLPlatform.getDefault().getMaxFlopsDevice(), params.descriptorDataSource.getDescriptor()), 1);
+//  }
+
   @Bean
   @Scope("prototype")
   public Function<CellularAutomatonSimulatorParams, CellularAutomatonSimulator> cellularAutomatonSimulatorFactory() {
-    return params -> new BitwiseCellularAutomatonSimulator(
-            new OpenClCellularAutomatonSimulator(IntMath.divide(params.numAutomata, Integer.SIZE, RoundingMode.CEILING),
-                    PrimordialEntityInput.DATA_SIZE_BITS, PrimordialEntityOutput.DATA_SIZE_BITS,
-                    CLPlatform.getDefault().getMaxFlopsDevice(), params.descriptorDataSource.getDescriptor()), 1);
+    return params -> new NoOpCellularAutomatonSimulator(params.numAutomata, 1, 500, 1);
   }
 
   private PrimordialEntityFactory entityFactory(

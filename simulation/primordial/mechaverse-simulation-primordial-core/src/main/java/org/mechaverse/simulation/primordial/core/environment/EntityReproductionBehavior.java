@@ -61,28 +61,27 @@ public class EntityReproductionBehavior extends PrimordialEnvironmentBehavior {
             int row = random.nextInt(envModel.getHeight());
             int col = random.nextInt(envModel.getWidth());
 
-            if (envModel.hasCell(row, col)) {
-                PrimordialCellModel cell = envModel.getCell(row, col);
-                if (cell.getEntity(EntityType.ENTITY) == null) {
-                    PrimordialEntityModel selectedEntity = fitnessDistribution.selectEntity(random);
-                    PrimordialEntityModel clone = generateRandomEntity(state, random);
-                    cell.setEntity(clone);
-                    env.addEntity(clone);
+            if (envModel.isValidCell(row, col) && envModel.getEntity(row, col) == null) {
+                PrimordialEntityModel selectedEntity = fitnessDistribution.selectEntity(random);
+                PrimordialEntityModel clone = generateRandomEntity(state, random);
+                clone.setX(col);
+                clone.setY(row);
+                envModel.addEntity(clone);
+                env.addEntity(clone);
 
-                    if(selectedEntity != null) {
-                        // Copy genetic data to new entity.
-                        for (String key : CellularAutomatonGeneticDataGenerator.KEY_SET) {
-                            byte[] data = selectedEntity.getData(key);
-                            if (data != null) {
-                                byte[] cloneData = data.clone();
-                                bitMutator.mutate(cloneData, random);
-                                clone.putData(key, cloneData);
-                            }
+                if(selectedEntity != null) {
+                    // Copy genetic data to new entity.
+                    for (String key : CellularAutomatonGeneticDataGenerator.KEY_SET) {
+                        byte[] data = selectedEntity.getData(key);
+                        if (data != null) {
+                            byte[] cloneData = data.clone();
+                            bitMutator.mutate(cloneData, random);
+                            clone.putData(key, cloneData);
                         }
-                        logger.info("Generated clone of entity " + selectedEntity.getId());
-                    } else {
-                        logger.info("Generated new random entity " + clone.getId());
                     }
+                    logger.info("Generated clone of entity " + selectedEntity.getId());
+                } else {
+                    logger.info("Generated new random entity " + clone.getId());
                 }
             }
             cnt++;

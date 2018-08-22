@@ -2,7 +2,6 @@ package org.mechaverse.simulation.primordial.core.entity;
 
 import com.google.common.math.IntMath;
 import java.math.RoundingMode;
-import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
 
 /**
@@ -70,12 +69,12 @@ public final class PrimordialEntityInput {
     setBits(0, ENERGY_LEVEL_IDX, 2, value);
   }
 
-  public SensorInfo getFrontSensor() {
-    return getSensorData(FRONT_SENSOR_IDX);
+  public int getFrontEntityTypeOrginal() {
+    return getBits(0, FRONT_SENSOR_IDX, 2);
   }
 
-  public void setFrontSensor(EntityType entityType, Direction entityDirection, String entityId) {
-    setSensorData(entityType, FRONT_SENSOR_IDX);
+  public void setFrontEntityType(int entityTypeOrdinal) {
+    setBits(0, FRONT_SENSOR_IDX, 2, entityTypeOrdinal);
   }
 
   public boolean getEntitySensor() {
@@ -102,25 +101,6 @@ public final class PrimordialEntityInput {
     for (int idx = 0; idx < data.length; idx++) {
       data[idx] = 0;
     }
-  }
-
-  private SensorInfo getSensorData(int idx) {
-    EntityType entityType = getEntityType(idx);
-    return new SensorInfo(entityType);
-  }
-
-  private void setSensorData(EntityType entityType, int idx) {
-    setEntityType(entityType, idx);
-  }
-
-  private EntityType getEntityType(int idx) {
-    int entityTypeValue = getBits(0, idx, 2);
-    return entityTypeValue < EntityUtil.ENTITY_TYPES.length ? EntityUtil.ENTITY_TYPES[entityTypeValue] : null;
-  }
-
-  private void setEntityType(EntityType entityType, int idx) {
-    int entityTypeValue = entityType != null ? entityType.ordinal() : 0b11;
-    setBits(0, idx, 2, entityTypeValue);
   }
 
   private int getBits(int idx, int bitOffset, int bitCount) {
