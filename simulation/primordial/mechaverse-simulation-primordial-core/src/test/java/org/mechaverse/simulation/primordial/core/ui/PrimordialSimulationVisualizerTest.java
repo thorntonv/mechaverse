@@ -42,7 +42,6 @@ public class PrimordialSimulationVisualizerTest {
     PrimordialSimulationModelGenerator modelGenerator =
         new PrimordialSimulationModelGenerator(0);
     PrimordialSimulationModel model = modelGenerator.generate(new Well19937c());
-    //model.setEntityMaxCountPerEnvironment(16 * 1024);
 
     simulation.setState(model);
     visualizer = new PrimordialSimulationVisualizer(

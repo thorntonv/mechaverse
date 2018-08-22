@@ -6,6 +6,7 @@ import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.EnvironmentModel;
 import org.mechaverse.simulation.primordial.core.entity.EntityUtil;
+import org.mechaverse.simulation.primordial.core.entity.PrimordialEntityInput;
 
 public final class PrimordialEnvironmentModel extends
     EnvironmentModel<EntityModel<EntityType>, EntityType> {
@@ -13,6 +14,7 @@ public final class PrimordialEnvironmentModel extends
   private int[][] entityMatrix;
   private PrimordialEntityModel[][] entityModelMatrix;
   private int[][] foodMatrix;
+  private PrimordialEntityInput[][] inputMatrix;
 
   private static final int[] CELL_DIRECTION_ROW_OFFSETS = new int[]{0, -1, -1, -1, 0, 1, 1, 1};
   private static final int[] CELL_DIRECTION_COL_OFFSETS = new int[]{1,  1,  0, -1, -1, -1, 0, 1};
@@ -22,6 +24,24 @@ public final class PrimordialEnvironmentModel extends
 
   public EntityModel<EntityType> getPrimaryEntityModel(int row, int col) {
     return entityModelMatrix[row+1][col+1];
+  }
+
+  public void updateInputMatrix() {
+    for (int row = 0; row < inputMatrix.length; row++) {
+      for (int col = 0; col < inputMatrix[row].length; col++) {
+        int entityRow = row + 1;
+        int entityCol = col + 1;
+        PrimordialEntityModel entityModel = entityModelMatrix[entityRow][entityCol];
+        if (entityModel != null) {
+          boolean nearbyFood = isFoodNearby(row, col);
+          boolean nearbyEntity = isEntityNearby(row, col);
+          int frontEntityTypeOrdinal = getCellTypeInDirection(row, col,
+              entityModel.getDirection());
+          inputMatrix[row][col].setInput(entityModel.getEnergy(), entityModel.getMaxEnergy(),
+              frontEntityTypeOrdinal, nearbyEntity, nearbyFood);
+        }
+      }
+    }
   }
 
   public boolean isValidCell(int row, int col) {
@@ -174,12 +194,19 @@ public final class PrimordialEnvironmentModel extends
     entityMatrix = new int[getHeight()+2][];
     entityModelMatrix = new PrimordialEntityModel[getHeight()+2][];
     foodMatrix = new int[getHeight()+2][];
-
+    inputMatrix = new PrimordialEntityInput[getHeight()][];
     // Allocate cells.
     for (int row = 0; row < entityMatrix.length; row++) {
       entityMatrix[row] = new int[getWidth()+2];
       entityModelMatrix[row] = new PrimordialEntityModel[getWidth()+2];
       foodMatrix[row] = new int[getWidth()+2];
+    }
+
+    for(int row = 0; row < inputMatrix.length; row++) {
+      inputMatrix[row] = new PrimordialEntityInput[getWidth()];
+      for(int col = 0; col < getWidth(); col++) {
+        inputMatrix[row][col] = new PrimordialEntityInput();
+      }
     }
 
     // Add entities to the appropriate cells.

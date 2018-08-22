@@ -51,10 +51,13 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
   }
 
   @Override
-  public void beforePerformAction(PrimordialSimulationModel state, Environment environment, RandomGenerator random) {
+  public void beforePerformAction(PrimordialSimulationModel state,
+      Environment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> environment, RandomGenerator random) {
     if (!ioMapsSet) {
       setIOMaps(state);
     }
+
+    environment.getModel().updateInputMatrix();
 
     simulator.update();
   }

@@ -17,27 +17,25 @@ public abstract class AbstractPrimordialEntityBehavior implements
   private final PrimordialEntityInput input = new PrimordialEntityInput();
   protected final EntityModel<EntityType> entity;
 
+  private static Food FOOD_INSTANCE = new Food();
+
   protected AbstractPrimordialEntityBehavior(EntityModel<EntityType> entity) {
     this.entity = entity;
   }
 
   @Override
-  public void updateInput(PrimordialEnvironmentModel env, RandomGenerator random) {
-    input.resetToDefault();
-    input.setEnergy(entity.getEnergy(), entity.getMaxEnergy());
-
-    int entityRow = entity.getY();
-    int entityCol = entity.getX();
-
-    input.setFrontEntityType(env.getCellTypeInDirection(entityRow, entityCol, entity.getDirection()));
-    input.setEntitySensor(env.isEntityNearby(entityRow, entityCol));
-    input.setFoodSensor(env.isFoodNearby(entityRow, entityCol));
-
-    setInput(input, random);
+  public final void updateInput(PrimordialEnvironmentModel env, RandomGenerator random) {
+//    int entityRow = entity.getY();
+//    int entityCol = entity.getX();
+//    boolean nearbyFood = env.isFoodNearby(entityRow, entityCol);
+//    boolean nearbyEntity = env.isEntityNearby(entityRow, entityCol);
+//    int frontEntityTypeOrdinal = env.getCellTypeInDirection(entityRow, entityCol, entity.getDirection());
+//    input.setInput(entity.getEnergy(), entity.getMaxEnergy(), frontEntityTypeOrdinal, nearbyEntity, nearbyFood);
+//    setInput(input, random);
   }
 
   @Override
-  public void performAction(Environment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> env,
+  public final void performAction(Environment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> env,
           RandomGenerator random) {
     final PrimordialEnvironmentModel envModel = env.getModel();
     PrimordialEntityOutput output = getOutput(random);
@@ -57,7 +55,7 @@ public abstract class AbstractPrimordialEntityBehavior implements
     // Consume action.
     if (output.shouldConsume() && envModel.hasFood(entityRow, entityCol)) {
       env.getModel().removeFood(entityRow, entityCol);
-      env.removeEntity(new Food());
+      env.removeEntity(FOOD_INSTANCE);
       entityEnergy += 100;
     }
 

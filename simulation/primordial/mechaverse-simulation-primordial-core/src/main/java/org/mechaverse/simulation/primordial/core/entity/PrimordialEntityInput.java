@@ -52,24 +52,29 @@ public final class PrimordialEntityInput {
     return getBits(0, ENERGY_LEVEL_IDX, 2);
   }
 
+  public final void setInput(int energyLevel, int maxEnergyLevel, int frontEntityOrdinal,
+      boolean nearbyEntity, boolean nearbyFood) {
+    int value = energyLevel * 3 / maxEnergyLevel;
+    value <<= 2;
+    value |= frontEntityOrdinal & 0b11;
+    value <<= 1;
+    value |= nearbyEntity ? 1 : 0;
+    value <<= 1;
+    value |= nearbyFood ? 1 : 0;
+
+    data[0] = value;
+  }
+
   /**
    * Sets the energy level for the entity. It is represented using 2 bits (0 = low, 3 = high).
    */
   public void setEnergy(int energyLevel, int maxEnergyLevel) {
     // Use a direct proportion to map the energy level on to the new range.
-    int energyPercent = energyLevel * 100 / maxEnergyLevel;
-    int value = 0;
-    if (energyPercent >= 75) {
-      value = 3;
-    } else if (energyPercent >= 50) {
-      value = 2;
-    } else if (energyPercent >= 33) {
-      value = 1;
-    }
-    setBits(0, ENERGY_LEVEL_IDX, 2, value);
+    int energyPercent = energyLevel * 3 / maxEnergyLevel;
+    setBits(0, ENERGY_LEVEL_IDX, 2, energyPercent);
   }
 
-  public int getFrontEntityTypeOrginal() {
+  public int getFrontEntityTypeOrdinal() {
     return getBits(0, FRONT_SENSOR_IDX, 2);
   }
 
@@ -98,9 +103,7 @@ public final class PrimordialEntityInput {
   }
 
   public void resetToDefault() {
-    for (int idx = 0; idx < data.length; idx++) {
-      data[idx] = 0;
-    }
+    data[0] = 0;
   }
 
   private int getBits(int idx, int bitOffset, int bitCount) {

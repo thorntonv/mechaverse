@@ -49,56 +49,56 @@ public abstract class EntityModel<ENT_TYPE extends Enum<ENT_TYPE>> implements Se
   /**
    * Gets the value of the x property.
    */
-  public int getX() {
+  public final int getX() {
     return x;
   }
 
   /**
    * Sets the value of the x property.
    */
-  public void setX(int value) {
+  public final void setX(int value) {
     this.x = value;
   }
 
   /**
    * Gets the value of the y property.
    */
-  public int getY() {
+  public final int getY() {
     return y;
   }
 
   /**
    * Sets the value of the y property.
    */
-  public void setY(int value) {
+  public final void setY(int value) {
     this.y = value;
   }
 
   /**
    * Gets the value of the energy property.
    */
-  public int getEnergy() {
+  public final int getEnergy() {
     return energy;
   }
 
   /**
    * Sets the value of the energy property.
    */
-  public void setEnergy(int value) {
+  public final void setEnergy(int value) {
     this.energy = value;
   }
 
   /**
    * Gets the value of the maxEnergy property.
    */
-  public int getMaxEnergy() {
+  public final int getMaxEnergy() {
     return maxEnergy;
   }
 
   /**
    * Sets the value of the maxEnergy property.
    */
-  public void setMaxEnergy(int value) {
+  public final void setMaxEnergy(int value) {
     this.maxEnergy = value;
   }
 

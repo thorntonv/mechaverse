@@ -21,7 +21,7 @@ public class PrimordialEntityInputTest {
     for (int idx = 0; idx < expectedValues.length; idx++) {
       PrimordialEntityInput input = new PrimordialEntityInput(inputData[idx]);
       assertEquals(expectedValues[idx], input.getEnergyLevel());
-      assertEquals(EntityType.NONE, EntityType.values()[input.getFrontEntityTypeOrginal()]);
+      assertEquals(EntityType.NONE, EntityType.values()[input.getFrontEntityTypeOrdinal()]);
       assertFalse(input.getEntitySensor());
       assertFalse(input.getFoodSensor());
     }
