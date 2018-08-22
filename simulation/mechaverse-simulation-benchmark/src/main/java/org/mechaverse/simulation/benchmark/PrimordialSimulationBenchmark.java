@@ -25,7 +25,7 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-@Fork(value = 1, warmups = 0)
+@Fork(value = 1, warmups = 0, jvmArgs = {"-Xmx10G", "-server"})
 @Threads(1)
 @Warmup(iterations = 1)
 public class PrimordialSimulationBenchmark {
@@ -33,9 +33,9 @@ public class PrimordialSimulationBenchmark {
   @State(Scope.Benchmark)
   public static class ExecutionPlan {
 
-    @Param(value = {"0", "3", "7", "31", "63"}) int subEnvironmentCount;
-    @Param(value = {"1024", "4096", "8192", "16384", "20480", "32768", "65536"}) int numEntities;
-    @Param(value = {"1", "10", "25", "50"}) int stepCount;
+    @Param(value = {"7"}) int subEnvironmentCount;
+    @Param(value = {"262144"}) int numEntities;
+    @Param(value = {"25"}) int stepCount;
 
     private ClassPathXmlApplicationContext appContext;
     private Simulation simulation;
@@ -51,6 +51,7 @@ public class PrimordialSimulationBenchmark {
       PrimordialSimulationModel model = modelGenerator.generate(new Well19937c());
       model.setEntityMaxCountPerEnvironment(numEntities / (subEnvironmentCount + 1));
       simulation.setState(model);
+      simulation.step(stepCount);
     }
 
     @TearDown(Level.Trial)

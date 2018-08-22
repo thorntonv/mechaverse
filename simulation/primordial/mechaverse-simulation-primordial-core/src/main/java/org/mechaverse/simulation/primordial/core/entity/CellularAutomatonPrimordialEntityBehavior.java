@@ -23,7 +23,7 @@ public class CellularAutomatonPrimordialEntityBehavior extends AbstractPrimordia
       CellularAutomatonDescriptorDataSource dataSource, CellularAutomatonSimulator simulator) {
     super(entityModel);
     this.cellularAutomatonEntityBehavior = new CellularAutomatonEntityBehavior<>(
-            entity, PrimordialEntityOutput.DATA_SIZE, dataSource, simulator);
+            entity, dataSource, simulator, false, false);
   }
 
   @Override

@@ -80,7 +80,7 @@ public class FoodGenerationBehavior extends PrimordialEnvironmentBehavior {
       int row = random.nextInt(envModel.getHeight());
       int col = random.nextInt(envModel.getWidth());
 
-      logger.debug("Generating food at ({}, {})", row, col);
+      logger.trace("Generating food at ({}, {})", row, col);
 
       Function<EntityType, EntityModel<EntityType>> entityFactory = entityType -> {
         EntityModel<EntityType> entity = EntityUtil.newEntity(entityType);

@@ -1,5 +1,7 @@
 package org.mechaverse.simulation.primordial.core.entity;
 
+import com.google.common.math.IntMath;
+import java.math.RoundingMode;
 import org.mechaverse.simulation.common.model.MoveDirection;
 import org.mechaverse.simulation.common.model.TurnDirection;
 
@@ -12,24 +14,24 @@ public final class PrimordialEntityOutput {
   public static final MoveDirection[] MOVE_DIRECTIONS = MoveDirection.values();
   public static final TurnDirection[] TURN_DIRECTIONS = TurnDirection.values();
 
-  public static final int DATA_SIZE = 1;
+  public static final int DATA_SIZE_BITS = 4;
 
   private static final int MOVE_DIRECTION_IDX = 0;
   private static final int MOVE_DIRECTION_MASK = 0b1;
 
-  private static final int CONSUME_IDX = 0;
-  private static final int CONSUME_BIT_IDX = 1;
-  private static final int CONSUME_MASK = 0b1 << CONSUME_BIT_IDX;
+  private static final int CONSUME_IDX = 1;
+  private static final int CONSUME_BIT_IDX = 0;
+  private static final int CONSUME_MASK = 0b1;
 
-  private static final int TURN_DIRECTION_IDX = 0;
-  private static final int TURN_DIRECTION_BIT_IDX = 2;
-  private static final int TURN_DIRECTION_MASK = 0b11 << TURN_DIRECTION_BIT_IDX;
+  private static final int TURN_DIRECTION_IDX = 2;
+  private static final int TURN_DIRECTION_BIT_IDX = 0;
+  private static final int TURN_DIRECTION_MASK = 0b1;
 
 
   private int[] data;
 
   public PrimordialEntityOutput() {
-    this(new int[DATA_SIZE]);
+    this(new int[IntMath.divide(DATA_SIZE_BITS, Integer.SIZE, RoundingMode.CEILING)]);
 
     setMoveDirection(MoveDirection.NONE);
     setTurnDirection(TurnDirection.NONE);
@@ -40,7 +42,7 @@ public final class PrimordialEntityOutput {
   }
 
   public MoveDirection getMoveDirection() {
-    int moveDirectionOrdinal = (data[MOVE_DIRECTION_IDX] & MOVE_DIRECTION_MASK);
+    int moveDirectionOrdinal = getBits(0, MOVE_DIRECTION_IDX, 1);
     moveDirectionOrdinal = moveDirectionOrdinal < MOVE_DIRECTIONS.length ? moveDirectionOrdinal : 0;
     return MOVE_DIRECTIONS[moveDirectionOrdinal];
   }
@@ -49,30 +51,25 @@ public final class PrimordialEntityOutput {
     if (moveDirection == MoveDirection.BACKWARD) {
       throw new IllegalArgumentException(MoveDirection.BACKWARD.name() + " is not supported");
     }
-    int value = moveDirection.ordinal();
-    data[MOVE_DIRECTION_IDX] = (data[MOVE_DIRECTION_IDX] & ~MOVE_DIRECTION_MASK) | value;
+    setBits(0, MOVE_DIRECTION_IDX, 1, moveDirection.ordinal());
   }
 
   public TurnDirection getTurnDirection() {
-    int turnDirectionOrdinal =
-        (data[TURN_DIRECTION_IDX] & TURN_DIRECTION_MASK) >> TURN_DIRECTION_BIT_IDX;
+    int turnDirectionOrdinal = getBits(0, TURN_DIRECTION_IDX, 2);
     turnDirectionOrdinal = turnDirectionOrdinal < TURN_DIRECTIONS.length ? turnDirectionOrdinal : 0;
     return TURN_DIRECTIONS[turnDirectionOrdinal];
   }
 
   public void setTurnDirection(TurnDirection turnDirection) {
-    int value = turnDirection.ordinal();
-    data[TURN_DIRECTION_IDX] =
-        (data[TURN_DIRECTION_IDX] & ~TURN_DIRECTION_MASK) | (value << TURN_DIRECTION_BIT_IDX);
+    setBits(0, TURN_DIRECTION_IDX, 2, turnDirection.ordinal());
   }
 
   public boolean shouldConsume() {
-    return (data[CONSUME_IDX] & CONSUME_MASK) >> CONSUME_BIT_IDX == 1;
+    return getBits(0, CONSUME_IDX, 1) == 1;
   }
 
   public void setConsume(boolean shouldConsume) {
-    int value = shouldConsume ? 1 : 0;
-    data[CONSUME_IDX] = (data[CONSUME_IDX] & ~CONSUME_MASK) | (value << CONSUME_BIT_IDX);
+    setBits(0, CONSUME_IDX, 1, shouldConsume ? 1 : 0);
   }
 
   public int[] getData() {
@@ -87,5 +84,16 @@ public final class PrimordialEntityOutput {
     for (int idx = 0; idx < data.length; idx++) {
       data[idx] = 0;
     }
+  }
+
+  private int getBits(int idx, int bitOffset, int bitCount) {
+    int mask = (1 << bitCount) - 1;
+    return data[idx] >>> bitOffset & mask;
+  }
+
+  private void setBits(int idx, int bitOffset, int bitCount, int value) {
+    int srcMask = (1 << bitCount) - 1;
+    int destMask = ~(srcMask << bitOffset);
+    data[idx] = (data[idx] & destMask) | ((value & srcMask) << bitOffset);
   }
 }

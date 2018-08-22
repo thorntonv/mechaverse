@@ -21,18 +21,19 @@ import com.google.common.math.IntMath;
 public class CellularAutomatonGeneticDataGenerator {
 
   public static final String CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY = "cellularAutomatonState";
+  public static final String CELLULAR_AUTOMATON_INPUT_MAP_GENETIC_DATA_KEY = "cellularAutomatonInputMap";
   public static final String CELLULAR_AUTOMATON_OUTPUT_MAP_GENETIC_DATA_KEY = "cellularAutomatonOutputMap";
-  public static final String CELLULAR_AUTOMATON_BIT_OUTPUT_MAP_GENETIC_DATA_KEY = "cellularAutomatonBitOutputMap";
 
   public static final Set<String> KEY_SET = ImmutableSet.of(
-          CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY,
-          CELLULAR_AUTOMATON_OUTPUT_MAP_GENETIC_DATA_KEY,
-          CELLULAR_AUTOMATON_BIT_OUTPUT_MAP_GENETIC_DATA_KEY
+      CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY,
+      CELLULAR_AUTOMATON_INPUT_MAP_GENETIC_DATA_KEY,
+      CELLULAR_AUTOMATON_OUTPUT_MAP_GENETIC_DATA_KEY
   );
 
   public void generateGeneticData(GeneticDataStore dataStore,
-    CellularAutomatonSimulationModel model, int outputSize, RandomGenerator random) {
+    CellularAutomatonSimulationModel model, int inputSize, int outputSize, RandomGenerator random) {
     dataStore.put(CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY, generateStateGeneticData(model, random));
+    dataStore.put(CELLULAR_AUTOMATON_INPUT_MAP_GENETIC_DATA_KEY, generateInputMapGeneticData(model, inputSize, random));
     dataStore.put(CELLULAR_AUTOMATON_OUTPUT_MAP_GENETIC_DATA_KEY, generateOutputMapGeneticData(model, outputSize, random));
   }
 
@@ -65,13 +66,27 @@ public class CellularAutomatonGeneticDataGenerator {
     return new CellularAutomatonGeneticData(cellData, cellGroups);
   }
 
+  public GeneticData generateInputMapGeneticData(CellularAutomatonSimulationModel model,
+      int inputSize, RandomGenerator random) {
+    return generateInputMapGeneticData(
+        inputSize, model.getCellOutputStateSize(), random);
+  }
+
+  public GeneticData generateInputMapGeneticData(int outputSize, int stateSize, RandomGenerator random) {
+    return generateIOMapGeneticData(outputSize, stateSize, random);
+  }
+
   public GeneticData generateOutputMapGeneticData(CellularAutomatonSimulationModel model,
       int outputSize, RandomGenerator random) {
     return generateOutputMapGeneticData(
         outputSize, model.getCellOutputStateSize(), random);
   }
 
-  public GeneticData generateOutputMapGeneticData(int outputSize, int stateSize,
+  public GeneticData generateOutputMapGeneticData(int outputSize, int stateSize, RandomGenerator random) {
+    return generateIOMapGeneticData(outputSize, stateSize, random);
+  }
+
+  private GeneticData generateIOMapGeneticData(int outputSize, int stateSize,
       RandomGenerator random) {
     GeneticData.Builder geneticDataBuilder = GeneticData.newBuilder();
     for (int idx = 0; idx < outputSize; idx++) {
@@ -83,6 +98,10 @@ public class CellularAutomatonGeneticDataGenerator {
 
   public int[] getCellularAutomatonState(GeneticDataStore dataStore) {
     return ArrayUtil.toIntArray(dataStore.get(CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY).getData());
+  }
+
+  public int[] getInputMap(GeneticDataStore dataStore) {
+    return ArrayUtil.toIntArray(dataStore.get(CELLULAR_AUTOMATON_INPUT_MAP_GENETIC_DATA_KEY).getData());
   }
 
   public int[] getOutputMap(GeneticDataStore dataStore) {

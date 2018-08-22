@@ -1,5 +1,7 @@
 package org.mechaverse.simulation.primordial.core.entity;
 
+import com.google.common.math.IntMath;
+import java.math.RoundingMode;
 import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
 
@@ -27,27 +29,20 @@ public final class PrimordialEntityInput {
   }
 
 
-  public static int DATA_SIZE = 4;
+  public static int DATA_SIZE_BITS = 6;
 
   private static final int ENERGY_LEVEL_IDX = 0;
-  private static final int ENERGY_LEVEL_MASK = ~0b11;
 
-  private static final int FRONT_SENSOR_IDX = 1;
-  private static final int FRONT_ENTITY_TYPE_BIT_IDX = 0;
-  private static final int FRONT_ENTITY_TYPE_MASK = ~(0b11 << FRONT_ENTITY_TYPE_BIT_IDX);
+  private static final int FRONT_SENSOR_IDX = 2;
 
-  private static final int ENTITY_SENSOR_IDX = 2;
-  private static final int ENTITY_SENSOR_BIT_IDX = 0;
-  private static final int ENTITY_SENSOR_MASK = ~(0b1 << ENTITY_SENSOR_BIT_IDX);
+  private static final int ENTITY_SENSOR_IDX = 4;
 
-  private static final int FOOD_SENSOR_IDX = 3;
-  private static final int FOOD_SENSOR_BIT_IDX = 0;
-  private static final int FOOD_SENSOR_MASK = ~(0b1 << FOOD_SENSOR_BIT_IDX);
+  private static final int FOOD_SENSOR_IDX = 5;
 
   private final int[] data;
 
   public PrimordialEntityInput() {
-    this(new int[DATA_SIZE]);
+    this(new int[IntMath.divide(DATA_SIZE_BITS, Integer.SIZE, RoundingMode.CEILING)]);
   }
 
   public PrimordialEntityInput(int[] data) {
@@ -55,7 +50,7 @@ public final class PrimordialEntityInput {
   }
 
   public int getEnergyLevel() {
-    return data[ENERGY_LEVEL_IDX] & ~ENERGY_LEVEL_MASK;
+    return getBits(0, ENERGY_LEVEL_IDX, 2);
   }
 
   /**
@@ -63,44 +58,40 @@ public final class PrimordialEntityInput {
    */
   public void setEnergy(int energyLevel, int maxEnergyLevel) {
     // Use a direct proportion to map the energy level on to the new range.
-    int value;
     int energyPercent = energyLevel * 100 / maxEnergyLevel;
-    value = (energyPercent < 33) ? 1 : 0;
-    data[ENERGY_LEVEL_IDX] = (data[ENERGY_LEVEL_IDX] & ENERGY_LEVEL_MASK) | value;
+    int value = 0;
+    if (energyPercent >= 75) {
+      value = 3;
+    } else if (energyPercent >= 50) {
+      value = 2;
+    } else if (energyPercent >= 33) {
+      value = 1;
+    }
+    setBits(0, ENERGY_LEVEL_IDX, 2, value);
   }
 
   public SensorInfo getFrontSensor() {
-    return getSensorData(FRONT_SENSOR_IDX, FRONT_ENTITY_TYPE_MASK, FRONT_ENTITY_TYPE_BIT_IDX);
+    return getSensorData(FRONT_SENSOR_IDX);
   }
 
   public void setFrontSensor(EntityType entityType, Direction entityDirection, String entityId) {
-    setSensorData(entityType, FRONT_SENSOR_IDX, FRONT_ENTITY_TYPE_MASK, FRONT_ENTITY_TYPE_BIT_IDX);
+    setSensorData(entityType, FRONT_SENSOR_IDX);
   }
 
   public boolean getEntitySensor() {
-    int dataValue = data[ENTITY_SENSOR_IDX];
-    int nearbyEntity = ((dataValue & ~ENTITY_SENSOR_MASK) >> ENTITY_SENSOR_BIT_IDX) & 0b1;
-    return nearbyEntity == 1;
+    return getBits(0, ENTITY_SENSOR_IDX, 1) == 1;
   }
 
   public void setEntitySensor(boolean nearbyEntity) {
-    int nearbyEntityIntValue = nearbyEntity ? 1 : 0;
-    int dataValue = data[ENTITY_SENSOR_IDX];
-    dataValue = (dataValue & ENTITY_SENSOR_MASK) | (nearbyEntityIntValue << ENTITY_SENSOR_BIT_IDX);
-    data[ENTITY_SENSOR_IDX] = dataValue;
+    setBits(0, ENTITY_SENSOR_IDX, 1, nearbyEntity ? 1 : 0);
   }
 
   public boolean getFoodSensor() {
-    int dataValue = data[FOOD_SENSOR_IDX];
-    int nearbyFood = ((dataValue & ~FOOD_SENSOR_MASK) >> FOOD_SENSOR_BIT_IDX) & 0b1;
-    return nearbyFood == 1;
+    return getBits(0, FOOD_SENSOR_IDX, 1) == 1;
   }
 
   public void setFoodSensor(boolean nearbyFood) {
-    int nearbyFoodIntValue = nearbyFood ? 1 : 0;
-    int dataValue = data[FOOD_SENSOR_IDX];
-    dataValue = (dataValue & FOOD_SENSOR_MASK) | (nearbyFoodIntValue << FOOD_SENSOR_BIT_IDX);
-    data[FOOD_SENSOR_IDX] = dataValue;
+    setBits(0, FOOD_SENSOR_IDX, 1, nearbyFood ? 1 : 0);
   }
 
   public int[] getData() {
@@ -113,19 +104,33 @@ public final class PrimordialEntityInput {
     }
   }
 
-  private SensorInfo getSensorData(int dataIdx, int entityTypeMask, int entityTypeBitIdx) {
-    int dataValue = data[dataIdx];
-    int entityType = ((dataValue & ~entityTypeMask) >> entityTypeBitIdx) & 0b11;
-    EntityType type =
-        entityType < EntityUtil.ENTITY_TYPES.length ? EntityUtil.ENTITY_TYPES[entityType] : null;
-    return new SensorInfo(type);
+  private SensorInfo getSensorData(int idx) {
+    EntityType entityType = getEntityType(idx);
+    return new SensorInfo(entityType);
   }
 
-  private void setSensorData(EntityType entityType, int dataIdx, int entityTypeMask, int entityTypeBitIdx) {
-    int entityTypeValue = entityType != null ? entityType.ordinal() : 0b11;
+  private void setSensorData(EntityType entityType, int idx) {
+    setEntityType(entityType, idx);
+  }
 
-    int dataValue = data[dataIdx];
-    dataValue = (dataValue & entityTypeMask) | (entityTypeValue << entityTypeBitIdx);
-    data[dataIdx] = dataValue;
+  private EntityType getEntityType(int idx) {
+    int entityTypeValue = getBits(0, idx, 2);
+    return entityTypeValue < EntityUtil.ENTITY_TYPES.length ? EntityUtil.ENTITY_TYPES[entityTypeValue] : null;
+  }
+
+  private void setEntityType(EntityType entityType, int idx) {
+    int entityTypeValue = entityType != null ? entityType.ordinal() : 0b11;
+    setBits(0, idx, 2, entityTypeValue);
+  }
+
+  private int getBits(int idx, int bitOffset, int bitCount) {
+    int mask = (1 << bitCount) - 1;
+    return data[idx] >>> bitOffset & mask;
+  }
+
+  private void setBits(int idx, int bitOffset, int bitCount, int value) {
+    int srcMask = (1 << bitCount) - 1;
+    int destMask = ~(srcMask << bitOffset);
+    data[idx] = (data[idx] & destMask) | ((value & srcMask) << bitOffset);
   }
 }

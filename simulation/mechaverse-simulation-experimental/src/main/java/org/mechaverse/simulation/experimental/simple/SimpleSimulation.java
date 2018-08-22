@@ -1,5 +1,6 @@
 package org.mechaverse.simulation.experimental.simple;
 
+import static org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_INPUT_MAP_GENETIC_DATA_KEY;
 import static org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_OUTPUT_MAP_GENETIC_DATA_KEY;
 import static org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY;
 
@@ -211,6 +212,7 @@ public class SimpleSimulation<E extends SimpleCellularAutomatonEntity> implement
 
     GeneticDataStore childGeneticDataStore = entity.getGeneticDataStore();
     for (String key : Sets.newHashSet(CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY,
+            CELLULAR_AUTOMATON_INPUT_MAP_GENETIC_DATA_KEY,
             CELLULAR_AUTOMATON_OUTPUT_MAP_GENETIC_DATA_KEY)) {
       GeneticData parent1GeneticData = parent1GeneticDataStore.get(key);
       GeneticData childData = parent1GeneticData;
@@ -234,7 +236,7 @@ public class SimpleSimulation<E extends SimpleCellularAutomatonEntity> implement
   private void generateGeneticData(E entity) {
     GeneticDataStore geneticDataStore = new GeneticDataStore(entity);
     geneticDataGenerator.generateGeneticData(geneticDataStore, cellularAutomatonModel,
-        simulator.getAutomatonOutputSize(), random);
+        simulator.getAutomatonInputSize(), simulator.getAutomatonOutputSize(), random);
   }
 
   private void initializeCellularAutomaton(E entity) {
@@ -245,6 +247,11 @@ public class SimpleSimulation<E extends SimpleCellularAutomatonEntity> implement
     int[] automatonState = geneticDataGenerator.getCellularAutomatonState(geneticDataStore);
     simulator.setAutomatonState(automatonIndex, automatonState);
     entity.putData(CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY, ArrayUtil.toByteArray(automatonState));
+
+    // Cellular automaton input map.
+    int[] inputMap = geneticDataGenerator.getInputMap(geneticDataStore);
+    simulator.setAutomatonInputMap(automatonIndex, inputMap);
+    entity.putData(CELLULAR_AUTOMATON_INPUT_MAP_GENETIC_DATA_KEY, ArrayUtil.toByteArray(inputMap));
 
     // Cellular automaton output map.
     int[] outputMap = geneticDataGenerator.getOutputMap(geneticDataStore);

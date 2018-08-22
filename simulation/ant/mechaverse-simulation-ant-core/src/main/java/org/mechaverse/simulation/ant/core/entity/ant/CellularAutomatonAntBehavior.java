@@ -23,7 +23,7 @@ public class CellularAutomatonAntBehavior extends AbstractAntBehavior {
       CellularAutomatonDescriptorDataSource dataSource, CellularAutomatonSimulator simulator) {
     super(entity);
     this.cellularAutomatonEntityBehavior = new CellularAutomatonEntityBehavior<>(
-        entity, AntOutput.DATA_SIZE, dataSource, simulator);
+        entity, dataSource, simulator, true, true);
   }
 
   @Override

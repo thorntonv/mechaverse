@@ -15,8 +15,15 @@ public interface CellularAutomatonSimulator extends AutoCloseable {
   CellularAutomatonAllocator getAllocator();
   int size();
   int getAutomatonInputSize();
+  default int getAutomatonInputMapSize() {
+    return getAutomatonInputSize();
+  }
+
   int getAutomatonStateSize();
   int getAutomatonOutputSize();
+  default int getAutomatonOutputMapSize() {
+    return getAutomatonOutputSize();
+  }
   
   void getAutomatonState(int index, int[] state);
   void setAutomatonState(int index, int[] state);
