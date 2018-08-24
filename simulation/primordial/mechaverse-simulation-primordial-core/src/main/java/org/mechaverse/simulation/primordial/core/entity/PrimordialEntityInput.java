@@ -2,32 +2,13 @@ package org.mechaverse.simulation.primordial.core.entity;
 
 import com.google.common.math.IntMath;
 import java.math.RoundingMode;
-import org.mechaverse.simulation.primordial.core.model.EntityType;
 
 /**
  * Encodes and decodes input for a primordial entity.
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
 public final class PrimordialEntityInput {
-
-  /**
-   * Sensor information about an entity in a cell.
-   */
-  public static final class SensorInfo {
-
-    private EntityType entityType;
-
-    public SensorInfo(EntityType entityType) {
-      super();
-      this.entityType = entityType;
-    }
-
-    public EntityType getEntityType() {
-      return entityType;
-    }
-  }
-
-
+  
   public static int DATA_SIZE_BITS = 6;
 
   private static final int ENERGY_LEVEL_IDX = 0;

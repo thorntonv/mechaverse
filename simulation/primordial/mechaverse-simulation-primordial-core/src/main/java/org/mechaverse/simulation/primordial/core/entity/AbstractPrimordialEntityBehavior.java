@@ -4,9 +4,7 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.EntityBehavior;
 import org.mechaverse.simulation.common.Environment;
 import org.mechaverse.simulation.common.model.EntityModel;
-import org.mechaverse.simulation.common.util.SimulationUtil;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
-import org.mechaverse.simulation.primordial.core.model.Food;
 import org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel;
 import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel;
 
@@ -14,10 +12,8 @@ import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel
 public abstract class AbstractPrimordialEntityBehavior implements
     EntityBehavior<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> {
 
-  private final PrimordialEntityInput input = new PrimordialEntityInput();
   protected final EntityModel<EntityType> entity;
 
-  private static Food FOOD_INSTANCE = new Food();
 
   protected AbstractPrimordialEntityBehavior(EntityModel<EntityType> entity) {
     this.entity = entity;
@@ -25,64 +21,11 @@ public abstract class AbstractPrimordialEntityBehavior implements
 
   @Override
   public final void updateInput(PrimordialEnvironmentModel env, RandomGenerator random) {
-//    int entityRow = entity.getY();
-//    int entityCol = entity.getX();
-//    boolean nearbyFood = env.isFoodNearby(entityRow, entityCol);
-//    boolean nearbyEntity = env.isEntityNearby(entityRow, entityCol);
-//    int frontEntityTypeOrdinal = env.getCellTypeInDirection(entityRow, entityCol, entity.getDirection());
-//    input.setInput(entity.getEnergy(), entity.getMaxEnergy(), frontEntityTypeOrdinal, nearbyEntity, nearbyFood);
-//    setInput(input, random);
   }
 
   @Override
   public final void performAction(Environment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> env,
           RandomGenerator random) {
-    final PrimordialEnvironmentModel envModel = env.getModel();
-    PrimordialEntityOutput output = getOutput(random);
-
-    int entityRow = entity.getY();
-    int entityCol = entity.getX();
-    int entityEnergy = entity.getEnergy() - 1;
-
-    entity.setAge(entity.getAge() + 1);
-
-    if (entityEnergy <= 0) {
-      onRemoveEntity();
-      env.removeEntity(entity);
-      return;
-    }
-
-    // Consume action.
-    if (output.shouldConsume() && envModel.hasFood(entityRow, entityCol)) {
-      env.getModel().removeFood(entityRow, entityCol);
-      env.removeEntity(FOOD_INSTANCE);
-      entityEnergy += 100;
-    }
-
-    // Move action.
-    switch (output.getMoveDirection()) {
-      case NONE:
-        break;
-      case FORWARD:
-        envModel.moveEntityToCellInDirection(entityRow, entityCol, entity);
-        break;
-      case BACKWARD:
-        break;
-    }
-
-    // Turn action.
-    switch (output.getTurnDirection()) {
-      case NONE:
-        break;
-      case CLOCKWISE:
-        SimulationUtil.turnCW(entity);
-        break;
-      case COUNTERCLOCKWISE:
-        SimulationUtil.turnCCW(entity);
-        break;
-    }
-
-    entity.setEnergy(entityEnergy);
   }
 
   /**

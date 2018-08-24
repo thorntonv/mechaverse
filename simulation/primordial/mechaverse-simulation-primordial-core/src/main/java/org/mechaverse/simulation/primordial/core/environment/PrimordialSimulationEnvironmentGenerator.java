@@ -64,7 +64,7 @@ public class PrimordialSimulationEnvironmentGenerator
     }
     EntityModel<EntityType> entity = null;
     if (entityType == EntityType.ENTITY) {
-      if (env.getPrimaryEntityModel(row, column) != null) {
+      if (env.getEntity(row, column) != null) {
         return null;
       }
       entity = entityFactory.apply(entityType);

@@ -18,7 +18,7 @@ public abstract class EntityModel<ENT_TYPE extends Enum<ENT_TYPE>> implements Se
   private int y;
   private int energy;
   private int maxEnergy;
-  private long age;
+  private long createdIteration;
   private Direction direction;
 
   @JsonProperty
@@ -105,15 +105,15 @@ public abstract class EntityModel<ENT_TYPE extends Enum<ENT_TYPE>> implements Se
   /**
    * Gets the value of the age property.
    */
-  public long getAge() {
-    return age;
+  public long getCreatedIteration() {
+    return createdIteration;
   }
 
   /**
    * Sets the value of the age property.
    */
-  public void setAge(long value) {
-    this.age = value;
+  public void setCreatedIteration(long value) {
+    this.createdIteration = value;
   }
 
   /**

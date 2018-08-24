@@ -106,10 +106,10 @@ public class AbstractAntBehaviorTest {
 
   @Test
   public void age() {
-    when(mockAntEntity.getAge()).thenReturn(100L);
+    when(mockAntEntity.getCreatedIteration()).thenReturn(100L);
     mockOutput(new AntOutput());
     antBehavior.performAction(mockEnv, random);
-    verify(mockAntEntity).setAge(101L);
+    verify(mockAntEntity).setCreatedIteration(101L);
   }
 
   @Test

@@ -5,7 +5,6 @@ package org.mechaverse.simulation.common.cellautomaton.simulation;
  */
 public class NoOpCellularAutomatonSimulator implements CellularAutomatonSimulator {
 
-  private static final int RANDOM_OUTPUT_COUNT = 4096;
   private final int size;
   private final int inputSize;
   private final int stateSize;

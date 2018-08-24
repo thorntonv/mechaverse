@@ -39,7 +39,7 @@ public class EntityFitnessDistributionTest {
         TestEntityModel[] entities = new TestEntityModel[]{ENTITY1, ENTITY2, ENTITY3, ENTITY4, ENTITY5};
 
         EntityFitnessDistribution<TestEntityModel, EntityType> distribution = new EntityFitnessDistribution<>(entities,
-                entity -> entity.getAge() > 5 ? entity.getAge() : 0.0);
+                entity -> (double) entity.getCreatedIteration());
 
         when(mockRandomGenerator.nextDouble()).thenReturn(0.0);
         assertEquals(ENTITY1, distribution.selectEntity(mockRandomGenerator));
@@ -65,7 +65,7 @@ public class EntityFitnessDistributionTest {
         TestEntityModel[] entities = new TestEntityModel[]{};
 
         EntityFitnessDistribution<TestEntityModel, EntityType> distribution = new EntityFitnessDistribution<>(entities,
-                entity -> entity.getAge() > 5 ? entity.getAge() : 0.0);
+                entity -> (double) entity.getCreatedIteration());
         when(mockRandomGenerator.nextDouble()).thenReturn(0.5);
         assertNull(distribution.selectEntity(mockRandomGenerator));
     }
@@ -80,9 +80,9 @@ public class EntityFitnessDistributionTest {
         assertNull(distribution.selectEntity(mockRandomGenerator));
     }
 
-    private static TestEntityModel createEntityModel(int age) {
+    private static TestEntityModel createEntityModel(int createdIteration) {
         TestEntityModel model = new TestEntityModel();
-        model.setAge(age);
+        model.setCreatedIteration(createdIteration);
         return model;
     }
 }

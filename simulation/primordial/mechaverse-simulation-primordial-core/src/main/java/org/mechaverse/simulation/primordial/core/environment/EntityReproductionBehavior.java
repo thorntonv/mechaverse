@@ -95,7 +95,7 @@ public class EntityReproductionBehavior extends PrimordialEnvironmentBehavior {
             models[idx++] = entityModel;
         }
         return new EntityFitnessDistribution<>(models,
-                entity -> entity.getAge() >= entityMinReproductiveAge ? entity.getAge() : 0.0);
+                entity -> (double) entity.getCreatedIteration());
     }
 
     private PrimordialEntityModel generateRandomEntity(SimulationModel state,

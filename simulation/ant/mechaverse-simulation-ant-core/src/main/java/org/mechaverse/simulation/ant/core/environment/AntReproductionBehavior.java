@@ -67,14 +67,14 @@ public class AntReproductionBehavior extends AbstractAntEnvironmentBehavior {
       double ageSum = 0;
       double energySum = 0;
       for (Ant ant : ants) {
-        ageSum += ant.getAge();
+        ageSum += ant.getCreatedIteration();
         energySum += ant.getEnergy();
       }
 
       List<Pair<Ant, Double>> pmf = new ArrayList<>();
       for (Ant ant : ants) {
         if (ageSum != 0 && energySum != 0) {
-          double fitness = .7 * ant.getAge() / ageSum + .3 * ant.getEnergy() / energySum;
+          double fitness = .7 * ant.getCreatedIteration() / ageSum + .3 * ant.getEnergy() / energySum;
           pmf.add(new Pair<>(ant, fitness));
         } else {
           pmf.add(new Pair<>(ant, 1.0D / ants.size()));
@@ -233,9 +233,7 @@ public class AntReproductionBehavior extends AbstractAntEnvironmentBehavior {
   private Collection<Ant> getReproductiveAnts() {
     List<Ant> reproductiveAnts = new ArrayList<>();
     for (Ant ant : ants) {
-      if (ant.getAge() >= antMinReproductiveAge) {
-        reproductiveAnts.add(ant);
-      }
+      reproductiveAnts.add(ant);
     }
     return reproductiveAnts;
   }

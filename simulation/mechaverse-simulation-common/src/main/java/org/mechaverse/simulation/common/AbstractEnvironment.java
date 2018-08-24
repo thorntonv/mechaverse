@@ -3,7 +3,6 @@ package org.mechaverse.simulation.common;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -34,7 +33,6 @@ public abstract class AbstractEnvironment<
   private SIM_MODEL simulationModel;
   private ENV_MODEL environmentModel;
   private final Map<String, Entity<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE>> activeEntities = new LinkedHashMap<>();
-  private Object[] activeEntitiesArray = new Object[0];
   private final Set<String> activeEntitiesToRemove = new LinkedHashSet<>();
   private final Set<SimulationObserver<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE>> observers = Sets.newLinkedHashSet();
   private final EntityFactory<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE> entityFactory;
@@ -53,21 +51,14 @@ public abstract class AbstractEnvironment<
 
     behaviors.forEach(behavior -> behavior.beforeUpdate(simulationModel, this, random));
 
-    if(activeEntitiesArray == null) {
-      updateActiveEntitiesArray();
+    for (Entity<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE> activeEntity : activeEntities.values()) {
+      activeEntity.getBehavior().updateInput(environmentModel, random);
     }
-//    for (Object activeEntity : activeEntitiesArray) {
-//      ((Entity<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE>)activeEntity).getBehavior().updateInput(environmentModel, random);
-//    }
 
     behaviors.forEach(behavior -> behavior.beforePerformAction(simulationModel, this, random));
 
-    if(activeEntitiesArray == null) {
-      updateActiveEntitiesArray();
-    }
-
-    for (Object activeEntity : activeEntitiesArray) {
-      ((Entity<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE>)activeEntity).getBehavior().performAction(this, random);
+    for (Entity<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE> activeEntity : activeEntities.values()) {
+      activeEntity.getBehavior().performAction(this, random);
     }
 
     behaviors.forEach(behavior -> behavior.afterUpdate(simulationModel,this, random));
@@ -76,7 +67,6 @@ public abstract class AbstractEnvironment<
     for (String activeEntityToRemove : activeEntitiesToRemove) {
       activeEntities.remove(activeEntityToRemove);
     }
-    activeEntitiesArray = null;
     activeEntitiesToRemove.clear();
   }
 
@@ -116,7 +106,6 @@ public abstract class AbstractEnvironment<
         entity.get().getBehavior().setState(simulationModel);
       }
       activeEntities.put(entityModel.getId(), entity.get());
-      activeEntitiesArray = null;
     }
     observers.forEach(observer -> observer.onAddEntity(entityModel, simulationModel, environmentModel));
   }
@@ -165,14 +154,5 @@ public abstract class AbstractEnvironment<
 
     // Clean up the active entities.
     activeEntities.clear();
-    activeEntitiesArray = null;
-  }
-
-  private void updateActiveEntitiesArray() {
-    activeEntitiesArray = new Object[activeEntities.size()];
-    int idx = 0;
-    for(Entity<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE> entity : activeEntities.values()) {
-      activeEntitiesArray[idx++] = entity;
-    }
   }
 }
