@@ -39,7 +39,7 @@ public final class PrimordialEnvironmentModel extends
   @Override
   public void remove(EntityModel<EntityType> entity) {
     super.remove(entity);
-    if (entity.getType() == EntityType.ENTITY) {
+    if (entity.getType() == EntityType.ENTITY && entity.getX() >= 0 && entity.getY() >= 0) {
       int row = entity.getY() + 1;
       int col = entity.getX() + 1;
       entityModelMatrix[row][col] = null;

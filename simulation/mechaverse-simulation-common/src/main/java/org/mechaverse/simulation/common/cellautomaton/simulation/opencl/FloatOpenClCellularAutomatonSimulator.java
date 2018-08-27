@@ -75,13 +75,13 @@ public class FloatOpenClCellularAutomatonSimulator
   }
 
   @Override
-  protected void copyFromBufferToArray(FloatBuffer buffer, float[] array) {
-    buffer.get(array);
+  protected void copyFromBufferToArray(FloatBuffer buffer, float[] array, int offset, int length) {
+    buffer.get(array, offset, length);
   }
 
   @Override
-  protected void copyFromArrayToBuffer(float[] array, FloatBuffer buffer) {
-    buffer.put(array);
+  protected void copyFromArrayToBuffer(float[] array, int offset, int length, FloatBuffer buffer) {
+    buffer.put(array, offset, length);
   }
 
   private float[] toFloatArray(int[] array) {

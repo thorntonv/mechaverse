@@ -123,8 +123,8 @@ public abstract class AbstractOpenClCellularAutomatonSimulator<B extends Buffer,
   }
 
   protected abstract CLBuffer<B> createBuffer(final int size, final Mem... flags);
-  protected abstract void copyFromBufferToArray(B buffer, T array);
-  protected abstract void copyFromArrayToBuffer(T array, B buffer);
+  protected abstract void copyFromBufferToArray(B buffer, T array, int offset, int length);
+  protected abstract void copyFromArrayToBuffer(T array, int offet, int length, B buffer);
 
   public CellularAutomatonAllocator getAllocator() {
     return allocator;
@@ -158,7 +158,7 @@ public abstract class AbstractOpenClCellularAutomatonSimulator<B extends Buffer,
     }
     queue.putReadBuffer(stateBuffer, true);
     stateBuffer.getBuffer().position(index * automatonStateSize);
-    copyFromBufferToArray(stateBuffer.getBuffer(), state);
+    copyFromBufferToArray(stateBuffer.getBuffer(), state, 0, automatonStateSize);
     stateBuffer.getBuffer().rewind();
   }
 
@@ -168,7 +168,7 @@ public abstract class AbstractOpenClCellularAutomatonSimulator<B extends Buffer,
       finished = true;
     }
     stateBuffer.getBuffer().position(index * automatonStateSize);
-    copyFromArrayToBuffer(state, stateBuffer.getBuffer());
+    copyFromArrayToBuffer(state, 0, automatonStateSize, stateBuffer.getBuffer());
     stateBuffer.getBuffer().rewind();
     automatonStateUpdated = true;
   }
@@ -193,7 +193,7 @@ public abstract class AbstractOpenClCellularAutomatonSimulator<B extends Buffer,
       finished = true;
     }
     inputBuffer.getBuffer().position(index * automatonInputSize);
-    copyFromArrayToBuffer(input, inputBuffer.getBuffer());
+    copyFromArrayToBuffer(input, 0, automatonInputSize, inputBuffer.getBuffer());
     inputBuffer.getBuffer().rewind();
   }
 
@@ -217,7 +217,7 @@ public abstract class AbstractOpenClCellularAutomatonSimulator<B extends Buffer,
       finished = true;
     }
     outputBuffer.getBuffer().position(index * automatonOutputSize);
-    copyFromBufferToArray(outputBuffer.getBuffer(), output);
+    copyFromBufferToArray(outputBuffer.getBuffer(), output, 0, automatonOutputSize);
     outputBuffer.getBuffer().rewind();
   }
 

@@ -25,7 +25,7 @@ public class PrimordialSimulationModelGenerator extends
     PrimordialSimulationModel model = new PrimordialSimulationModel();
     model.setEntityMaxCountPerEnvironment(65536 / DEFAULT_SUB_ENVIRONMENT_COUNT);
     model.setEntityMinReproductiveAge(200);
-    model.setEntityInitialEnergy(12000);
+    model.setEntityInitialEnergy(1200);
     model.setFoodClusterRadius(20);
     model.setFoodMinCount(2500);
     model.setFoodInitialEnergy(100);

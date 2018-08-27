@@ -1,37 +1,41 @@
 package org.mechaverse.simulation.primordial.core.environment;
 
-import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_INPUT_MAP_KEY;
-import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_OUTPUT_MAP_KEY;
-
 import com.google.common.base.Preconditions;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
 import org.mechaverse.simulation.common.Environment;
 import org.mechaverse.simulation.common.cellautomaton.SimulationStateCellularAutomatonDescriptor;
-import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorDataSource;
+import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator.CellularAutomatonSimulatorParams;
+import org.mechaverse.simulation.common.genetic.GeneticDataStore;
 import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.MoveDirection;
 import org.mechaverse.simulation.common.model.TurnDirection;
 import org.mechaverse.simulation.common.util.ArrayUtil;
 import org.mechaverse.simulation.common.util.SimulationUtil;
-import org.mechaverse.simulation.primordial.core.model.EntityType;
-import org.mechaverse.simulation.primordial.core.model.Food;
-import org.mechaverse.simulation.primordial.core.model.PrimordialEntityModel;
-import org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel;
-import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel;
+import org.mechaverse.simulation.primordial.core.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+
+import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_INPUT_MAP_KEY;
+import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_OUTPUT_MAP_KEY;
+import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_STATE_KEY;
 
 /**
  * An environment module that updates simulated cellular automata before active entity actions are
  * performed.
  */
 public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBehavior {
+
+  public static int AUTOMATON_INPUT_DATA_SIZE_BITS = 6;
+  public static int AUTOMATON_OUTPUT_DATA_SIZE_BITS = 4;
 
   private static final int MOVE_FORWARD_ORDINAL = MoveDirection.FORWARD.ordinal();
   private static final int TURN_CLOCKWISE_ORDINAL = TurnDirection.CLOCKWISE.ordinal();
@@ -42,19 +46,6 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
   private static final int NONE_ORDINAL = EntityType.NONE.ordinal();
 
   private static final Food FOOD_INSTANCE = new Food();
-
-  @Autowired
-  private Function<CellularAutomatonSimulatorParams, CellularAutomatonSimulator> simulatorFactory;
-  private CellularAutomatonSimulator simulator;
-  private SimulationStateCellularAutomatonDescriptor descriptorDataSource;
-
-  private int numAutomata;
-  private int[] entityRows;
-  private int[] entityCols;
-  private int[] entityEnergy;
-  private int[] entityDirections;
-  private int[] entityInputs;
-  private int[] entityOutputs;
 
   private static final int[] CELL_DIRECTION_ROW_OFFSETS = new int[]{0, -1, -1, -1, 0, 1, 1, 1};
   private static final int[] CELL_DIRECTION_COL_OFFSETS = new int[]{1, 1, 0, -1, -1, -1, 0, 1};
@@ -68,10 +59,24 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
     }
   }
 
-  private int maxEnergyLevel;
-  private Map<EntityModel<EntityType>, Integer> entityModelIndexMap = new HashMap<>();
+  @Autowired
+  private Function<CellularAutomatonSimulatorParams, CellularAutomatonSimulator> simulatorFactory;
+  private CellularAutomatonSimulator simulator;
+  private SimulationStateCellularAutomatonDescriptor descriptorDataSource;
 
+  private int numAutomata;
+  private int[] entityRows;
+  private int[] entityCols;
+  private int[] entityEnergy;
+  private int[] entityDirections;
+
+  private int maxEnergyLevel;
+  private final Set<EntityModel<EntityType>> newEntities = Sets.newLinkedHashSet();
+  private final Map<EntityModel<EntityType>, Integer> entityModelIndexMap = Maps.newIdentityHashMap();
   private boolean ioMapsSet = false;
+
+  private final CellularAutomatonGeneticDataGenerator geneticDataGenerator =
+      new CellularAutomatonGeneticDataGenerator();
 
   @Override
   public void setState(PrimordialSimulationModel state,
@@ -87,16 +92,26 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
       params.descriptorDataSource = descriptorDataSource;
       simulator = simulatorFactory.apply(params);
 
-      entityRows = new int[params.numAutomata];
-      entityCols = new int[params.numAutomata];
-      entityEnergy = new int[params.numAutomata];
-      entityDirections = new int[params.numAutomata];
-      entityInputs = new int[params.numAutomata * simulator.getAutomatonInputSize()];
-      entityOutputs = new int[params.numAutomata * simulator.getAutomatonOutputSize()];
-
       numAutomata = simulator.size();
+      entityRows = new int[numAutomata];
+      entityCols = new int[numAutomata];
+      entityEnergy = new int[numAutomata];
+      entityDirections = new int[numAutomata];
+
       maxEnergyLevel = state.getEntityInitialEnergy();
       generateIOMaps(state);
+    }
+  }
+
+  @Override
+  public void updateState(PrimordialSimulationModel state,
+      Environment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> environment) {
+    super.updateState(state, environment);
+    for (Map.Entry<EntityModel<EntityType>, Integer> entry : entityModelIndexMap.entrySet()) {
+      EntityModel<EntityType> entityModel = entry.getKey();
+      int automatonIdx = entry.getValue();
+      entityModel.setY(entityRows[automatonIdx]);
+      entityModel.setX(entityCols[automatonIdx]);
     }
   }
 
@@ -112,9 +127,17 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
     final int[][] entityMatrix = envModel.getEntityMatrix();
     final int[][] foodMatrix = envModel.getFoodMatrix();
 
-    final int automatonInputSize = simulator.getAutomatonInputSize();
+    // Add new entities.
+    for(EntityModel<EntityType> entityModel : newEntities) {
+      initEntity(entityModel, random);
+    }
+    newEntities.clear();
 
     for (int idx = 0; idx < numAutomata; idx++) {
+      final int energy = entityEnergy[idx];
+      if (energy <= 0) {
+        continue;
+      }
       final int entityRow = entityRows[idx];
       final int entityCol = entityCols[idx];
       final int row = entityRow + 1;
@@ -125,7 +148,6 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
 
       // Nearby entity.
       int entitySum = 0;
-      entitySum += entityMatrix[row][col];
       entitySum += entityMatrix[row + 1][col];
       entitySum += entityMatrix[row + 1][col - 1];
       entitySum += entityMatrix[row + 1][col + 1];
@@ -152,7 +174,7 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
       }
 
       // Encode input.
-      int value = entityEnergy[idx] * 3 / maxEnergyLevel;
+      int value = energy * 3 / maxEnergyLevel;
       value <<= 2;
       value |= frontEntityOrdinal;
       value <<= 1;
@@ -160,10 +182,9 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
       value <<= 1;
       value |= foodSum > 0 ? 1 : 0;
 
-      entityInputs[idx * automatonInputSize] = value;
+      final int[] inputData = new int[] {value};
+      simulator.setAutomatonInput(idx, inputData);
     }
-
-//    simulator.setAutomatonInput(entityInputs);
 
     simulator.update();
   }
@@ -180,10 +201,7 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
 
     final int maxRow = envModel.getHeight() - 1;
     final int maxCol = envModel.getWidth() - 1;
-
-    final int automatonOutputSize = simulator.getAutomatonOutputSize();
-
-//    simulator.getAutomatonOutput(entityOutputs);
+    final int foodEnergy = state.getFoodInitialEnergy();
 
     for (int idx = 0; idx < numAutomata; idx++) {
       final int entityRow = entityRows[idx];
@@ -199,16 +217,20 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
       if (energy <= 0) {
         if (entityMatrix[row][col] != 0) {
           PrimordialEntityModel entityModel = entityModelMatrix[row][col];
+          entityModel.setY(entityRow);
+          entityModel.setX(entityCol);
           environment.removeEntity(entityModel);
-          entityModelMatrix[row][col] = null;
-          entityMatrix[row][col] = 0;
-          simulator.getAllocator().deallocate(idx);
         }
         continue;
       }
 
+      assert entityMatrix[row][col] == 1 : "" + energy;
+      assert entityModelMatrix[row][col] != null;
+
       // Decode output.
-      int outputValue = entityOutputs[idx * automatonOutputSize];
+      int[] outputData = new int[1];
+      simulator.getAutomatonOutput(idx, outputData);
+      int outputValue = outputData[0];
 
       final int moveDirectionOrdinal = outputValue & 0b1;
       outputValue >>= 1;
@@ -220,28 +242,25 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
       if (consume && foodMatrix[row][col] == 1) {
         envModel.removeFood(entityRow, entityCol);
         environment.removeEntity(FOOD_INSTANCE);
-        energy += 100;
+        energy += foodEnergy;
       }
 
       // Move action.
       if (moveDirectionOrdinal == MOVE_FORWARD_ORDINAL && entityMatrix[frontRow][frontCol] == 0 &&
           frontRow > 0 && frontCol > 0 && frontRow < maxRow && frontCol < maxCol) {
-
-        assert entityModelMatrix[row][col] != null;
-        assert entityMatrix[row][col] == 1;
-        assert entityModelMatrix[frontRow][frontCol] == null;
-
         entityModelMatrix[frontRow][frontCol] = entityModelMatrix[row][col];
         entityModelMatrix[row][col] = null;
         entityMatrix[row][col] = 0;
         entityMatrix[frontRow][frontCol] = 1;
+        entityRows[idx] = frontRow - 1;
+        entityCols[idx] = frontCol - 1;
       }
 
       // Turn action.
       if (turnDirectionOrdinal == TURN_CLOCKWISE_ORDINAL) {
         entityDirections[idx] = TURN_CLOCKWISE[directionOrdinal];
       } else if (turnDirectionOrdinal == TURN_COUNTERCLOCKWISE_ORDINAL) {
-        entityDirections[idx] = TURN_CLOCKWISE[directionOrdinal];
+        entityDirections[idx] = TURN_COUNTERCLOCKWISE[directionOrdinal];
       }
 
       entityEnergy[idx] = energy;
@@ -255,12 +274,7 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
     if (entity.getType() != EntityType.ENTITY) {
       return;
     }
-    int entityIdx = simulator.getAllocator().allocate();
-    entityRows[entityIdx] = entity.getY();
-    entityCols[entityIdx] = entity.getX();
-    entityDirections[entityIdx] = 0;
-    entityEnergy[entityIdx] = entity.getEnergy();
-    entityModelIndexMap.put(entity, entityIdx);
+    newEntities.add(entity);
   }
 
   @Override
@@ -271,24 +285,46 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
       return;
     }
 
-    Integer entityIdx = entityModelIndexMap.get(entity);
+    Integer entityIdx = entityModelIndexMap.remove(entity);
     if (entityIdx != null) {
       simulator.getAllocator().deallocate(entityIdx);
+      entity.setY(entityRows[entityIdx]);
+      entity.setX(entityCols[entityIdx]);
+      environmentModel.remove(entity);
+      entityEnergy[entityIdx] = 0;
     }
-  }
-
-  public CellularAutomatonDescriptorDataSource getDescriptorDataSource() {
-    return descriptorDataSource;
-  }
-
-  public CellularAutomatonSimulator getSimulator() {
-    return simulator;
+    newEntities.remove(entity);
   }
 
   @Override
   public void onClose() throws Exception {
     super.onClose();
     simulator.close();
+  }
+
+  private void initEntity(EntityModel<EntityType> entity, RandomGenerator random) {
+    int entityIdx = simulator.getAllocator().allocate();
+    entityRows[entityIdx] = entity.getY();
+    entityCols[entityIdx] = entity.getX();
+    entityDirections[entityIdx] = entity.getDirection() != null ?
+        entity.getDirection().ordinal() : 0;
+    entityEnergy[entityIdx] = entity.getEnergy();
+    entityModelIndexMap.put(entity, entityIdx);
+    entity.setX(-1);
+    entity.setY(-1);
+
+    // If the entity has an existing automaton state then load it.
+    byte[] stateBytes = entity.getData(CELLULAR_AUTOMATON_STATE_KEY);
+    if (stateBytes != null) {
+      simulator.setAutomatonState(entityIdx, ArrayUtil.toIntArray(stateBytes));
+    } else {
+      final GeneticDataStore geneticDataStore = new GeneticDataStore(entity);
+      geneticDataGenerator.generateGeneticData(geneticDataStore,
+          descriptorDataSource.getSimulationModel(), simulator.getAutomatonInputSize(),
+          simulator.getAutomatonOutputSize(), random);
+      int[] automatonState = geneticDataGenerator.getCellularAutomatonState(geneticDataStore);
+      simulator.setAutomatonState(entityIdx, automatonState);
+    }
   }
 
   private void generateIOMaps(PrimordialSimulationModel state) {

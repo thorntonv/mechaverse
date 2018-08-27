@@ -22,7 +22,7 @@ public class CellularAutomatonPrimordialSimulationImplTest extends AbstractPrimo
 
   @Override
   protected int testIterationCount() {
-    return 2000;
+    return 4000;
   }
 
   @Override
