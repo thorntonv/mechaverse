@@ -54,6 +54,8 @@ public class EntityReproductionBehavior extends PrimordialEnvironmentBehavior {
         final PrimordialEnvironmentModel envModel = env.getModel();
         int cnt = 0;
         EntityFitnessDistribution<PrimordialEntityModel, EntityType> fitnessDistribution = null;
+        int newRandomEntityCount = 0;
+        int newCloneEntityCount = 0;
         while (entities.size() < entityMaxCount && cnt < entityMaxCount) {
             if (fitnessDistribution == null) {
                 fitnessDistribution = buildEntityFitnessDistribution();
@@ -79,12 +81,16 @@ public class EntityReproductionBehavior extends PrimordialEnvironmentBehavior {
                             clone.putData(key, cloneData);
                         }
                     }
-                    logger.info("Generated clone of entity " + selectedEntity.getId());
+                    newCloneEntityCount++;
                 } else {
-                    logger.info("Generated new random entity " + clone.getId());
+                    newRandomEntityCount++;
                 }
             }
             cnt++;
+        }
+        if(newCloneEntityCount > 0 || newRandomEntityCount > 0) {
+            logger.info(String.format("Created %d new clones and %d new random entities",
+                newCloneEntityCount, newRandomEntityCount));
         }
     }
 

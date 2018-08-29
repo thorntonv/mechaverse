@@ -7,15 +7,14 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
 import org.mechaverse.simulation.common.Environment;
 import org.mechaverse.simulation.common.cellautomaton.SimulationStateCellularAutomatonDescriptor;
-import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator.CellularAutomatonSimulatorParams;
-import org.mechaverse.simulation.common.genetic.GeneticDataStore;
 import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.MoveDirection;
 import org.mechaverse.simulation.common.model.TurnDirection;
 import org.mechaverse.simulation.common.util.ArrayUtil;
+import org.mechaverse.simulation.common.util.SimulationModelUtil;
 import org.mechaverse.simulation.common.util.SimulationUtil;
 import org.mechaverse.simulation.primordial.core.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +26,7 @@ import java.util.function.Function;
 import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_INPUT_MAP_KEY;
 import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_OUTPUT_MAP_KEY;
 import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_STATE_KEY;
+import static org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY;
 
 /**
  * An environment module that updates simulated cellular automata before active entity actions are
@@ -75,9 +75,6 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
   private final Map<EntityModel<EntityType>, Integer> entityModelIndexMap = Maps.newIdentityHashMap();
   private boolean ioMapsSet = false;
 
-  private final CellularAutomatonGeneticDataGenerator geneticDataGenerator =
-      new CellularAutomatonGeneticDataGenerator();
-
   @Override
   public void setState(PrimordialSimulationModel state,
       Environment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> environment) {
@@ -112,6 +109,8 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
       int automatonIdx = entry.getValue();
       entityModel.setY(entityRows[automatonIdx]);
       entityModel.setX(entityCols[automatonIdx]);
+      entityModel.setEnergy(entityEnergy[automatonIdx]);
+      entityModel.setDirection(SimulationModelUtil.DIRECTIONS[entityDirections[automatonIdx]]);
     }
   }
 
@@ -318,11 +317,11 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
     if (stateBytes != null) {
       simulator.setAutomatonState(entityIdx, ArrayUtil.toIntArray(stateBytes));
     } else {
-      final GeneticDataStore geneticDataStore = new GeneticDataStore(entity);
-      geneticDataGenerator.generateGeneticData(geneticDataStore,
-          descriptorDataSource.getSimulationModel(), simulator.getAutomatonInputSize(),
-          simulator.getAutomatonOutputSize(), random);
-      int[] automatonState = geneticDataGenerator.getCellularAutomatonState(geneticDataStore);
+      int[] automatonState = new int[simulator.getAutomatonStateSize()];
+      for(int idx = 0; idx < automatonState.length; idx++) {
+        automatonState[idx] = random.nextInt();
+      }
+      entity.putData(CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY, ArrayUtil.toByteArray(automatonState));
       simulator.setAutomatonState(entityIdx, automatonState);
     }
   }
