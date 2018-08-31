@@ -1,6 +1,9 @@
 package org.mechaverse.simulation.primordial.core.environment;
 
 import com.google.common.annotations.VisibleForTesting;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.UUID;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.Environment;
 import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator;
@@ -9,13 +12,12 @@ import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.SimulationModel;
 import org.mechaverse.simulation.common.util.EntityFitnessDistribution;
 import org.mechaverse.simulation.common.util.SimulationUtil;
-import org.mechaverse.simulation.primordial.core.model.*;
+import org.mechaverse.simulation.primordial.core.model.EntityType;
+import org.mechaverse.simulation.primordial.core.model.PrimordialEntityModel;
+import org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel;
+import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.UUID;
 
 /**
  * An environment simulation module that maintains a target entity population size.
@@ -31,7 +33,7 @@ public class EntityReproductionBehavior extends PrimordialEnvironmentBehavior {
     private int entityInitialEnergy;
     private int entityMinReproductiveAge;
     private BitMutator bitMutator;
-
+    private long lastUpdateIteration = -1;
     private final Set<PrimordialEntityModel> entities = new LinkedHashSet<>();
 
     public EntityReproductionBehavior() {
@@ -51,6 +53,11 @@ public class EntityReproductionBehavior extends PrimordialEnvironmentBehavior {
     public void beforeUpdate(PrimordialSimulationModel state,
                              Environment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> env,
                              RandomGenerator random) {
+        if(state.getIteration() > lastUpdateIteration) {
+            lastUpdateIteration = state.getIteration();
+        } else {
+          return;
+        }
         final PrimordialEnvironmentModel envModel = env.getModel();
         int cnt = 0;
         EntityFitnessDistribution<PrimordialEntityModel, EntityType> fitnessDistribution = null;
