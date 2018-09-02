@@ -33,8 +33,8 @@ public class PrimordialSimulationBenchmark {
   @State(Scope.Benchmark)
   public static class ExecutionPlan {
 
-    @Param(value = {"7"}) int subEnvironmentCount;
-    @Param(value = {"262144"}) int numEntities;
+    @Param(value = {"31"}) int subEnvironmentCount;
+    @Param(value = {"1048576"}) int numEntities;
     @Param(value = {"25"}) int stepCount;
 
     private ClassPathXmlApplicationContext appContext;
@@ -51,7 +51,9 @@ public class PrimordialSimulationBenchmark {
       PrimordialSimulationModel model = modelGenerator.generate(new Well19937c());
       model.setEntityMaxCountPerEnvironment(numEntities / (subEnvironmentCount + 1));
       simulation.setState(model);
-      simulation.step(stepCount);
+      for(int cnt = 1; cnt <= 5; cnt++) {
+        simulation.step(stepCount);
+      }
     }
 
     @TearDown(Level.Trial)

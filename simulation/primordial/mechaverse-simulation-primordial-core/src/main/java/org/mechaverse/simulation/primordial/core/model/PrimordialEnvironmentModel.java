@@ -12,6 +12,7 @@ public final class PrimordialEnvironmentModel extends
   private int[][] entityMatrix;
   private PrimordialEntityModel[][] entityModelMatrix;
   private int[][] foodMatrix;
+  private int[][] nearbyFood;
 
   public int[][] getEntityMatrix() {
     return entityMatrix;
@@ -19,6 +20,10 @@ public final class PrimordialEnvironmentModel extends
 
   public int[][] getFoodMatrix() {
     return foodMatrix;
+  }
+
+  public int[][] getNearbyFoodMatrix() {
+    return nearbyFood;
   }
 
   public PrimordialEntityModel[][] getEntityModelMatrix() {
@@ -53,6 +58,33 @@ public final class PrimordialEnvironmentModel extends
 
   public void addFood(int row, int col) {
     foodMatrix[row+1][col+1] = 1;
+
+    int r = row;
+    int c = col;
+    int[] nearbyFoodRow = nearbyFood[r];
+    nearbyFoodRow[c]++;
+    c++;
+    nearbyFoodRow[c]++;
+    c++;
+    nearbyFoodRow[c]++;
+    r++;
+
+    nearbyFoodRow = nearbyFood[r];
+    c = col;
+    nearbyFoodRow[c]++;
+    c++;
+    nearbyFoodRow[c]++;
+    c++;
+    nearbyFoodRow[c]++;
+    r++;
+
+    nearbyFoodRow = nearbyFood[r];
+    c = col;
+    nearbyFoodRow[c]++;
+    c++;
+    nearbyFoodRow[c]++;
+    c++;
+    nearbyFoodRow[c]++;
   }
 
   public boolean hasFood(int row, int col) {
@@ -61,6 +93,33 @@ public final class PrimordialEnvironmentModel extends
 
   public void removeFood(int row, int col) {
     foodMatrix[row+1][col+1] = 0;
+
+    int r = row;
+    int c = col;
+    int[] nearbyFoodRow = nearbyFood[r];
+    nearbyFoodRow[c]--;
+    c++;
+    nearbyFoodRow[c]--;
+    c++;
+    nearbyFoodRow[c]--;
+    r++;
+
+    nearbyFoodRow = nearbyFood[r];
+    c = col;
+    nearbyFoodRow[c]--;
+    c++;
+    nearbyFoodRow[c]--;
+    c++;
+    nearbyFoodRow[c]--;
+    r++;
+
+    nearbyFoodRow = nearbyFood[r];
+    c = col;
+    nearbyFoodRow[c]--;
+    c++;
+    nearbyFoodRow[c]--;
+    c++;
+    nearbyFoodRow[c]--;
   }
 
   public List<EntityModel<EntityType>> getEntities() {
@@ -98,11 +157,14 @@ public final class PrimordialEnvironmentModel extends
     entityMatrix = new int[getHeight()+2][];
     entityModelMatrix = new PrimordialEntityModel[getHeight()+2][];
     foodMatrix = new int[getHeight()+2][];
+    nearbyFood = new int[getHeight()+2][];
+
     // Allocate cells.
     for (int row = 0; row < entityMatrix.length; row++) {
       entityMatrix[row] = new int[getWidth()+2];
       entityModelMatrix[row] = new PrimordialEntityModel[getWidth()+2];
       foodMatrix[row] = new int[getWidth()+2];
+      nearbyFood[row] = new int[getWidth()+2];
     }
 
     // Add entities to the appropriate cells.
