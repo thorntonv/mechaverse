@@ -128,7 +128,6 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
     final PrimordialEnvironmentModel envModel = environment.getModel();
     final int[][] entityMatrix = envModel.getEntityMatrix();
     final int[][] foodMatrix = envModel.getFoodMatrix();
-    final int[][] nearbyFoodMatrix = envModel.getNearbyFoodMatrix();
     final int[] inputData = new int[1];
 
     // Add new entities.
@@ -151,34 +150,64 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
       final int frontCol = col + CELL_DIRECTION_COL_OFFSETS[entityDirectionOrdinal];
 
       int leftCol = col - 1;
+
       // Nearby entity.
-      int entitySum = 0;
+      int nearbyEntity = 0;
+
       int r = row - 1;
       int[] matrixRow = entityMatrix[r];
       int c = leftCol;
-      entitySum |= matrixRow[c];
+      nearbyEntity |= matrixRow[c];
       c++;
-      entitySum |= matrixRow[c];
+      nearbyEntity |= matrixRow[c];
       c++;
-      entitySum |= matrixRow[c];
+      nearbyEntity |= matrixRow[c];
+
       r++;
       c = leftCol;
       matrixRow = entityMatrix[r];
-      entitySum |= matrixRow[c];
+      nearbyEntity |= matrixRow[c];
       c += 2;
-      entitySum |= matrixRow[c];
+      nearbyEntity |= matrixRow[c];
+
       r++;
       c = leftCol;
       matrixRow = entityMatrix[r];
-      entitySum |= matrixRow[c];
+      nearbyEntity |= matrixRow[c];
       c++;
-      entitySum |= matrixRow[c];
+      nearbyEntity |= matrixRow[c];
       c++;
-      entitySum |= matrixRow[c];
+      nearbyEntity |= matrixRow[c];
 
       // Nearby food.
-      assert nearbyFoodMatrix[row][col] >= 0;
-      int nearbyFood = nearbyFoodMatrix[row][col] > 0 ? 1 : 0;
+      int nearbyFood = 0;
+
+      r = row - 1;
+      matrixRow = foodMatrix[r];
+      c = leftCol;
+      nearbyFood |= matrixRow[c];
+      c++;
+      nearbyFood |= matrixRow[c];
+      c++;
+      nearbyFood |= matrixRow[c];
+
+      r++;
+      matrixRow = foodMatrix[r];
+      c = leftCol;
+      nearbyFood |= matrixRow[c];
+      c++;
+      nearbyFood |= matrixRow[c];
+      c++;
+      nearbyFood |= matrixRow[c];
+
+      r++;
+      matrixRow = foodMatrix[r];
+      c = leftCol;
+      nearbyFood |= matrixRow[c];
+      c++;
+      nearbyFood |= matrixRow[c];
+      c++;
+      nearbyFood |= matrixRow[c];
 
       // Front entity.
       int frontEntityOrdinal = NONE_ORDINAL;
@@ -193,7 +222,7 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
       value <<= 2;
       value |= frontEntityOrdinal;
       value <<= 1;
-      value |= entitySum;
+      value |= nearbyEntity;
       value <<= 1;
       value |= nearbyFood;
 
