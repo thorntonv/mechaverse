@@ -4,6 +4,8 @@ import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEn
 import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_OUTPUT_MAP_KEY;
 import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_STATE_KEY;
 import static org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY;
+import static org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel.ENTITY_MASK;
+import static org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel.FOOD_ENTITY_MASK;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
@@ -127,7 +129,6 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
 
     final PrimordialEnvironmentModel envModel = environment.getModel();
     final int[][] entityMatrix = envModel.getEntityMatrix();
-    final int[][] foodMatrix = envModel.getFoodMatrix();
     final int[] inputData = new int[1];
 
     // Add new entities.
@@ -151,69 +152,60 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
 
       int leftCol = col - 1;
 
-      // Nearby entity.
+      // Nearby entity / food.
       int nearbyEntity = 0;
-
-      int r = row - 1;
-      int[] matrixRow = entityMatrix[r];
-      int c = leftCol;
-      nearbyEntity |= matrixRow[c];
-      c++;
-      nearbyEntity |= matrixRow[c];
-      c++;
-      nearbyEntity |= matrixRow[c];
-
-      r++;
-      c = leftCol;
-      matrixRow = entityMatrix[r];
-      nearbyEntity |= matrixRow[c];
-      c += 2;
-      nearbyEntity |= matrixRow[c];
-
-      r++;
-      c = leftCol;
-      matrixRow = entityMatrix[r];
-      nearbyEntity |= matrixRow[c];
-      c++;
-      nearbyEntity |= matrixRow[c];
-      c++;
-      nearbyEntity |= matrixRow[c];
-
-      // Nearby food.
       int nearbyFood = 0;
 
-      r = row - 1;
-      matrixRow = foodMatrix[r];
-      c = leftCol;
-      nearbyFood |= matrixRow[c];
+      int r = row - 1;
+      int c = leftCol;
+      int[] entityMatrixRow = entityMatrix[r];
+      int tmp = entityMatrixRow[c];
+      nearbyEntity |= tmp & ENTITY_MASK;
+      nearbyFood |= tmp & FOOD_ENTITY_MASK;
       c++;
-      nearbyFood |= matrixRow[c];
+      tmp = entityMatrixRow[c];
+      nearbyEntity |= tmp & ENTITY_MASK;
+      nearbyFood |= tmp & FOOD_ENTITY_MASK;
       c++;
-      nearbyFood |= matrixRow[c];
+      tmp = entityMatrixRow[c];
+      nearbyEntity |= tmp & ENTITY_MASK;
+      nearbyFood |= tmp & FOOD_ENTITY_MASK;
 
       r++;
-      matrixRow = foodMatrix[r];
       c = leftCol;
-      nearbyFood |= matrixRow[c];
+      entityMatrixRow = entityMatrix[r];
+      tmp = entityMatrixRow[c];
+      nearbyEntity |= tmp & ENTITY_MASK;
+      nearbyFood |= tmp & FOOD_ENTITY_MASK;
       c++;
-      nearbyFood |= matrixRow[c];
+      // Skip checking the entity itself.
+      nearbyFood |= entityMatrixRow[c] & FOOD_ENTITY_MASK;
       c++;
-      nearbyFood |= matrixRow[c];
+      tmp = entityMatrixRow[c];
+      nearbyEntity |= tmp & ENTITY_MASK;
+      nearbyFood |= tmp & FOOD_ENTITY_MASK;
 
       r++;
-      matrixRow = foodMatrix[r];
       c = leftCol;
-      nearbyFood |= matrixRow[c];
+      entityMatrixRow = entityMatrix[r];
+      tmp = entityMatrixRow[c];
+      nearbyEntity |= tmp & ENTITY_MASK;
+      nearbyFood |= tmp & FOOD_ENTITY_MASK;
       c++;
-      nearbyFood |= matrixRow[c];
+      tmp = entityMatrixRow[c];
+      nearbyEntity |= tmp & ENTITY_MASK;
+      nearbyFood |= tmp & FOOD_ENTITY_MASK;
       c++;
-      nearbyFood |= matrixRow[c];
+      tmp = entityMatrixRow[c];
+      nearbyEntity |= tmp & ENTITY_MASK;
+      nearbyFood |= tmp & FOOD_ENTITY_MASK;
 
       // Front entity.
       int frontEntityOrdinal = NONE_ORDINAL;
-      if (entityMatrix[frontRow][frontCol] != 0) {
+      tmp = entityMatrix[frontRow][frontCol];
+      if ((tmp & ENTITY_MASK) != 0) {
         frontEntityOrdinal = ENTITY_ORDINAL;
-      } else if (foodMatrix[frontRow][frontCol] != 0) {
+      } else if ((tmp & FOOD_ENTITY_MASK) != 0) {
         frontEntityOrdinal = FOOD_ORDINAL;
       }
 
@@ -241,7 +233,6 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
     final PrimordialEnvironmentModel envModel = environment.getModel();
     final int[][] entityMatrix = envModel.getEntityMatrix();
     final PrimordialEntityModel[][] entityModelMatrix = envModel.getEntityModelMatrix();
-    final int[][] foodMatrix = envModel.getFoodMatrix();
 
     final int maxRow = envModel.getHeight() - 1;
     final int maxCol = envModel.getWidth() - 1;
@@ -259,7 +250,7 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
       int energy = entityEnergy[idx] - 1;
 
       if (energy <= 0) {
-        if (entityMatrix[row][col] != 0) {
+        if ((entityMatrix[row][col] & ENTITY_MASK) > 0) {
           PrimordialEntityModel entityModel = entityModelMatrix[row][col];
           entityModel.setY(entityRow);
           entityModel.setX(entityCol);
@@ -268,7 +259,7 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
         continue;
       }
 
-      assert entityMatrix[row][col] == 1 : "" + energy;
+      assert (entityMatrix[row][col] & ENTITY_MASK) > 0;
       assert entityModelMatrix[row][col] != null;
 
       // Decode output.
@@ -283,19 +274,19 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
       final boolean consume = outputValue > 0;
 
       // Consume action.
-      if (consume && foodMatrix[row][col] == 1) {
+      if (consume && (entityMatrix[row][col] & FOOD_ENTITY_MASK) > 0) {
         envModel.removeFood(entityRow, entityCol);
         environment.removeEntity(FOOD_INSTANCE);
         energy += foodEnergy;
       }
 
       // Move action.
-      if (moveDirectionOrdinal == MOVE_FORWARD_ORDINAL && entityMatrix[frontRow][frontCol] == 0 &&
+      if (moveDirectionOrdinal == MOVE_FORWARD_ORDINAL && (entityMatrix[frontRow][frontCol] & ENTITY_MASK) == 0 &&
           frontRow > 0 && frontCol > 0 && frontRow < maxRow && frontCol < maxCol) {
         entityModelMatrix[frontRow][frontCol] = entityModelMatrix[row][col];
         entityModelMatrix[row][col] = null;
-        entityMatrix[row][col] = 0;
-        entityMatrix[frontRow][frontCol] = 1;
+        entityMatrix[row][col] &= ~ENTITY_MASK;
+        entityMatrix[frontRow][frontCol] |= ENTITY_MASK;
         entityRows[idx] = frontRow - 1;
         entityCols[idx] = frontCol - 1;
       }

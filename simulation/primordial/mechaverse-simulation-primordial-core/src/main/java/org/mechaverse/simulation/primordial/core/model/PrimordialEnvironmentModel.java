@@ -9,16 +9,14 @@ import org.mechaverse.simulation.primordial.core.entity.EntityUtil;
 public final class PrimordialEnvironmentModel extends
     EnvironmentModel<EntityModel<EntityType>, EntityType> {
 
+  public static final int ENTITY_MASK = 0b1;
+  public static final int FOOD_ENTITY_MASK = 0b10;
+
   private int[][] entityMatrix;
   private PrimordialEntityModel[][] entityModelMatrix;
-  private int[][] foodMatrix;
 
   public int[][] getEntityMatrix() {
     return entityMatrix;
-  }
-
-  public int[][] getFoodMatrix() {
-    return foodMatrix;
   }
 
   public PrimordialEntityModel[][] getEntityModelMatrix() {
@@ -33,7 +31,7 @@ public final class PrimordialEnvironmentModel extends
     int row = entityModel.getY() + 1;
     int col = entityModel.getX() + 1;
     entityModelMatrix[row][col] = entityModel;
-    entityMatrix[row][col] = 1;
+    entityMatrix[row][col] |= ENTITY_MASK;
   }
 
   @Override
@@ -43,7 +41,7 @@ public final class PrimordialEnvironmentModel extends
       int row = entity.getY() + 1;
       int col = entity.getX() + 1;
       entityModelMatrix[row][col] = null;
-      entityMatrix[row][col] = 0;
+      entityMatrix[row][col] &= ~ENTITY_MASK;
     }
   }
 
@@ -52,15 +50,15 @@ public final class PrimordialEnvironmentModel extends
   }
 
   public void addFood(int row, int col) {
-    foodMatrix[row+1][col+1] = 1;
+    entityMatrix[row+1][col+1] |= FOOD_ENTITY_MASK;
   }
 
   public boolean hasFood(int row, int col) {
-    return foodMatrix[row + 1][col + 1] > 0;
+    return (entityMatrix[row + 1][col + 1] & FOOD_ENTITY_MASK) > 0;
   }
 
   public void removeFood(int row, int col) {
-    foodMatrix[row+1][col+1] = 0;
+    entityMatrix[row+1][col+1] &= ~FOOD_ENTITY_MASK;
   }
 
   public List<EntityModel<EntityType>> getEntities() {
@@ -75,9 +73,9 @@ public final class PrimordialEnvironmentModel extends
         }
       }
     }
-    for(int row = 0; row < foodMatrix.length; row++) {
-      for(int col = 0; col < foodMatrix[row].length; col++) {
-        if(foodMatrix[row][col] > 0) {
+    for(int row = 0; row < entityMatrix.length; row++) {
+      for(int col = 0; col < entityMatrix[row].length; col++) {
+        if((entityMatrix[row][col] & FOOD_ENTITY_MASK) > 0) {
           Food foodModel = new Food();
           foodModel.setEnergy(100);
           foodModel.setY(row);
@@ -97,13 +95,11 @@ public final class PrimordialEnvironmentModel extends
   public void initCells() {
     entityMatrix = new int[getHeight()+2][];
     entityModelMatrix = new PrimordialEntityModel[getHeight()+2][];
-    foodMatrix = new int[getHeight()+2][];
 
     // Allocate cells.
     for (int row = 0; row < entityMatrix.length; row++) {
       entityMatrix[row] = new int[getWidth()+2];
       entityModelMatrix[row] = new PrimordialEntityModel[getWidth()+2];
-      foodMatrix[row] = new int[getWidth()+2];
     }
 
     // Add entities to the appropriate cells.

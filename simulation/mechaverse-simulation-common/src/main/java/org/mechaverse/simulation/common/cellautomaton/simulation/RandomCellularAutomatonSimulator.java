@@ -13,7 +13,6 @@ public class RandomCellularAutomatonSimulator implements CellularAutomatonSimula
   private final int stateSize;
   private final int outputSize;
   private CellularAutomatonAllocator allocator;
-  private int[][] randomOutputs;
   private Random random = new Random();
 
   public RandomCellularAutomatonSimulator(int size, int inputSize, int stateSize, int outputSize) {
@@ -23,19 +22,6 @@ public class RandomCellularAutomatonSimulator implements CellularAutomatonSimula
     this.outputSize = outputSize;
 
     this.allocator = new CellularAutomatonAllocator(size);
-
-    randomOutputs = generateRandomOutputData(RANDOM_OUTPUT_COUNT, outputSize);
-  }
-
-  private int[][] generateRandomOutputData(int count, int size) {
-    int[][] data = new int[count][size];
-    for (int i = 0; i < data.length; i++) {
-      data[i] = new int[size];
-      for (int j = 0; j < data[i].length; j++) {
-        data[i][j] = random.nextInt();
-      }
-    }
-    return data;
   }
 
   @Override
@@ -80,8 +66,9 @@ public class RandomCellularAutomatonSimulator implements CellularAutomatonSimula
 
   @Override
   public void getAutomatonOutput(int index, int[] output) {
-    int[] randomOutput = randomOutputs[random.nextInt(randomOutputs.length)];
-    System.arraycopy(randomOutput, 0, output, 0, randomOutput.length);
+    for(int idx = 0; idx < output.length; idx++) {
+      output[idx] = random.nextInt();
+    }
   }
 
   @Override
