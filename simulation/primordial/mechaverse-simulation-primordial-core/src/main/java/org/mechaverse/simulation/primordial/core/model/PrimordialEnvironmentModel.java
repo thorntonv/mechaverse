@@ -12,10 +12,10 @@ public final class PrimordialEnvironmentModel extends
   public static final int ENTITY_MASK = 0b1;
   public static final int FOOD_ENTITY_MASK = 0b10;
 
-  private int[][] entityMatrix;
+  private byte[][] entityMatrix;
   private PrimordialEntityModel[][] entityModelMatrix;
 
-  public int[][] getEntityMatrix() {
+  public byte[][] getEntityMatrix() {
     return entityMatrix;
   }
 
@@ -93,12 +93,12 @@ public final class PrimordialEnvironmentModel extends
   }
 
   public void initCells() {
-    entityMatrix = new int[getHeight()+2][];
+    entityMatrix = new byte[getHeight()+2][];
     entityModelMatrix = new PrimordialEntityModel[getHeight()+2][];
 
     // Allocate cells.
     for (int row = 0; row < entityMatrix.length; row++) {
-      entityMatrix[row] = new int[getWidth()+2];
+      entityMatrix[row] = new byte[getWidth()+2];
       entityModelMatrix[row] = new PrimordialEntityModel[getWidth()+2];
     }
 

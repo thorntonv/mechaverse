@@ -128,7 +128,7 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
     }
 
     final PrimordialEnvironmentModel envModel = environment.getModel();
-    final int[][] entityMatrix = envModel.getEntityMatrix();
+    final byte[][] entityMatrix = envModel.getEntityMatrix();
     final int[] inputData = new int[1];
 
     // Add new entities.
@@ -158,8 +158,8 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
 
       int r = row - 1;
       int c = leftCol;
-      int[] entityMatrixRow = entityMatrix[r];
-      int tmp = entityMatrixRow[c];
+      byte[] entityMatrixRow = entityMatrix[r];
+      byte tmp = entityMatrixRow[c];
       nearbyEntity |= tmp & ENTITY_MASK;
       nearbyFood |= tmp & FOOD_ENTITY_MASK;
       c++;
@@ -231,7 +231,7 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
       RandomGenerator random) {
 
     final PrimordialEnvironmentModel envModel = environment.getModel();
-    final int[][] entityMatrix = envModel.getEntityMatrix();
+    final byte[][] entityMatrix = envModel.getEntityMatrix();
     final PrimordialEntityModel[][] entityModelMatrix = envModel.getEntityModelMatrix();
 
     final int maxRow = envModel.getHeight() - 1;

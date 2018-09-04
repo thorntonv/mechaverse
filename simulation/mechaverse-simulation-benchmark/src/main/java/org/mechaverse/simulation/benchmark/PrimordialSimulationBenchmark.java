@@ -51,7 +51,7 @@ public class PrimordialSimulationBenchmark {
       PrimordialSimulationModel model = modelGenerator.generate(new Well19937c());
       model.setEntityMaxCountPerEnvironment(numEntities / (subEnvironmentCount + 1));
       simulation.setState(model);
-      for(int cnt = 1; cnt <= 5; cnt++) {
+      for(int cnt = 1; cnt <= 1000/stepCount; cnt++) {
         simulation.step(stepCount);
       }
     }
