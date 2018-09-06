@@ -70,7 +70,7 @@ public class EntityReproductionBehavior extends PrimordialEnvironmentBehavior {
             int row = random.nextInt(envModel.getHeight());
             int col = random.nextInt(envModel.getWidth());
 
-            if (envModel.isValidCell(row, col) && envModel.getEntity(row, col) == null) {
+            if (envModel.isValidCell(row, col) && !envModel.hasEntity(row, col)) {
                 PrimordialEntityModel selectedEntity = fitnessDistribution.selectEntity(random);
                 PrimordialEntityModel clone = generateRandomEntity(state, random);
                 clone.setX(col);

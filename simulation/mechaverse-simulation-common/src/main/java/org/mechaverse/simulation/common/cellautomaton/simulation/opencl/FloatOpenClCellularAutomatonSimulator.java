@@ -53,8 +53,18 @@ public class FloatOpenClCellularAutomatonSimulator
   }
 
   @Override
+  public void getAutomataState(int[] state) {
+    getAutomataState(toFloatArray(state));
+  }
+
+  @Override
   public void setAutomatonState(int index, int[] state) {
     setAutomatonState(index, toFloatArray(state));
+  }
+
+  @Override
+  public void setAutomataState(int[] state) {
+    setAutomataState(toFloatArray(state));
   }
 
   @Override
@@ -63,9 +73,21 @@ public class FloatOpenClCellularAutomatonSimulator
   }
 
   @Override
+  public void setAutomataInput(int[] input) {
+    setAutomataInput(toFloatArray(input));
+  }
+
+  @Override
   public void getAutomatonOutput(int index, int[] output) {
     float[] result = new float[output.length];
     getAutomatonOutput(index, result);
+    copyToIntArray(result, output);
+  }
+
+  @Override
+  public void getAutomataOutput(int[] output) {
+    float[] result = new float[output.length];
+    getAutomataOutput(result);
     copyToIntArray(result, output);
   }
 

@@ -86,8 +86,28 @@ public final class JavaCellularAutomatonSimulator implements CellularAutomatonSi
   }
 
   @Override
+  public void getAutomataState(int[] state) {
+    final int automatonStateSize = getAutomatonStateSize();
+    final int[] buffer = new int[automatonStateSize];
+    for (int idx = 0; idx < simulations.length; idx++) {
+      getAutomatonState(idx, buffer);
+      System.arraycopy(buffer, 0, state, idx * automatonStateSize, automatonStateSize);
+    }
+  }
+
+  @Override
   public void setAutomatonState(int index, int[] state) {
     simulations[index].setState(state);
+  }
+
+  @Override
+  public void setAutomataState(int[] state) {
+    final int automatonStateSize = getAutomatonStateSize();
+    final int[] buffer = new int[automatonStateSize];
+    for (int idx = 0; idx < simulations.length; idx++) {
+      System.arraycopy(state, idx * automatonStateSize, buffer, 0, automatonStateSize);
+      setAutomatonState(idx, buffer);
+    }
   }
 
   @Override
@@ -104,8 +124,28 @@ public final class JavaCellularAutomatonSimulator implements CellularAutomatonSi
   }
 
   @Override
+  public void setAutomataInput(int[] input) {
+    final int automatonInputSize = getAutomatonInputSize();
+    final int[] buffer = new int[automatonInputSize];
+    for (int idx = 0; idx < simulations.length; idx++) {
+      System.arraycopy(input, idx * automatonInputSize, buffer, 0, automatonInputSize);
+      setAutomatonInput(idx, buffer);
+    }
+  }
+
+  @Override
   public void getAutomatonOutput(int index, int[] output) {
     simulations[index].getOutput(output);
+  }
+
+  @Override
+  public void getAutomataOutput(int[] output) {
+    final int automatonOutputSize = getAutomatonOutputSize();
+    final int[] buffer = new int[automatonOutputSize];
+    for (int idx = 0; idx < simulations.length; idx++) {
+      getAutomatonOutput(idx, buffer);
+      System.arraycopy(buffer, 0, output, idx * automatonOutputSize, automatonOutputSize);
+    }
   }
 
   @Override

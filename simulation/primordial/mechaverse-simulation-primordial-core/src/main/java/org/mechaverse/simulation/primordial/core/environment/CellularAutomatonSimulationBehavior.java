@@ -3,13 +3,14 @@ package org.mechaverse.simulation.primordial.core.environment;
 import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_INPUT_MAP_KEY;
 import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_OUTPUT_MAP_KEY;
 import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_STATE_KEY;
-import static org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY;
 import static org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel.ENTITY_MASK;
 import static org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel.FOOD_ENTITY_MASK;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -28,7 +29,6 @@ import org.mechaverse.simulation.common.util.SimulationModelUtil;
 import org.mechaverse.simulation.common.util.SimulationUtil;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
 import org.mechaverse.simulation.primordial.core.model.Food;
-import org.mechaverse.simulation.primordial.core.model.PrimordialEntityModel;
 import org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel;
 import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,10 +74,16 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
   private int[] entityCols;
   private int[] entityEnergy;
   private int[] entityDirections;
+  private final TIntObjectMap<EntityModel<EntityType>> automatonIdxEntityModelMap = new TIntObjectHashMap<>();
+  private final Map<EntityModel<EntityType>, Integer> entityModelAutomatonIdxMap = Maps.newIdentityHashMap();
+
+
+  private int[] stateData;
+  private int[] inputData;
+  private int[] outputData;
 
   private int maxEnergyLevel;
   private final Set<EntityModel<EntityType>> newEntities = Sets.newLinkedHashSet();
-  private final Map<EntityModel<EntityType>, Integer> entityModelIndexMap = Maps.newIdentityHashMap();
   private boolean ioMapsSet = false;
 
   @Override
@@ -99,6 +105,14 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
       entityCols = new int[numAutomata];
       entityEnergy = new int[numAutomata];
       entityDirections = new int[numAutomata];
+      for(int idx = 0; idx < numAutomata; idx++) {
+        entityRows[idx] = -1;
+        entityCols[idx] = -1;
+      }
+
+      stateData = new int[simulator.getAutomatonStateSize() * numAutomata];
+      inputData = new int[simulator.getAutomatonInputSize() * numAutomata];
+      outputData = new int[simulator.getAutomatonOutputSize() * numAutomata];
 
       maxEnergyLevel = state.getEntityInitialEnergy();
       generateIOMaps(state);
@@ -109,7 +123,7 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
   public void updateState(PrimordialSimulationModel state,
       Environment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> environment) {
     super.updateState(state, environment);
-    for (Map.Entry<EntityModel<EntityType>, Integer> entry : entityModelIndexMap.entrySet()) {
+    for (Map.Entry<EntityModel<EntityType>, Integer> entry : entityModelAutomatonIdxMap.entrySet()) {
       EntityModel<EntityType> entityModel = entry.getKey();
       int automatonIdx = entry.getValue();
       entityModel.setY(entityRows[automatonIdx]);
@@ -129,98 +143,130 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
 
     final PrimordialEnvironmentModel envModel = environment.getModel();
     final byte[][] entityMatrix = envModel.getEntityMatrix();
-    final int[] inputData = new int[1];
 
     // Add new entities.
+
+    if(newEntities.size() > 0) {
+      simulator.getAutomataState(stateData);
+    }
+
     for(EntityModel<EntityType> entityModel : newEntities) {
       initEntity(entityModel, random);
     }
-    newEntities.clear();
 
-    for (int idx = 0; idx < numAutomata; idx++) {
-      final int energy = entityEnergy[idx];
-      if (energy <= 0) {
-        continue;
-      }
-      final int entityRow = entityRows[idx];
-      final int entityCol = entityCols[idx];
-      final int row = entityRow + 1;
-      final int col = entityCol + 1;
-      final int entityDirectionOrdinal = entityDirections[idx];
-      final int frontRow = row + CELL_DIRECTION_ROW_OFFSETS[entityDirectionOrdinal];
-      final int frontCol = col + CELL_DIRECTION_COL_OFFSETS[entityDirectionOrdinal];
-
-      int leftCol = col - 1;
-
-      // Nearby entity / food.
-      int nearbyEntity = 0;
-      int nearbyFood = 0;
-
-      int r = row - 1;
-      int c = leftCol;
-      byte[] entityMatrixRow = entityMatrix[r];
-      byte tmp = entityMatrixRow[c];
-      nearbyEntity |= tmp & ENTITY_MASK;
-      nearbyFood |= tmp & FOOD_ENTITY_MASK;
-      c++;
-      tmp = entityMatrixRow[c];
-      nearbyEntity |= tmp & ENTITY_MASK;
-      nearbyFood |= tmp & FOOD_ENTITY_MASK;
-      c++;
-      tmp = entityMatrixRow[c];
-      nearbyEntity |= tmp & ENTITY_MASK;
-      nearbyFood |= tmp & FOOD_ENTITY_MASK;
-
-      r++;
-      c = leftCol;
-      entityMatrixRow = entityMatrix[r];
-      tmp = entityMatrixRow[c];
-      nearbyEntity |= tmp & ENTITY_MASK;
-      nearbyFood |= tmp & FOOD_ENTITY_MASK;
-      c++;
-      // Skip checking the entity itself.
-      nearbyFood |= entityMatrixRow[c] & FOOD_ENTITY_MASK;
-      c++;
-      tmp = entityMatrixRow[c];
-      nearbyEntity |= tmp & ENTITY_MASK;
-      nearbyFood |= tmp & FOOD_ENTITY_MASK;
-
-      r++;
-      c = leftCol;
-      entityMatrixRow = entityMatrix[r];
-      tmp = entityMatrixRow[c];
-      nearbyEntity |= tmp & ENTITY_MASK;
-      nearbyFood |= tmp & FOOD_ENTITY_MASK;
-      c++;
-      tmp = entityMatrixRow[c];
-      nearbyEntity |= tmp & ENTITY_MASK;
-      nearbyFood |= tmp & FOOD_ENTITY_MASK;
-      c++;
-      tmp = entityMatrixRow[c];
-      nearbyEntity |= tmp & ENTITY_MASK;
-      nearbyFood |= tmp & FOOD_ENTITY_MASK;
-
-      // Front entity.
-      int frontEntityOrdinal = NONE_ORDINAL;
-      tmp = entityMatrix[frontRow][frontCol];
-      if ((tmp & ENTITY_MASK) != 0) {
-        frontEntityOrdinal = ENTITY_ORDINAL;
-      } else if ((tmp & FOOD_ENTITY_MASK) != 0) {
-        frontEntityOrdinal = FOOD_ORDINAL;
-      }
-
-      // Encode input.
-      int value = energy * 3 / maxEnergyLevel;
-      value <<= 2;
-      value |= frontEntityOrdinal;
-      value <<= 1;
-      value |= nearbyEntity;
-      value <<= 1;
-      value |= nearbyFood;
-
-      inputData[0] = value;
-      simulator.setAutomatonInput(idx, inputData);
+    if (newEntities.size() > 0) {
+      simulator.setAutomataState(stateData);
+      newEntities.clear();
     }
+
+    for (int idx = 0; idx < numAutomata; ) {
+      int i1 = 0;
+      int i2 = 0;
+      int i3 = 0;
+      int i4 = 0;
+      int i5 = 0;
+      int i6 = 0;
+      final int automatonInputIdx = idx / Integer.SIZE;
+
+      final int maxCount = Math.min(32, numAutomata - idx);
+      for (int cnt = 1; cnt <= maxCount; cnt++) {
+        final int energy = entityEnergy[idx];
+        if (energy <= 0) {
+          idx++;
+          continue;
+        }
+        final int entityRow = entityRows[idx];
+        final int entityCol = entityCols[idx];
+        final int row = entityRow + 1;
+        final int col = entityCol + 1;
+        final int entityDirectionOrdinal = entityDirections[idx];
+        final int frontRow = row + CELL_DIRECTION_ROW_OFFSETS[entityDirectionOrdinal];
+        final int frontCol = col + CELL_DIRECTION_COL_OFFSETS[entityDirectionOrdinal];
+
+        int leftCol = col - 1;
+
+        // Nearby entity / food.
+        int nearbyEntity = 0;
+        int nearbyFood = 0;
+
+        int r = row - 1;
+        int c = leftCol;
+        byte[] entityMatrixRow = entityMatrix[r];
+        byte tmp = entityMatrixRow[c];
+        nearbyEntity |= tmp & ENTITY_MASK;
+        nearbyFood |= tmp & FOOD_ENTITY_MASK;
+        c++;
+        tmp = entityMatrixRow[c];
+        nearbyEntity |= tmp & ENTITY_MASK;
+        nearbyFood |= tmp & FOOD_ENTITY_MASK;
+        c++;
+        tmp = entityMatrixRow[c];
+        nearbyEntity |= tmp & ENTITY_MASK;
+        nearbyFood |= tmp & FOOD_ENTITY_MASK;
+
+        r++;
+        c = leftCol;
+        entityMatrixRow = entityMatrix[r];
+        tmp = entityMatrixRow[c];
+        nearbyEntity |= tmp & ENTITY_MASK;
+        nearbyFood |= tmp & FOOD_ENTITY_MASK;
+        c++;
+        // Skip checking the entity itself.
+        nearbyFood |= entityMatrixRow[c] & FOOD_ENTITY_MASK;
+        c++;
+        tmp = entityMatrixRow[c];
+        nearbyEntity |= tmp & ENTITY_MASK;
+        nearbyFood |= tmp & FOOD_ENTITY_MASK;
+
+        r++;
+        c = leftCol;
+        entityMatrixRow = entityMatrix[r];
+        tmp = entityMatrixRow[c];
+        nearbyEntity |= tmp & ENTITY_MASK;
+        nearbyFood |= tmp & FOOD_ENTITY_MASK;
+        c++;
+        tmp = entityMatrixRow[c];
+        nearbyEntity |= tmp & ENTITY_MASK;
+        nearbyFood |= tmp & FOOD_ENTITY_MASK;
+        c++;
+        tmp = entityMatrixRow[c];
+        nearbyEntity |= tmp & ENTITY_MASK;
+        nearbyFood |= tmp & FOOD_ENTITY_MASK;
+        nearbyFood >>= 1;
+
+        // Front entity.
+        int frontEntityOrdinal = NONE_ORDINAL;
+        tmp = entityMatrix[frontRow][frontCol];
+        if ((tmp & ENTITY_MASK) != 0) {
+          frontEntityOrdinal = ENTITY_ORDINAL;
+        } else if ((tmp & FOOD_ENTITY_MASK) != 0) {
+          frontEntityOrdinal = FOOD_ORDINAL;
+        }
+
+        // Encode input.
+        final int bitOffset = idx % Integer.SIZE;
+
+        int value = energy * 3 / maxEnergyLevel;
+        i1 |= (value & 0b1) << bitOffset;
+        i2 |= (value >> 1) << bitOffset;
+        value = frontEntityOrdinal;
+        i3 |= (value & 0b1) << bitOffset;
+        i4 |= (value >> 1) << bitOffset;
+        i5 |= (nearbyEntity & 0b1) << bitOffset;
+        i6 |= (nearbyFood & 0b1) << bitOffset;
+
+        idx++;
+      }
+
+      inputData[automatonInputIdx] = i1;
+      inputData[automatonInputIdx + 1] = i2;
+      inputData[automatonInputIdx + 2] = i3;
+      inputData[automatonInputIdx + 3] = i4;
+      inputData[automatonInputIdx + 4] = i5;
+      inputData[automatonInputIdx + 5] = i6;
+    }
+
+    simulator.setAutomataInput(inputData);
 
     simulator.update();
   }
@@ -232,73 +278,80 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
 
     final PrimordialEnvironmentModel envModel = environment.getModel();
     final byte[][] entityMatrix = envModel.getEntityMatrix();
-    final PrimordialEntityModel[][] entityModelMatrix = envModel.getEntityModelMatrix();
 
     final int maxRow = envModel.getHeight() - 1;
     final int maxCol = envModel.getWidth() - 1;
     final int foodEnergy = state.getFoodInitialEnergy();
 
-    for (int idx = 0; idx < numAutomata; idx++) {
-      final int entityRow = entityRows[idx];
-      final int entityCol = entityCols[idx];
-      final int row = entityRow + 1;
-      final int col = entityCol + 1;
-      final int directionOrdinal = entityDirections[idx];
-      final int frontRow = row + CELL_DIRECTION_ROW_OFFSETS[directionOrdinal];
-      final int frontCol = col + CELL_DIRECTION_COL_OFFSETS[directionOrdinal];
+    simulator.getAutomataOutput(outputData);
 
-      int energy = entityEnergy[idx] - 1;
+    for (int idx = 0; idx < numAutomata; ) {
+      final int automatonOutputIdx = idx / Integer.SIZE;
+      int o1 = outputData[automatonOutputIdx];
+      int o2 = outputData[automatonOutputIdx + 1];
+      int o3 = outputData[automatonOutputIdx + 2];
+      int o4 = outputData[automatonOutputIdx + 3];
 
-      if (energy <= 0) {
-        if ((entityMatrix[row][col] & ENTITY_MASK) > 0) {
-          PrimordialEntityModel entityModel = entityModelMatrix[row][col];
-          entityModel.setY(entityRow);
-          entityModel.setX(entityCol);
-          environment.removeEntity(entityModel);
+      final int maxCount = Math.min(32, numAutomata - idx);
+      for (int cnt = 1; cnt <= maxCount; cnt++) {
+        final int entityRow = entityRows[idx];
+        final int entityCol = entityCols[idx];
+        final int row = entityRow + 1;
+        final int col = entityCol + 1;
+        final int directionOrdinal = entityDirections[idx];
+        final int frontRow = row + CELL_DIRECTION_ROW_OFFSETS[directionOrdinal];
+        final int frontCol = col + CELL_DIRECTION_COL_OFFSETS[directionOrdinal];
+
+        int energy = entityEnergy[idx] - 1;
+
+        if (energy <= 0) {
+          if (entityRow >= 0 && entityCol >= 0 && (entityMatrix[row][col] & ENTITY_MASK) > 0) {
+            EntityModel<EntityType> entityModel = automatonIdxEntityModelMap.get(idx);
+            entityModel.setY(entityRow);
+            entityModel.setX(entityCol);
+            environment.removeEntity(entityModel);
+          }
+          idx++;
+          continue;
         }
-        continue;
+
+        assert (entityMatrix[row][col] & ENTITY_MASK) > 0;
+        assert automatonIdxEntityModelMap.containsKey(idx);
+
+        // Decode output.
+        final int bitOffset = idx % Integer.SIZE;
+        final int moveDirectionOrdinal = (o1 >> bitOffset) & 0b1;
+        final int turnDirectionOrdinal = (((o2 >> bitOffset) & 0b1) << 1) | ((o3 >> bitOffset) & 0b1);
+        final boolean consume = ((o4 >> bitOffset) & 0b1) > 0;
+
+        // Consume action.
+        if (consume && (entityMatrix[row][col] & FOOD_ENTITY_MASK) > 0) {
+          envModel.removeFood(entityRow, entityCol);
+          environment.removeEntity(FOOD_INSTANCE);
+          energy += foodEnergy;
+        }
+
+        // Move action.
+        if (moveDirectionOrdinal == MOVE_FORWARD_ORDINAL
+            && (entityMatrix[frontRow][frontCol] & ENTITY_MASK) == 0 &&
+            frontRow > 0 && frontCol > 0 && frontRow < maxRow && frontCol < maxCol) {
+          entityMatrix[row][col] &= ~ENTITY_MASK;
+          entityMatrix[frontRow][frontCol] |= ENTITY_MASK;
+          entityRows[idx] = frontRow - 1;
+          entityCols[idx] = frontCol - 1;
+        }
+
+        // Turn action.
+        if (turnDirectionOrdinal == TURN_CLOCKWISE_ORDINAL) {
+          entityDirections[idx] = TURN_CLOCKWISE[directionOrdinal];
+        } else if (turnDirectionOrdinal == TURN_COUNTERCLOCKWISE_ORDINAL) {
+          entityDirections[idx] = TURN_COUNTERCLOCKWISE[directionOrdinal];
+        }
+
+        entityEnergy[idx] = energy;
+
+        idx++;
       }
-
-      assert (entityMatrix[row][col] & ENTITY_MASK) > 0;
-      assert entityModelMatrix[row][col] != null;
-
-      // Decode output.
-      int[] outputData = new int[1];
-      simulator.getAutomatonOutput(idx, outputData);
-      int outputValue = outputData[0];
-
-      final int moveDirectionOrdinal = outputValue & 0b1;
-      outputValue >>= 1;
-      final int turnDirectionOrdinal = outputValue & 0b11;
-      outputValue >>= 2;
-      final boolean consume = outputValue > 0;
-
-      // Consume action.
-      if (consume && (entityMatrix[row][col] & FOOD_ENTITY_MASK) > 0) {
-        envModel.removeFood(entityRow, entityCol);
-        environment.removeEntity(FOOD_INSTANCE);
-        energy += foodEnergy;
-      }
-
-      // Move action.
-      if (moveDirectionOrdinal == MOVE_FORWARD_ORDINAL && (entityMatrix[frontRow][frontCol] & ENTITY_MASK) == 0 &&
-          frontRow > 0 && frontCol > 0 && frontRow < maxRow && frontCol < maxCol) {
-        entityModelMatrix[frontRow][frontCol] = entityModelMatrix[row][col];
-        entityModelMatrix[row][col] = null;
-        entityMatrix[row][col] &= ~ENTITY_MASK;
-        entityMatrix[frontRow][frontCol] |= ENTITY_MASK;
-        entityRows[idx] = frontRow - 1;
-        entityCols[idx] = frontCol - 1;
-      }
-
-      // Turn action.
-      if (turnDirectionOrdinal == TURN_CLOCKWISE_ORDINAL) {
-        entityDirections[idx] = TURN_CLOCKWISE[directionOrdinal];
-      } else if (turnDirectionOrdinal == TURN_COUNTERCLOCKWISE_ORDINAL) {
-        entityDirections[idx] = TURN_COUNTERCLOCKWISE[directionOrdinal];
-      }
-
-      entityEnergy[idx] = energy;
     }
   }
 
@@ -320,13 +373,13 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
       return;
     }
 
-    Integer entityIdx = entityModelIndexMap.remove(entity);
-    if (entityIdx != null) {
-      simulator.getAllocator().deallocate(entityIdx);
-      entity.setY(entityRows[entityIdx]);
-      entity.setX(entityCols[entityIdx]);
+    Integer entityAutomatonIdx = entityModelAutomatonIdxMap.remove(entity);
+    if (entityAutomatonIdx != null) {
+      simulator.getAllocator().deallocate(entityAutomatonIdx);
+      entity.setY(entityRows[entityAutomatonIdx]);
+      entity.setX(entityCols[entityAutomatonIdx]);
       environmentModel.remove(entity);
-      entityEnergy[entityIdx] = 0;
+      entityEnergy[entityAutomatonIdx] = 0;
     }
     newEntities.remove(entity);
   }
@@ -344,22 +397,36 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
     entityCols[entityIdx] = entity.getX();
     entityDirections[entityIdx] = entity.getDirection() != null ?
         entity.getDirection().ordinal() : 0;
-    entityModelIndexMap.put(entity, entityIdx);
+    entityModelAutomatonIdxMap.put(entity, entityIdx);
+    automatonIdxEntityModelMap.put(entityIdx, entity);
     entity.setX(-1);
     entity.setY(-1);
 
     // If the entity has an existing automaton state then load it.
-    byte[] stateBytes = entity.getData(CELLULAR_AUTOMATON_STATE_KEY);
+    int[] state;
+    final int automatonStateSize = simulator.getAutomatonStateSize();
+    final byte[] stateBytes = entity.getData(CELLULAR_AUTOMATON_STATE_KEY);
     if (stateBytes != null) {
-        simulator.setAutomatonState(entityIdx, ArrayUtil.toIntArray(stateBytes));
+      state = ArrayUtil.toIntArray(stateBytes);
     } else {
-      int[] automatonState = new int[simulator.getAutomatonStateSize()];
-      for (int idx = 0; idx < automatonState.length; idx++) {
-        automatonState[idx] = random.nextInt();
+      state = new int[automatonStateSize];
+      for (int i = 0; i < state.length; i++) {
+        state[i] = random.nextInt();
       }
-      entity.putData(CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY,
-          ArrayUtil.toByteArray(automatonState));
-      simulator.setAutomatonState(entityIdx, automatonState);
+
+      // TODO:
+//      entity.putData(CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY,
+//          ArrayUtil.toByteArray(automatonState));
+    }
+
+    final int automatonIdx = entityIdx / Integer.SIZE;
+    final int bitOffset = entityIdx % Integer.SIZE;
+    final int mask = ~(1 << bitOffset);
+    final int startIdx = automatonIdx * automatonStateSize;
+
+    for (int i = 0; i < state.length; i++) {
+      stateData[startIdx + i] &= mask;
+      stateData[startIdx + i] |= (state[i] & 0b1) << bitOffset;
     }
   }
 

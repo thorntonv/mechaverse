@@ -5,7 +5,8 @@ import com.google.common.math.IntMath;
 import com.jogamp.opencl.CLPlatform;
 import org.mechaverse.simulation.common.Environment;
 import org.mechaverse.simulation.common.SimulationModelGenerator;
-import org.mechaverse.simulation.common.cellautomaton.simulation.BitwiseCellularAutomatonSimulator;
+import org.mechaverse.simulation.common.cellautomaton.simulation.BitwiseCellularAutomatonSimulatorAdapter;
+import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonAllocator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator.CellularAutomatonSimulatorParams;
 import org.mechaverse.simulation.common.cellautomaton.simulation.opencl.OpenClCellularAutomatonSimulator;
@@ -85,13 +86,13 @@ public class PrimordialSimulationConfig {
   @Scope("prototype")
   public Function<CellularAutomatonSimulatorParams, CellularAutomatonSimulator> cellularAutomatonSimulatorFactory() {
     return params -> {
-      CellularAutomatonSimulator simulator = new OpenClCellularAutomatonSimulator(
+      CellularAutomatonAllocator allocator = new CellularAutomatonAllocator(params.numAutomata * Integer.SIZE);
+      return new BitwiseCellularAutomatonSimulatorAdapter(new OpenClCellularAutomatonSimulator(
           IntMath.divide(params.numAutomata, Integer.SIZE, RoundingMode.CEILING),
           CellularAutomatonSimulationBehavior.AUTOMATON_INPUT_DATA_SIZE_BITS,
           CellularAutomatonSimulationBehavior.AUTOMATON_OUTPUT_DATA_SIZE_BITS,
           CLPlatform.getDefault().getMaxFlopsDevice(),
-          params.descriptorDataSource.getDescriptor());
-      return new BitwiseCellularAutomatonSimulator(simulator, BITS_PER_ENTITY);
+          params.descriptorDataSource.getDescriptor()), 1);
     };
   }
 

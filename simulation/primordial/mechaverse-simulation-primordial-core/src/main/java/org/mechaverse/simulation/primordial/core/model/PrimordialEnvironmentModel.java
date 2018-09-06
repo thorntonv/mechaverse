@@ -1,7 +1,10 @@
 package org.mechaverse.simulation.primordial.core.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.EnvironmentModel;
 import org.mechaverse.simulation.primordial.core.entity.EntityUtil;
@@ -12,15 +15,13 @@ public final class PrimordialEnvironmentModel extends
   public static final int ENTITY_MASK = 0b1;
   public static final int FOOD_ENTITY_MASK = 0b10;
 
+  @JsonIgnore
   private byte[][] entityMatrix;
-  private PrimordialEntityModel[][] entityModelMatrix;
+  @JsonIgnore
+  private Set<EntityModel<EntityType>> entityModels = Sets.newLinkedHashSet();
 
   public byte[][] getEntityMatrix() {
     return entityMatrix;
-  }
-
-  public PrimordialEntityModel[][] getEntityModelMatrix() {
-    return entityModelMatrix;
   }
 
   public boolean isValidCell(int row, int col) {
@@ -30,8 +31,12 @@ public final class PrimordialEnvironmentModel extends
   public void addEntity(PrimordialEntityModel entityModel) {
     int row = entityModel.getY() + 1;
     int col = entityModel.getX() + 1;
-    entityModelMatrix[row][col] = entityModel;
     entityMatrix[row][col] |= ENTITY_MASK;
+    entityModels.add(entityModel);
+  }
+
+  public boolean hasEntity(int row, int col) {
+    return (entityMatrix[row + 1][col + 1] & ENTITY_MASK) > 0;
   }
 
   @Override
@@ -40,13 +45,9 @@ public final class PrimordialEnvironmentModel extends
     if (entity.getType() == EntityType.ENTITY && entity.getX() >= 0 && entity.getY() >= 0) {
       int row = entity.getY() + 1;
       int col = entity.getX() + 1;
-      entityModelMatrix[row][col] = null;
       entityMatrix[row][col] &= ~ENTITY_MASK;
+      entityModels.remove(entity);
     }
-  }
-
-  public PrimordialEntityModel getEntity(int row, int col) {
-    return entityModelMatrix[row + 1][col + 1];
   }
 
   public void addFood(int row, int col) {
@@ -62,20 +63,13 @@ public final class PrimordialEnvironmentModel extends
   }
 
   public List<EntityModel<EntityType>> getEntities() {
-    if(entityModelMatrix == null) {
+    if (entityMatrix == null) {
       initCells();
     }
-    List<EntityModel<EntityType>> entities = new ArrayList<>();
-    for (PrimordialEntityModel[] row : entityModelMatrix) {
-      for(PrimordialEntityModel entityModel : row) {
-        if(entityModel != null) {
-          entities.add(entityModel);
-        }
-      }
-    }
-    for(int row = 0; row < entityMatrix.length; row++) {
-      for(int col = 0; col < entityMatrix[row].length; col++) {
-        if((entityMatrix[row][col] & FOOD_ENTITY_MASK) > 0) {
+    List<EntityModel<EntityType>> entities = new ArrayList<>(entityModels);
+    for (int row = 0; row < entityMatrix.length; row++) {
+      for (int col = 0; col < entityMatrix[row].length; col++) {
+        if ((entityMatrix[row][col] & FOOD_ENTITY_MASK) > 0) {
           Food foodModel = new Food();
           foodModel.setEnergy(100);
           foodModel.setY(row);
@@ -94,12 +88,10 @@ public final class PrimordialEnvironmentModel extends
 
   public void initCells() {
     entityMatrix = new byte[getHeight()+2][];
-    entityModelMatrix = new PrimordialEntityModel[getHeight()+2][];
 
     // Allocate cells.
     for (int row = 0; row < entityMatrix.length; row++) {
       entityMatrix[row] = new byte[getWidth()+2];
-      entityModelMatrix[row] = new PrimordialEntityModel[getWidth()+2];
     }
 
     // Add entities to the appropriate cells.

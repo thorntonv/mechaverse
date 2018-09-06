@@ -56,7 +56,8 @@ public final class OpenClCellularAutomatonSimulator
 
   @Override
   protected void copyFromArrayToBuffer(int[] array, int offset, int length, IntBuffer buffer) {
-    assert array.length >= offset + length;
+    assert array.length >= offset + length :
+        "array.length: " + array.length + ", offset: " + offset + ", length: " + length;
     buffer.put(array, offset, length);
   }
 }

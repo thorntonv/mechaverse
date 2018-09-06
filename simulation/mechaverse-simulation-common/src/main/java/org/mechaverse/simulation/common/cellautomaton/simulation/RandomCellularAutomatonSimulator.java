@@ -53,7 +53,15 @@ public class RandomCellularAutomatonSimulator implements CellularAutomatonSimula
   public void getAutomatonState(int index, int[] state) {}
 
   @Override
+  public void getAutomataState(int[] state) {
+  }
+
+  @Override
   public void setAutomatonState(int index, int[] state) {}
+
+  @Override
+  public void setAutomataState(int[] state) {
+  }
 
   @Override
   public void setAutomatonInputMap(int index, int[] inputMap) {}
@@ -62,10 +70,21 @@ public class RandomCellularAutomatonSimulator implements CellularAutomatonSimula
   public void setAutomatonInput(int index, int[] input) {}
 
   @Override
+  public void setAutomataInput(int[] input) {
+  }
+
+  @Override
   public void setAutomatonOutputMap(int index, int[] outputMap) {}
 
   @Override
   public void getAutomatonOutput(int index, int[] output) {
+    for(int idx = 0; idx < output.length; idx++) {
+      output[idx] = random.nextInt();
+    }
+  }
+
+  @Override
+  public void getAutomataOutput(int[] output) {
     for(int idx = 0; idx < output.length; idx++) {
       output[idx] = random.nextInt();
     }

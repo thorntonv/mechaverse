@@ -162,6 +162,22 @@ public abstract class AbstractOpenClCellularAutomatonSimulator<B extends Buffer,
     stateBuffer.getBuffer().rewind();
   }
 
+  public void getAutomataState(T state) {
+    if (!finished) {
+      queue.finish();
+      finished = true;
+    }
+    if (automatonStateUpdated) {
+      // Finish the write before starting the read.
+      queue.putWriteBuffer(stateBuffer, true);
+      automatonStateUpdated = false;
+    }
+    queue.putReadBuffer(stateBuffer, true);
+    stateBuffer.getBuffer().position(0);
+    copyFromBufferToArray(stateBuffer.getBuffer(), state, 0, automatonStateSize * numAutomata);
+    stateBuffer.getBuffer().rewind();
+  }
+
   public void setAutomatonState(int index, T state) {
     if (!finished) {
       queue.finish();
@@ -169,6 +185,17 @@ public abstract class AbstractOpenClCellularAutomatonSimulator<B extends Buffer,
     }
     stateBuffer.getBuffer().position(index * automatonStateSize);
     copyFromArrayToBuffer(state, 0, automatonStateSize, stateBuffer.getBuffer());
+    stateBuffer.getBuffer().rewind();
+    automatonStateUpdated = true;
+  }
+
+  public void setAutomataState(T state) {
+    if (!finished) {
+      queue.finish();
+      finished = true;
+    }
+    stateBuffer.getBuffer().position(0);
+    copyFromArrayToBuffer(state, 0, automatonStateSize * numAutomata, stateBuffer.getBuffer());
     stateBuffer.getBuffer().rewind();
     automatonStateUpdated = true;
   }
@@ -197,6 +224,16 @@ public abstract class AbstractOpenClCellularAutomatonSimulator<B extends Buffer,
     inputBuffer.getBuffer().rewind();
   }
 
+  public void setAutomataInput(T input) {
+    if (!finished) {
+      queue.finish();
+      finished = true;
+    }
+    inputBuffer.getBuffer().position(0);
+    copyFromArrayToBuffer(input, 0, automatonInputSize * numAutomata, inputBuffer.getBuffer());
+    inputBuffer.getBuffer().rewind();
+  }
+
   public void setAutomatonOutputMap(int index, int[] outputMap) {
     for (int idx = 0; idx < outputMap.length; idx++) {
       outputMap[idx] = Math.abs(outputMap[idx]) % automatonStateSize;
@@ -218,6 +255,16 @@ public abstract class AbstractOpenClCellularAutomatonSimulator<B extends Buffer,
     }
     outputBuffer.getBuffer().position(index * automatonOutputSize);
     copyFromBufferToArray(outputBuffer.getBuffer(), output, 0, automatonOutputSize);
+    outputBuffer.getBuffer().rewind();
+  }
+
+  public void getAutomataOutput(T output) {
+    if (!finished) {
+      queue.finish();
+      finished = true;
+    }
+    outputBuffer.getBuffer().position(0);
+    copyFromBufferToArray(outputBuffer.getBuffer(), output, 0, automatonOutputSize * numAutomata);
     outputBuffer.getBuffer().rewind();
   }
 
