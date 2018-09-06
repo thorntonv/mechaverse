@@ -33,7 +33,7 @@ public class PrimordialSimulationBenchmark {
   @State(Scope.Benchmark)
   public static class ExecutionPlan {
 
-    @Param(value = {"31"}) int subEnvironmentCount;
+    @Param(value = {"7"}) int subEnvironmentCount;
     @Param(value = {"1048576"}) int numEntities;
     @Param(value = {"25"}) int stepCount;
 

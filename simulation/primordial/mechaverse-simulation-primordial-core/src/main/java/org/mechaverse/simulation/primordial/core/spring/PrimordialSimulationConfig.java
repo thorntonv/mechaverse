@@ -3,10 +3,12 @@ package org.mechaverse.simulation.primordial.core.spring;
 import com.google.common.collect.ImmutableList;
 import com.google.common.math.IntMath;
 import com.jogamp.opencl.CLPlatform;
+import java.math.RoundingMode;
+import java.util.List;
+import java.util.function.Function;
 import org.mechaverse.simulation.common.Environment;
 import org.mechaverse.simulation.common.SimulationModelGenerator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.BitwiseCellularAutomatonSimulatorAdapter;
-import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonAllocator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator.CellularAutomatonSimulatorParams;
 import org.mechaverse.simulation.common.cellautomaton.simulation.opencl.OpenClCellularAutomatonSimulator;
@@ -15,17 +17,17 @@ import org.mechaverse.simulation.primordial.core.PrimordialEnvironmentFactory;
 import org.mechaverse.simulation.primordial.core.PrimordialSimulationImpl;
 import org.mechaverse.simulation.primordial.core.PrimordialSimulationModelGenerator;
 import org.mechaverse.simulation.primordial.core.entity.PrimordialEntityFactory;
-import org.mechaverse.simulation.primordial.core.environment.*;
+import org.mechaverse.simulation.primordial.core.environment.CellularAutomatonSimulationBehavior;
+import org.mechaverse.simulation.primordial.core.environment.EntityReproductionBehavior;
+import org.mechaverse.simulation.primordial.core.environment.FoodGenerationBehavior;
+import org.mechaverse.simulation.primordial.core.environment.PrimordialEnvironment;
+import org.mechaverse.simulation.primordial.core.environment.PrimordialEnvironmentBehavior;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
 import org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel;
 import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
-
-import java.math.RoundingMode;
-import java.util.List;
-import java.util.function.Function;
 
 @Configuration
 @SuppressWarnings({"unused", "WeakerAccess"})
@@ -86,13 +88,12 @@ public class PrimordialSimulationConfig {
   @Scope("prototype")
   public Function<CellularAutomatonSimulatorParams, CellularAutomatonSimulator> cellularAutomatonSimulatorFactory() {
     return params -> {
-      CellularAutomatonAllocator allocator = new CellularAutomatonAllocator(params.numAutomata * Integer.SIZE);
       return new BitwiseCellularAutomatonSimulatorAdapter(new OpenClCellularAutomatonSimulator(
           IntMath.divide(params.numAutomata, Integer.SIZE, RoundingMode.CEILING),
           CellularAutomatonSimulationBehavior.AUTOMATON_INPUT_DATA_SIZE_BITS,
           CellularAutomatonSimulationBehavior.AUTOMATON_OUTPUT_DATA_SIZE_BITS,
           CLPlatform.getDefault().getMaxFlopsDevice(),
-          params.descriptorDataSource.getDescriptor()), 1);
+          params.descriptorDataSource.getDescriptor()), BITS_PER_ENTITY);
     };
   }
 
