@@ -169,7 +169,7 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
       final int automatonInputIdx = idx / Integer.SIZE;
 
       final int maxCount = Math.min(32, numAutomata - idx);
-      for (int cnt = 1; cnt <= maxCount; cnt++) {
+      for (int bitOffset = 0; bitOffset < maxCount; bitOffset++) {
         final int energy = entityEnergy[idx];
         if (energy <= 0) {
           idx++;
@@ -244,8 +244,6 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
         }
 
         // Encode input.
-        final int bitOffset = idx % Integer.SIZE;
-
         int value = energy * 3 / maxEnergyLevel;
         i1 |= (value & 0b1) << bitOffset;
         i2 |= (value >> 1) << bitOffset;
@@ -293,7 +291,7 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
       int o4 = outputData[automatonOutputIdx + 3];
 
       final int maxCount = Math.min(32, numAutomata - idx);
-      for (int cnt = 1; cnt <= maxCount; cnt++) {
+      for (int bitOffset = 0; bitOffset < maxCount; bitOffset++) {
         final int entityRow = entityRows[idx];
         final int entityCol = entityCols[idx];
         final int row = entityRow + 1;
@@ -319,7 +317,6 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
         assert automatonIdxEntityModelMap.containsKey(idx);
 
         // Decode output.
-        final int bitOffset = idx % Integer.SIZE;
         final int moveDirectionOrdinal = (o1 >> bitOffset) & 0b1;
         final int turnDirectionOrdinal = (((o2 >> bitOffset) & 0b1) << 1) | ((o3 >> bitOffset) & 0b1);
         final boolean consume = ((o4 >> bitOffset) & 0b1) > 0;
