@@ -35,7 +35,7 @@ public class PrimordialSimulationBenchmark {
 
     @Param(value = {"7"}) int subEnvironmentCount;
     @Param(value = {"1048576"}) int numEntities;
-    @Param(value = {"25"}) int stepCount;
+    @Param(value = {"50"}) int stepCount;
 
     private ClassPathXmlApplicationContext appContext;
     private Simulation simulation;
