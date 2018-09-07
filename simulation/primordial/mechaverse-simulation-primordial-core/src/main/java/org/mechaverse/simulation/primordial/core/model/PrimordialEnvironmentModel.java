@@ -1,16 +1,23 @@
 package org.mechaverse.simulation.primordial.core.model;
 
+import static org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator.CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.EnvironmentModel;
+import org.mechaverse.simulation.common.util.ArrayUtil;
 import org.mechaverse.simulation.primordial.core.entity.EntityUtil;
 
 public final class PrimordialEnvironmentModel extends
     EnvironmentModel<EntityModel<EntityType>, EntityType> {
+
+  public static final String GENETIC_DATA_KEY = "geneticData." + CELLULAR_AUTOMATON_STATE_GENETIC_DATA_KEY;
 
   public static final int ENTITY_MASK = 0b1;
   public static final int FOOD_ENTITY_MASK = 0b10;
@@ -19,6 +26,8 @@ public final class PrimordialEnvironmentModel extends
   private byte[][] entityMatrix;
   @JsonIgnore
   private Set<EntityModel<EntityType>> entityModels = Sets.newLinkedHashSet();
+  @JsonIgnore
+  private Map<EntityModel<EntityType>, int[]> entityGeneticDataMap = Maps.newIdentityHashMap();
 
   public byte[][] getEntityMatrix() {
     return entityMatrix;
@@ -33,6 +42,23 @@ public final class PrimordialEnvironmentModel extends
     int col = entityModel.getX() + 1;
     entityMatrix[row][col] |= ENTITY_MASK;
     entityModels.add(entityModel);
+
+    final byte[] stateBytes = entityModel.getData(GENETIC_DATA_KEY);
+    if (stateBytes != null) {
+      setEntityGeneticData(entityModel, ArrayUtil.toIntArray(stateBytes));
+    }
+  }
+
+  public void setEntityGeneticData(EntityModel<EntityType> entityModel, int[] entityGeneticData) {
+    entityGeneticDataMap.put(entityModel, entityGeneticData);
+  }
+
+  public int[] getEntityGeneticData(EntityModel<EntityType> entityModel) {
+    return entityGeneticDataMap.get(entityModel);
+  }
+
+  public void removeEntityGeneticData(EntityModel<EntityType> entityModel) {
+    entityGeneticDataMap.remove(entityModel);
   }
 
   public boolean hasEntity(int row, int col) {
@@ -47,6 +73,7 @@ public final class PrimordialEnvironmentModel extends
       int col = entity.getX() + 1;
       entityMatrix[row][col] &= ~ENTITY_MASK;
       entityModels.remove(entity);
+      removeEntityGeneticData(entity);
     }
   }
 

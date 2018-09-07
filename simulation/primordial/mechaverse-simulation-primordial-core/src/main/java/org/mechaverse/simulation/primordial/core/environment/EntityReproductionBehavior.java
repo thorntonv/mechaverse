@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.UUID;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.Environment;
-import org.mechaverse.simulation.common.cellautomaton.genetic.CellularAutomatonGeneticDataGenerator;
 import org.mechaverse.simulation.common.genetic.BitMutator;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.SimulationModel;
@@ -80,13 +79,11 @@ public class EntityReproductionBehavior extends PrimordialEnvironmentBehavior {
 
                 if(selectedEntity != null) {
                     // Copy genetic data to new entity.
-                    for (String key : CellularAutomatonGeneticDataGenerator.KEY_SET) {
-                        byte[] data = selectedEntity.getData(key);
-                        if (data != null) {
-                            byte[] cloneData = data.clone();
-                            bitMutator.mutate(cloneData, random);
-                            clone.putData(key, cloneData);
-                        }
+                    int[] geneticData = envModel.getEntityGeneticData(selectedEntity);
+                    if (geneticData != null) {
+                        int[] cloneData = geneticData.clone();
+                        bitMutator.mutate(cloneData, random);
+                        envModel.setEntityGeneticData(clone, cloneData);
                     }
                     newCloneEntityCount++;
                 } else {
