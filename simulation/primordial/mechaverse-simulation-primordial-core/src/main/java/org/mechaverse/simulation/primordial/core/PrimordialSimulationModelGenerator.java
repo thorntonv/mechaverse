@@ -23,7 +23,7 @@ public class PrimordialSimulationModelGenerator extends
   @Override
   protected PrimordialSimulationModel createModel() {
     PrimordialSimulationModel model = new PrimordialSimulationModel();
-    model.setEntityMaxCountPerEnvironment(65536 / DEFAULT_SUB_ENVIRONMENT_COUNT);
+    model.setEntityMaxCountPerEnvironment(1048560 / DEFAULT_SUB_ENVIRONMENT_COUNT);
     model.setEntityMinReproductiveAge(200);
     model.setEntityInitialEnergy(1200);
     model.setFoodClusterRadius(20);

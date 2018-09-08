@@ -23,7 +23,6 @@ import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomat
 import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.MoveDirection;
-import org.mechaverse.simulation.common.model.TurnDirection;
 import org.mechaverse.simulation.common.util.ArrayUtil;
 import org.mechaverse.simulation.common.util.SimulationModelUtil;
 import org.mechaverse.simulation.common.util.SimulationUtil;
@@ -43,22 +42,18 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
   public static int AUTOMATON_OUTPUT_DATA_SIZE_BITS = 4;
 
   private static final int MOVE_FORWARD_ORDINAL = MoveDirection.FORWARD.ordinal();
-  private static final int TURN_CLOCKWISE_ORDINAL = TurnDirection.CLOCKWISE.ordinal();
-  private static final int TURN_COUNTERCLOCKWISE_ORDINAL = TurnDirection.COUNTERCLOCKWISE.ordinal();
-
-  private static final int ENTITY_ORDINAL = EntityType.ENTITY.ordinal();
-  private static final int FOOD_ORDINAL = EntityType.FOOD.ordinal();
-  private static final int NONE_ORDINAL = EntityType.NONE.ordinal();
 
   private static final Food FOOD_INSTANCE = new Food();
 
   private static final int[] CELL_DIRECTION_ROW_OFFSETS = new int[]{0, -1, -1, -1, 0, 1, 1, 1};
   private static final int[] CELL_DIRECTION_COL_OFFSETS = new int[]{1, 1, 0, -1, -1, -1, 0, 1};
+  private static final int[] TURN_NONE = new int[Direction.values().length];
   private static final int[] TURN_CLOCKWISE = new int[Direction.values().length];
   private static final int[] TURN_COUNTERCLOCKWISE = new int[Direction.values().length];
 
   static {
     for (Direction direction : Direction.values()) {
+      TURN_NONE[direction.ordinal()] = direction.ordinal();
       TURN_CLOCKWISE[direction.ordinal()] = SimulationUtil.directionCW(direction).ordinal();
       TURN_COUNTERCLOCKWISE[direction.ordinal()] = SimulationUtil.directionCCW(direction).ordinal();
     }
@@ -77,7 +72,6 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
   private final TIntObjectMap<EntityModel<EntityType>> automatonIdxEntityModelMap = new TIntObjectHashMap<>();
   private final Map<EntityModel<EntityType>, Integer> entityModelAutomatonIdxMap = Maps.newIdentityHashMap();
 
-
   private int[] stateData;
   private int[] inputData;
   private int[] outputData;
@@ -85,6 +79,8 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
   private int maxEnergyLevel;
   private final Set<EntityModel<EntityType>> newEntities = Sets.newLinkedHashSet();
   private boolean ioMapsSet = false;
+
+  private long lastRemoveEntityIteration = -1;
 
   @Override
   public void setState(PrimordialSimulationModel state,
@@ -110,9 +106,9 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
         entityCols[idx] = -1;
       }
 
-      stateData = new int[simulator.getAutomatonStateSize() * numAutomata];
-      inputData = new int[simulator.getAutomatonInputSize() * numAutomata];
-      outputData = new int[simulator.getAutomatonOutputSize() * numAutomata];
+      stateData = new int[simulator.getAutomatonStateSize() * numAutomata / Integer.SIZE];
+      inputData = new int[simulator.getAutomatonInputSize() * numAutomata / Integer.SIZE];
+      outputData = new int[simulator.getAutomatonOutputSize() * numAutomata / Integer.SIZE];
 
       maxEnergyLevel = state.getEntityInitialEnergy();
       generateIOMaps(state);
@@ -130,7 +126,10 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
       entityModel.setX(entityCols[automatonIdx]);
       entityModel.setEnergy(entityEnergy[automatonIdx]);
       entityModel.setDirection(SimulationModelUtil.DIRECTIONS[entityDirections[automatonIdx]]);
-      entityModel.putData(GENETIC_DATA_KEY, ArrayUtil.toByteArray(environment.getModel().getEntityGeneticData(entityModel)));
+      if(state.isPersistEntityCellularAutomatonStateEnabled()) {
+        entityModel.putData(GENETIC_DATA_KEY,
+            ArrayUtil.toByteArray(environment.getModel().getEntityGeneticData(entityModel)));
+      }
     }
   }
 
@@ -171,88 +170,53 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
 
       final int maxCount = Math.min(32, numAutomata - idx);
       for (int bitOffset = 0; bitOffset < maxCount; bitOffset++) {
-        final int energy = entityEnergy[idx];
-        if (energy <= 0) {
+        final int entityRow = entityRows[idx];
+        final int entityCol = entityCols[idx];
+
+        if (entityRow < 0) {
           idx++;
           continue;
         }
-        final int entityRow = entityRows[idx];
-        final int entityCol = entityCols[idx];
+
+        final int energy = entityEnergy[idx];
         final int row = entityRow + 1;
         final int col = entityCol + 1;
         final int entityDirectionOrdinal = entityDirections[idx];
         final int frontRow = row + CELL_DIRECTION_ROW_OFFSETS[entityDirectionOrdinal];
         final int frontCol = col + CELL_DIRECTION_COL_OFFSETS[entityDirectionOrdinal];
+        // Front entity.
+        final int frontEntityBitVector = entityMatrix[frontRow][frontCol];
 
-        int leftCol = col - 1;
+        final int leftRow = row - 1;
+        final int leftCol = col - 1;
 
         // Nearby entity / food.
-        int nearbyEntity = 0;
-        int nearbyFood = 0;
+        int nearbyEntityBitVector = 0;
 
-        int r = row - 1;
-        int c = leftCol;
-        byte[] entityMatrixRow = entityMatrix[r];
-        byte tmp = entityMatrixRow[c];
-        nearbyEntity |= tmp & ENTITY_MASK;
-        nearbyFood |= tmp & FOOD_ENTITY_MASK;
-        c++;
-        tmp = entityMatrixRow[c];
-        nearbyEntity |= tmp & ENTITY_MASK;
-        nearbyFood |= tmp & FOOD_ENTITY_MASK;
-        c++;
-        tmp = entityMatrixRow[c];
-        nearbyEntity |= tmp & ENTITY_MASK;
-        nearbyFood |= tmp & FOOD_ENTITY_MASK;
+        byte[] entityMatrixRow = entityMatrix[leftRow];
+        nearbyEntityBitVector |= entityMatrixRow[leftCol];
+        nearbyEntityBitVector |= entityMatrixRow[leftCol + 1];
+        nearbyEntityBitVector |= entityMatrixRow[leftCol + 2];
 
-        r++;
-        c = leftCol;
-        entityMatrixRow = entityMatrix[r];
-        tmp = entityMatrixRow[c];
-        nearbyEntity |= tmp & ENTITY_MASK;
-        nearbyFood |= tmp & FOOD_ENTITY_MASK;
-        c++;
+        entityMatrixRow = entityMatrix[leftRow + 1];
+        nearbyEntityBitVector |= entityMatrixRow[leftCol];
         // Skip checking the entity itself.
-        nearbyFood |= entityMatrixRow[c] & FOOD_ENTITY_MASK;
-        c++;
-        tmp = entityMatrixRow[c];
-        nearbyEntity |= tmp & ENTITY_MASK;
-        nearbyFood |= tmp & FOOD_ENTITY_MASK;
+        nearbyEntityBitVector |= entityMatrixRow[leftCol + 1] & FOOD_ENTITY_MASK;
+        nearbyEntityBitVector |= entityMatrixRow[leftCol + 2];
 
-        r++;
-        c = leftCol;
-        entityMatrixRow = entityMatrix[r];
-        tmp = entityMatrixRow[c];
-        nearbyEntity |= tmp & ENTITY_MASK;
-        nearbyFood |= tmp & FOOD_ENTITY_MASK;
-        c++;
-        tmp = entityMatrixRow[c];
-        nearbyEntity |= tmp & ENTITY_MASK;
-        nearbyFood |= tmp & FOOD_ENTITY_MASK;
-        c++;
-        tmp = entityMatrixRow[c];
-        nearbyEntity |= tmp & ENTITY_MASK;
-        nearbyFood |= tmp & FOOD_ENTITY_MASK;
-        nearbyFood >>= 1;
-
-        // Front entity.
-        int frontEntityOrdinal = NONE_ORDINAL;
-        tmp = entityMatrix[frontRow][frontCol];
-        if ((tmp & ENTITY_MASK) != 0) {
-          frontEntityOrdinal = ENTITY_ORDINAL;
-        } else if ((tmp & FOOD_ENTITY_MASK) != 0) {
-          frontEntityOrdinal = FOOD_ORDINAL;
-        }
+        entityMatrixRow = entityMatrix[leftRow + 2];
+        nearbyEntityBitVector |= entityMatrixRow[leftCol];
+        nearbyEntityBitVector |= entityMatrixRow[leftCol + 1];
+        nearbyEntityBitVector |= entityMatrixRow[leftCol + 2];
 
         // Encode input.
-        int value = energy * 3 / maxEnergyLevel;
+        final int value = energy * 3 / maxEnergyLevel;
         i1 |= (value & 0b1) << bitOffset;
         i2 |= (value >> 1) << bitOffset;
-        value = frontEntityOrdinal;
-        i3 |= (value & 0b1) << bitOffset;
-        i4 |= (value >> 1) << bitOffset;
-        i5 |= (nearbyEntity & 0b1) << bitOffset;
-        i6 |= (nearbyFood & 0b1) << bitOffset;
+        i3 |= (frontEntityBitVector & 0b1) << bitOffset;
+        i4 |= (frontEntityBitVector >> 1) << bitOffset;
+        i5 |= (nearbyEntityBitVector & 0b1) << bitOffset;
+        i6 |= (nearbyEntityBitVector >> 1) << bitOffset;
 
         idx++;
       }
@@ -284,12 +248,16 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
 
     simulator.getAutomataOutput(outputData);
 
+    final int[][] turnMatrix = new int[][]{
+        TURN_NONE, TURN_CLOCKWISE, TURN_COUNTERCLOCKWISE, TURN_NONE
+    };
+
     for (int idx = 0; idx < numAutomata; ) {
       final int automatonOutputIdx = idx / Integer.SIZE;
-      int o1 = outputData[automatonOutputIdx];
-      int o2 = outputData[automatonOutputIdx + 1];
-      int o3 = outputData[automatonOutputIdx + 2];
-      int o4 = outputData[automatonOutputIdx + 3];
+      final int o1 = outputData[automatonOutputIdx];
+      final int o2 = outputData[automatonOutputIdx + 1];
+      final int o3 = outputData[automatonOutputIdx + 2];
+      final int o4 = outputData[automatonOutputIdx + 3];
 
       final int maxCount = Math.min(32, numAutomata - idx);
       for (int bitOffset = 0; bitOffset < maxCount; bitOffset++) {
@@ -297,25 +265,17 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
         final int entityCol = entityCols[idx];
         final int row = entityRow + 1;
         final int col = entityCol + 1;
+
+        if (entityRow < 0) {
+          idx++;
+          continue;
+        }
+
         final int directionOrdinal = entityDirections[idx];
         final int frontRow = row + CELL_DIRECTION_ROW_OFFSETS[directionOrdinal];
         final int frontCol = col + CELL_DIRECTION_COL_OFFSETS[directionOrdinal];
 
         int energy = entityEnergy[idx] - 1;
-
-        if (energy <= 0) {
-          if (entityRow >= 0 && entityCol >= 0 && (entityMatrix[row][col] & ENTITY_MASK) > 0) {
-            EntityModel<EntityType> entityModel = automatonIdxEntityModelMap.get(idx);
-            entityModel.setY(entityRow);
-            entityModel.setX(entityCol);
-            environment.removeEntity(entityModel);
-          }
-          idx++;
-          continue;
-        }
-
-        assert (entityMatrix[row][col] & ENTITY_MASK) > 0;
-        assert automatonIdxEntityModelMap.containsKey(idx);
 
         // Decode output.
         final int moveDirectionOrdinal = (o1 >> bitOffset) & 0b1;
@@ -340,15 +300,29 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
         }
 
         // Turn action.
-        if (turnDirectionOrdinal == TURN_CLOCKWISE_ORDINAL) {
-          entityDirections[idx] = TURN_CLOCKWISE[directionOrdinal];
-        } else if (turnDirectionOrdinal == TURN_COUNTERCLOCKWISE_ORDINAL) {
-          entityDirections[idx] = TURN_COUNTERCLOCKWISE[directionOrdinal];
-        }
+        entityDirections[idx] = turnMatrix[turnDirectionOrdinal][directionOrdinal];
 
         entityEnergy[idx] = energy;
 
         idx++;
+      }
+    }
+
+    if (state.getIteration() > lastRemoveEntityIteration + state.getEntityInitialEnergy()) {
+      lastRemoveEntityIteration = state.getIteration();
+      for (int idx = 0; idx < numAutomata; idx++) {
+        int energy = entityEnergy[idx];
+        if (energy <= 0) {
+          final int entityRow = entityRows[idx];
+          final int entityCol = entityCols[idx];
+          if (entityRow >= 0 && entityCol >= 0
+              && (entityMatrix[entityRow + 1][entityCol + 1] & ENTITY_MASK) > 0) {
+            EntityModel<EntityType> entityModel = automatonIdxEntityModelMap.get(idx);
+            entityModel.setY(entityRow);
+            entityModel.setX(entityCol);
+            environment.removeEntity(entityModel);
+          }
+        }
       }
     }
   }

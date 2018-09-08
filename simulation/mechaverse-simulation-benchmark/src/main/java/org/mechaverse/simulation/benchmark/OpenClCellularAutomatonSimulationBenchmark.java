@@ -47,7 +47,7 @@ public class OpenClCellularAutomatonSimulationBenchmark {
     @Param(value = {"4"}) int outputSize;
     @Param(value = {"2"}) int width;
     @Param(value = {"2"}) int height;
-    @Param(value = {"25"}) int stepCount;
+    @Param(value = {"50"}) int stepCount;
 
     private int[] input;
     private int[] output;

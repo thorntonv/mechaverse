@@ -29,7 +29,7 @@ import static org.junit.Assert.*;
 public abstract class AbstractPrimordialSimulationImplTest {
 
   private static int STEP_COUNT = 25;
-  private static int ENTITIES_PER_ENVIRONMENT = 250;
+  private static int ENTITIES_PER_ENVIRONMENT = 1000;
 
   private static class EntityTypeCounter {
 

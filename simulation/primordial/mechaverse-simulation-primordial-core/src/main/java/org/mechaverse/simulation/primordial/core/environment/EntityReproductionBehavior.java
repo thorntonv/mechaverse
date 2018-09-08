@@ -26,116 +26,111 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("unused")
 public class EntityReproductionBehavior extends PrimordialEnvironmentBehavior {
 
-    private static final Logger logger = LoggerFactory.getLogger(EntityReproductionBehavior.class);
+  private static final Logger logger = LoggerFactory.getLogger(EntityReproductionBehavior.class);
 
-    private int entityMaxCount;
-    private int entityInitialEnergy;
-    private int entityMinReproductiveAge;
-    private BitMutator bitMutator;
-    private long lastUpdateIteration = -1;
-    private final Set<PrimordialEntityModel> entities = new LinkedHashSet<>();
+  private int entityMaxCount;
+  private int entityInitialEnergy;
+  private int entityMinReproductiveAge;
+  private BitMutator bitMutator;
+  private final Set<PrimordialEntityModel> entities = new LinkedHashSet<>();
 
-    public EntityReproductionBehavior() {
-    }
+  public EntityReproductionBehavior() {
+  }
 
-    @Override
-    public void setState(final PrimordialSimulationModel state,
-                         final Environment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> environment) {
-        super.setState(state, environment);
-        entityMaxCount = state.getEntityMaxCountPerEnvironment();
-        entityInitialEnergy = state.getEntityInitialEnergy();
-        entityMinReproductiveAge = state.getEntityMinReproductiveAge();
-        bitMutator = new BitMutator(state.getMutationRate());
-    }
+  @Override
+  public void setState(final PrimordialSimulationModel state,
+      final Environment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> environment) {
+    super.setState(state, environment);
+    entityMaxCount = state.getEntityMaxCountPerEnvironment();
+    entityInitialEnergy = state.getEntityInitialEnergy();
+    entityMinReproductiveAge = state.getEntityMinReproductiveAge();
+    bitMutator = new BitMutator(state.getMutationRate());
+  }
 
-    @Override
-    public void beforeUpdate(PrimordialSimulationModel state,
-                             Environment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> env,
-                             RandomGenerator random) {
-        if(state.getIteration() > lastUpdateIteration) {
-            lastUpdateIteration = state.getIteration();
+  @Override
+  public void beforeUpdate(PrimordialSimulationModel state,
+      Environment<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> env,
+      RandomGenerator random) {
+    final PrimordialEnvironmentModel envModel = env.getModel();
+    int cnt = 0;
+    EntityFitnessDistribution<PrimordialEntityModel, EntityType> fitnessDistribution = null;
+    int newRandomEntityCount = 0;
+    int newCloneEntityCount = 0;
+    while (entities.size() < entityMaxCount && cnt < entityMaxCount) {
+      if (fitnessDistribution == null) {
+        fitnessDistribution = buildEntityFitnessDistribution();
+      }
+      int row = random.nextInt(envModel.getHeight());
+      int col = random.nextInt(envModel.getWidth());
+
+      if (envModel.isValidCell(row, col) && !envModel.hasEntity(row, col)) {
+        PrimordialEntityModel selectedEntity = fitnessDistribution.selectEntity(random);
+        PrimordialEntityModel clone = generateRandomEntity(state, random);
+        clone.setX(col);
+        clone.setY(row);
+        envModel.addEntity(clone);
+        env.addEntity(clone);
+
+        if (selectedEntity != null) {
+          // Copy genetic data to new entity.
+          int[] geneticData = envModel.getEntityGeneticData(selectedEntity);
+          if (geneticData != null) {
+            int[] cloneData = geneticData.clone();
+            bitMutator.mutate(cloneData, random);
+            envModel.setEntityGeneticData(clone, cloneData);
+          }
+          newCloneEntityCount++;
         } else {
-          return;
+          newRandomEntityCount++;
         }
-        final PrimordialEnvironmentModel envModel = env.getModel();
-        int cnt = 0;
-        EntityFitnessDistribution<PrimordialEntityModel, EntityType> fitnessDistribution = null;
-        int newRandomEntityCount = 0;
-        int newCloneEntityCount = 0;
-        while (entities.size() < entityMaxCount && cnt < entityMaxCount) {
-            if (fitnessDistribution == null) {
-                fitnessDistribution = buildEntityFitnessDistribution();
-            }
-            int row = random.nextInt(envModel.getHeight());
-            int col = random.nextInt(envModel.getWidth());
-
-            if (envModel.isValidCell(row, col) && !envModel.hasEntity(row, col)) {
-                PrimordialEntityModel selectedEntity = fitnessDistribution.selectEntity(random);
-                PrimordialEntityModel clone = generateRandomEntity(state, random);
-                clone.setX(col);
-                clone.setY(row);
-                envModel.addEntity(clone);
-                env.addEntity(clone);
-
-                if(selectedEntity != null) {
-                    // Copy genetic data to new entity.
-                    int[] geneticData = envModel.getEntityGeneticData(selectedEntity);
-                    if (geneticData != null) {
-                        int[] cloneData = geneticData.clone();
-                        bitMutator.mutate(cloneData, random);
-                        envModel.setEntityGeneticData(clone, cloneData);
-                    }
-                    newCloneEntityCount++;
-                } else {
-                    newRandomEntityCount++;
-                }
-            }
-            cnt++;
-        }
-        if(newCloneEntityCount > 0 || newRandomEntityCount > 0) {
-            logger.info(String.format("Created %d new clones and %d new random entities",
-                newCloneEntityCount, newRandomEntityCount));
-        }
+      }
+      cnt++;
     }
-
-    private EntityFitnessDistribution<PrimordialEntityModel, EntityType> buildEntityFitnessDistribution() {
-        PrimordialEntityModel[] models = new PrimordialEntityModel[entities.size()];
-        int idx = 0;
-        for (PrimordialEntityModel entityModel : entities) {
-            models[idx++] = entityModel;
-        }
-        return new EntityFitnessDistribution<>(models,
-                entity -> (double) entity.getCreatedIteration());
+    if (newCloneEntityCount > 0 || newRandomEntityCount > 0) {
+      logger.info(String.format("Created %d new clones and %d new random entities",
+          newCloneEntityCount, newRandomEntityCount));
     }
+  }
 
-    private PrimordialEntityModel generateRandomEntity(SimulationModel state,
-                                                       RandomGenerator random) {
-        PrimordialEntityModel entity = new PrimordialEntityModel();
-        entity.setId(new UUID(random.nextLong(), random.nextLong()).toString());
-        entity.setDirection(SimulationUtil.randomDirection(random));
-        entity.setEnergy(entityInitialEnergy);
-        entity.setMaxEnergy(entityInitialEnergy);
-        return entity;
+  private EntityFitnessDistribution<PrimordialEntityModel, EntityType> buildEntityFitnessDistribution() {
+    PrimordialEntityModel[] models = new PrimordialEntityModel[entities.size()];
+    int idx = 0;
+    for (PrimordialEntityModel entityModel : entities) {
+      models[idx++] = entityModel;
     }
+    return new EntityFitnessDistribution<>(models,
+        entity -> (double) entity.getCreatedIteration());
+  }
 
-    @Override
-    public void onAddEntity(EntityModel<EntityType> entity, PrimordialSimulationModel state,
-                            PrimordialEnvironmentModel envModel) {
-        if (entity instanceof PrimordialEntityModel) {
-            entities.add((PrimordialEntityModel) entity);
-        }
-    }
+  private PrimordialEntityModel generateRandomEntity(SimulationModel state,
+      RandomGenerator random) {
+    PrimordialEntityModel entity = new PrimordialEntityModel();
+    entity.setId(new UUID(random.nextLong(), random.nextLong()).toString());
+    entity.setDirection(SimulationUtil.randomDirection(random));
+    entity.setEnergy(entityInitialEnergy);
+    entity.setMaxEnergy(entityInitialEnergy);
+    entity.setCreatedIteration(state.getIteration());
+    return entity;
+  }
 
-    @Override
-    public void onRemoveEntity(EntityModel<EntityType> entity, PrimordialSimulationModel state,
-                               PrimordialEnvironmentModel envModel) {
-        if (entity instanceof PrimordialEntityModel) {
-            entities.remove(entity);
-        }
+  @Override
+  public void onAddEntity(EntityModel<EntityType> entity, PrimordialSimulationModel state,
+      PrimordialEnvironmentModel envModel) {
+    if (entity instanceof PrimordialEntityModel) {
+      entities.add((PrimordialEntityModel) entity);
     }
+  }
 
-    @VisibleForTesting
-    void setEntityMaxCount(int entityMaxCount) {
-        this.entityMaxCount = entityMaxCount;
+  @Override
+  public void onRemoveEntity(EntityModel<EntityType> entity, PrimordialSimulationModel state,
+      PrimordialEnvironmentModel envModel) {
+    if (entity instanceof PrimordialEntityModel) {
+      entities.remove(entity);
     }
+  }
+
+  @VisibleForTesting
+  void setEntityMaxCount(int entityMaxCount) {
+    this.entityMaxCount = entityMaxCount;
+  }
 }
