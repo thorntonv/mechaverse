@@ -105,14 +105,6 @@ public class AbstractAntBehaviorTest {
   }
 
   @Test
-  public void age() {
-    when(mockAntEntity.getCreatedIteration()).thenReturn(100L);
-    mockOutput(new AntOutput());
-    antBehavior.performAction(mockEnv, random);
-    verify(mockAntEntity).setCreatedIteration(101L);
-  }
-
-  @Test
   public void energyLevel() {
     when(mockAntEntity.getEnergy()).thenReturn(75);
     when(mockAntEntity.getMaxEnergy()).thenReturn(100);

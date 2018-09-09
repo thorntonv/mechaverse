@@ -58,7 +58,7 @@ public class EntityReproductionBehavior extends PrimordialEnvironmentBehavior {
     int newCloneEntityCount = 0;
     while (entities.size() < entityMaxCount && cnt < entityMaxCount) {
       if (fitnessDistribution == null) {
-        fitnessDistribution = buildEntityFitnessDistribution();
+        fitnessDistribution = buildEntityFitnessDistribution(state);
       }
       int row = random.nextInt(envModel.getHeight());
       int col = random.nextInt(envModel.getWidth());
@@ -92,14 +92,15 @@ public class EntityReproductionBehavior extends PrimordialEnvironmentBehavior {
     }
   }
 
-  private EntityFitnessDistribution<PrimordialEntityModel, EntityType> buildEntityFitnessDistribution() {
+  private EntityFitnessDistribution<PrimordialEntityModel, EntityType> buildEntityFitnessDistribution(
+      PrimordialSimulationModel state) {
     PrimordialEntityModel[] models = new PrimordialEntityModel[entities.size()];
     int idx = 0;
     for (PrimordialEntityModel entityModel : entities) {
       models[idx++] = entityModel;
     }
-    return new EntityFitnessDistribution<>(models,
-        entity -> (double) entity.getCreatedIteration());
+    return new EntityFitnessDistribution<>(models, entity -> (double) (
+        state.getIteration() - entity.getCreatedIteration() + entity.getEnergy()));
   }
 
   private PrimordialEntityModel generateRandomEntity(SimulationModel state,

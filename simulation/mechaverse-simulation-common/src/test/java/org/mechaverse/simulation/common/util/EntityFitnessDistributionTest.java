@@ -36,22 +36,24 @@ public class EntityFitnessDistributionTest {
 
     @Test
     public void selectEntity() {
+        //   20,   5,   27,   26, 24
+        // .196 .245, .510, .765,  1
         TestEntityModel[] entities = new TestEntityModel[]{ENTITY1, ENTITY2, ENTITY3, ENTITY4, ENTITY5};
 
         EntityFitnessDistribution<TestEntityModel, EntityType> distribution = new EntityFitnessDistribution<>(entities,
-                entity -> (double) entity.getCreatedIteration());
+                entity -> (double) (30 - entity.getCreatedIteration()));
 
         when(mockRandomGenerator.nextDouble()).thenReturn(0.0);
         assertEquals(ENTITY1, distribution.selectEntity(mockRandomGenerator));
 
         when(mockRandomGenerator.nextDouble()).thenReturn(0.20);
-        assertEquals(ENTITY1, distribution.selectEntity(mockRandomGenerator));
+        assertEquals(ENTITY2, distribution.selectEntity(mockRandomGenerator));
 
         when(mockRandomGenerator.nextDouble()).thenReturn(0.5);
-        assertEquals(ENTITY2, distribution.selectEntity(mockRandomGenerator));
+        assertEquals(ENTITY3, distribution.selectEntity(mockRandomGenerator));
 
         when(mockRandomGenerator.nextDouble()).thenReturn(0.75);
-        assertEquals(ENTITY2, distribution.selectEntity(mockRandomGenerator));
+        assertEquals(ENTITY4, distribution.selectEntity(mockRandomGenerator));
 
         when(mockRandomGenerator.nextDouble()).thenReturn(.9);
         assertEquals(ENTITY5, distribution.selectEntity(mockRandomGenerator));

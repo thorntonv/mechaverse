@@ -311,13 +311,17 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
     if (state.getIteration() > lastRemoveEntityIteration + state.getEntityInitialEnergy()) {
       lastRemoveEntityIteration = state.getIteration();
       for (int idx = 0; idx < numAutomata; idx++) {
+        EntityModel<EntityType> entityModel = automatonIdxEntityModelMap.get(idx);
+        if(entityModel == null) {
+          continue;
+        }
         int energy = entityEnergy[idx];
+        entityModel.setEnergy(energy);
         if (energy <= 0) {
           final int entityRow = entityRows[idx];
           final int entityCol = entityCols[idx];
           if (entityRow >= 0 && entityCol >= 0
               && (entityMatrix[entityRow + 1][entityCol + 1] & ENTITY_MASK) > 0) {
-            EntityModel<EntityType> entityModel = automatonIdxEntityModelMap.get(idx);
             entityModel.setY(entityRow);
             entityModel.setX(entityCol);
             environment.removeEntity(entityModel);
