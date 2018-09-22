@@ -3,13 +3,12 @@ package org.mechaverse.simulation.primordial.core.spring;
 import com.google.common.collect.ImmutableList;
 import com.google.common.math.IntMath;
 import com.jogamp.opencl.CLPlatform;
-
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.function.Function;
 import org.mechaverse.simulation.common.Environment;
 import org.mechaverse.simulation.common.SimulationModelGenerator;
-import org.mechaverse.simulation.common.cellautomaton.simulation.BitwiseCellularAutomatonSimulator;
+import org.mechaverse.simulation.common.cellautomaton.simulation.BitwiseCellularAutomatonSimulatorAdapter;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator.CellularAutomatonSimulatorParams;
 import org.mechaverse.simulation.common.cellautomaton.simulation.opencl.OpenClCellularAutomatonSimulator;
@@ -17,14 +16,13 @@ import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.primordial.core.PrimordialEnvironmentFactory;
 import org.mechaverse.simulation.primordial.core.PrimordialSimulationImpl;
 import org.mechaverse.simulation.primordial.core.PrimordialSimulationModelGenerator;
-import org.mechaverse.simulation.primordial.core.entity.*;
+import org.mechaverse.simulation.primordial.core.entity.PrimordialEntityFactory;
 import org.mechaverse.simulation.primordial.core.environment.CellularAutomatonSimulationBehavior;
 import org.mechaverse.simulation.primordial.core.environment.EntityReproductionBehavior;
 import org.mechaverse.simulation.primordial.core.environment.FoodGenerationBehavior;
 import org.mechaverse.simulation.primordial.core.environment.PrimordialEnvironment;
 import org.mechaverse.simulation.primordial.core.environment.PrimordialEnvironmentBehavior;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
-import org.mechaverse.simulation.primordial.core.model.PrimordialEntityModel;
 import org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel;
 import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel;
 import org.springframework.context.annotation.Bean;
@@ -34,6 +32,8 @@ import org.springframework.context.annotation.Scope;
 @Configuration
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class PrimordialSimulationConfig {
+
+  private static final int BITS_PER_ENTITY = 1;
 
   @Bean
   @Scope("prototype")
@@ -79,8 +79,7 @@ public class PrimordialSimulationConfig {
             foodGenerationBehavior(),
             reproductionBehavior(),
             cellularAutomatonBehavior);
-        return new PrimordialEnvironment(environmentModel, environmentBehaviors,
-            entityFactory(cellularAutomatonBehavior));
+        return new PrimordialEnvironment(environmentModel, environmentBehaviors, entityFactory());
       }
     };
   }
@@ -88,21 +87,17 @@ public class PrimordialSimulationConfig {
   @Bean
   @Scope("prototype")
   public Function<CellularAutomatonSimulatorParams, CellularAutomatonSimulator> cellularAutomatonSimulatorFactory() {
-    return params -> new BitwiseCellularAutomatonSimulator(
-            new OpenClCellularAutomatonSimulator(IntMath.divide(params.numAutomata, Integer.SIZE, RoundingMode.CEILING),
-                    PrimordialEntityInput.DATA_SIZE_BITS, PrimordialEntityOutput.DATA_SIZE_BITS,
-                    CLPlatform.getDefault().getMaxFlopsDevice(), params.descriptorDataSource.getDescriptor()), 1);
+    return params -> {
+      return new BitwiseCellularAutomatonSimulatorAdapter(new OpenClCellularAutomatonSimulator(
+          IntMath.divide(params.numAutomata, Integer.SIZE, RoundingMode.CEILING),
+          CellularAutomatonSimulationBehavior.AUTOMATON_INPUT_DATA_SIZE_BITS,
+          CellularAutomatonSimulationBehavior.AUTOMATON_OUTPUT_DATA_SIZE_BITS,
+          CLPlatform.getDefault().getMaxFlopsDevice(),
+          params.descriptorDataSource.getDescriptor()), BITS_PER_ENTITY);
+    };
   }
 
-  private PrimordialEntityFactory entityFactory(
-      CellularAutomatonSimulationBehavior cellularAutomatonBehavior) {
-    return new PrimordialEntityFactory(antEntityFactory(cellularAutomatonBehavior));
-  }
-
-  private Function<PrimordialEntityModel, PrimordialEntity> antEntityFactory(
-      CellularAutomatonSimulationBehavior cellularAutomatonBehavior) {
-    return (entity) -> new PrimordialEntity(entity, new CellularAutomatonPrimordialEntityBehavior(entity,
-        cellularAutomatonBehavior.getDescriptorDataSource(),
-        cellularAutomatonBehavior.getSimulator()));
+  private PrimordialEntityFactory entityFactory() {
+    return new PrimordialEntityFactory();
   }
 }

@@ -26,7 +26,10 @@ public interface CellularAutomatonSimulator extends AutoCloseable {
   }
   
   void getAutomatonState(int index, int[] state);
+  void getAutomataState(int[] state);
+
   void setAutomatonState(int index, int[] state);
+  void setAutomataState(int[] state);
 
   /**
    * Sets the input map.
@@ -37,6 +40,7 @@ public interface CellularAutomatonSimulator extends AutoCloseable {
    */
   void setAutomatonInputMap(int index, int[] inputMap);
   void setAutomatonInput(int index, int[] input);
+  void setAutomataInput(int[] input);
 
   /**
    * Sets the output map.
@@ -47,5 +51,7 @@ public interface CellularAutomatonSimulator extends AutoCloseable {
    */
   void setAutomatonOutputMap(int index, int[] outputMap);
   void getAutomatonOutput(int index, int[] output);
+  void getAutomataOutput(int[] output);
+
   void update();
 }

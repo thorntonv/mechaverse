@@ -132,8 +132,6 @@ public abstract class AbstractAntBehavior implements EntityBehavior<AntSimulatio
     Cell cell = envModel.getCell(entity);
     Cell frontCell = envModel.getCellInDirection(cell, entity.getDirection());
 
-    entity.setAge(entity.getAge() + 1);
-
     entity.setEnergy(entity.getEnergy() - 1);
     if (entity.getEnergy() <= 0) {
       onRemoveEntity();

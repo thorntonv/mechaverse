@@ -53,13 +53,28 @@ public class FloatOpenClCellularAutomatonSimulator
   }
 
   @Override
+  public void getAutomataState(int[] state) {
+    getAutomataState(toFloatArray(state));
+  }
+
+  @Override
   public void setAutomatonState(int index, int[] state) {
     setAutomatonState(index, toFloatArray(state));
   }
 
   @Override
+  public void setAutomataState(int[] state) {
+    setAutomataState(toFloatArray(state));
+  }
+
+  @Override
   public void setAutomatonInput(int index, int[] input) {
     setAutomatonInput(index, toFloatArray(input));
+  }
+
+  @Override
+  public void setAutomataInput(int[] input) {
+    setAutomataInput(toFloatArray(input));
   }
 
   @Override
@@ -70,18 +85,25 @@ public class FloatOpenClCellularAutomatonSimulator
   }
 
   @Override
+  public void getAutomataOutput(int[] output) {
+    float[] result = new float[output.length];
+    getAutomataOutput(result);
+    copyToIntArray(result, output);
+  }
+
+  @Override
   protected CLBuffer<FloatBuffer> createBuffer(int size, CLMemory.Mem... flags) {
     return context.createFloatBuffer(size, flags);
   }
 
   @Override
-  protected void copyFromBufferToArray(FloatBuffer buffer, float[] array) {
-    buffer.get(array);
+  protected void copyFromBufferToArray(FloatBuffer buffer, float[] array, int offset, int length) {
+    buffer.get(array, offset, length);
   }
 
   @Override
-  protected void copyFromArrayToBuffer(float[] array, FloatBuffer buffer) {
-    buffer.put(array);
+  protected void copyFromArrayToBuffer(float[] array, int offset, int length, FloatBuffer buffer) {
+    buffer.put(array, offset, length);
   }
 
   private float[] toFloatArray(int[] array) {

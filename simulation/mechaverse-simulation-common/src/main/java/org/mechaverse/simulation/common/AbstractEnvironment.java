@@ -3,7 +3,6 @@ package org.mechaverse.simulation.common;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -52,14 +51,13 @@ public abstract class AbstractEnvironment<
 
     behaviors.forEach(behavior -> behavior.beforeUpdate(simulationModel, this, random));
 
-    Collection<Entity<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE>> activeEntityList = activeEntities.values();
-    for (Entity<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE> activeEntity : activeEntityList) {
+    for (Entity<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE> activeEntity : activeEntities.values()) {
       activeEntity.getBehavior().updateInput(environmentModel, random);
     }
 
     behaviors.forEach(behavior -> behavior.beforePerformAction(simulationModel, this, random));
 
-    for (Entity<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE> activeEntity : activeEntityList) {
+    for (Entity<SIM_MODEL, ENV_MODEL, ENT_MODEL, ENT_TYPE> activeEntity : activeEntities.values()) {
       activeEntity.getBehavior().performAction(this, random);
     }
 

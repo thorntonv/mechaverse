@@ -20,6 +20,12 @@ public class PrimordialSimulationImpl extends
   }
 
   @Override
+  public void setState(PrimordialSimulationModel model) {
+    model.getEnvironments().forEach(PrimordialEnvironmentModel::initCells);
+    super.setState(model);
+  }
+
+  @Override
   public void setStateData(byte[] data) throws Exception {
     setState(PrimordialSimulationModelUtil.deserialize(data));
   }

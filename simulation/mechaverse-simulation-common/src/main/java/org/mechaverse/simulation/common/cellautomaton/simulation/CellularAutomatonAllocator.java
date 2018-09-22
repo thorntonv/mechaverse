@@ -1,19 +1,18 @@
 package org.mechaverse.simulation.common.cellautomaton.simulation;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import gnu.trove.stack.array.TIntArrayStack;
 
 /**
  * Used to track the cellular automaton instances that are being used.
  */
 public class CellularAutomatonAllocator {
 
-  private final Set<Integer> availableInstances = new HashSet<>();
+  private final TIntArrayStack availableInstances;
 
   public CellularAutomatonAllocator(int numInstances) {
+    availableInstances = new TIntArrayStack(numInstances);
     for (int idx = 0; idx < numInstances; idx++) {
-      availableInstances.add(idx);
+      availableInstances.push(numInstances - idx - 1);
     }
   }
 
@@ -22,16 +21,13 @@ public class CellularAutomatonAllocator {
   }
 
   public int allocate() {
-    Iterator<Integer> it = availableInstances.iterator();
-    if (it.hasNext()) {
-      int idx = it.next();
-      it.remove();
-      return idx;
+    if(availableInstances.size() == 0) {
+      throw new IllegalStateException("No instances are available");
     }
-    throw new IllegalStateException("No instances are available");
+    return availableInstances.pop();
   }
 
   public void deallocate(int idx) {
-    availableInstances.add(idx);
+    availableInstances.push(idx);
   }
 }

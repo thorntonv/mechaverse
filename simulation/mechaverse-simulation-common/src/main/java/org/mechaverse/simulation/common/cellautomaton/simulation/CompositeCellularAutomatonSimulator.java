@@ -89,9 +89,31 @@ public final class CompositeCellularAutomatonSimulator implements CellularAutoma
   }
 
   @Override
+  public void getAutomataState(int[] state) {
+    final int automatonStateSize = getAutomatonStateSize();
+    final int[] buffer = new int[automatonStateSize];
+    for (int idx = 0; idx < simulators.length; idx++) {
+      CellularAutomatonSimulator simulator = simulators[idx];
+      simulator.getAutomataState(buffer);
+      System.arraycopy(buffer, 0, state, idx * automatonStateSize, automatonStateSize);
+    }
+  }
+
+  @Override
   public void setAutomatonState(int index, int[] state) {
     MappedCellularAutomatonInfo automaton = mappedCellularAutomatonInfo[index];
     automaton.simulator.setAutomatonState(automaton.index, state);
+  }
+
+  @Override
+  public void setAutomataState(int[] state) {
+    final int automatonStateSize = getAutomatonStateSize();
+    final int[] buffer = new int[automatonStateSize];
+    for (int idx = 0; idx < simulators.length; idx++) {
+      CellularAutomatonSimulator simulator = simulators[idx];
+      System.arraycopy(state, idx * automatonStateSize, buffer, 0, automatonStateSize);
+      simulator.setAutomataState(buffer);
+    }
   }
 
   @Override
@@ -107,6 +129,17 @@ public final class CompositeCellularAutomatonSimulator implements CellularAutoma
   }
 
   @Override
+  public void setAutomataInput(int[] input) {
+    final int automatonInputSize = getAutomatonInputSize();
+    final int[] buffer = new int[automatonInputSize];
+    for (int idx = 0; idx < simulators.length; idx++) {
+      CellularAutomatonSimulator simulator = simulators[idx];
+      System.arraycopy(input, idx * automatonInputSize, buffer, 0, automatonInputSize);
+      simulator.setAutomataInput(buffer);
+    }
+  }
+
+  @Override
   public void setAutomatonOutputMap(int index, int[] outputMap) {
     MappedCellularAutomatonInfo automaton = mappedCellularAutomatonInfo[index];
     automaton.simulator.setAutomatonOutputMap(automaton.index, outputMap);
@@ -116,6 +149,17 @@ public final class CompositeCellularAutomatonSimulator implements CellularAutoma
   public void getAutomatonOutput(int index, int[] output) {
     MappedCellularAutomatonInfo automaton = mappedCellularAutomatonInfo[index];
     automaton.simulator.getAutomatonOutput(automaton.index, output);
+  }
+
+  @Override
+  public void getAutomataOutput(int[] output) {
+    final int automatonOutputSize = getAutomatonOutputSize();
+    final int[] buffer = new int[automatonOutputSize];
+    for (int idx = 0; idx < simulators.length; idx++) {
+      CellularAutomatonSimulator simulator = simulators[idx];
+      simulator.getAutomataOutput(buffer);
+      System.arraycopy(buffer, 0, output, idx * automatonOutputSize, automatonOutputSize);
+    }
   }
 
   @Override

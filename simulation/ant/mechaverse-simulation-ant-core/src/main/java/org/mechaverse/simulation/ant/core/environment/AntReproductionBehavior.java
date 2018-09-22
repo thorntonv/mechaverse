@@ -66,15 +66,21 @@ public class AntReproductionBehavior extends AbstractAntEnvironmentBehavior {
 
       double ageSum = 0;
       double energySum = 0;
+      long maxCreatedIteration = 0;
       for (Ant ant : ants) {
-        ageSum += ant.getAge();
+        maxCreatedIteration = Math.max(maxCreatedIteration, ant.getCreatedIteration());
+      }
+
+      for (Ant ant : ants) {
+        ageSum += maxCreatedIteration - ant.getCreatedIteration();
         energySum += ant.getEnergy();
       }
 
       List<Pair<Ant, Double>> pmf = new ArrayList<>();
       for (Ant ant : ants) {
         if (ageSum != 0 && energySum != 0) {
-          double fitness = .7 * ant.getAge() / ageSum + .3 * ant.getEnergy() / energySum;
+          long relativeAge = maxCreatedIteration - ant.getCreatedIteration();
+          double fitness = .7 * relativeAge / ageSum + .3 * ant.getEnergy() / energySum;
           pmf.add(new Pair<>(ant, fitness));
         } else {
           pmf.add(new Pair<>(ant, 1.0D / ants.size()));
@@ -156,7 +162,7 @@ public class AntReproductionBehavior extends AbstractAntEnvironmentBehavior {
   public Ant generateAnt(AntSimulationModel state, RandomGenerator random) {
     Ant ant = generateRandomAnt(state, random);
 
-    Collection<Ant> reproductiveAnts = getReproductiveAnts();
+    Collection<Ant> reproductiveAnts = getReproductiveAnts(state.getIteration());
     if (reproductiveAnts.size() < 2) {
       logger.debug("Generated ant {}", ant.getId());
       return ant;
@@ -230,10 +236,11 @@ public class AntReproductionBehavior extends AbstractAntEnvironmentBehavior {
     this.antMaxCount = antMaxCount;
   }
 
-  private Collection<Ant> getReproductiveAnts() {
+  private Collection<Ant> getReproductiveAnts(long currentIteration) {
     List<Ant> reproductiveAnts = new ArrayList<>();
     for (Ant ant : ants) {
-      if (ant.getAge() >= antMinReproductiveAge) {
+      long age = currentIteration - ant.getCreatedIteration();
+      if(age >= antMinReproductiveAge) {
         reproductiveAnts.add(ant);
       }
     }

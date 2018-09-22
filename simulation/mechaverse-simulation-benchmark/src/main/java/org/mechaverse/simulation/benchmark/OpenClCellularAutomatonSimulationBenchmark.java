@@ -6,7 +6,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
 import org.mechaverse.cellautomaton.model.CellularAutomatonDescriptor;
-import org.mechaverse.simulation.common.cellautomaton.simulation.BitwiseCellularAutomatonSimulator;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonDescriptorReader;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulationUtil;
 import org.mechaverse.simulation.common.cellautomaton.simulation.CellularAutomatonSimulator;
@@ -43,12 +42,12 @@ public class OpenClCellularAutomatonSimulationBenchmark {
   public static class ExecutionPlan {
 
     @Param(value = {"20"}) int iterationsPerUpdate;
-    @Param(value = {"262144"}) int numAutomata;
+    @Param(value = {"1048576"}) int numAutomata;
     @Param(value = {"6"}) int inputSize;
     @Param(value = {"4"}) int outputSize;
     @Param(value = {"2"}) int width;
     @Param(value = {"2"}) int height;
-    @Param(value = {"25"}) int stepCount;
+    @Param(value = {"50"}) int stepCount;
 
     private int[] input;
     private int[] output;
@@ -68,8 +67,6 @@ public class OpenClCellularAutomatonSimulationBenchmark {
       try {
         simulator = new OpenClCellularAutomatonSimulator(numAutomata / Integer.SIZE, inputSize, outputSize,
             CLPlatform.getDefault().getMaxFlopsDevice(), descriptor);
-
-        simulator = new BitwiseCellularAutomatonSimulator(simulator, 1);
 
         input = CellularAutomatonSimulationUtil.randomState(simulator.getAutomatonInputSize(), random);
         output = CellularAutomatonSimulationUtil.randomState(simulator.getAutomatonOutputSize(), random);

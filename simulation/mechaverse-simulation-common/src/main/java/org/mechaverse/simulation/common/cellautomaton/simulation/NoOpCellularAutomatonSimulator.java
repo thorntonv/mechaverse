@@ -5,7 +5,6 @@ package org.mechaverse.simulation.common.cellautomaton.simulation;
  */
 public class NoOpCellularAutomatonSimulator implements CellularAutomatonSimulator {
 
-  private static final int RANDOM_OUTPUT_COUNT = 4096;
   private final int size;
   private final int inputSize;
   private final int stateSize;
@@ -51,7 +50,16 @@ public class NoOpCellularAutomatonSimulator implements CellularAutomatonSimulato
   }
 
   @Override
+  public void getAutomataState(int[] state) {
+  }
+
+  @Override
   public void setAutomatonState(int index, int[] state) {
+  }
+
+  @Override
+  public void setAutomataState(int[] state) {
+
   }
 
   @Override
@@ -63,11 +71,20 @@ public class NoOpCellularAutomatonSimulator implements CellularAutomatonSimulato
   }
 
   @Override
+  public void setAutomataInput(int[] input) {
+
+  }
+
+  @Override
   public void setAutomatonOutputMap(int index, int[] outputMap) {
   }
 
   @Override
   public void getAutomatonOutput(int index, int[] output) {
+  }
+
+  @Override
+  public void getAutomataOutput(int[] output) {
   }
 
   @Override
