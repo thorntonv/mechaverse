@@ -16,6 +16,5 @@
   
   <modules>
     <module>mechaverse-simulation-primordial-core</module>
-    <module>mechaverse-simulation-primordial-client</module>
   </modules>
 </project>

@@ -5,7 +5,7 @@ import java.util.List;
 import org.mechaverse.gwt.client.manager.SimulationInfoPresenter.SimulationInfoPlace;
 import org.mechaverse.gwt.common.client.webconsole.NotificationBar;
 import org.mechaverse.gwt.common.shared.ManagerGwtRpcServiceAsync;
-import org.mechaverse.service.manager.api.model.SimulationInfo;
+import org.mechaverse.manager.api.model.SimulationInfo;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;

@@ -39,5 +39,10 @@
       <g:customCell><g:Label addStyleNames="{style.label}">Max task duration (sec.)</g:Label></g:customCell>
       <g:customCell><g:TextBox ui:field="taskMaxDurationSeconds" addStyleNames="{style.textBox}" /></g:customCell>
     </g:row>
+
+    <g:row>
+      <g:customCell><g:Label addStyleNames="{style.label}">Simulation Type</g:Label></g:customCell>
+      <g:customCell><g:ListBox ui:field="simulationType" addStyleNames="{style.textBox}" /></g:customCell>
+    </g:row>
   </g:Grid>
 </ui:UiBinder>

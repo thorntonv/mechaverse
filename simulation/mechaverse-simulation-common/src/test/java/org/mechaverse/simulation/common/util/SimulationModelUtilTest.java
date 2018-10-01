@@ -3,13 +3,7 @@ package org.mechaverse.simulation.common.util;
 import static org.junit.Assert.assertEquals;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.google.common.io.CharStreams;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 import org.junit.Test;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.model.SimulationModel;
@@ -54,12 +48,8 @@ public class SimulationModelUtilTest {
     }
   }
 
-
-
-  private static final String TEST_JSON = "{\"id\":\"abc\",\"environment\":{\"@type\":\"TestCellEnvironmentModel\",\"width\":10,\"height\":10,\"entities\":[{\"@type\":\"TestEntity1\",\"id\":\"e1\",\"x\":3,\"y\":2,\"energy\":0,\"maxEnergy\":0,\"createdIteration\":0,\"data\":{},\"field1\":101},{\"@type\":\"TestEntity2\",\"id\":\"e2\",\"x\":3,\"y\":5,\"energy\":0,\"maxEnergy\":0,\"createdIteration\":0,\"data\":{},\"field2\":\"testStr\"}]},\"subEnvironments\":[],\"iteration\":0,\"data\":{\"key1\":\"dGVzdFZhbHVlMQ==\"},\"persistEntityCellularAutomatonStateEnabled\":true}";
-
   @Test
-  public void testSerialize() throws IOException {
+  public void testSerializeDeserialize() throws IOException {
     SimulationModel simulationModel = new SimulationModel();
     simulationModel.setId("abc");
     simulationModel.putData("key1", "testValue1".getBytes());
@@ -81,27 +71,20 @@ public class SimulationModelUtilTest {
     simulationModel.setEnvironment(environmentModel);
 
     byte[] serialized = SimulationModelUtil.serialize(simulationModel);
-    assertEquals(TEST_JSON, toString(serialized));
-  }
 
-  @Test
-  public void testDeserialize() throws IOException {
-    SimulationModel simulationModel = SimulationModelUtil.deserialize(toBytes(TEST_JSON), new Class[]{
+    SimulationModel deserializedModel = SimulationModelUtil.deserialize(serialized, new Class[]{
         TestCellEnvironmentModel.class, TestEntity1.class, TestEntity2.class}, SimulationModel.class);
 
-    assertEquals("abc", simulationModel.getId());
-    assertEquals(2, simulationModel.getEnvironment().getEntities().size());
-  }
+    assertEquals("abc", deserializedModel.getId());
+    assertEquals("testValue1", new String(deserializedModel.getData("key1")));
+    environmentModel = (TestCellEnvironmentModel) deserializedModel.getEnvironment();
+    assertEquals(10, environmentModel.getWidth());
+    assertEquals(10, environmentModel.getHeight());
+    assertEquals(2, environmentModel.getEntities().size());
 
-  private String toString(byte[] serialized) throws IOException {
-    return CharStreams.toString(new InputStreamReader(new GZIPInputStream(new ByteArrayInputStream(serialized))));
-  }
-
-  private byte[] toBytes(String jsonString) throws IOException {
-    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-    try(GZIPOutputStream out = new GZIPOutputStream(byteOut)) {
-      out.write(jsonString.getBytes());
-    }
-    return byteOut.toByteArray();
+    entityModel1 = (TestEntity1) environmentModel.getEntities().get(0);
+    assertEquals("e1", entityModel1.getId());
+    assertEquals(2, entityModel1.getY());
+    assertEquals(101, entityModel1.getField1());
   }
 }

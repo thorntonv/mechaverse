@@ -8,9 +8,8 @@ import org.mechaverse.gwt.common.client.webconsole.BasicNavMenu;
 import org.mechaverse.gwt.common.client.webconsole.RefreshButton;
 import org.mechaverse.gwt.common.client.webconsole.WebConsoleLayoutView;
 import org.mechaverse.gwt.common.client.webconsole.WebConsoleResourceBundle.TableResources;
-import org.mechaverse.service.manager.api.MechaverseManagerUtil;
-import org.mechaverse.service.manager.api.model.InstanceInfo;
-import org.mechaverse.service.manager.api.model.SimulationInfo;
+import org.mechaverse.manager.api.model.InstanceInfo;
+import org.mechaverse.manager.api.model.SimulationInfo;
 
 import com.google.gwt.cell.client.ButtonCell;
 import com.google.gwt.cell.client.FieldUpdater;

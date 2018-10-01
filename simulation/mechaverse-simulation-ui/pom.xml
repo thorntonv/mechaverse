@@ -22,11 +22,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.mechaverse.common</groupId>
-      <artifactId>mechaverse-common</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.mechaverse.client</groupId>
       <artifactId>mechaverse-gwt-common</artifactId>
       <version>${project.version}</version>
@@ -39,8 +34,13 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.mechaverse.service</groupId>
-      <artifactId>mechaverse-manager-api</artifactId>
+      <groupId>org.mechaverse.manager</groupId>
+      <artifactId>mechaverse-manager-client</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mechaverse.manager</groupId>
+      <artifactId>mechaverse-manager-client</artifactId>
       <version>${project.version}</version>
       <classifier>sources</classifier>
       <scope>provided</scope>
@@ -55,12 +55,17 @@
       <artifactId>mechaverse-simulation-ant-core</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.mechaverse.simulation.ant</groupId>-->
+      <!--<artifactId>mechaverse-simulation-ant-core</artifactId>-->
+      <!--<version>${project.version}</version>-->
+      <!--<classifier>sources</classifier>-->
+      <!--<scope>provided</scope>-->
+    <!--</dependency>-->
     <dependency>
-      <groupId>org.mechaverse.simulation.ant</groupId>
-      <artifactId>mechaverse-simulation-ant-core</artifactId>
+      <groupId>org.mechaverse.simulation.primordial</groupId>
+      <artifactId>mechaverse-simulation-primordial-core</artifactId>
       <version>${project.version}</version>
-      <classifier>sources</classifier>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.mechaverse.simulation</groupId>
@@ -109,6 +114,14 @@
       <artifactId>javaee-api</artifactId>
       <version>7.0</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

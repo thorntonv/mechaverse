@@ -14,7 +14,7 @@
   </parent>
   
   <modules>
-    <module>mechaverse-client-common</module>
+    <module>mechaverse-client</module>
     <module>mechaverse-gwt-common</module>
   </modules>
 </project>
