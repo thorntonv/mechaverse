@@ -3,9 +3,9 @@ package org.mechaverse.gwt.client.manager;
 import org.mechaverse.gwt.client.simulation.SimulationPresenter.SimulationPlace;
 import org.mechaverse.gwt.common.client.webconsole.NotificationBar;
 import org.mechaverse.gwt.common.shared.ManagerGwtRpcServiceAsync;
-import org.mechaverse.service.manager.api.model.InstanceInfo;
-import org.mechaverse.service.manager.api.model.SimulationConfig;
-import org.mechaverse.service.manager.api.model.SimulationInfo;
+import org.mechaverse.manager.api.model.InstanceInfo;
+import org.mechaverse.manager.api.model.SimulationConfig;
+import org.mechaverse.manager.api.model.SimulationInfo;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;

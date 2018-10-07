@@ -99,8 +99,8 @@ public final class PrimordialEnvironmentModel extends
         if ((entityMatrix[row][col] & FOOD_ENTITY_MASK) > 0) {
           Food foodModel = new Food();
           foodModel.setEnergy(100);
-          foodModel.setY(row);
-          foodModel.setX(col);
+          foodModel.setY(row - 1);
+          foodModel.setX(col - 1);
           entities.add(foodModel);
         }
       }

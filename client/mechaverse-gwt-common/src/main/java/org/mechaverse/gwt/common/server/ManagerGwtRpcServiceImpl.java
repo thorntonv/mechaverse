@@ -6,9 +6,9 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 
 import org.mechaverse.gwt.common.shared.ManagerGwtRpcService;
-import org.mechaverse.service.manager.api.MechaverseManager;
-import org.mechaverse.service.manager.api.model.SimulationConfig;
-import org.mechaverse.service.manager.api.model.SimulationInfo;
+import org.mechaverse.manager.api.MechaverseManagerApi;
+import org.mechaverse.manager.api.model.SimulationConfig;
+import org.mechaverse.manager.api.model.SimulationInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -24,7 +24,8 @@ public class ManagerGwtRpcServiceImpl extends RemoteServiceServlet implements Ma
 
   private static final long serialVersionUID = -1273742074908104295L;
 
-  @Autowired private MechaverseManager manager;
+  @Autowired
+  private MechaverseManagerApi manager;
 
   @Override
   public void init(ServletConfig config) throws ServletException {
@@ -36,7 +37,7 @@ public class ManagerGwtRpcServiceImpl extends RemoteServiceServlet implements Ma
 
   @Override
   public List<SimulationInfo> getSimulationInfo() {
-    return manager.getSimulationInfo();
+    return manager.getAllSimulationInfo();
   }
 
   @Override

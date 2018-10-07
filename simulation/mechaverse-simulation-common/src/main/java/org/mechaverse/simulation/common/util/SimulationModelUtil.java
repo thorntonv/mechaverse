@@ -3,6 +3,7 @@ package org.mechaverse.simulation.common.util;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.smile.SmileFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -22,14 +23,14 @@ public final class SimulationModelUtil {
   private static final int DEFAULT_GZIP_BUFFER_SIZE = 128 * 1024;
 
   /**
-   * Serializes the given model to json written to the given {@link OutputStream}.
+   * Serializes the given model to smile written to the given {@link OutputStream}.
    *
    * @param model the model to serialize
    * @param out the output stream to which serialized data will be written
    */
   private static void serialize(SimulationModel model, OutputStream out)
       throws IOException {
-    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectMapper objectMapper = new ObjectMapper(new SmileFactory());
     objectMapper.setSerializationInclusion(Include.NON_NULL);
     objectMapper.writeValue(out, model);
     out.close();
@@ -39,14 +40,14 @@ public final class SimulationModelUtil {
     if (data == null) {
       return null;
     }
-    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectMapper objectMapper = new ObjectMapper(new SmileFactory());
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     objectMapper.registerSubtypes(classesToBeBound);
     return objectMapper.readValue(new GZIPInputStream(new ByteArrayInputStream(data)), simulationModelClass);
   }
 
   /**
-   * Serializes a {@link SimulationModel} to a byte array that contains the compressed json
+   * Serializes a {@link SimulationModel} to a byte array that contains the compressed smile
    * representation of the model.
    */
   public static byte[] serialize(SimulationModel model) throws IOException {

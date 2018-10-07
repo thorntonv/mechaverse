@@ -44,7 +44,7 @@ public class AntSimulationConfig {
   private static final int FOOD_INITIAL_ENERGY = 10;
   private static final int PHEROMONE_INITIAL_ENERGY = 100;
   private static final int PHEROMONE_DECAY_INTERVAL = 100;
-  private static final int SUB_ENVIRONMENT_COUNT = 3;
+  private static final int SUB_ENVIRONMENT_COUNT = 0;
 
   @Bean
   @Scope("prototype")

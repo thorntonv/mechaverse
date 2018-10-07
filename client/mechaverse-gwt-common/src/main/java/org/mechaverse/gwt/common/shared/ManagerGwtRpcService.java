@@ -2,11 +2,10 @@ package org.mechaverse.gwt.common.shared;
 
 import java.util.List;
 
-import org.mechaverse.service.manager.api.model.SimulationConfig;
-import org.mechaverse.service.manager.api.model.SimulationInfo;
-
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import org.mechaverse.manager.api.model.SimulationConfig;
+import org.mechaverse.manager.api.model.SimulationInfo;
 
 /**
  * A GWT RPC service for accessing the manager interface.
