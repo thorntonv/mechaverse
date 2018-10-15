@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
-  version="3.0">
-
-  <session-config>
-      <session-timeout>1</session-timeout>
-  </session-config>
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
   <context-param>
     <param-name>contextConfigLocation</param-name>
@@ -16,6 +10,22 @@
   <listener>
     <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>
+
+  <servlet>
+    <servlet-name>gwt-boot</servlet-name>
+    <servlet-class>
+      org.springframework.web.servlet.DispatcherServlet
+    </servlet-class>
+    <init-param>
+      <param-name>contextClass</param-name>
+      <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext
+      </param-value>
+    </init-param>
+    <init-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>org.mechaverse.gwt.server.ServerApplication</param-value>
+    </init-param>
+  </servlet>
 
   <servlet>
     <servlet-name>simulationServlet</servlet-name>
@@ -28,6 +38,11 @@
   </servlet>
 
   <servlet-mapping>
+    <servlet-name>gwt-boot</servlet-name>
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
     <servlet-name>simulationServlet</servlet-name>
     <url-pattern>/MechaverseClient/simulation</url-pattern>
   </servlet-mapping>
@@ -37,12 +52,7 @@
     <url-pattern>/MechaverseClient/manager</url-pattern>
   </servlet-mapping>
 
-  <listener>
-    <listener-class>org.mechaverse.gwt.server.SimulationGwtRpcServiceImpl</listener-class>
-  </listener>
-
   <welcome-file-list>
     <welcome-file>mechaverse.html</welcome-file>
   </welcome-file-list>
-
 </web-app>

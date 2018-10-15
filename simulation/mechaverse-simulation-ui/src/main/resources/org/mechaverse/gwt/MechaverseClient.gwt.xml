@@ -2,8 +2,6 @@
 <module rename-to='MechaverseClient'>
   <inherits name='com.google.gwt.user.User' />
 
-  <inherits name='com.google.gwt.junit.JUnit' />
-
   <inherits name="org.mechaverse.gwt.common"/>
   <entry-point class='org.mechaverse.gwt.client.MechaverseClient' />
 
@@ -11,7 +9,6 @@
   <source path='shared' />
 
   <add-linker name="xsiframe"/>
-  <set-configuration-property name="devModeRedirectEnabled" value="true"/>
-  <set-configuration-property name="CssResource.style" value="pretty"/> 
+  <set-configuration-property name="CssResource.style" value="pretty"/>
   <set-property name="user.agent" value="safari,gecko1_8"/>
 </module>

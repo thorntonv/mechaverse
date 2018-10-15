@@ -39,7 +39,7 @@ public class MechaverseClientApp implements CommandLineRunner {
         String clientId = args[0];
 
         final List<MechaverseClient> clientInstances = new ArrayList<>();
-        int instanceCount = 8;
+        int instanceCount = Runtime.getRuntime().availableProcessors();
         ExecutorService executorService = Executors.newFixedThreadPool(instanceCount);
         for (int idx = 0; idx < instanceCount; idx++) {
             final int instanceIdx = idx;
