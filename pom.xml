@@ -18,6 +18,8 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <jackson.version>2.9.7</jackson.version>
+    <javax.activation.version>1.2.0</javax.activation.version>
+    <jaxb.api.version>2.3.0</jaxb.api.version>
     <spring-boot.version>1.5.16.RELEASE</spring-boot.version>
     <dependency-plugin.version>2.10</dependency-plugin.version>
     <jocl.version>2.3.2</jocl.version>
@@ -48,6 +50,26 @@
         <groupId>org.aspectj</groupId>
         <artifactId>aspectjweaver</artifactId>
         <version>1.7.4</version>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.activation</groupId>
+        <artifactId>javax.activation</artifactId>
+        <version>${javax.activation.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.xml.bind</groupId>
+        <artifactId>jaxb-api</artifactId>
+        <version>${jaxb.api.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.xml.bind</groupId>
+        <artifactId>jaxb-core</artifactId>
+        <version>${jaxb.api.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.xml.bind</groupId>
+        <artifactId>jaxb-impl</artifactId>
+        <version>${jaxb.api.version}</version>
       </dependency>
 
       <!-- Jackson -->

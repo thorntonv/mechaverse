@@ -18,7 +18,7 @@
   <version>0.1</version>
 
   <properties>
-    <gwt.version>2.8.0</gwt.version>
+    <gwt.version>2.8.2</gwt.version>
     <java.version>1.8</java.version>
     <jetty.version>9.2.17.v20160517</jetty.version>
     <outputFolder>${project.build.directory}/${project.artifactId}</outputFolder>
