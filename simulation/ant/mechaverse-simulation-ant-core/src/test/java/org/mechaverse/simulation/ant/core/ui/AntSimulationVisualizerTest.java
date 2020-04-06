@@ -38,7 +38,7 @@ public class AntSimulationVisualizerTest {
     simulation.setState(simulation.generateRandomState());
     visualizer = new AntSimulationVisualizer(
         simulation, AntSimulationImageProvider.DEFAULT_CELL_SIZE / 2,
-        FRAMES_PER_SECOND, RUN_TIME_SECONDS * FRAMES_PER_SECOND
+        FRAMES_PER_SECOND, RUN_TIME_SECONDS * FRAMES_PER_SECOND, false, null
     );
   }
 

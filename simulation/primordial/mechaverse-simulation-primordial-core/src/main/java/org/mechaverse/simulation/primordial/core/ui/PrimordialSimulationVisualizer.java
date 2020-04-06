@@ -11,8 +11,8 @@ import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel
 public class PrimordialSimulationVisualizer extends SimulationVisualizer<PrimordialSimulationModel, PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> {
 
     public PrimordialSimulationVisualizer(final PrimordialSimulationImpl simulation,
-            final int cellSize, final int framesPerSecond, final int frameCount) {
+            final int cellSize, final int framesPerSecond, final int frameCount, boolean writeImages, String imageBasePath) {
         super(simulation, new SimulationRenderer<>(new PrimordialSimulationImageProvider(), cellSize),
-                framesPerSecond, frameCount);
+                framesPerSecond, frameCount, writeImages, imageBasePath);
     }
 }

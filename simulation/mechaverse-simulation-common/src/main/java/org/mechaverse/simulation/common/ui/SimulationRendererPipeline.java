@@ -46,17 +46,15 @@ public class SimulationRendererPipeline<SIM_MODEL extends
             return Pair.of(state, environmentImages);
           }));
         } catch (InterruptedException e) {
-          e.printStackTrace();
         }
       }
     }
   }
 
-  private ExecutorService executorService = Executors
-      .newFixedThreadPool(1);
+  private ExecutorService executorService = Executors.newFixedThreadPool(1);
 
-  private BlockingQueue<Future<Pair<SIM_MODEL, Map<String, BufferedImage>>>> stateImageQueue = new ArrayBlockingQueue<>(
-      60);
+  private final BlockingQueue<Future<Pair<SIM_MODEL, Map<String, BufferedImage>>>> stateImageQueue =
+          new ArrayBlockingQueue<>(10);
 
   private AtomicBoolean running = new AtomicBoolean(false);
 

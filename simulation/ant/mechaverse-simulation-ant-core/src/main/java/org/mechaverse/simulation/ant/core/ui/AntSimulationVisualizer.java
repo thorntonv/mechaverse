@@ -13,8 +13,9 @@ import org.mechaverse.simulation.common.ui.SimulationVisualizer;
 public class AntSimulationVisualizer extends SimulationVisualizer<AntSimulationModel, CellEnvironment, EntityModel<EntityType>, EntityType> {
 
     public AntSimulationVisualizer(
-            final AntSimulationImpl simulation, final int cellSize, final int framesPerSecond, final int frameCount) throws IOException {
+            final AntSimulationImpl simulation, final int cellSize, final int framesPerSecond, final int frameCount,
+            boolean writeImages, String imageBasePath) throws IOException {
         super(simulation, new SimulationRenderer<>(new AntSimulationImageProvider(), cellSize),
-                framesPerSecond, frameCount);
+                framesPerSecond, frameCount, writeImages, imageBasePath);
     }
 }

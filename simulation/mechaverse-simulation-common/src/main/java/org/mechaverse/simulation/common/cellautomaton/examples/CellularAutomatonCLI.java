@@ -40,10 +40,12 @@ public abstract class CellularAutomatonCLI {
         cli.createVisualizer(width, height, framesPerSecond, frameCount);
       } else if (cmd.hasOption('f')) {
         int frameCount = Integer.parseInt(cmd.getOptionValue("frameCount", "1800"));
+        int repeatCount = Integer.parseInt(cmd.getOptionValue("repeat", "1"));
+        String imageBasePath = cmd.getOptionValue("imageBasePath", "");
         CellularAutomaton cells = cli.createCellularAutomaton();
         CellularAutomatonRenderer renderer =
             cli.createCellularAutomatonRenderer(cells, width, height);
-        writeImages(cells, renderer, 0, frameCount);
+        writeImages(cells, renderer, 0, frameCount, repeatCount, imageBasePath);
       } else if (cmd.hasOption('a')) {
         // TODO(thorntonv): Integrate analysis.
       } else {
@@ -58,14 +60,17 @@ public abstract class CellularAutomatonCLI {
   }
   
   public static void writeImages(CellularAutomaton cells, CellularAutomatonRenderer renderer,
-      int startIteration, int endIteration) throws IOException {
+      int startIteration, int endIteration, int repeatCount, String imageBasePath) throws IOException {
     System.out.println("Performing simulation ... ");
+    int imgIdx = 1;
     for (int iteration = 1; iteration <= endIteration; iteration++) {
       System.out.printf("  Iteration %d / %d%n", iteration, endIteration);
       if (iteration >= startIteration && iteration <= endIteration) {
         BufferedImage image = renderer.draw();
-        String imageFilename = String.format("images/iteration-%04d.png", iteration);
-        ImageIO.write(image, "PNG", new File(imageFilename));
+        for(int cnt = 1; cnt <= repeatCount; cnt++) {
+          String imageFilename = String.format(imageBasePath + "/iteration-%07d.png", imgIdx++);
+          ImageIO.write(image, "PNG", new File(imageFilename));
+        }
       }
       cells.update();
     }
@@ -88,6 +93,8 @@ public abstract class CellularAutomatonCLI {
     options.addOption(new Option("w", "width", true, "Image width"));
     options.addOption(new Option("h", "height", true, "Image height"));
     options.addOption(new Option("r", "frameRate", true, "Visualization frame rate (fps)"));
+    options.addOption(new Option("p", "imageBasePath", true, "Image output base path"));
+    options.addOption(new Option("repeat", "repeat", true, "Number of times to repeat image per iteration"));
     return options;
   }
 }

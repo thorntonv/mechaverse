@@ -46,7 +46,7 @@ public class PrimordialSimulationVisualizerTest {
     simulation.setState(model);
     visualizer = new PrimordialSimulationVisualizer(
         simulation, PrimordialSimulationImageProvider.DEFAULT_CELL_SIZE,
-        FRAMES_PER_SECOND, RUN_TIME_SECONDS * FRAMES_PER_SECOND
+        FRAMES_PER_SECOND, RUN_TIME_SECONDS * FRAMES_PER_SECOND, false, null
     );
   }
 
