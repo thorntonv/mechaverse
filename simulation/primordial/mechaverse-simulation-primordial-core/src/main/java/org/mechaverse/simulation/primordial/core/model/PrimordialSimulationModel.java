@@ -8,6 +8,7 @@ public class PrimordialSimulationModel
 {
     private int entityMaxCountPerEnvironment;
     private int entityInitialEnergy;
+    private int entityMaxEnergy;
     private int entityMinReproductiveAge;
     private int foodMinCount;
     private int foodClusterRadius;
@@ -68,5 +69,13 @@ public class PrimordialSimulationModel
 
     public void setMutationRate(float mutationRate) {
         this.mutationRate = mutationRate;
+    }
+
+    public int getEntityMaxEnergy() {
+        return entityMaxEnergy;
+    }
+
+    public void setEntityMaxEnergy(int entityMaxEnergy) {
+        this.entityMaxEnergy = entityMaxEnergy;
     }
 }

@@ -27,8 +27,8 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes = {PrimordialSimulationConfig.class})
 public class PrimordialSimulationVisualizerTest {
 
-  private static final int RUN_TIME_SECONDS = 5;
-  private static final int FRAMES_PER_SECOND = 15;
+  private static final int RUN_TIME_SECONDS = 120;
+  private static final int FRAMES_PER_SECOND = 60;
 
   private static final Logger logger = LoggerFactory.getLogger(PrimordialSimulationVisualizerTest.class);
 
@@ -42,7 +42,13 @@ public class PrimordialSimulationVisualizerTest {
     PrimordialSimulationModelGenerator modelGenerator =
         new PrimordialSimulationModelGenerator(0);
     PrimordialSimulationModel model = modelGenerator.generate(new Well19937c());
-    model.setEntityMaxCountPerEnvironment(65536);
+    model.setEntityMaxCountPerEnvironment(2000);
+    model.setEntityMinReproductiveAge(10);
+    model.setFoodClusterRadius(20);
+    model.setFoodMinCount(100);
+    model.setEntityInitialEnergy(500);
+    model.setEntityMaxEnergy(1200);
+    model.setFoodInitialEnergy(400);
     simulation.setState(model);
     visualizer = new PrimordialSimulationVisualizer(
         simulation, PrimordialSimulationImageProvider.DEFAULT_CELL_SIZE,

@@ -1,22 +1,20 @@
 package org.mechaverse.simulation.primordial.core.ui;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsEnvironment;
-import java.awt.Transparency;
-import java.awt.image.BufferedImage;
-import java.util.HashMap;
-import java.util.Map;
 import org.mechaverse.simulation.common.model.EntityModel;
 import org.mechaverse.simulation.common.ui.SimulationImageProvider;
 import org.mechaverse.simulation.primordial.core.model.EntityType;
+import org.mechaverse.simulation.primordial.core.model.PrimordialEntityModel;
 import org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.Map;
 
 @SuppressWarnings("WeakerAccess")
 public class PrimordialSimulationImageProvider implements SimulationImageProvider<PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> {
 
-    public static final int DEFAULT_CELL_SIZE = 8;
+    public static final int DEFAULT_CELL_SIZE = 4;
 
     private final int cellImageSize;
 
@@ -37,10 +35,8 @@ public class PrimordialSimulationImageProvider implements SimulationImageProvide
 
         image = createCellImage();
         Graphics2D g2d = image.createGraphics();
-        g2d.setColor(Color.DARK_GRAY);
+        g2d.setColor(Color.BLACK);
         g2d.fillRect(0, 0, image.getWidth(), image.getHeight());
-        g2d.setColor(new Color(85, 85, 85));
-        g2d.fillRect(1, 1, image.getWidth() - 2, image.getHeight() - 2);
         imageCache.put("cellBackground", image);
         return image;
     }
@@ -50,14 +46,27 @@ public class PrimordialSimulationImageProvider implements SimulationImageProvide
             final PrimordialEnvironmentModel environmentModel) {
         String imageCacheKey = entityModel.getType().name();
         BufferedImage image = imageCache.get(imageCacheKey);
-        if(image != null) {
+        if(image != null && entityModel.getType() != EntityType.ENTITY) {
             return image;
         }
         image = createCellImage();
         Graphics2D g2d = image.createGraphics();
         switch (entityModel.getType()) {
             case ENTITY:
-                g2d.setColor(new Color(0, 200, 0));
+                PrimordialEntityModel model = (PrimordialEntityModel) entityModel;
+                int r = (int)(model.getStrainId() & 255);
+                int g = (int)(model.getStrainId() >> 8 & 255);
+                int b = (int)(model.getStrainId() >> 16 & 255);
+
+                if(model.getStrainId() == 0) {
+                    r = g = b = 255;
+                }
+                if (model.getEnergy() <= 0) {
+                    r = r / 2;
+                    g = g / 2;
+                    b = b / 2;
+                }
+                g2d.setColor(new Color(r, g, b));
                 g2d.fillRect(1, 1, image.getWidth() - 2, image.getHeight() - 2);
                 break;
             case BARRIER:
@@ -65,7 +74,7 @@ public class PrimordialSimulationImageProvider implements SimulationImageProvide
                 g2d.fillRect(0, 0, image.getWidth(), image.getHeight());
                 break;
             case FOOD:
-                g2d.setColor(new Color(0, 85, 200));
+                g2d.setColor(new Color(0, 200, 85));
                 g2d.fillRect(1, 1, image.getWidth() - 2, image.getHeight() - 2);
                 break;
         }

@@ -1,19 +1,10 @@
 package org.mechaverse.simulation.primordial.core.environment;
 
-import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_INPUT_MAP_KEY;
-import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_OUTPUT_MAP_KEY;
-import static org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel.ENTITY_MASK;
-import static org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel.FOOD_ENTITY_MASK;
-import static org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel.GENETIC_DATA_KEY;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
 import org.mechaverse.simulation.common.Environment;
@@ -31,6 +22,14 @@ import org.mechaverse.simulation.primordial.core.model.Food;
 import org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel;
 import org.mechaverse.simulation.primordial.core.model.PrimordialSimulationModel;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+
+import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_INPUT_MAP_KEY;
+import static org.mechaverse.simulation.common.cellautomaton.CellularAutomatonEntityBehavior.CELLULAR_AUTOMATON_OUTPUT_MAP_KEY;
+import static org.mechaverse.simulation.primordial.core.model.PrimordialEnvironmentModel.*;
 
 /**
  * An environment module that updates simulated cellular automata before active entity actions are
@@ -76,7 +75,8 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
   private int[] inputData;
   private int[] outputData;
 
-  private int maxEnergyLevel;
+  private int entityInitialEnergy;
+  private int entityMaxEnergy;
   private final Set<EntityModel<EntityType>> newEntities = Sets.newLinkedHashSet();
   private boolean ioMapsSet = false;
 
@@ -110,7 +110,9 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
       inputData = new int[simulator.getAutomatonInputSize() * numAutomata / Integer.SIZE];
       outputData = new int[simulator.getAutomatonOutputSize() * numAutomata / Integer.SIZE];
 
-      maxEnergyLevel = state.getEntityInitialEnergy();
+      entityInitialEnergy = state.getEntityInitialEnergy();
+      entityMaxEnergy = state.getEntityMaxEnergy();
+
       generateIOMaps(state);
     }
   }
@@ -210,7 +212,8 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
         nearbyEntityBitVector |= entityMatrixRow[leftCol + 2];
 
         // Encode input.
-        final int value = energy * 3 / maxEnergyLevel;
+        int value = energy * 3 / entityInitialEnergy;
+        value = value > 3 ? 3 : value;
         i1 |= (value & 0b1) << bitOffset;
         i2 |= (value >> 1) << bitOffset;
         i3 |= (frontEntityBitVector & 0b1) << bitOffset;
@@ -287,12 +290,15 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
           envModel.removeFood(entityRow, entityCol);
           environment.removeEntity(FOOD_INSTANCE);
           energy += foodEnergy;
+          energy = energy > entityMaxEnergy ? entityMaxEnergy : energy;
+        } else if (consume && (entityMatrix[row][col] & ENTITY_MASK) > 0) {
+          // TODO(thorntonv): Implement consume entity.
         }
 
         // Move action.
         if (moveDirectionOrdinal == MOVE_FORWARD_ORDINAL
             && (entityMatrix[frontRow][frontCol] & ENTITY_MASK) == 0 &&
-            frontRow > 0 && frontCol > 0 && frontRow < maxRow && frontCol < maxCol) {
+            frontRow > 0 && frontCol > 0 && frontRow <= maxRow + 1 && frontCol <= maxCol + 1) {
           entityMatrix[row][col] &= ~ENTITY_MASK;
           entityMatrix[frontRow][frontCol] |= ENTITY_MASK;
           entityRows[idx] = frontRow - 1;
@@ -302,13 +308,14 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
         // Turn action.
         entityDirections[idx] = turnMatrix[turnDirectionOrdinal][directionOrdinal];
 
+        energy = energy < 0 ? 0 : energy;
         entityEnergy[idx] = energy;
 
         idx++;
       }
     }
 
-    if (state.getIteration() > lastRemoveEntityIteration + state.getEntityInitialEnergy()) {
+    if (state.getIteration() > lastRemoveEntityIteration + entityInitialEnergy) {
       lastRemoveEntityIteration = state.getIteration();
       for (int idx = 0; idx < numAutomata; idx++) {
         EntityModel<EntityType> entityModel = automatonIdxEntityModelMap.get(idx);
@@ -354,8 +361,10 @@ public class CellularAutomatonSimulationBehavior extends PrimordialEnvironmentBe
       simulator.getAllocator().deallocate(entityAutomatonIdx);
       entity.setY(entityRows[entityAutomatonIdx]);
       entity.setX(entityCols[entityAutomatonIdx]);
-      environmentModel.remove(entity);
+      entityRows[entityAutomatonIdx] = -1;
+      entityCols[entityAutomatonIdx] = -1;
       entityEnergy[entityAutomatonIdx] = 0;
+      environmentModel.remove(entity);
     }
     newEntities.remove(entity);
   }

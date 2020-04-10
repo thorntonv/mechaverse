@@ -13,10 +13,20 @@ public class PrimordialEntityModel extends EntityModel<EntityType> implements Se
 
   private final static long serialVersionUID = -1L;
 
+  private long strainId;
+
   public PrimordialEntityModel() {}
 
   @Override
   public EntityType getType() {
     return EntityType.ENTITY;
+  }
+
+  public long getStrainId() {
+    return strainId;
+  }
+
+  public void setStrainId(long strainId) {
+    this.strainId = strainId;
   }
 }

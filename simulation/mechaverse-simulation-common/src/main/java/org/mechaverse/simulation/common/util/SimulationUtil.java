@@ -1,12 +1,20 @@
 package org.mechaverse.simulation.common.util;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.mechaverse.simulation.common.model.Direction;
 import org.mechaverse.simulation.common.model.EntityModel;
 
+import java.util.List;
+
 public final class SimulationUtil {
 
   private SimulationUtil() {}
+
+  public static final List<int[]> POSITION_DELTAS = ImmutableList.of(
+          new int[]{-1, -1}, new int[]{-1, 0}, new int[]{-1, 1},
+          new int[]{0, -1}, new int[]{0, 0}, new int[]{0, 1},
+          new int[]{1, -1}, new int[]{1, 0}, new int[]{1, 1});
 
   public static void turnCW(EntityModel entity) {
     entity.setDirection(directionCW(entity.getDirection()));
