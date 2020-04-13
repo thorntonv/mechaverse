@@ -73,7 +73,7 @@ public class EntityReproductionBehavior extends PrimordialEnvironmentBehavior {
     while (entities.size() < entityMaxCount && cnt < maxTries) {
       int row, col;
       PrimordialEntityModel selectedEntity = null;
-      if (!reproductiveEntities.isEmpty() && random.nextFloat() > .05) {
+      if (!reproductiveEntities.isEmpty() && random.nextFloat() > .02) {
         selectedEntity = reproductiveEntities.get(random.nextInt(reproductiveEntities.size()));
         row = selectedEntity.getY() + positionDeltas.get(random.nextInt(positionDeltas.size()))[0];
         col = selectedEntity.getX() + positionDeltas.get(random.nextInt(positionDeltas.size()))[1];

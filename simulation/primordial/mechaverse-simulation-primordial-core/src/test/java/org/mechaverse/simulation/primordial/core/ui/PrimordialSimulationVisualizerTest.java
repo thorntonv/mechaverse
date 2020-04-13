@@ -27,8 +27,8 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes = {PrimordialSimulationConfig.class})
 public class PrimordialSimulationVisualizerTest {
 
-  private static final int RUN_TIME_SECONDS = 120;
-  private static final int FRAMES_PER_SECOND = 60;
+  private static final int RUN_TIME_SECONDS = 60*5;
+  private static final int FRAMES_PER_SECOND = 24;
 
   private static final Logger logger = LoggerFactory.getLogger(PrimordialSimulationVisualizerTest.class);
 
@@ -42,17 +42,17 @@ public class PrimordialSimulationVisualizerTest {
     PrimordialSimulationModelGenerator modelGenerator =
         new PrimordialSimulationModelGenerator(0);
     PrimordialSimulationModel model = modelGenerator.generate(new Well19937c());
-    model.setEntityMaxCountPerEnvironment(2000);
+    model.setEntityMaxCountPerEnvironment(3000);
     model.setEntityMinReproductiveAge(10);
-    model.setFoodClusterRadius(20);
-    model.setFoodMinCount(100);
+    model.setFoodClusterRadius(50);
+    model.setFoodMinCount(1000);
     model.setEntityInitialEnergy(500);
-    model.setEntityMaxEnergy(1200);
-    model.setFoodInitialEnergy(400);
+    model.setEntityMaxEnergy(1500);
+    model.setFoodInitialEnergy(300);
     simulation.setState(model);
     visualizer = new PrimordialSimulationVisualizer(
         simulation, PrimordialSimulationImageProvider.DEFAULT_CELL_SIZE,
-        FRAMES_PER_SECOND, RUN_TIME_SECONDS * FRAMES_PER_SECOND, false, null
+        FRAMES_PER_SECOND, RUN_TIME_SECONDS * FRAMES_PER_SECOND, false, "/media/thorntonv/Storage/temp/images"
     );
   }
 

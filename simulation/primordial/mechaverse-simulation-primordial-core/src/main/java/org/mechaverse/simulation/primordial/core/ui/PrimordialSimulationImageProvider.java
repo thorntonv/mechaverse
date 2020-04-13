@@ -14,7 +14,7 @@ import java.util.Map;
 @SuppressWarnings("WeakerAccess")
 public class PrimordialSimulationImageProvider implements SimulationImageProvider<PrimordialEnvironmentModel, EntityModel<EntityType>, EntityType> {
 
-    public static final int DEFAULT_CELL_SIZE = 4;
+    public static final int DEFAULT_CELL_SIZE = 5;
 
     private final int cellImageSize;
 
@@ -54,9 +54,9 @@ public class PrimordialSimulationImageProvider implements SimulationImageProvide
         switch (entityModel.getType()) {
             case ENTITY:
                 PrimordialEntityModel model = (PrimordialEntityModel) entityModel;
-                int r = (int)(model.getStrainId() & 255);
-                int g = (int)(model.getStrainId() >> 8 & 255);
-                int b = (int)(model.getStrainId() >> 16 & 255);
+              int r = (int) (model.getStrainId() & 255) % 128 + 115;
+              int g = (int) ((model.getStrainId() >> 8) & 255) % 128 + 115;
+              int b = (int) ((model.getStrainId() >> 16) & 255) % 128 + 115;
 
                 if(model.getStrainId() == 0) {
                     r = g = b = 255;
@@ -65,6 +65,7 @@ public class PrimordialSimulationImageProvider implements SimulationImageProvide
                     r = r / 2;
                     g = g / 2;
                     b = b / 2;
+                    r = g = b = 85;
                 }
                 g2d.setColor(new Color(r, g, b));
                 g2d.fillRect(1, 1, image.getWidth() - 2, image.getHeight() - 2);
@@ -74,7 +75,7 @@ public class PrimordialSimulationImageProvider implements SimulationImageProvide
                 g2d.fillRect(0, 0, image.getWidth(), image.getHeight());
                 break;
             case FOOD:
-                g2d.setColor(new Color(0, 200, 85));
+                g2d.setColor(new Color(0, 200, 45));
                 g2d.fillRect(1, 1, image.getWidth() - 2, image.getHeight() - 2);
                 break;
         }
